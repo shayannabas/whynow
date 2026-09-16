@@ -18,5 +18,9 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
       - name: Scan full history for secrets
         uses: docker://zricethezav/gitleaks:v8.24.3
+        env:
+          GIT_CONFIG_COUNT: '1'
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: /github/workspace
         with:
           args: git --redact --log-opts=--all
