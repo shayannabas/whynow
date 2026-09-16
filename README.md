@@ -1,5 +1,11 @@
 # WhyNow
 
+## Start with a company name
+
+Enter **Vercel** (or another company name) on Overview or `/onboarding` and click **Continue**. WhyNow saves the request and opens the research-results screen. With integrations disabled, it shows **Research not configured**: no facts, sources or ideal customer profile have been generated, all progress steps are not started, and approval is disabled. No website is guessed from the name. No API is called even if a key happens to exist in the environment. Repeating a waiting company request reopens it instead of making another workspace.
+
+Manual company selection is at `/onboarding/manual` and manual profile editing remains available as a fallback. The intended future main flow researches the seller automatically and asks you to review the results. This update builds the empty-state UI and persisted request, not that research engine.
+
 A prospecting engine that explains who to contact, why now, and where the proof is. Stage 1 adds public-page collection and saved evidence to the workspace foundation.
 
 ## Run locally

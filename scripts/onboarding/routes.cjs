@@ -5,6 +5,8 @@ const { resolveSeller, confirmCandidate } = require('./resolve-seller.cjs');
 const { onboardingPage } = require('./pages.cjs');
 const { profilePage } = require('./profile-page.cjs');
 const { saveManualProfile, approveManualProfile } = require('./manual-profile.cjs');
+const {requestResearch}=require('./research-request.cjs');
+const {nameEntryPage,researchPage}=require('./research-page.cjs');
 
 async function onboardingRoute({ req, res, pathname, state, mutate, env, runtimeFactory, stateFile }) {
   if (!pathname.startsWith('/onboarding')) return false;
@@ -21,8 +23,12 @@ async function onboardingRoute({ req, res, pathname, state, mutate, env, runtime
     res.writeHead(200, {'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
     res.end(profilePage(state)); return true;
   }
-  if (req.method === 'GET' && pathname === '/onboarding') { render(200); return true; }
-  if (req.method !== 'POST' || !['/onboarding/resolve', '/onboarding/confirm', '/onboarding/profile/save', '/onboarding/profile/approve'].includes(pathname)) {
+  if (req.method === 'GET' && ['/onboarding','/onboarding/results'].includes(pathname)) {
+    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
+    res.end(pathname==='/onboarding'?nameEntryPage(state):researchPage(state));return true;
+  }
+  if (req.method === 'GET' && pathname === '/onboarding/manual') { render(200); return true; }
+  if (req.method !== 'POST' || !['/onboarding/start','/onboarding/resolve', '/onboarding/confirm', '/onboarding/profile/save', '/onboarding/profile/approve'].includes(pathname)) {
     json(res, 404, { error: 'Page not found' }); return true;
   }
   if (req.headers.origin !== `http://${req.headers.host}`) { json(res, 403, { error: 'Use the local page form' }); return true; }
@@ -32,6 +38,16 @@ async function onboardingRoute({ req, res, pathname, state, mutate, env, runtime
     if (Buffer.byteLength(body) > 128 * 1024) { json(res, 413, { error: 'Form too large' }); return true; }
   }
   const form = new URLSearchParams(body);
+  if(pathname==='/onboarding/start') {
+    try {
+      await mutate(current=>requestResearch(current,form.get('name')));
+      res.writeHead(303,{Location:'/onboarding/results'});res.end();
+    } catch(error) {
+      res.writeHead(400,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
+      res.end(nameEntryPage(state,{error:error.message,name:form.get('name')}));
+    }
+    return true;
+  }
   const id = form.get('workspaceId');
   if (!state.activeWorkspaceId || id !== state.activeWorkspaceId) { json(res, 409, { error: 'Workspace changed. Refresh and try again.' }); return true; }
   const workspace = getWorkspace(state, id);
@@ -70,7 +86,7 @@ async function onboardingRoute({ req, res, pathname, state, mutate, env, runtime
         return updateWorkspace(current, id, w => { w.onboarding = { ...resolved, name: form.get('name').trim() }; });
       });
     }
-    res.writeHead(303, { Location: '/onboarding' }); res.end();
+    res.writeHead(303, { Location: '/onboarding/manual' }); res.end();
   } catch (error) { render(400, error.code ? 'Company lookup could not complete. Check the collector configuration and try again.' : error.message); }
   return true;
 }

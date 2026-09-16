@@ -1,5 +1,7 @@
 # Stage 2 initiation
 
+Current primary experience: enter a company name on Overview or `/onboarding`, then open `/onboarding/results`. Posting `/onboarding/start` creates a draft Demo workspace with a versioned research-intent record. Repeated submissions reuse a waiting request for that name. No provider is invoked, even if keys are present. Every step is not started, facts/sources are empty, ICP is absent and approval is disabled. Existing manual profiles are preserved; manual selection remains at `/onboarding/manual` as a fallback. Vercel is used as a name-only test, with no invented domain or company facts.
+
 Owner decision: AI remains disabled; the owner will choose APIs before any are enabled. No new provider dependency was added.
 
 Implemented first increment: the `/onboarding` page accepts a seller name and supplied HTTPS website, offers explicit company confirmation, and persists the selection in the active draft workspace. Search candidate resolution is testable against recorded responses using the existing Serper adapter; no search key is currently configured. Supplied URLs and search snippets remain unverified. Selecting a company does not approve a profile or activate a workspace.

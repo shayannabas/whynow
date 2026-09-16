@@ -1,0 +1,14 @@
+const {esc}=require('../utils.cjs');
+const {getWorkspace}=require('../server/state.cjs');
+const {shell}=require('../server/pages.cjs');
+
+function nameEntryPage(state,{error='',name=''}={}) {
+  return shell(state,`<span class="eyebrow">Seller onboarding · Demo mode</span><h1>Who are you selling for?</h1><p>Enter a company name. Once research is connected, WhyNow will find its public sources and draft the seller facts and ideal customer profile for your review.</p>${error?`<p role="alert">${esc(error)}</p>`:''}<section class="card"><form method="post" action="/onboarding/start"><label for="company-name">Company name</label><div class="row"><input id="company-name" name="name" required maxlength="120" placeholder="e.g. Vercel" value="${esc(name)}"><button>Continue</button></div></form><p>Research is not configured. No AI or external API will run.</p></section><details><summary>Manual fallback</summary><p>If you want to enter a profile yourself, the manual workflow is still available.</p><a href="/onboarding/manual">Choose a company manually</a></details>`,'Seller onboarding');
+}
+function researchPage(state) {
+  const w=state.activeWorkspaceId?getWorkspace(state,state.activeWorkspaceId):null;
+  if(!w?.research)return shell(state,'<h1>Research results</h1><p>No research request in this workspace.</p><a href="/onboarding">Enter a company name</a>','Research results');
+  const request=w.research;
+  return shell(state,`<span class="eyebrow">${esc(w.name)} · Demo mode</span><h1>${esc(request.companyName)}</h1><section class="card" role="status"><h2>Research not configured</h2><p>Your company name is saved. Research has not started because AI and search integrations are disabled.</p><p>No company website, facts, customers or target segments have been inferred from the name.</p></section><section class="card"><h2>Research progress</h2><p>All steps are waiting for research to be connected.</p><ol>${request.steps.map(step=>`<li style="padding:8px 0">${esc(step.label)} — <span>Not started</span></li>`).join('')}</ol></section><section class="card"><h2>Seller facts</h2><p>No facts found yet.</p><p>Product, positioning, customers and proof points will appear here with source links and uncertainty labels.</p></section><section class="card"><h2>Proposed ideal customers</h2><p>No targeting proposal yet.</p><p>You’ll review the suggested industries, company sizes and buyer roles before approving them.</p></section><section class="card"><h2>Sources and review</h2><p>No sources collected. There is no generated profile to approve.</p><button disabled>Approve profile</button></section><p><a href="/onboarding">Enter another company</a></p><details><summary>Manual fallback</summary><p>Manual entries are separate from automated research results.</p><a href="/onboarding/manual">Choose this company manually</a></details>`,'Research results');
+}
+module.exports={nameEntryPage,researchPage};
