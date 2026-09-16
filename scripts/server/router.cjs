@@ -12,6 +12,7 @@ const {getWorkspace,updateWorkspace} = require('./state.cjs');
 const {esc} = require('../utils.cjs');
 const {randomUUID} = require('node:crypto');
 const {onboardingRoute} = require('../onboarding/routes.cjs');
+const {changeArchive,workspacesPage}=require('./workspaces.cjs');
 function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options)} = {}) {
   loadState(stateFile);
   let writes = Promise.resolve();
@@ -24,6 +25,19 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
     const html = (status, body) => {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(body);};
     try {
       const pathname = new URL(req.url,'http://localhost').pathname;
+      if(['/workspaces','/workspaces/archive','/workspaces/restore'].includes(pathname) && !(req.method==='POST' && pathname==='/workspaces')) {
+        if(env.NODE_ENV==='production' || !['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress) || !/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||''))return json(res,403,{error:'Local administrator access only'});
+        if(req.method==='GET' && pathname==='/workspaces')return html(200,workspacesPage(loadState(stateFile)));
+        if(req.method!=='POST' || pathname==='/workspaces')return json(res,404,{error:'Page not found'});
+        if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>4096)return json(res,413,{error:'Form too large'});}
+        const form=new URLSearchParams(body);
+        if(!form.has('acknowledged'))return json(res,400,{error:'Confirm this workspace action first.'});
+        try {
+          await mutate(current=>changeArchive(current,form.get('id'),{restore:pathname.endsWith('/restore'),revision:form.get('revision'),profileRevision:form.get('profileRevision')}));
+        } catch {return json(res,409,{error:'Workspace changed or unavailable. Refresh and try again.'});}
+        res.writeHead(303,{Location:'/workspaces'});return res.end();
+      }
       if (pathname.startsWith('/onboarding') && await onboardingRoute({req,res,pathname,state:loadState(stateFile),mutate,env,runtimeFactory,stateFile})) return;
       if (pathname.startsWith('/collectors') || pathname.startsWith('/sources/')) {
         // Authentication arrives in Stage 10. Debug actions are local-admin only;

@@ -1,4 +1,3 @@
-const path = require('node:path');
 const { getWorkspace, updateWorkspace } = require('../server/state.cjs');
 const { json } = require('../utils.cjs');
 const { resolveSeller, confirmCandidate } = require('./resolve-seller.cjs');
@@ -17,7 +16,7 @@ async function onboardingRoute({ req, res, pathname, state, mutate, env, runtime
   }
   const render = (status, error = '') => {
     res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
-    res.end(onboardingPage(state, { searchConfigured: Boolean(env.SERPER_API_KEY), error }));
+    res.end(onboardingPage(state, { searchConfigured: false, error }));
   };
   if (req.method === 'GET' && pathname === '/onboarding/profile') {
     res.writeHead(200, {'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
@@ -72,15 +71,9 @@ async function onboardingRoute({ req, res, pathname, state, mutate, env, runtime
         return updateWorkspace(current, id, w => { w.onboarding = confirmCandidate(w.onboarding, form.get('candidateId')); });
       });
     } else {
-      const runtime = runtimeFactory({ env, cacheDir: stateFile ? path.join(path.dirname(stateFile), 'collector-cache') : undefined });
-      const previous = workspace.budgets.collector;
-      const day = new Date().toISOString().slice(0, 10);
-      if (previous?.day === day) { runtime.usage = structuredClone(previous.usage); runtime.health = structuredClone(previous.health); }
-      let resolved;
-      try { resolved = await resolveSeller({ name: form.get('name'), website: form.get('website') }, { runtime, env }); }
-      finally {
-        if (runtime.usage.serper.requests || runtime.usage.serper.cacheHits) await mutate(current => updateWorkspace(current, id, w => { w.budgets.collector = { ...runtime.snapshot(), day }; }));
-      }
+      // Owner has paused provider integration. Keys alone must not enable it,
+      // including through the manual fallback or a direct POST.
+      const resolved = await resolveSeller({ name: form.get('name'), website: form.get('website') }, { env: {} });
       await mutate(current => {
         if (current.activeWorkspaceId !== id || getWorkspace(current, id).status !== 'draft') throw new Error('Workspace changed. Refresh and try again.');
         return updateWorkspace(current, id, w => { w.onboarding = { ...resolved, name: form.get('name').trim() }; });

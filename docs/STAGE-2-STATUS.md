@@ -1,4 +1,24 @@
-# Stage 2 initiation
+# Stage 2 — In progress, not accepted
+
+Current audit (2026-09-16), checked against Implementation Plan v4 in Drive:
+
+| Requirement | Status |
+| --- | --- |
+| Name-only entry and honest waiting/results screen | Implemented and browser-checked; not automated research |
+| Candidate resolution and explicit selection | Implemented; search adapter tested offline; live search intentionally disabled |
+| Manual seller facts, receipts, ICP editing and approval | Implemented with tests; external first-party customer-source classification remains pending |
+| Workspace list, status, created/approved dates, archive | Implemented, with restore, stale-action protection and tests; page and confirmation browser-checked |
+| Background research with bounded discovery, page storage and progress | Not implemented |
+| LLM wrapper, source-only synthesis and generated-schema validation | Not implemented; provider/model and spend-cap decisions are outstanding |
+| Resolve reference configuration and three real sellers' saved-page fixtures | Not implemented; cannot substitute invented evidence |
+| Monthly re-research and approval-required diffs | Not implemented |
+| Three real names complete in under three minutes with at least 90% receipted fields | Not run; requires the research implementation and real configured providers |
+
+The owner's instruction to keep AI and API integrations disabled is still in force. Name-first and manual onboarding do not invoke providers even if keys are present. Stage 3 has not started. The remaining implementation and live acceptance are not merely a key-entry step; they still require work after provider decisions. Do not claim all offline Stage 2 work is complete.
+
+Workspace management retains all saved records when archived and hides archived workspaces from switching. Restore returns an approved profile to needs_review, clears current approval and stays in Demo mode. Lifecycle changes have audit events and stale-revision checks. Automated tests cover lifecycle, isolation, restart, origin checks, local-only access and the manual provider-disable gate. Full suite: 41 passing tests on Node 22.
+
+## Earlier implementation notes
 
 Current primary experience: enter a company name on Overview or `/onboarding`, then open `/onboarding/results`. Posting `/onboarding/start` creates a draft Demo workspace with a versioned research-intent record. Repeated submissions reuse a waiting request for that name. No provider is invoked, even if keys are present. Every step is not started, facts/sources are empty, ICP is absent and approval is disabled. Existing manual profiles are preserved; manual selection remains at `/onboarding/manual` as a fallback. Vercel is used as a name-only test, with no invented domain or company facts.
 
@@ -10,6 +30,6 @@ Manual review increment implemented: `/onboarding/profile` lets the owner edit p
 
 The ICP form supports 3–10 segments at approval, 4–8 custom search phrases per segment or deterministic strategy defaults, buyer/champion/excluded roles, signal and trigger keywords, size and disqualification patterns, and source preferences. Starting weights, SLAs and tier rules are configuration defaults, not seller facts. Every save requires review; approval requires explicit acknowledgement, marks the workspace active in Demo mode, and appends a workspace-scoped audit event. Editing an active profile removes approval. Revision checks reject stale tabs. No provider is called by this flow.
 
-Remaining Stage 2 scope: bounded background research, saved page fixtures for three real sellers, workspace archive/list, Resolve reference profile, refresh diffs, and browser acceptance. AI synthesis remains disabled by owner instruction and will require separate approval to enable a provider.
+Remaining Stage 2 scope is listed in the current audit above. AI synthesis remains disabled by owner instruction and will require separate approval to enable a provider.
 
-The manual workflow is implemented; full automated onboarding and three-seller acceptance are not complete. Browser verification is blocked by the browser connection failing to initialize. All 33 local tests passed on Node 22.
+The manual workflow is implemented; full automated onboarding and three-seller acceptance are not complete. Earlier browser connection failures were resolved for the name-first and workspace-list checks. Full manual form browser acceptance remains pending; do not infer it from passing HTTP tests.

@@ -4,7 +4,8 @@ async function workspaceAction(req, state, pathname) {
   let body=''; for await (const chunk of req) { body+=chunk; if (Buffer.byteLength(body)>4096) throw new Error('Form too large'); }
   const fields = new URLSearchParams(body);
   if (pathname === '/workspaces') return createWorkspace(state,{name:fields.get('name')});
-  const id = fields.get('id'); getWorkspace(state,id);
+  const id = fields.get('id');
+  if(getWorkspace(state,id).status==='archived')throw new Error('Restore this workspace before opening it.');
   return {...state,activeWorkspaceId:id};
 }
 module.exports = { workspaceAction };

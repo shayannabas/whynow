@@ -1,6 +1,6 @@
 # WhyNow
 
-Build only the approved stage of the WhyNow v4 implementation plan. Node 22, CommonJS, built-in HTTP; no application framework. Stage 2 is being initiated. Remote CI passed for Stages 0–1; browser verification remains pending.
+Build only the approved stage of the WhyNow v4 implementation plan. Node 22, CommonJS, built-in HTTP; no application framework. Stage 2 is in progress, not complete. See docs/STAGE-2-STATUS.md for the current acceptance checklist; do not advance to Stage 3 while Stage 2 acceptance is pending.
 
 Owner decision: keep AI disabled. Do not enable AI or add API providers until the owner explicitly chooses them. Main onboarding asks only for a company name, with Vercel as the first intended real test. Show “Research not configured” and no generated facts while providers are disabled. Manual website/profile entry is a secondary fallback. Never ask for API keys in chat.
 
