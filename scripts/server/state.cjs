@@ -61,4 +61,4 @@ function createWorkspace(state, {name}) {
   next.workspaces[id] = {schemaVersion:1, id, name:name.trim(), createdAt:nowIso(), status:'draft', deliveryMode:'demo', sellerProfile:{schemaVersion:1, deliveryAllowed:false}, icpConfig:{schemaVersion:1}, accounts:[], universeSeeds:[], runs:[], suppression:[], drafts:[], outcomes:[], budgets:{}};
   next.activeWorkspaceId = id; return next;
 }
-module.exports = { defaultState, loadState, saveState, getWorkspace, updateWorkspace, createWorkspace };
+module.exports = { defaultState, loadState, saveState, getWorkspace, updateWorkspace, createWorkspace, atomicWrite };

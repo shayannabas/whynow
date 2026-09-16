@@ -1,0 +1,85 @@
+import {it,expect,afterEach} from 'vitest';
+import {createRequire} from 'node:module';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+const require=createRequire(import.meta.url);
+const {CollectorRuntime,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress}=require('../scripts/collectors/runtime.cjs');
+const {recordSource,quoteIsGrounded,getSource}=require('../scripts/sources.cjs');
+const {defaultState}=require('../scripts/server/state.cjs');
+const {signal,stripHtml,evidenceBelongsToTarget}=require('../scripts/collectors/common.cjs');
+const {search}=require('../scripts/serper.cjs');
+const dirs=[];
+afterEach(()=>{for(const dir of dirs.splice(0))fs.rmSync(dir,{recursive:true,force:true});});
+const lookup=async()=>[{address:'93.184.215.14',family:4}];
+const response=(text,status=200,headers={})=>({status,headers:new Headers({'content-type':'text/html',...headers}),text:async()=>text});
+function harness(options={}) {
+  const cacheDir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-collector-'));dirs.push(cacheDir);
+  let time=Date.parse('2026-09-16T00:00:00Z');const calls=[],sleeps=[];
+  const runtime=new CollectorRuntime({cacheDir,lookup,env:{CRAWLER_CONTACT_EMAIL:'crawler@example.org'},now:()=>time,sleep:async ms=>{sleeps.push(ms);time+=ms;},fetch:async(url,opts)=>{calls.push({url,opts});return response(url.endsWith('/robots.txt')?'User-agent: *\nAllow: /':'<title>Example</title><p>Public evidence.</p>');},...options});
+  return {runtime,calls,sleeps,advance:ms=>{time+=ms;}};
+}
+it('refuses missing contact identity before any request',async()=>{
+  const h=harness({env:{}});await expect(h.runtime.request('seller_site','https://example.org')).rejects.toMatchObject({code:'CONTACT_REQUIRED'});expect(h.calls).toHaveLength(0);
+});
+it('rejects private, encoded, mixed DNS, credentials, non-HTTPS and reserved destinations',async()=>{
+  for(const url of ['http://example.org','https://127.1','https://2130706433','https://0x7f000001','https://[::1]','https://[::ffff:127.0.0.1]','https://169.254.169.254','https://user:pass@example.org','https://example.org:8443','https://localhost'])await expect(assertPublicHttpsUrl(url,{lookup})).rejects.toThrow();
+  await expect(assertPublicHttpsUrl('https://example.org',{lookup:async()=>[{address:'93.184.215.14',family:4},{address:'10.0.0.1',family:4}]})).rejects.toMatchObject({code:'UNSAFE_URL'});
+  expect(isPublicAddress('100.64.0.1')).toBe(false);expect(isPublicAddress('2001:db8::1')).toBe(false);
+  expect((await assertPublicHttpsUrl('https://example.org',{lookup})).addresses[0].address).toBe('93.184.215.14');
+});
+it('sends identity, pins approved addresses, caches hits and refreshes expired entries',async()=>{
+  const h=harness();const a=await h.runtime.request('seller_site','https://example.org/page');
+  expect(a.fromCache).toBe(false);expect(h.calls[1].opts.headers['User-Agent']).toBe('WhyNow/0.1 (+mailto:crawler@example.org)');
+  expect(h.calls[1].opts.addresses[0].address).toBe('93.184.215.14');
+  expect((await h.runtime.request('seller_site','https://example.org/page')).fromCache).toBe(true);expect(h.calls).toHaveLength(2);
+  h.advance(DEFAULT_BUDGETS.seller_site.ttlMs+1);await h.runtime.request('seller_site','https://example.org/page');expect(h.calls).toHaveLength(4);
+});
+it('denies robots restrictions and fails closed on robots errors',async()=>{
+  for(const robots of [response('User-agent: *\nDisallow: /private'),response('unavailable',503),response('denied',403)]){
+    let pages=0;const h=harness({fetch:async url=>url.endsWith('/robots.txt')?robots:(pages++,response('page'))});
+    await expect(h.runtime.request('seller_site','https://example.org/private')).rejects.toThrow();expect(pages).toBe(0);
+  }
+});
+it('honors robots crawl delay and permits a missing robots file',async()=>{
+  const h=harness({fetch:async url=>response(url.endsWith('/robots.txt')?'User-agent: *\nCrawl-delay: 2':'page')});
+  await h.runtime.request('seller_site','https://example.org/page');expect(h.sleeps).toContain(2000);
+  const missing=harness({fetch:async url=>url.endsWith('/robots.txt')?response('',404):response('page')});
+  expect((await missing.runtime.request('seller_site','https://example.org')).status).toBe(200);
+});
+it('enforces budgets with concurrent calls and does not charge cached pages',async()=>{
+  const h=harness({budgets:{...DEFAULT_BUDGETS,seller_site:{...DEFAULT_BUDGETS.seller_site,limit:1}}});
+  const results=await Promise.allSettled([h.runtime.request('seller_site','https://example.org/a'),h.runtime.request('seller_site','https://example.org/b')]);
+  expect(results.map(r=>r.status)).toEqual(['fulfilled','rejected']);expect(results[1].reason.code).toBe('BUDGET_EXHAUSTED');
+  await h.runtime.request('seller_site','https://example.org/a');expect(h.runtime.usage.seller_site.requests).toBe(1);
+});
+it('revalidates redirects and rejects private destinations before fetching them',async()=>{
+  const calls=[];const h=harness({fetch:async url=>{calls.push(url);return url.endsWith('/robots.txt')?response(''):response('',302,{location:'https://127.0.0.1/'});}});
+  await expect(h.runtime.request('seller_site','https://example.org/a')).rejects.toMatchObject({code:'UNSAFE_URL'});expect(calls).toHaveLength(2);
+});
+it('rejects timeouts, oversized bodies, and unsupported content',async()=>{
+  const timeout=harness({timeoutMs:10,fetch:async()=>new Promise(()=>{})});
+  await expect(timeout.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'TIMEOUT'});
+  const large=harness({fetch:async()=>response('a'.repeat(2*1024*1024+1))});await expect(large.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'TOO_LARGE'});
+  const binary=harness({fetch:async()=>response('binary',200,{'content-type':'image/png'})});await expect(binary.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'CONTENT_TYPE'});
+});
+it('retains source revisions and accepts exact whitespace-normalized quotes only',()=>{
+  const a=recordSource(defaultState(),{url:'https://example.org',fetchedAt:'2026-09-16T00:00:00Z',title:'Source',text:'The public\n page has evidence.'});
+  expect(quoteIsGrounded(a.state,a.source.id,'public page has evidence.')).toBe(true);
+  expect(quoteIsGrounded(a.state,a.source.id,'The page contains proof')).toBe(false);
+  expect(quoteIsGrounded(a.state,a.source.id,'')).toBe(false);
+  const b=recordSource(a.state,{...a.source,text:'Changed page.'});expect(Object.keys(b.state.sources)).toHaveLength(2);
+  const copy=getSource(b.state,a.source.id);copy.text='overwrite';expect(getSource(b.state,a.source.id).text).toBe(a.source.text);
+});
+it('normalizes evidence without inventing a receipt',()=>{
+  expect(signal({score:8})).toMatchObject({score:5,inferred:true,evidenceUrl:null});
+  expect(stripHtml('<script>secret()</script><p>A &amp; B</p>')).toBe('A & B');
+  expect(evidenceBelongsToTarget({name:'Example',domain:'example.org'},'https://example.org/blog')).toBe(true);
+  expect(evidenceBelongsToTarget({name:'Example',domain:'example.org'},'https://news.org','Examples are many')).toBe(false);
+});
+it('search uses the runtime and never puts API keys in cache or health',async()=>{
+  const h=harness({fetch:async()=>response('{"organic":[]} ',200,{'content-type':'application/json'})});
+  expect(await search('public company',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'}})).toEqual([]);
+  const cached=fs.readdirSync(h.runtime.cacheDir).map(f=>fs.readFileSync(path.join(h.runtime.cacheDir,f),'utf8')).join('');
+  expect(cached).not.toContain('test-secret');expect(JSON.stringify(h.runtime.snapshot())).not.toContain('test-secret');
+});

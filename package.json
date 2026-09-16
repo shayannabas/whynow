@@ -1,1 +1,1 @@
-{"name":"whynow","version":"0.1.0","private":true,"scripts":{"start":"node scripts/server.cjs","test":"vitest run","test:watch":"vitest"},"engines":{"node":"22.x"},"dependencies":{"@fontsource-variable/manrope":"^5.2.8"},"devDependencies":{"vitest":"^3.2.4"}}
+{"name":"whynow","version":"0.1.0","private":true,"scripts":{"start":"node scripts/server.cjs","test":"vitest run","test:watch":"vitest"},"engines":{"node":"22.x"},"dependencies":{"@fontsource-variable/manrope":"^5.2.8","robots-parser":"^3.0.1"},"devDependencies":{"vitest":"^3.2.4"}}
