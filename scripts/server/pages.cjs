@@ -1,0 +1,14 @@
+const { esc } = require('../utils.cjs');
+const { getWorkspace } = require('./state.cjs');
+const styles = require('./styles.cjs');
+const headScript = `document.addEventListener('click',async e=>{const a=e.target.closest('a[data-nav]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();try{const r=await fetch(a.href);if(!r.ok)throw Error();const d=new DOMParser().parseFromString(await r.text(),'text/html');document.querySelector('main').replaceWith(d.querySelector('main'));history.pushState({},'',a.href);document.querySelector('main').focus()}catch{location.href=a.href}});addEventListener('popstate',()=>location.reload());`;
+function shell(state, body, title = 'Overview') {
+  const options = Object.keys(state.workspaces).map(id => getWorkspace(state,id)).map(w => `<option value="${esc(w.id)}" ${state.activeWorkspaceId===w.id?'selected':''}>${esc(w.name)}</option>`).join('');
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} · WhyNow</title><style>${styles}</style><script>${headScript}</script></head><body><header><a class="wordmark" href="/">WhyNow<span aria-hidden="true">.</span></a><form method="post" action="/workspaces/switch"><label for="workspace">Workspace</label><div class="row"><select id="workspace" name="id" ${options?'':'disabled'}>${options || '<option>No workspaces yet</option>'}</select>${options?'<button>Switch</button>':''}</div></form></header><div class="layout"><aside aria-label="Primary navigation"><nav><a href="/" data-nav aria-current="page">Overview</a></nav></aside><main tabindex="-1">${body}</main></div></body></html>`;
+}
+function overview(state) {
+  const w = state.activeWorkspaceId ? getWorkspace(state,state.activeWorkspaceId) : null;
+  const form = `<form method="post" action="/workspaces"><label for="name">Workspace name</label><div class="row"><input id="name" name="name" required maxlength="120" placeholder="Enter a seller company name"><button>Create workspace</button></div></form>`;
+  return shell(state, `<span class="eyebrow">Your prospecting workspace</span><h1>${w?esc(w.name):'Overview'}</h1><p>Know who to contact, why now, and where the proof is.</p>${w?'<span class="badge">Demo · Draft workspace</span>':''}<section class="card"><div class="count">${w?w.accounts.length:0} accounts</div><h2>${w?'Your workspace is ready to begin':'Start with a workspace'}</h2><p>${w?'No prospects have been collected. Seller research and profile review will arrive in a later stage.':'Create a separate space for each seller. Its prospects, evidence, and drafts will stay together.'}</p>${w?`<details><summary>New workspace</summary>${form}</details>`:`<h2>New workspace</h2>${form}`}</section>`);
+}
+module.exports = { shell, overview };
