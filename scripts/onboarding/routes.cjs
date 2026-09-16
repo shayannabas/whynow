@@ -3,6 +3,8 @@ const { getWorkspace, updateWorkspace } = require('../server/state.cjs');
 const { json } = require('../utils.cjs');
 const { resolveSeller, confirmCandidate } = require('./resolve-seller.cjs');
 const { onboardingPage } = require('./pages.cjs');
+const { profilePage } = require('./profile-page.cjs');
+const { saveManualProfile, approveManualProfile } = require('./manual-profile.cjs');
 
 async function onboardingRoute({ req, res, pathname, state, mutate, env, runtimeFactory, stateFile }) {
   if (!pathname.startsWith('/onboarding')) return false;
@@ -15,20 +17,37 @@ async function onboardingRoute({ req, res, pathname, state, mutate, env, runtime
     res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end(onboardingPage(state, { searchConfigured: Boolean(env.SERPER_API_KEY), error }));
   };
+  if (req.method === 'GET' && pathname === '/onboarding/profile') {
+    res.writeHead(200, {'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
+    res.end(profilePage(state)); return true;
+  }
   if (req.method === 'GET' && pathname === '/onboarding') { render(200); return true; }
-  if (req.method !== 'POST' || !['/onboarding/resolve', '/onboarding/confirm'].includes(pathname)) {
+  if (req.method !== 'POST' || !['/onboarding/resolve', '/onboarding/confirm', '/onboarding/profile/save', '/onboarding/profile/approve'].includes(pathname)) {
     json(res, 404, { error: 'Page not found' }); return true;
   }
   if (req.headers.origin !== `http://${req.headers.host}`) { json(res, 403, { error: 'Use the local page form' }); return true; }
   let body = '';
   for await (const chunk of req) {
     body += chunk;
-    if (Buffer.byteLength(body) > 8192) { json(res, 413, { error: 'Form too large' }); return true; }
+    if (Buffer.byteLength(body) > 128 * 1024) { json(res, 413, { error: 'Form too large' }); return true; }
   }
   const form = new URLSearchParams(body);
   const id = form.get('workspaceId');
   if (!state.activeWorkspaceId || id !== state.activeWorkspaceId) { json(res, 409, { error: 'Workspace changed. Refresh and try again.' }); return true; }
   const workspace = getWorkspace(state, id);
+  if (pathname.startsWith('/onboarding/profile/')) {
+    try {
+      await mutate(current => {
+        if(current.activeWorkspaceId !== id) throw new Error('Workspace changed. Refresh and try again.');
+        return pathname.endsWith('/save') ? saveManualProfile(current,id,form) : approveManualProfile(current,id,{revision:form.get('revision'),acknowledged:form.has('acknowledged')});
+      });
+      res.writeHead(303,{Location:'/onboarding/profile'});res.end();
+    } catch(error) {
+      res.writeHead(400,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
+      res.end(profilePage(state,{error:error.message,submitted:pathname.endsWith('/save')?form:null}));
+    }
+    return true;
+  }
   if (workspace.status !== 'draft') { json(res, 409, { error: 'Only draft workspaces can change company selection' }); return true; }
   try {
     if (pathname === '/onboarding/confirm') {

@@ -40,4 +40,16 @@ Source records contain URL, fetch time, title, extracted text and a SHA-256 cont
 
 “I built the evidence pipeline before adding AI. It identifies itself to sites, follows their crawling rules, limits requests and reuses cached pages. Each saved source includes its URL, time and text fingerprint. Later, I can check that a claimed quote actually appears in that source, instead of trusting the model's wording.”
 
-The Collectors page exposes only infrastructure and one-page checks. Seller onboarding, prospect collectors and scoring have not been built.
+The Collectors page exposes only infrastructure and one-page checks. Automatic seller research, prospect collectors and scoring have not been built.
+
+## Manual seller profile (AI disabled)
+
+From Overview, choose **Set up seller**, supply a company name and website, and confirm the company. Then open **Seller profile** in the sidebar. Enter the seller description and supporting links, plus its ideal industries, size, 3–10 customer segments and buyer/champion roles. Optional sections capture proof, customers, competitors and targeting keywords. Empty optional sections stay empty.
+
+Click **Save draft for review**. Review the saved claims and source links, check the acknowledgement and click **Approve saved profile**. Approval activates the workspace in Demo mode but neither enables sending nor starts discovery. Editing an approved profile requires approval again. The server rejects outdated revision numbers to prevent a second tab overwriting newer work.
+
+A source URL alone is not verification. Only an exact quote matched to saved source text gets a matched-quote label; other claims stay unverified after approval and must be excluded from future outreach. Matching text does not prove that a quote supports the surrounding claim: the owner still reviews its meaning. Customer quote matching currently requires the seller's own domain. Adding a link does not automatically fetch it; use the existing Collectors action separately if you want to save a public source.
+
+No AI or search provider is called by manual profile editing or approval. Your existing `CRAWLER_CONTACT_EMAIL` remains solely for explicit public-page collection. No new APIs were enabled.
+
+Interview explanation: “I separated profile approval from evidence verification. A human can approve the targeting strategy, but unsupported claims stay visibly unverified. Each workspace has independent drafts, and edits invalidate approval so stale information cannot silently become approved.”
