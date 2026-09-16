@@ -11,6 +11,7 @@ const {stripHtml} = require('../collectors/common.cjs');
 const {getWorkspace,updateWorkspace} = require('./state.cjs');
 const {esc} = require('../utils.cjs');
 const {randomUUID} = require('node:crypto');
+const {onboardingRoute} = require('../onboarding/routes.cjs');
 function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options)} = {}) {
   loadState(stateFile);
   let writes = Promise.resolve();
@@ -23,6 +24,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
     const html = (status, body) => {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(body);};
     try {
       const pathname = new URL(req.url,'http://localhost').pathname;
+      if (pathname.startsWith('/onboarding') && await onboardingRoute({req,res,pathname,state:loadState(stateFile),mutate,env,runtimeFactory,stateFile})) return;
       if (pathname.startsWith('/collectors') || pathname.startsWith('/sources/')) {
         // Authentication arrives in Stage 10. Debug actions are local-admin only;
         // there is no production or remotely reachable administrator fallback.
