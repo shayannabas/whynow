@@ -40,10 +40,14 @@ function evidence(state, value, sourceUrl, quote, sellerDomain, customer=false) 
     verification:verified?'matched_saved_quote':url?'linked_unverified':'no_source',
     reason:verified?'Quote matched saved source text.':customer && url && !firstParty?'Customer claim needs the seller’s own public source.':url?'Link supplied; claim has not been verified against saved source text.':'No supporting source supplied.'};
 }
+function field(form,name,fallback='') {
+  return form.has(name)?form.get(name):fallback;
+}
 function rows(form, group, max=30) {
-  const indexes=[...new Set([...form.keys()].flatMap(key=>{const match=key.match(new RegExp(`^${group}\\.(\\d+)\\.`));return match?[Number(match[1])]:[];}))].sort((a,b)=>a-b);
+  const escaped=group.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const indexes=[...new Set([...form.keys()].flatMap(key=>{const match=key.match(new RegExp(`^${escaped}\\.(\\d+)\\.`));return match?[Number(match[1])]:[];}))].sort((a,b)=>a-b);
   if(indexes.length>max)throw new Error(`Too many ${group} entries.`);
-  return indexes.map(index=>Object.fromEntries([...form].filter(([key])=>key.startsWith(`${group}.${index}.`)).map(([key,value])=>[key.slice(`${group}.${index}.`.length),value])));
+  return indexes.map(index=>({__index:index,...Object.fromEntries([...form].filter(([key])=>key.startsWith(`${group}.${index}.`)).map(([key,value])=>[key.slice(`${group}.${index}.`.length),value]))}));
 }
 function strategyQueries(label) {
   // Search strategies, not claims about any existing company.
@@ -79,18 +83,46 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
   const segments=rows(form,'segments',10).filter(row=>text(row.label)).map(row=>{
     const label=text(row.label,100),queries=lines(row.queryTemplates,8);
     if(queries.length && queries.length<4)throw new Error('Each segment needs 4–8 search phrases, or leave them blank for basic defaults.');
-    return {key:stableId(label.toLowerCase()),label,enabled:true,subIndustries:lines(row.subIndustries),queryTemplates:queries.length?queries:strategyQueries(label),revenueSensitivityBase:3,wedgeCustomers:[],exampleTargets:[]};
+    const sensitivity=Number(row.revenueSensitivityBase||3);
+    if(!Number.isInteger(sensitivity)||sensitivity<1||sensitivity>5)throw new Error('Each segment impact sensitivity must be a whole number from 1 to 5.');
+    const exampleTargets=rows(form,`segments.${row.__index}.exampleTargets`,20).filter(target=>!target.remove).map(target=>{
+      const name=text(target.name,200),domain=text(target.domain,253).toLowerCase().replace(/^www\./,'');
+      if(!name&&!domain)return null;
+      if(!name||!domain||!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/.test(domain))throw new Error('Each example target needs a name and a domain such as company.com.');
+      const receipt=evidence(state,name,target.url,target.quote,selected.domain);
+      return {name,domain,sourceUrl:receipt.sourceUrl,sourceId:receipt.sourceId,evidenceQuote:receipt.evidenceQuote,inferred:receipt.inferred,verification:receipt.verification,reason:receipt.reason};
+    }).filter(Boolean);
+    return {key:stableId(label.toLowerCase()),label,enabled:true,subIndustries:lines(row.subIndustries),queryTemplates:queries.length?queries:strategyQueries(label),revenueSensitivityBase:sensitivity,wedgeCustomers:lines(row.wedgeCustomers,20),exampleTargets};
   });
   if(new Set(segments.map(s=>s.key)).size!==segments.length)throw new Error('Give each customer segment a different name.');
-  const definitions=Object.fromEntries(Object.keys(WEIGHTS).map(key=>[key,{label:LABELS[key],description:'Manual starting configuration; review before scoring.',evidenceKeywords:lines(form.get(`signals.${key}`)),negativeKeywords:[],preferredSources:[],rubric:{1:'No verified relevant evidence',3:'Some verified relevant evidence',5:'Strong verified relevant evidence'}}]));
+  const savedDefinitions=workspace.icpConfig?.signalDefinitions||{};
+  const definitions=Object.fromEntries(Object.keys(WEIGHTS).map(key=>{
+    const saved=savedDefinitions[key]||{},prefix=`signals.${key}`;
+    return [key,{
+      label:text(field(form,`${prefix}.label`,saved.label||LABELS[key]),100),
+      description:text(field(form,`${prefix}.description`,saved.description||'Manual starting configuration; review before scoring.'),500),
+      evidenceKeywords:lines(field(form,`${prefix}.evidenceKeywords`,field(form,prefix,saved.evidenceKeywords?.join('\n')||''))),
+      negativeKeywords:lines(field(form,`${prefix}.negativeKeywords`,saved.negativeKeywords?.join('\n')||'')),
+      preferredSources:lines(field(form,`${prefix}.preferredSources`,saved.preferredSources?.join('\n')||''),20),
+      rubric:{
+        1:text(field(form,`${prefix}.rubric.1`,saved.rubric?.[1]||'No verified relevant evidence'),300),
+        3:text(field(form,`${prefix}.rubric.3`,saved.rubric?.[3]||'Some verified relevant evidence'),300),
+        5:text(field(form,`${prefix}.rubric.5`,saved.rubric?.[5]||'Strong verified relevant evidence'),300)
+      }
+    }];
+  }));
   const floor=Number(form.get('sizeFloor')||0);
   if(!Number.isInteger(floor)||floor<0||floor>10000000)throw new Error('The minimum team size must be a whole number from 0 to 10,000,000.');
+  const savedPitch=workspace.icpConfig?.pitch||{};
+  const objectionDefaults=['Acknowledge the concern and ask a clarifying question.','Use a verified proof point only when relevant.','Offer a small next step without pressure.'];
+  const objectionTemplates=[0,1,2].map(index=>text(field(form,`objectionTemplates.${index}`,workspace.icpConfig?.objectionTemplates?.[index]||objectionDefaults[index]),500));
+  if(objectionTemplates.some(item=>!item)||new Set(objectionTemplates.map(item=>item.toLowerCase())).size!==3)throw new Error('Keep three different objection response guidelines.');
   const config={schemaVersion:1,segments,personas:{buyerTitles:lines(form.get('buyerTitles')),championTitles:lines(form.get('championTitles')),wrongOrgTitles:lines(form.get('wrongOrgTitles'))},signalDefinitions:definitions,
     triggerMapping:{pain_event:lines(form.get('painKeywords')),buying_intent:lines(form.get('buyingKeywords')),function_roles:lines(form.get('functionRoles')),tech_adoption:lines(form.get('technologies')),competitor_names:profile.competitors.map(c=>c.name)},
     killPatterns:{solvingInHouse:lines(form.get('solvingInHouse')),buildCulture:lines(form.get('buildCulture')),sizeMetric:{label:text(form.get('sizeLabel')||'employees',100),floor}},
     painSources:{statuspage:form.has('source.statuspage'),hn:form.has('source.hn'),news:form.has('source.news'),filings:form.has('source.filings')},
-    pitch:{receiptOpenerStyle:'Start with a verified prospect event.',oneSentenceProduct:profile.productOneLiner,credentialLine:'',ctaStyle:'Ask permission for a brief conversation.'},
-    objectionTemplates:['Acknowledge the concern and ask a clarifying question.','Use a verified proof point only when relevant.','Offer a small next step without pressure.'],
+    pitch:{receiptOpenerStyle:text(field(form,'pitch.receiptOpenerStyle',savedPitch.receiptOpenerStyle||'Start with a verified prospect event.'),500),oneSentenceProduct:profile.productOneLiner,credentialLine:text(field(form,'pitch.credentialLine',savedPitch.credentialLine||''),500),ctaStyle:text(field(form,'pitch.ctaStyle',savedPitch.ctaStyle||'Ask permission for a brief conversation.'),500)},
+    objectionTemplates,
     weights:{...WEIGHTS},slaDays:{...SLAS},tierRules:{tier1:{public:true,revenue:500000000,employees:2000,valuation:5000000000},tier2:{revenue:25000000,employees:150,fundingStages:['Series A','Series B','Series C','Series D','growth','PE']},tier3:{maxEmployees:149,minRaised:2000000},unclassified:'parked'},
     defaultsReviewRequired:true};
   return {profile,config};
@@ -117,7 +149,13 @@ function checkRevision(workspace,revision) {
 function saveManualProfile(state,id,form,{now=()=>new Date().toISOString()}={}) {
   const workspace=getWorkspace(state,id);checkRevision(workspace,form.get('revision'));
   const {profile,config}=draftFromForm(state,workspace,form,now);
-  return updateWorkspace(state,id,w=>{w.sellerProfile=profile;w.icpConfig=config;w.status='needs_review';w.profileRevision=(w.profileRevision||0)+1;w.deliveryMode='demo';});
+  return updateWorkspace(state,id,w=>{
+    w.sellerProfile=profile;w.icpConfig=config;w.status='needs_review';w.profileRevision=(w.profileRevision||0)+1;w.deliveryMode='demo';
+    if(w.research&&['review_required','approved'].includes(w.research.status)){
+      w.research.status='review_required';w.research.revision=(w.research.revision||0)+1;
+      w.research.steps=(w.research.steps||[]).map(step=>step.key==='review'?{...step,status:'pending'}:step);
+    }
+  });
 }
 function approveManualProfile(state,id,{revision,acknowledged=false,now=()=>new Date().toISOString()}={}) {
   const workspace=getWorkspace(state,id);checkRevision(workspace,revision);
@@ -127,6 +165,10 @@ function approveManualProfile(state,id,{revision,acknowledged=false,now=()=>new 
   const next=updateWorkspace(state,id,w=>{
     w.status='active';w.sellerProfile.approvedAt=now();w.sellerProfile.deliveryAllowed=false;
     w.icpConfig.defaultsReviewRequired=false;w.deliveryMode='demo';w.profileRevision+=1;
+    if(w.research?.status==='review_required'){
+      w.research.status='approved';w.research.revision=(w.research.revision||0)+1;w.research.completedAt=w.sellerProfile.approvedAt;
+      w.research.steps=(w.research.steps||[]).map(step=>step.key==='review'?{...step,status:'complete'}:step);
+    }
   });
   next.auditLog.push({schemaVersion:1,id:stableId(`${id}:${next.workspaces[id].profileRevision}`),workspaceId:id,type:'seller_profile_approved',occurredAt:now(),profileRevision:next.workspaces[id].profileRevision,actor:'local-admin',unverifiedClaims:profileWarnings(workspace.sellerProfile).length});
   return next;

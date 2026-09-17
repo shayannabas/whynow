@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "seller": {"name": "Shopify", "domain": "shopify.com"},
+  "capturedOn": "2026-09-17",
+  "source": {
+    "url": "https://www.shopify.com/about",
+    "title": "About Shopify",
+    "text": "Shopify is a complete commerce platform to sell online or in person—whether you're running a side hustle, retail shop, or global brand. Customize your store, manage inventory, run marketing campaigns, and analyze performance—all from a single place."
+  },
+  "receipt": "Shopify is a complete commerce platform to sell online or in person—whether you're running a side hustle, retail shop, or global brand."
+}

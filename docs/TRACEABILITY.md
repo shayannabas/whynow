@@ -1,4 +1,18 @@
-# Stage 0 traceability
+# WhyNow traceability
+
+## Stage 2 offline research core — 2026-09-17
+
+Implemented the main name-first research path in `scripts/onboarding/research.cjs`, `research-page.cjs`, `routes.cjs` and `server/router.cjs`. Serper requires an explicit switch, private key and positive persisted caps; the coordinator reserves queries before sending them, hard-limits a run to four searches/twenty pages, requires candidate confirmation, keeps only the selected seller domain, records progress and partial errors, deduplicates concurrent jobs and resumes safe in-progress work after restart. Search snippets never become claim evidence.
+
+Implemented source-only drafting in `synthesize.cjs`, `validate.cjs` and `synthesis-runner.cjs`. Input is a bounded set of saved excerpts. Output must match a strict schema. The server derives source URLs, checks exact quotes, marks unsupported general claims inferred, removes unsupported customers/competitors, counts rejected attempts against receipt coverage, rejects stale outputs and hands successful drafts to the existing editable human-review flow. OpenAI remains disabled with a zero dollar limit; no live AI call is claimed.
+
+Added a frozen, load-only Resolve AI comparison in `config/reference-profiles/resolve-ai.json`, transcribed from the friend's `resolve-gtm.cjs`, `stage3-signals.cjs` and tier rules. It contains targeting configuration but no invented seller profile. Official-page excerpt fixtures for Resolve AI, Vercel and Shopify exercise exact-receipt behavior offline. Their source URLs are `https://resolve.ai/product/overview`, `https://vercel.com/docs` and `https://www.shopify.com/about`.
+
+Added monthly refresh proposal logic and review UI in `refresh.cjs` and `profile-page.cjs`: semantic and receipt-only differences are visible, the active profile is never auto-overwritten, proposals are workspace/revision guarded, approval rechecks saved quotes, rejection preserves the current profile and history is bounded. The automatic monthly provider runner remains paused until paid OpenAI is separately approved.
+
+The final offline audit closed five gaps: refresh approval now checks every non-empty factual field against its matching evidence entry; every AI-created targeting and messaging setting is visible and editable before approval; seller-page redirects are blocked before fetching when they leave the confirmed company domain; stale tabs cannot confirm research, start drafting or approve refreshes after the active workspace changes; and Serper search is fail-closed by default for future callers. The local `.env` containing the authorized Serper key is ignored by Git and restricted to its owner with mode `0600`.
+
+Verification: 16 test files, 84 tests passed on Node 22, including local HTTP flows. Provider tests use injected recorded responses and do not contact Serper or OpenAI. On September 17, a separate owner-authorized live Vercel check used four Serper searches, confirmed `vercel.com`, saved twenty official-domain pages with zero page errors and completed in about forty seconds. The browser visibly showed the completed research state and twenty saved sources at desktop and 768-pixel widths, plus the complete editable review controls at desktop and mobile widths. Paid OpenAI stayed disabled with a zero limit, so no AI request ran. Three-seller generated-profile acceptance and publication are still pending; Stage 3 has not started.
 
 ## OpenAI foundation — 2026-09-17
 

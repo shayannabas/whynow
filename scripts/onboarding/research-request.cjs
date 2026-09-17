@@ -1,11 +1,12 @@
 const {createWorkspace,getWorkspace} = require('../server/state.cjs');
 
-// This stores intent only. Provider integration requires a later owner decision.
+// This stores intent before the fail-closed research coordinator decides whether
+// the authorized provider configuration is ready.
 function requestResearch(state,name) {
   const companyName=String(name||'').trim();
   if(!companyName || companyName.length>120)throw new Error('Enter a company name of 1–120 characters.');
   const existing=Object.keys(state.workspaces).map(id=>getWorkspace(state,id)).find(w=>
-    w.status==='draft' && w.research?.status==='not_configured' &&
+    w.status==='draft' && w.research &&
     w.research.companyName.toLowerCase()===companyName.toLowerCase());
   if(existing)return {...structuredClone(state),activeWorkspaceId:existing.id};
   const next=createWorkspace(state,{name:companyName});

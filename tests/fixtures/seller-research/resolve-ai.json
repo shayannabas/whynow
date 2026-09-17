@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "seller": {"name": "Resolve AI", "domain": "resolve.ai"},
+  "capturedOn": "2026-09-17",
+  "source": {
+    "url": "https://resolve.ai/product/overview",
+    "title": "Product overview | Resolve AI",
+    "text": "Agents for on-call, incidents, and operational tasks. Built on a platform that plugs into the production system you already operate. 60+ integrations across your code, infrastructure, telemetry, knowledge, and team tools."
+  },
+  "receipt": "Agents for on-call, incidents, and operational tasks."
+}

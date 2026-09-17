@@ -68,6 +68,26 @@ it('escapes saved claims and preserves posted edits when rendering errors',()=>{
   expect(profilePage(saved)).toContain('&lt;img');expect(profilePage(saved)).not.toContain('<img src=x');
   f.set('category','Unsaved edit');expect(profilePage(saved,{submitted:f,error:'Invalid source'})).toContain('Unsaved edit');
 });
+it('shows and saves the deeper targeting and messaging rules before approval',()=>{
+  let state=initial();const id=state.activeWorkspaceId;state=saveManualProfile(state,id,form());
+  state=recordSource(state,{url:'https://example.org/example-target',text:'Example Target',fetchedAt:'2026-09-17T00:00:00Z'}).state;
+  const f=form(1);
+  f.set('segments.0.revenueSensitivityBase','5');f.set('segments.0.wedgeCustomers','Customer One\nCustomer Two');
+  f.set('segments.0.exampleTargets.0.name','Example Target');f.set('segments.0.exampleTargets.0.domain','target.example');
+  f.set('segments.0.exampleTargets.0.url','https://example.org/example-target');f.set('segments.0.exampleTargets.0.quote','Example Target');
+  f.set('signals.techStack.label','Technical environment fit');f.set('signals.techStack.description','Review the public technical environment.');
+  f.set('signals.techStack.evidenceKeywords','Node.js\nTypeScript');f.set('signals.techStack.negativeKeywords','Legacy only');
+  f.set('signals.techStack.preferredSources','Engineering blog');f.set('signals.techStack.rubric.1','No matching environment');
+  f.set('signals.techStack.rubric.3','Some matching environment');f.set('signals.techStack.rubric.5','Strong matching environment');
+  f.set('pitch.receiptOpenerStyle','Open with one verified change.');f.set('pitch.credentialLine','Use only a verified credential.');f.set('pitch.ctaStyle','Ask for a short conversation.');
+  f.set('objectionTemplates.0','Ask what concern matters most.');
+  const saved=saveManualProfile(state,id,f),config=saved.workspaces[id].icpConfig,html=profilePage(saved);
+  expect(config.segments[0]).toMatchObject({revenueSensitivityBase:5,wedgeCustomers:['Customer One','Customer Two'],exampleTargets:[{name:'Example Target',domain:'target.example',inferred:false}]});
+  expect(config.signalDefinitions.techStack).toMatchObject({label:'Technical environment fit',description:'Review the public technical environment.',negativeKeywords:['Legacy only'],preferredSources:['Engineering blog'],rubric:{1:'No matching environment',3:'Some matching environment',5:'Strong matching environment'}});
+  expect(config.pitch).toMatchObject({receiptOpenerStyle:'Open with one verified change.',credentialLine:'Use only a verified credential.',ctaStyle:'Ask for a short conversation.'});
+  expect(config.objectionTemplates[0]).toBe('Ask what concern matters most.');
+  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Open with one verified change.','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
+});
 it('saves, reviews and approves through local HTTP; rejects forged workspace and cross-origin changes',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-manual-')),file=path.join(dir,'state.json');let server;
   try{

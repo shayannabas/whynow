@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "seller": {"name": "Vercel", "domain": "vercel.com"},
+  "capturedOn": "2026-09-17",
+  "source": {
+    "url": "https://vercel.com/docs",
+    "title": "Vercel Documentation",
+    "text": "Vercel is the AI Cloud, a unified platform for building, deploying, and scaling AI-powered applications. Ship web apps, agentic workloads, and everything in between."
+  },
+  "receipt": "Vercel is the AI Cloud, a unified platform for building, deploying, and scaling AI-powered applications."
+}

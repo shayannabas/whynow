@@ -2,11 +2,11 @@
 
 Updated: September 17, 2026. Current stage: 2 — seller onboarding.
 
-This is the working checklist, updated as work is verified. Checked means completed, not merely planned. No live provider calls have been enabled for onboarding. Latest application verification: 41 tests passed and GitHub checks green (4585a94).
+This is the working checklist, updated as work is verified. Checked means completed, not merely planned. Latest local verification: 84 tests passed across 16 files on Node 22. A bounded live Vercel research run also passed: four Serper searches, twenty official-domain pages saved, no page errors and about forty seconds from start to finish. No OpenAI request was made. The last published milestone remains `4d97335`; this Stage 2 milestone is not yet published.
 
 ## Current decision
 
-Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup, then explicitly requested that paid calls stay OFF. No spending is approved. Serper remains disabled. The OpenAI client is prepared and offline-tested, not activated or wired into automatic research. No key or billing setup is needed while paid calls remain off.
+Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup, then explicitly requested that paid calls stay OFF. No OpenAI spending is approved. On September 17 the owner approved Serper integration using a key shared by a friend with permission and asked to run WhyNow locally. Local operation avoids hosting charges, but Serper calls still consume that account's credits. The key is stored only in the ignored local `.env`; presence was verified without displaying it. The live Vercel check respected the 4-query run cap, 50-query monthly cap and 20-page research cap.
 
 Do not paste API keys into chat. Store keys in the local ignored .env file, never in this checklist or GitHub. Provider credentials and billing have not been verified.
 
@@ -19,24 +19,25 @@ Do not paste API keys into chat. Store keys in the local ignored .env file, neve
 - [x] Workspace list, archive, restore and isolation.
 - [x] Check current provider requirements and public pricing.
 - [x] Choose OpenAI first and match the friend's default profile-parser model: gpt-4o-mini.
-- [ ] Confirm and configure Serper separately.
-- [ ] Agree spending limit and live-test allowance.
-- [ ] User creates/opens provider accounts and configures billing as needed.
-- [ ] Store Serper and OpenAI keys privately; verify presence without displaying them.
+- [x] Confirm Serper, store the authorized key privately and enforce explicit local-first caps.
+- [ ] Agree OpenAI spending limit and live-test allowance; paid OpenAI stays off.
+- [x] Store the authorized Serper key privately and verify presence without displaying it.
+- [ ] OpenAI account/key/billing setup remains deferred while paid calls are off.
 - [x] Implement the OpenAI enable switch (off by default), persistent conservative spending reservations and per-workspace request caps. A key alone does not enable calls.
-- [ ] Connect name search and candidate confirmation to the main flow.
-- [ ] Build bounded background research: discover public pages, respect robots, save sources, show progress, handle errors/restarts.
+- [x] Connect name search and candidate confirmation to the main flow.
+- [x] Build bounded background research: discover public pages, respect robots, save sources, show progress, handle errors/restarts.
 - [x] Implement and offline-test AI wrapper: strict structured output, one bounded transient-error retry, timeout, caching and safe error messages.
 - [ ] Activate and verify the OpenAI connection only after the owner changes the paid-off decision, supplies their own key privately and approves a cap.
-- [ ] Generate seller facts and ideal-customer proposals from collected excerpts only.
-- [ ] Validate every factual field; reject unsupported customers and flag uncertainty.
-- [ ] Connect generated results to editing and human approval.
-- [ ] Add the original Resolve reference configuration without making it the default seller.
-- [ ] Add genuine saved-page fixtures for Resolve AI and two unrelated sellers; document the reference comparison.
-- [ ] Add monthly refresh proposals, visible differences and fresh approval.
-- [ ] Pass offline tests, including hallucinated claims, stale results, budget exhaustion and cross-workspace isolation.
-- [ ] Browser-check the complete manual and generated-review workflows.
-- [ ] Run Vercel live after configuration and spending approval; do not claim researched facts beforehand.
+- [x] Generate seller facts and ideal-customer proposals from collected excerpts only; live generation stays gated while paid OpenAI is off.
+- [x] Validate every factual field; reject unsupported customers and competitors, count them against receipt coverage, and flag uncertainty.
+- [x] Connect generated results to editing and human approval behind the disabled-by-default OpenAI gate.
+- [x] Add the original Resolve reference configuration without making it the default seller.
+- [x] Add genuine official-page excerpt fixtures for Resolve AI, Vercel and Shopify; document the reference comparison.
+- [x] Add monthly refresh proposals, receipt-aware visible differences, grounding recheck and fresh approval. Automatic collection/drafting remains paused with OpenAI off.
+- [x] Pass 84 offline tests, including hallucinated claims, refresh receipt gaps, off-domain redirects, stale tabs/results, budget exhaustion, restarts and cross-workspace isolation.
+- [x] Browser-check the real Vercel candidate/evidence result at desktop and 768-pixel widths.
+- [ ] Browser-check the complete manual and generated-review workflows. Generated review remains gated while paid OpenAI is off.
+- [x] Run Vercel's live Serper identity/evidence check: four searches, twenty saved `vercel.com` pages, zero page errors, about forty seconds.
 - [ ] Pass three-seller acceptance: under 3 minutes each and at least 90% receipted fields, with human approval.
 - [ ] Update traceability, publish verified changes and confirm GitHub checks.
 - [ ] Mark Stage 2 complete; only then begin Stage 3.

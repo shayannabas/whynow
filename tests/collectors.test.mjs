@@ -57,6 +57,11 @@ it('revalidates redirects and rejects private destinations before fetching them'
   const calls=[];const h=harness({fetch:async url=>{calls.push(url);return url.endsWith('/robots.txt')?response(''):response('',302,{location:'https://127.0.0.1/'});}});
   await expect(h.runtime.request('seller_site','https://example.org/a')).rejects.toMatchObject({code:'UNSAFE_URL'});expect(calls).toHaveLength(2);
 });
+it('blocks a seller-page redirect outside the confirmed company domain before fetching it',async()=>{
+  const calls=[];const h=harness({fetch:async url=>{calls.push(url);return url.endsWith('/robots.txt')?response(''):response('',302,{location:'https://other.org/landing'});}});
+  await expect(h.runtime.request('seller_site','https://example.org/a',{allowedRedirectDomain:'example.org'})).rejects.toMatchObject({code:'REDIRECT_BLOCKED'});
+  expect(calls).toEqual(['https://example.org/robots.txt','https://example.org/a']);
+});
 it('rejects timeouts, oversized bodies, and unsupported content',async()=>{
   const timeout=harness({timeoutMs:10,fetch:async()=>new Promise(()=>{})});
   await expect(timeout.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'TIMEOUT'});
@@ -79,7 +84,7 @@ it('normalizes evidence without inventing a receipt',()=>{
 });
 it('search uses the runtime and never puts API keys in cache or health',async()=>{
   const h=harness({fetch:async()=>response('{"organic":[]} ',200,{'content-type':'application/json'})});
-  expect(await search('public company',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'}})).toEqual([]);
+  expect(await search('public company',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'},enforceEnabled:false})).toEqual([]);
   const cached=fs.readdirSync(h.runtime.cacheDir).map(f=>fs.readFileSync(path.join(h.runtime.cacheDir,f),'utf8')).join('');
   expect(cached).not.toContain('test-secret');expect(JSON.stringify(h.runtime.snapshot())).not.toContain('test-secret');
 });

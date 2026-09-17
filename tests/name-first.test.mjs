@@ -13,7 +13,7 @@ it('Vercel creates only research intent, with no fabricated facts or approval',(
   const state=requestResearch(defaultState(),'Vercel'),w=state.workspaces[state.activeWorkspaceId];
   expect(w.status).toBe('draft');expect(w.research).toMatchObject({status:'not_configured',companyName:'Vercel',facts:[],sources:[],icp:null});
   expect(w.sellerProfile.approvedAt).toBeUndefined();expect(w.onboarding).toBeUndefined();
-  expect(researchPage(state)).toContain('Research not configured');expect(researchPage(state)).toContain('<button disabled>Approve profile</button>');
+  expect(researchPage(state)).toContain('Research request saved');expect(researchPage(state)).toContain('Nothing can be approved');
   expect(researchPage(state)).not.toContain('vercel.com');
   expect(w.research.steps.every(s=>s.status==='not_started')).toBe(true);
 });
@@ -44,7 +44,7 @@ it('name-only HTTP flow needs no provider, survives restart, rejects cross-origi
     const approval=await fetch(base+'/onboarding/profile/approve',{method:'POST',headers:{Origin:base},body:new URLSearchParams({workspaceId:id,revision:'0',acknowledged:'on'})});
     expect(approval.status).toBe(400);expect(loadState(stateFile).workspaces[id].status).toBe('draft');
     await stop();base=await start();
-    const html=await(await fetch(base+'/onboarding/results')).text();expect(html).toContain('Vercel');expect(html).toContain('No facts found yet.');
+    const html=await(await fetch(base+'/onboarding/results')).text();expect(html).toContain('Vercel');expect(html).toContain('Serper setup needed');expect(html).toContain('No readable pages have been saved yet.');
     expect((await fetch(base+'/onboarding/manual')).status).toBe(200);
   }finally{if(server?.listening)await stop();fs.rmSync(dir,{recursive:true,force:true});}
 });

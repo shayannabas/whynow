@@ -64,6 +64,12 @@ function publicFetch(url,{addresses,method='GET',headers={},body,signal,maxBytes
     req.on('error',reject);if(body)req.write(body);req.end();
   });
 }
+function redirectStaysInDomain(value,domain) {
+  const allowed=String(domain||'').trim().toLowerCase().replace(/^www\./,'').replace(/\.$/,'');
+  if(!allowed||!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/.test(allowed))return false;
+  let host;try{host=new URL(value).hostname.toLowerCase().replace(/^www\./,'').replace(/\.$/,'');}catch{return false;}
+  return host===allowed||host.endsWith(`.${allowed}`);
+}
 
 class CollectorRuntime {
   constructor({env=process.env,now=Date.now,fetch=publicFetch,lookup=dns.lookup.bind(dns),sleep=ms=>new Promise(r=>setTimeout(r,ms)),cacheDir=path.resolve(__dirname,'../../.whynow/collector-cache'),budgets=DEFAULT_BUDGETS,timeoutMs=8000}={}) {
@@ -97,10 +103,11 @@ class CollectorRuntime {
     if(depth>3)throw new CollectorHttpError('REDIRECT_LIMIT','Too many redirects');
     const checked=await assertPublicHttpsUrl(value,{lookup:this.lookup});
     const {url}=checked;
+    if(options.allowedRedirectDomain&&!redirectStaysInDomain(url.href,options.allowedRedirectDomain))throw new CollectorHttpError('REDIRECT_BLOCKED','The request left the approved company domain');
     let crawlDelay=0;
     if(source!=='robots' && source!=='serper') {
       const robotsUrl=new URL('/robots.txt',url).href;
-      const response=await this.request('robots',robotsUrl);
+      const response=await this.request('robots',robotsUrl,options.allowedRedirectDomain?{allowedRedirectDomain:options.allowedRedirectDomain}:{});
       const rules=robotsParser(robotsUrl,response.status===404?'':response.text);
       if(rules.isAllowed(url.href,this.identity())===false)throw new CollectorHttpError('ROBOTS_DISALLOWED','This site disallows crawling this page');
       crawlDelay=(rules.getCrawlDelay(this.identity())||0)*1000;
@@ -131,7 +138,9 @@ class CollectorRuntime {
         if(source==='serper')throw new CollectorHttpError('REDIRECT_BLOCKED','Search API redirects are not allowed');
         const location=response.headers.get('location');
         if(!location)throw new CollectorHttpError('BAD_REDIRECT','Redirect has no destination');
-        return this.perform(source,new URL(location,url).href,options,depth+1);
+        const destination=new URL(location,url).href;
+        if(options.allowedRedirectDomain&&!redirectStaysInDomain(destination,options.allowedRedirectDomain))throw new CollectorHttpError('REDIRECT_BLOCKED','The request tried to redirect away from the approved company domain');
+        return this.perform(source,destination,options,depth+1);
       }
       if(!(response.status>=200 && response.status<300) && !(source==='robots' && response.status===404))throw new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);
       if(Buffer.byteLength(response.text)>2*1024*1024)throw new CollectorHttpError('TOO_LARGE','Page exceeds the 2 MB limit');
@@ -142,4 +151,4 @@ class CollectorRuntime {
     } finally {clearTimeout(timer);}
   }
 }
-module.exports={CollectorRuntime,CollectorHttpError,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress};
+module.exports={CollectorRuntime,CollectorHttpError,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress,redirectStaysInDomain};

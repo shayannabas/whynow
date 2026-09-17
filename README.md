@@ -1,10 +1,14 @@
 # WhyNow
 
+WhyNow runs locally by default on `127.0.0.1`. This avoids hosting charges during development. External provider use is separate: Serper searches consume provider credits, and OpenAI requests are usage-billed. Both integrations are fail-closed behind environment switches and persisted caps; OpenAI paid calls remain disabled.
+
 ## Start with a company name
 
-Enter **Vercel** (or another company name) on Overview or `/onboarding` and click **Continue**. WhyNow saves the request and opens the research-results screen. With integrations disabled, it shows **Research not configured**: no facts, sources or ideal customer profile have been generated, all progress steps are not started, and approval is disabled. No website is guessed from the name. No API is called even if a key happens to exist in the environment. Repeating a waiting company request reopens it instead of making another workspace.
+Enter **Vercel** (or another company name) on Overview or `/onboarding` and click **Continue**. When Serper is explicitly enabled, WhyNow finds up to five possible official websites and pauses for you to choose the right company. It then uses no more than four Serper searches and twenty same-domain public pages in one run. Search snippets guide discovery but never count as evidence.
 
-Manual company selection is at `/onboarding/manual` and manual profile editing remains available as a fallback. The intended future main flow researches the seller automatically and asks you to review the results. This update builds the empty-state UI and persisted request, not that research engine.
+The results screen follows the background job and links every saved page. With paid OpenAI disabled, the flow stops honestly at **Evidence is ready**. No seller facts, customers or ideal-customer claims are invented. Manual company selection remains available at `/onboarding/manual`.
+
+To enable only Serper, put the authorized key after `SERPER_API_KEY=` in the ignored local `.env` file, keep `SERPER_ENABLED=true`, and restart the app. The default local limits are four queries per run, fifty per month across saved workspaces, and twenty pages per run. A key alone is insufficient: the enable switch and positive caps are all required. Never put a key in chat, a form, documentation or GitHub.
 
 A prospecting engine that explains who to contact, why now, and where the proof is. Stage 1 adds public-page collection and saved evidence to the workspace foundation.
 
@@ -46,7 +50,19 @@ Source records contain URL, fetch time, title, extracted text and a SHA-256 cont
 
 “I built the evidence pipeline before adding AI. It identifies itself to sites, follows their crawling rules, limits requests and reuses cached pages. Each saved source includes its URL, time and text fingerprint. Later, I can check that a claimed quote actually appears in that source, instead of trusting the model's wording.”
 
-The Collectors page exposes only infrastructure and one-page checks. Automatic seller research, prospect collectors and scoring have not been built.
+The Collectors page remains a one-page infrastructure check. Stage 2 seller research uses that guarded runtime; prospect-signal collectors and scoring belong to later stages and have not started.
+
+## Stage 2: seller research and review
+
+Stage 2 now has an offline-tested research path. A persistent background coordinator reserves each Serper query before it is sent, survives restarts, prevents duplicate jobs, keeps workspaces isolated and stores partial page failures. The public-page runtime still checks DNS, robots rules, redirects, response sizes and daily limits. Only pages on the confirmed seller domain enter the synthesis evidence set.
+
+The source-only synthesis layer is connected behind the existing OpenAI switch. It sends bounded saved excerpts, requires strict structured output, derives URLs on the server, checks exact quotes locally and drops unsupported customer or competitor claims. Generated profiles always enter `needs_review` in Demo mode. Approval is a separate human action; editing invalidates the old approval.
+
+Paid OpenAI remains intentionally off. Setting an API key alone cannot make a request: the enable switch, dollar limit and per-workspace request limit must also be positive. Until the owner separately approves those settings, the app displays collected evidence and offers the manual fallback.
+
+The original Resolve AI targeting configuration from the reference repository is stored as a frozen, load-only comparison—it is never silently used as another seller's profile. Offline official-page fixtures cover Resolve AI, Vercel and Shopify. Monthly refresh logic creates a visible, stale-safe diff and keeps the approved profile unchanged until a human approves grounded receipts; automatic refresh collection/drafting remains paused with OpenAI off.
+
+Interview explanation: “I split discovery, evidence and judgment into separate gates. Search proposes an identity, I confirm it, the crawler saves permitted pages, and the model can only cite those saved excerpts. The server checks every quote again and a human approves the draft. I also reserve usage before provider calls, so a crash cannot quietly bypass the cost cap.”
 
 ## Manual seller profile (AI disabled)
 

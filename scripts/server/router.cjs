@@ -12,8 +12,11 @@ const {getWorkspace,updateWorkspace} = require('./state.cjs');
 const {esc} = require('../utils.cjs');
 const {randomUUID} = require('node:crypto');
 const {onboardingRoute} = require('../onboarding/routes.cjs');
+const {createResearchCoordinator}=require('../onboarding/research.cjs');
+const {createSynthesisCoordinator}=require('../onboarding/synthesis-runner.cjs');
+const {createLlm}=require('../llm.cjs');
 const {changeArchive,workspacesPage}=require('./workspaces.cjs');
-function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options)} = {}) {
+function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,llm:providedLlm} = {}) {
   loadState(stateFile);
   let writes = Promise.resolve();
   const jobs=new Map();
@@ -21,6 +24,15 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
     const work=writes.then(()=>{const next=fn(loadState(stateFile));saveState(next,stateFile);return next;});
     writes=work.catch(()=>{});return work;
   };
+  const read=()=>loadState(stateFile);
+  const cacheDir=stateFile?path.join(path.dirname(stateFile),'collector-cache'):undefined;
+  const guardedRuntimeFactory=options=>runtimeFactory({...options,cacheDir});
+  const researchCoordinator=providedResearch||createResearchCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
+  const llm=providedLlm||createLlm({read,mutate,env});
+  const synthesisCoordinator=providedSynthesis||createSynthesisCoordinator({read,mutate,llm});
+  // Persisted interrupted research can resume after a local restart. Errors are
+  // saved in the workspace and never crash the HTTP server.
+  if(typeof researchCoordinator.resumePending==='function')void researchCoordinator.resumePending().catch(()=>{});
   return async (req,res) => {
     const html = (status, body) => {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(body);};
     try {
@@ -38,7 +50,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         } catch {return json(res,409,{error:'Workspace changed or unavailable. Refresh and try again.'});}
         res.writeHead(303,{Location:'/workspaces'});return res.end();
       }
-      if (pathname.startsWith('/onboarding') && await onboardingRoute({req,res,pathname,state:loadState(stateFile),mutate,env,runtimeFactory,stateFile})) return;
+      if (pathname.startsWith('/onboarding') && await onboardingRoute({req,res,pathname,state:loadState(stateFile),mutate,env,researchCoordinator,synthesisCoordinator})) return;
       if (pathname.startsWith('/collectors') || pathname.startsWith('/sources/')) {
         // Authentication arrives in Stage 10. Debug actions are local-admin only;
         // there is no production or remotely reachable administrator fallback.

@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "referenceProfileVersion": "resolve-ai-v1",
+  "id": "resolve-ai",
+  "kind": "load_only_reference",
+  "loadOnly": true,
+  "seller": {
+    "name": "Resolve AI",
+    "domain": "resolve.ai",
+    "website": "https://resolve.ai"
+  },
+  "provenance": {
+    "sourceProject": "flowfire",
+    "sourceModules": [
+      "scripts/resolve-gtm.cjs",
+      "scripts/stage3-signals.cjs",
+      "scripts/tiering.cjs"
+    ],
+    "customerSourceUrl": "https://resolve.ai/customers",
+    "customerEvidenceStatus": "requires_live_research",
+    "referenceCustomerNames": [
+      "Coinbase",
+      "DoorDash",
+      "Salesforce",
+      "Snowflake",
+      "Zscaler",
+      "MongoDB",
+      "Expedia Group",
+      "Toast",
+      "Eventbrite",
+      "Pinecone",
+      "MSCI",
+      "Guidewire",
+      "Gametime",
+      "Upwind",
+      "Fireworks",
+      "Blueground"
+    ]
+  },
+  "icpConfig": {
+    "schemaVersion": 1,
+    "segments": [
+      {
+        "key": "crypto_fintech",
+        "label": "Crypto / fintech exchanges & brokers",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" cryptocurrency exchange",
+          "\"incident\" fintech trading platform",
+          "\"site reliability engineer\" exchange Kubernetes",
+          "\"incident management\" fintech hiring"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": ["Coinbase", "MSCI"],
+        "exampleTargets": []
+      },
+      {
+        "key": "delivery_marketplaces",
+        "label": "Delivery / real-time marketplaces",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" delivery marketplace",
+          "\"site reliability\" real-time marketplace",
+          "\"incident management\" delivery platform",
+          "\"Kubernetes\" marketplace engineering"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": ["DoorDash"],
+        "exampleTargets": []
+      },
+      {
+        "key": "ticketing_live_events",
+        "label": "Ticketing / live events",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" ticketing platform",
+          "\"down\" ticket sales platform",
+          "\"site reliability engineer\" ticketing",
+          "\"incident management\" live events platform"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": ["Gametime", "Eventbrite"],
+        "exampleTargets": []
+      },
+      {
+        "key": "sports_betting",
+        "label": "Sports betting / iGaming",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" sportsbook",
+          "\"down\" sports betting app",
+          "\"performance and chaos\" betting engineering",
+          "\"incident management\" sportsbook hiring"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": ["Coinbase"],
+        "exampleTargets": []
+      },
+      {
+        "key": "data_ai_infrastructure",
+        "label": "Data / AI infrastructure",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" AI infrastructure",
+          "\"incident\" data platform",
+          "\"site reliability engineer\" AI platform Kubernetes",
+          "\"observability\" data infrastructure hiring"
+        ],
+        "revenueSensitivityBase": 4,
+        "wedgeCustomers": ["Snowflake", "MongoDB", "Pinecone", "Fireworks"],
+        "exampleTargets": []
+      },
+      {
+        "key": "cybersecurity",
+        "label": "Cybersecurity platforms",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" cybersecurity platform",
+          "\"incident\" security cloud service",
+          "\"site reliability engineer\" cybersecurity Kubernetes",
+          "\"observability\" security platform hiring"
+        ],
+        "revenueSensitivityBase": 4,
+        "wedgeCustomers": ["Zscaler", "Upwind"],
+        "exampleTargets": []
+      },
+      {
+        "key": "travel_hospitality",
+        "label": "Travel / hospitality",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" travel booking platform",
+          "\"incident\" hospitality marketplace",
+          "\"site reliability engineer\" travel platform",
+          "\"incident management\" booking platform hiring"
+        ],
+        "revenueSensitivityBase": 4,
+        "wedgeCustomers": ["Expedia Group", "Blueground"],
+        "exampleTargets": []
+      },
+      {
+        "key": "restaurant_commerce_saas",
+        "label": "Restaurant / commerce SaaS",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" restaurant software platform",
+          "\"incident\" commerce SaaS",
+          "\"site reliability engineer\" restaurant technology",
+          "\"observability\" commerce platform hiring"
+        ],
+        "revenueSensitivityBase": 4,
+        "wedgeCustomers": ["Toast"],
+        "exampleTargets": []
+      },
+      {
+        "key": "insurance_vertical_saas",
+        "label": "Insurance / vertical enterprise SaaS",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" insurance software platform",
+          "\"incident\" vertical SaaS",
+          "\"site reliability engineer\" insurance technology",
+          "\"observability\" insurance platform hiring"
+        ],
+        "revenueSensitivityBase": 3,
+        "wedgeCustomers": ["Guidewire"],
+        "exampleTargets": []
+      },
+      {
+        "key": "enterprise_platforms",
+        "label": "Enterprise platforms",
+        "enabled": true,
+        "subIndustries": [],
+        "queryTemplates": [
+          "\"outage\" enterprise software platform",
+          "\"incident\" enterprise SaaS",
+          "\"site reliability engineer\" enterprise platform",
+          "\"observability\" enterprise software hiring"
+        ],
+        "revenueSensitivityBase": 3,
+        "wedgeCustomers": ["Salesforce"],
+        "exampleTargets": []
+      }
+    ],
+    "personas": {
+      "buyerTitles": ["CTO", "SVP Engineering", "VP Engineering"],
+      "championTitles": [
+        "Head of SRE",
+        "Director of SRE",
+        "Head of Platform Engineering",
+        "Director of Incident Management",
+        "Director of Performance Engineering",
+        "Director of Chaos Engineering"
+      ],
+      "wrongOrgTitles": []
+    },
+    "signalDefinitions": {
+      "techStack": {"label": "Tech Stack", "description": "", "evidenceKeywords": [], "negativeKeywords": [], "preferredSources": [], "rubric": {}},
+      "revenueSensitivity": {"label": "Revenue Sensitivity", "description": "", "evidenceKeywords": [], "negativeKeywords": [], "preferredSources": [], "rubric": {}},
+      "observabilityScale": {"label": "Observability Scale", "description": "", "evidenceKeywords": [], "negativeKeywords": [], "preferredSources": [], "rubric": {}},
+      "activePain": {"label": "Active Pain", "description": "", "evidenceKeywords": [], "negativeKeywords": [], "preferredSources": [], "rubric": {}},
+      "aiCompatibility": {"label": "AI Compatibility", "description": "", "evidenceKeywords": [], "negativeKeywords": [], "preferredSources": [], "rubric": {}},
+      "competitiveWedge": {"label": "Competitive Wedge", "description": "", "evidenceKeywords": [], "negativeKeywords": [], "preferredSources": [], "rubric": {}}
+    },
+    "triggerMapping": {
+      "pain_event": [
+        "outage",
+        "incident",
+        "downtime",
+        "degraded",
+        "service disruption",
+        "root cause",
+        "on-call",
+        "site reliability",
+        "sre",
+        "observability",
+        "kubernetes",
+        "microservices",
+        "datadog",
+        "grafana",
+        "pagerduty",
+        "opentelemetry",
+        "prometheus",
+        "splunk",
+        "chaos engineering",
+        "production engineering"
+      ],
+      "buying_intent": ["ai_rca_hiring"],
+      "function_roles": ["reliability_hiring"],
+      "tech_adoption": ["otel_adoption"],
+      "competitor_names": []
+    },
+    "killPatterns": {
+      "solvingInHouse": [],
+      "buildCulture": [],
+      "sizeMetric": {"label": "minEngineeringHeadcount", "floor": 200}
+    },
+    "painSources": {"statuspage": false, "hn": false, "news": false, "filings": false},
+    "pitch": {"receiptOpenerStyle": "", "oneSentenceProduct": "", "credentialLine": "", "ctaStyle": ""},
+    "objectionTemplates": [],
+    "weights": {
+      "techStack": 1.3,
+      "activePain": 1.2,
+      "revenueSensitivity": 1.1,
+      "observabilityScale": 1,
+      "aiCompatibility": 0.9,
+      "competitiveWedge": 0.8
+    },
+    "slaDays": {
+      "default": 90,
+      "form_d_filing": 14,
+      "outage": 30,
+      "exec_change": 30,
+      "hiring_surge": 45,
+      "first_infra_hire": 45,
+      "headcount_surge": 45,
+      "otel_adoption": 90,
+      "otel_contributor": 180,
+      "risk_factor_added": 120,
+      "conference_talk": 120,
+      "public_postmortem": 30,
+      "reliability_hiring": 90,
+      "ai_rca_hiring": 60,
+      "funding": 30
+    },
+    "tierRules": {
+      "tier1": {"revenue": 500000000, "employees": 2000, "valuation": 5000000000},
+      "tier2": {"revenue": 25000000, "employees": 150, "fundingStages": ["series a", "series b", "series c", "series d", "growth", "private equity"]},
+      "tier3": {"maxEmployees": 149, "minimumRaised": 2000000}
+    }
+  }
+}
