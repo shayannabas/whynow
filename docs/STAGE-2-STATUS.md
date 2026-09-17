@@ -20,6 +20,7 @@ Updated September 17, 2026 against Implementation Plan v4 and PRD v4.
 1. Separately decide whether to enable paid OpenAI with the owner's own key and explicit dollar/request limits. A key alone must never enable it.
 2. If approved, browser-check generated profile editing and review, then run Resolve AI, Vercel and Shopify end to end in under three minutes each and verify at least 90% of attempted factual claims have matched receipts.
 3. Activate and verify the monthly collection/drafting runner only after the same paid-provider decision.
-4. Publish this verified milestone and confirm GitHub checks.
+
+The bounded research milestone is published at `349d6ac`, and its GitHub tests, production dependency audit and full-history secret scan passed.
 
 Stage 3 has not started. Running locally avoids hosting fees, not provider usage: Serper consumes search credits and OpenAI is usage-billed.

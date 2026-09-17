@@ -2,7 +2,7 @@
 
 Updated: September 17, 2026. Current stage: 2 — seller onboarding.
 
-This is the working checklist, updated as work is verified. Checked means completed, not merely planned. Latest local verification: 84 tests passed across 16 files on Node 22. A bounded live Vercel research run also passed: four Serper searches, twenty official-domain pages saved, no page errors and about forty seconds from start to finish. No OpenAI request was made. The last published milestone remains `4d97335`; this Stage 2 milestone is not yet published.
+This is the working checklist, updated as work is verified. Checked means completed, not merely planned. Latest local verification: 84 tests passed across 16 files on Node 22. A bounded live Vercel research run also passed: four Serper searches, twenty official-domain pages saved, no page errors and about forty seconds from start to finish. No OpenAI request was made. The Stage 2 research milestone is published at `349d6ac`; GitHub tests, production audit and full-history secret scan passed.
 
 ## Current decision
 
@@ -39,7 +39,7 @@ Do not paste API keys into chat. Store keys in the local ignored .env file, neve
 - [ ] Browser-check the complete manual and generated-review workflows. Generated review remains gated while paid OpenAI is off.
 - [x] Run Vercel's live Serper identity/evidence check: four searches, twenty saved `vercel.com` pages, zero page errors, about forty seconds.
 - [ ] Pass three-seller acceptance: under 3 minutes each and at least 90% receipted fields, with human approval.
-- [ ] Update traceability, publish verified changes and confirm GitHub checks.
+- [x] Update traceability, publish verified changes and confirm GitHub tests, production audit and full-history secret scan.
 - [ ] Mark Stage 2 complete; only then begin Stage 3.
 
 ## Provider reference
