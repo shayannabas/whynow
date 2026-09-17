@@ -9,12 +9,12 @@ Current audit (2026-09-16), checked against Implementation Plan v4 in Drive:
 | Manual seller facts, receipts, ICP editing and approval | Implemented with tests; external first-party customer-source classification remains pending |
 | Workspace list, status, created/approved dates, archive | Implemented, with restore, stale-action protection and tests; page and confirmation browser-checked |
 | Background research with bounded discovery, page storage and progress | Not implemented |
-| LLM wrapper, source-only synthesis and generated-schema validation | Not implemented; provider/model and spend-cap decisions are outstanding |
+| LLM wrapper, source-only synthesis and generated-schema validation | GPT-4o mini wrapper implemented and offline-tested with strict output, caching and fail-closed budgets; synthesis and field-level grounding remain pending; paid calls stay off |
 | Resolve reference configuration and three real sellers' saved-page fixtures | Not implemented; cannot substitute invented evidence |
 | Monthly re-research and approval-required diffs | Not implemented |
 | Three real names complete in under three minutes with at least 90% receipted fields | Not run; requires the research implementation and real configured providers |
 
-The owner's instruction to keep AI and API integrations disabled is still in force. Name-first and manual onboarding do not invoke providers even if keys are present. Stage 3 has not started. The remaining implementation and live acceptance are not merely a key-entry step; they still require work after provider decisions. Do not claim all offline Stage 2 work is complete.
+OpenAI paid calls remain disabled by owner instruction. On September 17 the owner authorized local-first Serper integration using a key shared with permission, but the key is not yet stored locally and no Serper call has run. Name-first and manual onboarding do not invoke providers merely because keys are present. Stage 3 has not started. Do not claim all offline Stage 2 work is complete.
 
 Workspace management retains all saved records when archived and hides archived workspaces from switching. Restore returns an approved profile to needs_review, clears current approval and stays in Demo mode. Lifecycle changes have audit events and stale-revision checks. Automated tests cover lifecycle, isolation, restart, origin checks, local-only access and the manual provider-disable gate. Full suite: 41 passing tests on Node 22.
 
