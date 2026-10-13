@@ -1,5 +1,17 @@
 # WhyNow traceability
 
+## Stage 2 local completion — 2026-10-13
+
+Closed the remaining local Stage 2 implementation gaps. Seller research now expands its bounded plan from relevant homepage and sitemap links and may accept seller-tied results from the allowlisted Greenhouse, Lever, Ashby and SEC/EDGAR hosts. Redirects must remain on the approved seller or external host. The results screen shows bounded progress events without exposing provider credentials or treating search snippets as evidence.
+
+Completed the editable review surface for all generated targeting settings: segment enablement, six scoring weights, signal definitions and rubrics, source preferences, timing windows, tier rules, messaging guidance and the one-sentence pitch. Numeric and enum values are bounded on the server. Saving creates a new review revision; approval still requires an explicit acknowledgement and keeps delivery disabled in Demo mode.
+
+Added `refresh-runner.cjs`, the persistent monthly coordinator. A due approved seller is copied into a hidden system workspace, the existing bounded research and source-only synthesis pipelines run there, grounding is rechecked, and only a reviewable diff reaches the approved workspace. The original profile stays active. Hidden refresh workspaces cannot appear in the switcher or Workspaces page and cannot be opened directly. Interrupted runs can resume. With the current `OPENAI_ENABLED=false` and zero-dollar limit, the coordinator is dormant and no paid request is made.
+
+Added complete recorded onboarding fixtures for Resolve AI, Shopify and Vercel. All three pass evidence collection, strict grounded drafting, at least 90% receipt coverage, editable review and explicit human approval without provider calls. Resolve's generated segments and buyer/champion personas overlap the frozen reference configuration as required. Browser verification used isolated local state and visibly confirmed the complete generated-review screen, 100% receipt report and monthly before/after approval screen at desktop and 768-pixel widths; no real workspace was changed.
+
+Verification: 18 test files and 93 tests passed. `npm audit --omit=dev --audit-level=high` found zero vulnerabilities. The ignored local `.env` and `.whynow/` state stayed outside Git. The Implementation Plan's real-key three-company paid acceptance is deliberately not claimed because the owner instructed that paid OpenAI remain off. Stage 2 is complete for the current local/no-paid-OpenAI configuration; Stage 3 has not started.
+
 ## Stage 2 offline research core — 2026-09-17
 
 Implemented the main name-first research path in `scripts/onboarding/research.cjs`, `research-page.cjs`, `routes.cjs` and `server/router.cjs`. Serper requires an explicit switch, private key and positive persisted caps; the coordinator reserves queries before sending them, hard-limits a run to four searches/twenty pages, requires candidate confirmation, keeps only the selected seller domain, records progress and partial errors, deduplicates concurrent jobs and resumes safe in-progress work after restart. Search snippets never become claim evidence.

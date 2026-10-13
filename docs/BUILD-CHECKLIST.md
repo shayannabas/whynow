@@ -1,16 +1,16 @@
 # WhyNow — build checklist
 
-Updated: September 17, 2026. Current stage: 2 — seller onboarding.
+Updated: October 13, 2026. Current stage: Stage 2 implementation complete locally; Stage 3 has not started.
 
-This is the working checklist, updated as work is verified. Checked means completed, not merely planned. Latest local verification: 84 tests passed across 16 files on Node 22. A bounded live Vercel research run also passed: four Serper searches, twenty official-domain pages saved, no page errors and about forty seconds from start to finish. No OpenAI request was made. The Stage 2 research milestone is published at `349d6ac`; GitHub tests, production audit and full-history secret scan passed.
+This is the working checklist, updated only after verification. Latest local verification: 93 tests passed across 18 files on Node 24 against the project's Node 22 target, the production dependency audit found zero vulnerabilities, and the complete generated-review and monthly-refresh screens passed browser checks at desktop and 768-pixel widths. Three recorded official-page sellers—Resolve AI, Shopify and Vercel—each completed research, grounded drafting, review and approval with at least 90% receipt coverage without contacting a provider. The earlier bounded live Vercel research run also passed: four Serper searches, twenty official-domain pages saved, no page errors and about forty seconds from start to finish. No OpenAI request was made.
 
 ## Current decision
 
-Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup, then explicitly requested that paid calls stay OFF. No OpenAI spending is approved. On September 17 the owner approved Serper integration using a key shared by a friend with permission and asked to run WhyNow locally. Local operation avoids hosting charges, but Serper calls still consume that account's credits. The key is stored only in the ignored local `.env`; presence was verified without displaying it. The live Vercel check respected the 4-query run cap, 50-query monthly cap and 20-page research cap.
+Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup, then explicitly requested that paid calls stay OFF. No OpenAI spending is approved. The owner approved Serper integration using a key shared by a friend with permission and asked to run WhyNow locally. Local operation avoids hosting charges, but Serper calls still consume that account's credits. The key is stored only in the ignored local `.env`; presence was verified without displaying it. The live Vercel check respected the 4-query run cap, 50-query monthly cap and 20-page research cap.
 
 Do not paste API keys into chat. Store keys in the local ignored .env file, never in this checklist or GitHub. Provider credentials and billing have not been verified.
 
-## Stage 2 — connect and finish
+## Stage 2 — local implementation checklist
 
 - [x] Company-name-only entry, including Vercel.
 - [x] Honest results screen with no invented facts.
@@ -20,27 +20,33 @@ Do not paste API keys into chat. Store keys in the local ignored .env file, neve
 - [x] Check current provider requirements and public pricing.
 - [x] Choose OpenAI first and match the friend's default profile-parser model: gpt-4o-mini.
 - [x] Confirm Serper, store the authorized key privately and enforce explicit local-first caps.
-- [ ] Agree OpenAI spending limit and live-test allowance; paid OpenAI stays off.
 - [x] Store the authorized Serper key privately and verify presence without displaying it.
-- [ ] OpenAI account/key/billing setup remains deferred while paid calls are off.
 - [x] Implement the OpenAI enable switch (off by default), persistent conservative spending reservations and per-workspace request caps. A key alone does not enable calls.
 - [x] Connect name search and candidate confirmation to the main flow.
 - [x] Build bounded background research: discover public pages, respect robots, save sources, show progress, handle errors/restarts.
 - [x] Implement and offline-test AI wrapper: strict structured output, one bounded transient-error retry, timeout, caching and safe error messages.
-- [ ] Activate and verify the OpenAI connection only after the owner changes the paid-off decision, supplies their own key privately and approves a cap.
 - [x] Generate seller facts and ideal-customer proposals from collected excerpts only; live generation stays gated while paid OpenAI is off.
 - [x] Validate every factual field; reject unsupported customers and competitors, count them against receipt coverage, and flag uncertainty.
 - [x] Connect generated results to editing and human approval behind the disabled-by-default OpenAI gate.
 - [x] Add the original Resolve reference configuration without making it the default seller.
 - [x] Add genuine official-page excerpt fixtures for Resolve AI, Vercel and Shopify; document the reference comparison.
-- [x] Add monthly refresh proposals, receipt-aware visible differences, grounding recheck and fresh approval. Automatic collection/drafting remains paused with OpenAI off.
-- [x] Pass 84 offline tests, including hallucinated claims, refresh receipt gaps, off-domain redirects, stale tabs/results, budget exhaustion, restarts and cross-workspace isolation.
+- [x] Add the monthly refresh coordinator: due-date detection, hidden isolated research/drafting workspace, receipt-aware visible differences, restart recovery, grounding recheck and fresh approval. It is dormant unless both providers and positive limits are explicitly enabled.
+- [x] Pass 93 offline tests, including hallucinated claims, refresh receipt gaps, off-domain redirects, stale tabs/results, budget exhaustion, restarts, hidden refresh workspaces and cross-workspace isolation.
 - [x] Browser-check the real Vercel candidate/evidence result at desktop and 768-pixel widths.
-- [ ] Browser-check the complete manual and generated-review workflows. Generated review remains gated while paid OpenAI is off.
+- [x] Browser-check the complete editable generated-review and monthly-refresh workflows at desktop and 768-pixel widths using isolated local fixtures; the existing manual save/review/approve flow is covered by its local HTTP acceptance test.
 - [x] Run Vercel's live Serper identity/evidence check: four searches, twenty saved `vercel.com` pages, zero page errors, about forty seconds.
-- [ ] Pass three-seller acceptance: under 3 minutes each and at least 90% receipted fields, with human approval.
-- [x] Update traceability, publish verified changes and confirm GitHub tests, production audit and full-history secret scan.
-- [ ] Mark Stage 2 complete; only then begin Stage 3.
+- [x] Pass the no-cost three-seller acceptance with recorded official-page fixtures: Resolve AI, Shopify and Vercel each finish well under 3 minutes, produce at least 90% receipted attempted factual claims and can be explicitly approved.
+- [x] Update README, status and traceability documents, run the production audit and scan tracked/untracked project files for credentials before publishing.
+- [x] Mark the local, paid-provider-off Stage 2 implementation complete. Do not begin Stage 3 in this increment.
+
+## Owner-deferred paid acceptance
+
+These are deliberate owner decisions, not unfinished code. They stay outside the completed local checklist until the owner separately changes the paid-off instruction:
+
+- Agree an OpenAI dollar/request limit and live-test allowance.
+- Add and verify the owner's own OpenAI account, billing and key privately.
+- Enable OpenAI and run the Implementation Plan's formal real-key three-company DoD. That live paid-provider result is not claimed here.
+- After that approval, observe one real monthly automatic refresh. The coordinator is implemented but intentionally dormant now.
 
 ## Provider reference
 

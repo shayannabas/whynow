@@ -13,6 +13,12 @@ const COLLECTIONS = {
 const WEIGHTS = {techStack:1.3, activePain:1.2, revenueSensitivity:1.1, observabilityScale:1, aiCompatibility:0.9, competitiveWedge:0.8};
 const LABELS = {techStack:'Environment fit', activePain:'Active pain', revenueSensitivity:'Impact sensitivity', observabilityScale:'Operational scale', aiCompatibility:'Adoption readiness', competitiveWedge:'Competitive wedge'};
 const SLAS = {form_d_filing:14,funding:30,exec_change:30,executive_departure:30,new_account_with_warm_champion:30,old_account_inherited_pain:30,hiring_surge:45,first_function_hire:45,headcount_surge:45,risk_factor_added:120,pain_event:30,public_postmortem:30,public_pain_writeup:30,buying_intent_hiring:60,function_hiring:90,internal_tool_maintenance:90,tech_adoption:90,competitor_adoption:120,conference_talk:120};
+const TIER_RULES = Object.freeze({
+  tier1:Object.freeze({public:true,revenue:500000000,employees:2000,valuation:5000000000}),
+  tier2:Object.freeze({revenue:25000000,employees:150,fundingStages:Object.freeze(['Series A','Series B','Series C','Series D','growth','PE'])}),
+  tier3:Object.freeze({maxEmployees:149,minRaised:2000000}),
+  unclassified:'parked'
+});
 
 function text(value, max=2000) {
   const result = String(value ?? '').trim();
@@ -42,6 +48,14 @@ function evidence(state, value, sourceUrl, quote, sellerDomain, customer=false) 
 }
 function field(form,name,fallback='') {
   return form.has(name)?form.get(name):fallback;
+}
+function numberSetting(form,name,fallback,{label,min=0,max=Number.MAX_SAFE_INTEGER,integer=false}={}) {
+  const raw=String(field(form,name,String(fallback))).trim(),value=Number(raw);
+  if(!raw||!Number.isFinite(value)||(integer&&!Number.isInteger(value))||value<min||value>max) {
+    const kind=integer?'a whole number':'a number';
+    throw new Error(`${label} must be ${kind} from ${min} to ${max}.`);
+  }
+  return value;
 }
 function rows(form, group, max=30) {
   const escaped=group.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
@@ -85,6 +99,9 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
     if(queries.length && queries.length<4)throw new Error('Each segment needs 4–8 search phrases, or leave them blank for basic defaults.');
     const sensitivity=Number(row.revenueSensitivityBase||3);
     if(!Number.isInteger(sensitivity)||sensitivity<1||sensitivity>5)throw new Error('Each segment impact sensitivity must be a whole number from 1 to 5.');
+    const savedSegment=workspace.icpConfig?.segments?.find(segment=>segment.key===stableId(label.toLowerCase()));
+    const enabledRaw=String(row.enabled??savedSegment?.enabled??true).trim();
+    if(!['true','false'].includes(enabledRaw))throw new Error('Each customer segment must be enabled or paused.');
     const exampleTargets=rows(form,`segments.${row.__index}.exampleTargets`,20).filter(target=>!target.remove).map(target=>{
       const name=text(target.name,200),domain=text(target.domain,253).toLowerCase().replace(/^www\./,'');
       if(!name&&!domain)return null;
@@ -92,7 +109,7 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
       const receipt=evidence(state,name,target.url,target.quote,selected.domain);
       return {name,domain,sourceUrl:receipt.sourceUrl,sourceId:receipt.sourceId,evidenceQuote:receipt.evidenceQuote,inferred:receipt.inferred,verification:receipt.verification,reason:receipt.reason};
     }).filter(Boolean);
-    return {key:stableId(label.toLowerCase()),label,enabled:true,subIndustries:lines(row.subIndustries),queryTemplates:queries.length?queries:strategyQueries(label),revenueSensitivityBase:sensitivity,wedgeCustomers:lines(row.wedgeCustomers,20),exampleTargets};
+    return {key:stableId(label.toLowerCase()),label,enabled:enabledRaw==='true',subIndustries:lines(row.subIndustries),queryTemplates:queries.length?queries:strategyQueries(label),revenueSensitivityBase:sensitivity,wedgeCustomers:lines(row.wedgeCustomers,20),exampleTargets};
   });
   if(new Set(segments.map(s=>s.key)).size!==segments.length)throw new Error('Give each customer segment a different name.');
   const savedDefinitions=workspace.icpConfig?.signalDefinitions||{};
@@ -117,13 +134,41 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
   const objectionDefaults=['Acknowledge the concern and ask a clarifying question.','Use a verified proof point only when relevant.','Offer a small next step without pressure.'];
   const objectionTemplates=[0,1,2].map(index=>text(field(form,`objectionTemplates.${index}`,workspace.icpConfig?.objectionTemplates?.[index]||objectionDefaults[index]),500));
   if(objectionTemplates.some(item=>!item)||new Set(objectionTemplates.map(item=>item.toLowerCase())).size!==3)throw new Error('Keep three different objection response guidelines.');
+  const savedWeights=workspace.icpConfig?.weights||{};
+  const weights=Object.fromEntries(Object.keys(WEIGHTS).map(key=>[key,numberSetting(form,`weights.${key}`,savedWeights[key]??WEIGHTS[key],{label:`${LABELS[key]} scoring weight`,min:0.01,max:100})]));
+  const savedSlas=workspace.icpConfig?.slaDays||{};
+  const slaDays=Object.fromEntries(Object.keys(SLAS).map(key=>[key,numberSetting(form,`slaDays.${key}`,savedSlas[key]??SLAS[key],{label:`${key.replaceAll('_',' ')} time window`,min:1,max:3650,integer:true})]));
+  const savedTiers=workspace.icpConfig?.tierRules||{};
+  const tierOne=savedTiers.tier1||{},tierTwo=savedTiers.tier2||{},tierThree=savedTiers.tier3||{};
+  const publicRaw=String(field(form,'tierRules.tier1.public',String(tierOne.public??TIER_RULES.tier1.public))).trim();
+  if(!['true','false'].includes(publicRaw))throw new Error('Tier 1 public-company rule must be true or false.');
+  const tierRules={
+    tier1:{
+      public:publicRaw==='true',
+      revenue:numberSetting(form,'tierRules.tier1.revenue',tierOne.revenue??TIER_RULES.tier1.revenue,{label:'Tier 1 revenue threshold',min:0,integer:true}),
+      employees:numberSetting(form,'tierRules.tier1.employees',tierOne.employees??TIER_RULES.tier1.employees,{label:'Tier 1 employee threshold',min:0,max:10000000,integer:true}),
+      valuation:numberSetting(form,'tierRules.tier1.valuation',tierOne.valuation??TIER_RULES.tier1.valuation,{label:'Tier 1 valuation threshold',min:0,integer:true})
+    },
+    tier2:{
+      revenue:numberSetting(form,'tierRules.tier2.revenue',tierTwo.revenue??TIER_RULES.tier2.revenue,{label:'Tier 2 revenue threshold',min:0,integer:true}),
+      employees:numberSetting(form,'tierRules.tier2.employees',tierTwo.employees??TIER_RULES.tier2.employees,{label:'Tier 2 employee threshold',min:0,max:10000000,integer:true}),
+      fundingStages:lines(field(form,'tierRules.tier2.fundingStages',(tierTwo.fundingStages||TIER_RULES.tier2.fundingStages).join('\n')),20)
+    },
+    tier3:{
+      maxEmployees:numberSetting(form,'tierRules.tier3.maxEmployees',tierThree.maxEmployees??TIER_RULES.tier3.maxEmployees,{label:'Tier 3 maximum employees',min:0,max:10000000,integer:true}),
+      minRaised:numberSetting(form,'tierRules.tier3.minRaised',tierThree.minRaised??TIER_RULES.tier3.minRaised,{label:'Tier 3 minimum funding',min:0,integer:true})
+    },
+    unclassified:text(field(form,'tierRules.unclassified',savedTiers.unclassified||TIER_RULES.unclassified),100)
+  };
+  if(!tierRules.tier2.fundingStages.length)throw new Error('Add at least one Tier 2 funding stage.');
+  if(!tierRules.unclassified)throw new Error('Add the handling rule for unclassified companies.');
   const config={schemaVersion:1,segments,personas:{buyerTitles:lines(form.get('buyerTitles')),championTitles:lines(form.get('championTitles')),wrongOrgTitles:lines(form.get('wrongOrgTitles'))},signalDefinitions:definitions,
     triggerMapping:{pain_event:lines(form.get('painKeywords')),buying_intent:lines(form.get('buyingKeywords')),function_roles:lines(form.get('functionRoles')),tech_adoption:lines(form.get('technologies')),competitor_names:profile.competitors.map(c=>c.name)},
     killPatterns:{solvingInHouse:lines(form.get('solvingInHouse')),buildCulture:lines(form.get('buildCulture')),sizeMetric:{label:text(form.get('sizeLabel')||'employees',100),floor}},
     painSources:{statuspage:form.has('source.statuspage'),hn:form.has('source.hn'),news:form.has('source.news'),filings:form.has('source.filings')},
-    pitch:{receiptOpenerStyle:text(field(form,'pitch.receiptOpenerStyle',savedPitch.receiptOpenerStyle||'Start with a verified prospect event.'),500),oneSentenceProduct:profile.productOneLiner,credentialLine:text(field(form,'pitch.credentialLine',savedPitch.credentialLine||''),500),ctaStyle:text(field(form,'pitch.ctaStyle',savedPitch.ctaStyle||'Ask permission for a brief conversation.'),500)},
+    pitch:{receiptOpenerStyle:text(field(form,'pitch.receiptOpenerStyle',savedPitch.receiptOpenerStyle||'Start with a verified prospect event.'),500),oneSentenceProduct:text(field(form,'pitch.oneSentenceProduct',savedPitch.oneSentenceProduct||profile.productOneLiner),500),credentialLine:text(field(form,'pitch.credentialLine',savedPitch.credentialLine||''),500),ctaStyle:text(field(form,'pitch.ctaStyle',savedPitch.ctaStyle||'Ask permission for a brief conversation.'),500)},
     objectionTemplates,
-    weights:{...WEIGHTS},slaDays:{...SLAS},tierRules:{tier1:{public:true,revenue:500000000,employees:2000,valuation:5000000000},tier2:{revenue:25000000,employees:150,fundingStages:['Series A','Series B','Series C','Series D','growth','PE']},tier3:{maxEmployees:149,minRaised:2000000},unclassified:'parked'},
+    weights,slaDays,tierRules,
     defaultsReviewRequired:true};
   return {profile,config};
 }
@@ -173,4 +218,4 @@ function approveManualProfile(state,id,{revision,acknowledged=false,now=()=>new 
   next.auditLog.push({schemaVersion:1,id:stableId(`${id}:${next.workspaces[id].profileRevision}`),workspaceId:id,type:'seller_profile_approved',occurredAt:now(),profileRevision:next.workspaces[id].profileRevision,actor:'local-admin',unverifiedClaims:profileWarnings(workspace.sellerProfile).length});
   return next;
 }
-module.exports={FACT_FIELDS,COLLECTIONS,WEIGHTS,LABELS,SLAS,profileWarnings,approvalProblems,saveManualProfile,approveManualProfile,draftFromForm};
+module.exports={FACT_FIELDS,COLLECTIONS,WEIGHTS,LABELS,SLAS,TIER_RULES,profileWarnings,approvalProblems,saveManualProfile,approveManualProfile,draftFromForm};

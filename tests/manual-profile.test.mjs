@@ -6,7 +6,7 @@ import path from 'node:path';
 import http from 'node:http';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace,updateWorkspace,saveState,loadState}=require('../scripts/server/state.cjs');
-const {saveManualProfile,approveManualProfile,profileWarnings}=require('../scripts/onboarding/manual-profile.cjs');
+const {WEIGHTS,SLAS,saveManualProfile,approveManualProfile,profileWarnings}=require('../scripts/onboarding/manual-profile.cjs');
 const {recordSource}=require('../scripts/sources.cjs');
 const {profilePage}=require('../scripts/onboarding/profile-page.cjs');
 const {createRouter}=require('../scripts/server/router.cjs');
@@ -60,7 +60,12 @@ it('links without a saved exact quote remain unverified; paraphrases fail',()=>{
 });
 it('validates segment sizes, query counts, duplicate segments and unsafe source URLs',()=>{
   const state=initial(),id=state.activeWorkspaceId;
-  for(const [key,value] of [['segments.1.label','Segment A'],['segments.0.queryTemplates','just one'],['category.url','javascript:alert(1)'],['sizeFloor','-1']]){const f=form();f.set(key,value);expect(()=>saveManualProfile(state,id,f)).toThrow();}
+  for(const [key,value] of [
+    ['segments.1.label','Segment A'],['segments.0.queryTemplates','just one'],['segments.0.enabled','maybe'],['category.url','javascript:alert(1)'],['sizeFloor','-1'],
+    ['weights.techStack','0'],['weights.activePain','101'],['slaDays.funding','0'],['slaDays.exec_change','1.5'],
+    ['tierRules.tier1.public','maybe'],['tierRules.tier1.revenue','-1'],['tierRules.tier2.employees','1.5'],
+    ['tierRules.tier2.fundingStages',''],['tierRules.tier3.maxEmployees','10000001'],['tierRules.unclassified','']
+  ]){const f=form();f.set(key,value);expect(()=>saveManualProfile(state,id,f)).toThrow();}
 });
 it('escapes saved claims and preserves posted edits when rendering errors',()=>{
   const state=initial(),f=form();f.set('category','<img src=x onerror=alert(1)>');
@@ -72,21 +77,32 @@ it('shows and saves the deeper targeting and messaging rules before approval',()
   let state=initial();const id=state.activeWorkspaceId;state=saveManualProfile(state,id,form());
   state=recordSource(state,{url:'https://example.org/example-target',text:'Example Target',fetchedAt:'2026-09-17T00:00:00Z'}).state;
   const f=form(1);
-  f.set('segments.0.revenueSensitivityBase','5');f.set('segments.0.wedgeCustomers','Customer One\nCustomer Two');
+  f.set('segments.0.enabled','false');f.set('segments.0.revenueSensitivityBase','5');f.set('segments.0.wedgeCustomers','Customer One\nCustomer Two');
   f.set('segments.0.exampleTargets.0.name','Example Target');f.set('segments.0.exampleTargets.0.domain','target.example');
   f.set('segments.0.exampleTargets.0.url','https://example.org/example-target');f.set('segments.0.exampleTargets.0.quote','Example Target');
   f.set('signals.techStack.label','Technical environment fit');f.set('signals.techStack.description','Review the public technical environment.');
   f.set('signals.techStack.evidenceKeywords','Node.js\nTypeScript');f.set('signals.techStack.negativeKeywords','Legacy only');
   f.set('signals.techStack.preferredSources','Engineering blog');f.set('signals.techStack.rubric.1','No matching environment');
   f.set('signals.techStack.rubric.3','Some matching environment');f.set('signals.techStack.rubric.5','Strong matching environment');
-  f.set('pitch.receiptOpenerStyle','Open with one verified change.');f.set('pitch.credentialLine','Use only a verified credential.');f.set('pitch.ctaStyle','Ask for a short conversation.');
+  Object.keys(WEIGHTS).forEach((key,index)=>f.set(`weights.${key}`,String(1.5+index/10)));
+  Object.keys(SLAS).forEach((key,index)=>f.set(`slaDays.${key}`,String(20+index)));
+  f.set('tierRules.tier1.public','false');f.set('tierRules.tier1.revenue','750000000');f.set('tierRules.tier1.employees','3000');f.set('tierRules.tier1.valuation','7000000000');
+  f.set('tierRules.tier2.revenue','50000000');f.set('tierRules.tier2.employees','250');f.set('tierRules.tier2.fundingStages','Series B\nSeries C');
+  f.set('tierRules.tier3.maxEmployees','249');f.set('tierRules.tier3.minRaised','5000000');f.set('tierRules.unclassified','manual review');
+  f.set('pitch.receiptOpenerStyle','Open with one verified change.');f.set('pitch.oneSentenceProduct','A concise reviewed product sentence.');f.set('pitch.credentialLine','Use only a verified credential.');f.set('pitch.ctaStyle','Ask for a short conversation.');
   f.set('objectionTemplates.0','Ask what concern matters most.');
   const saved=saveManualProfile(state,id,f),config=saved.workspaces[id].icpConfig,html=profilePage(saved);
-  expect(config.segments[0]).toMatchObject({revenueSensitivityBase:5,wedgeCustomers:['Customer One','Customer Two'],exampleTargets:[{name:'Example Target',domain:'target.example',inferred:false}]});
+  expect(config.segments[0]).toMatchObject({enabled:false,revenueSensitivityBase:5,wedgeCustomers:['Customer One','Customer Two'],exampleTargets:[{name:'Example Target',domain:'target.example',inferred:false}]});
   expect(config.signalDefinitions.techStack).toMatchObject({label:'Technical environment fit',description:'Review the public technical environment.',negativeKeywords:['Legacy only'],preferredSources:['Engineering blog'],rubric:{1:'No matching environment',3:'Some matching environment',5:'Strong matching environment'}});
-  expect(config.pitch).toMatchObject({receiptOpenerStyle:'Open with one verified change.',credentialLine:'Use only a verified credential.',ctaStyle:'Ask for a short conversation.'});
+  expect(config.weights).toEqual(Object.fromEntries(Object.keys(WEIGHTS).map((key,index)=>[key,1.5+index/10])));
+  expect(config.slaDays).toEqual(Object.fromEntries(Object.keys(SLAS).map((key,index)=>[key,20+index])));
+  expect(config.tierRules).toEqual({tier1:{public:false,revenue:750000000,employees:3000,valuation:7000000000},tier2:{revenue:50000000,employees:250,fundingStages:['Series B','Series C']},tier3:{maxEmployees:249,minRaised:5000000},unclassified:'manual review'});
+  expect(config.pitch).toMatchObject({receiptOpenerStyle:'Open with one verified change.',oneSentenceProduct:'A concise reviewed product sentence.',credentialLine:'Use only a verified credential.',ctaStyle:'Ask for a short conversation.'});
   expect(config.objectionTemplates[0]).toBe('Ask what concern matters most.');
-  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Open with one verified change.','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
+  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Timing windows','Company tier rules','manual review','A concise reviewed product sentence.','Open with one verified change.','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
+  for(const key of Object.keys(WEIGHTS))expect(html).toContain(`name="weights.${key}"`);
+  for(const key of Object.keys(SLAS))expect(html).toContain(`name="slaDays.${key}"`);
+  for(const key of ['tier1.public','tier1.revenue','tier1.employees','tier1.valuation','tier2.revenue','tier2.employees','tier2.fundingStages','tier3.maxEmployees','tier3.minRaised','unclassified'])expect(html).toContain(`name="tierRules.${key}"`);
 });
 it('saves, reviews and approves through local HTTP; rejects forged workspace and cross-origin changes',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-manual-')),file=path.join(dir,'state.json');let server;

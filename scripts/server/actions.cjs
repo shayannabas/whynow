@@ -5,7 +5,9 @@ async function workspaceAction(req, state, pathname) {
   const fields = new URLSearchParams(body);
   if (pathname === '/workspaces') return createWorkspace(state,{name:fields.get('name')});
   const id = fields.get('id');
-  if(getWorkspace(state,id).status==='archived')throw new Error('Restore this workspace before opening it.');
+  const workspace=getWorkspace(state,id);
+  if(workspace.systemRole)throw new Error('System workspaces cannot be opened.');
+  if(workspace.status==='archived')throw new Error('Restore this workspace before opening it.');
   return {...state,activeWorkspaceId:id};
 }
 module.exports = { workspaceAction };

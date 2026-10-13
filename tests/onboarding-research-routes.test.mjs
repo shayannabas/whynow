@@ -48,6 +48,7 @@ it('connects name entry, explicit confirmation and bounded evidence collection w
 
     const html=await(await fetch(base+'/onboarding/results')).text();
     expect(html).toContain('Evidence is ready');expect(html).toContain('Paid OpenAI drafting remains off');expect(html).toContain('Saved public evidence');
+    expect(html).toContain('Recent research activity');expect(html).toContain('public pages saved for review');
     const status=await(await fetch(base+'/onboarding/research/status')).text();
     expect(status).not.toContain(key);expect(status).toContain('evidence_ready');
   }finally{await new Promise(resolve=>server.close(resolve));fs.rmSync(dir,{recursive:true,force:true});}

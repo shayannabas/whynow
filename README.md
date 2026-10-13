@@ -60,7 +60,9 @@ The source-only synthesis layer is connected behind the existing OpenAI switch. 
 
 Paid OpenAI remains intentionally off. Setting an API key alone cannot make a request: the enable switch, dollar limit and per-workspace request limit must also be positive. Until the owner separately approves those settings, the app displays collected evidence and offers the manual fallback.
 
-The original Resolve AI targeting configuration from the reference repository is stored as a frozen, load-only comparison—it is never silently used as another seller's profile. Offline official-page fixtures cover Resolve AI, Vercel and Shopify. Monthly refresh logic creates a visible, stale-safe diff and keeps the approved profile unchanged until a human approves grounded receipts; automatic refresh collection/drafting remains paused with OpenAI off.
+The original Resolve AI targeting configuration from the reference repository is stored as a frozen, load-only comparison—it is never silently used as another seller's profile. Offline official-page fixtures cover Resolve AI, Vercel and Shopify. Each fixture completes grounded drafting, review and approval with at least 90% receipt coverage without spending provider credits.
+
+Monthly refresh has a persistent coordinator. When a profile is due, it researches and drafts inside a hidden isolated workspace, checks the new receipts, and creates a visible before/after proposal. It never auto-applies a change. The coordinator starts only when both Serper and OpenAI are explicitly enabled with keys and positive limits, so it remains dormant under the current paid-OpenAI-off setting.
 
 Interview explanation: “I split discovery, evidence and judgment into separate gates. Search proposes an identity, I confirm it, the crawler saves permitted pages, and the model can only cite those saved excerpts. The server checks every quote again and a human approves the draft. I also reserve usage before provider calls, so a crash cannot quietly bypass the cost cap.”
 

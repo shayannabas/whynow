@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-09-17",
+  "seller": {
+    "name": "Vercel",
+    "domain": "vercel.com",
+    "website": "https://vercel.com"
+  },
+  "sources": [
+    {
+      "url": "https://vercel.com/docs",
+      "title": "Vercel Documentation",
+      "text": "Vercel is the AI Cloud, a unified platform for building, deploying, and scaling AI-powered applications. Ship web apps, agentic workloads, and everything in between."
+    },
+    {
+      "url": "https://vercel.com/pricing",
+      "title": "Vercel Pricing",
+      "text": "Enterprise is for teams seeking greater performance, collaboration, and security."
+    }
+  ],
+  "sellerFacts": {
+    "category": {
+      "value": "AI cloud platform",
+      "sourceUrl": "https://vercel.com/docs",
+      "evidenceQuote": "Vercel is the AI Cloud, a unified platform for building, deploying, and scaling AI-powered applications."
+    },
+    "productOneLiner": {
+      "value": "A platform for building, deploying, and scaling AI-powered applications",
+      "sourceUrl": "https://vercel.com/docs",
+      "evidenceQuote": "a unified platform for building, deploying, and scaling AI-powered applications."
+    },
+    "pricingModel": null,
+    "targetCompanySize": {
+      "value": "Teams seeking enterprise performance, collaboration, and security",
+      "sourceUrl": "https://vercel.com/pricing",
+      "evidenceQuote": "Enterprise is for teams seeking greater performance, collaboration, and security."
+    },
+    "valueProps": [
+      {
+        "value": "Supports web apps and agentic workloads",
+        "sourceUrl": "https://vercel.com/docs",
+        "evidenceQuote": "Ship web apps, agentic workloads, and everything in between."
+      }
+    ],
+    "proofPoints": [],
+    "credentials": [],
+    "targetIndustries": [
+      {
+        "value": "AI-powered applications",
+        "sourceUrl": "https://vercel.com/docs",
+        "evidenceQuote": "AI-powered applications."
+      }
+    ],
+    "customers": [],
+    "competitors": []
+  },
+  "strategy": {
+    "segments": ["AI application teams", "Web application teams", "Digital commerce teams"],
+    "buyerTitles": ["CTO", "VP Engineering"],
+    "championTitles": ["Platform Engineering Lead", "Frontend Engineering Lead"],
+    "wrongOrgTitles": []
+  }
+}

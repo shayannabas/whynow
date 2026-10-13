@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-09-17",
+  "seller": {
+    "name": "Resolve AI",
+    "domain": "resolve.ai",
+    "website": "https://resolve.ai"
+  },
+  "sources": [
+    {
+      "url": "https://resolve.ai/product/overview",
+      "title": "Product overview | Resolve AI",
+      "text": "AI agents drive your on-call, incidents, and daily operational tasks in production. Agent Teams investigate in parallel across code, infrastructure, and telemetry."
+    },
+    {
+      "url": "https://resolve.ai/customers",
+      "title": "Customers | Resolve AI",
+      "text": "Trusted by Builders From Engineers to CTOs at Innovative Companies. DoorDash Customer Story Powering Uninterrupted Ads for DoorDash Advertisers. Engineering teams are transforming software engineering with agentic AI."
+    }
+  ],
+  "sellerFacts": {
+    "category": {
+      "value": "AI incident operations",
+      "sourceUrl": "https://resolve.ai/product/overview",
+      "evidenceQuote": "AI agents drive your on-call, incidents, and daily operational tasks in production."
+    },
+    "productOneLiner": {
+      "value": "AI agents for on-call, incidents, and daily production operations",
+      "sourceUrl": "https://resolve.ai/product/overview",
+      "evidenceQuote": "AI agents drive your on-call, incidents, and daily operational tasks in production."
+    },
+    "pricingModel": null,
+    "targetCompanySize": {
+      "value": "Engineering organizations with engineers through CTOs",
+      "sourceUrl": "https://resolve.ai/customers",
+      "evidenceQuote": "Trusted by Builders From Engineers to CTOs at Innovative Companies."
+    },
+    "valueProps": [
+      {
+        "value": "Investigates incidents across code, infrastructure, and telemetry",
+        "sourceUrl": "https://resolve.ai/product/overview",
+        "evidenceQuote": "Agent Teams investigate in parallel across code, infrastructure, and telemetry."
+      }
+    ],
+    "proofPoints": [],
+    "credentials": [],
+    "targetIndustries": [
+      {
+        "value": "Software engineering",
+        "sourceUrl": "https://resolve.ai/customers",
+        "evidenceQuote": "Engineering teams are transforming software engineering with agentic AI."
+      }
+    ],
+    "customers": [
+      {
+        "name": "DoorDash",
+        "domain": "doordash.com",
+        "sourceUrl": "https://resolve.ai/customers",
+        "evidenceQuote": "DoorDash Customer Story Powering Uninterrupted Ads for DoorDash Advertisers."
+      }
+    ],
+    "competitors": []
+  },
+  "strategy": {
+    "segments": [
+      "Crypto / fintech exchanges & brokers",
+      "Delivery / real-time marketplaces",
+      "Data / AI infrastructure"
+    ],
+    "buyerTitles": ["CTO", "VP Engineering"],
+    "championTitles": ["Head of SRE", "Head of Platform Engineering"],
+    "wrongOrgTitles": []
+  }
+}

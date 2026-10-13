@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-09-17",
+  "seller": {
+    "name": "Shopify",
+    "domain": "shopify.com",
+    "website": "https://www.shopify.com"
+  },
+  "sources": [
+    {
+      "url": "https://www.shopify.com/about",
+      "title": "About Shopify",
+      "text": "Shopify is a complete commerce platform to sell online or in person—whether you're running a side hustle, retail shop, or global brand. Customize your store, manage inventory, run marketing campaigns, and analyze performance—all from a single place."
+    }
+  ],
+  "sellerFacts": {
+    "category": {
+      "value": "Commerce platform",
+      "sourceUrl": "https://www.shopify.com/about",
+      "evidenceQuote": "Shopify is a complete commerce platform"
+    },
+    "productOneLiner": {
+      "value": "A commerce platform for selling online or in person",
+      "sourceUrl": "https://www.shopify.com/about",
+      "evidenceQuote": "a complete commerce platform to sell online or in person"
+    },
+    "pricingModel": null,
+    "targetCompanySize": {
+      "value": "Side hustles, retail shops, and global brands",
+      "sourceUrl": "https://www.shopify.com/about",
+      "evidenceQuote": "whether you're running a side hustle, retail shop, or global brand."
+    },
+    "valueProps": [
+      {
+        "value": "Store, inventory, marketing, and performance tools in one place",
+        "sourceUrl": "https://www.shopify.com/about",
+        "evidenceQuote": "Customize your store, manage inventory, run marketing campaigns, and analyze performance—all from a single place."
+      }
+    ],
+    "proofPoints": [],
+    "credentials": [],
+    "targetIndustries": [
+      {
+        "value": "Retail and commerce",
+        "sourceUrl": "https://www.shopify.com/about",
+        "evidenceQuote": "retail shop"
+      }
+    ],
+    "customers": [],
+    "competitors": []
+  },
+  "strategy": {
+    "segments": ["New merchants", "Retail businesses", "Global brands"],
+    "buyerTitles": ["Founder", "VP Ecommerce"],
+    "championTitles": ["Ecommerce Manager", "Store Operations Lead"],
+    "wrongOrgTitles": []
+  }
+}

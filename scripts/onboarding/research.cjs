@@ -11,6 +11,17 @@ const MAX_SERPER_QUERIES=4;
 const MAX_FETCHED_PAGES=20;
 const MAX_STORED_TEXT_PER_PAGE=50000;
 const MAX_STORED_TEXT_PER_RUN=500000;
+const MAX_PROGRESS_EVENTS=50;
+const RESEARCH_PATH_PATTERN=/(?:^|[-_/])(?:products?|platform|solutions?|pricing|customers?|case-stud(?:y|ies)|stories|about|company|careers?|jobs?|industr(?:y|ies)|security|docs?|resources?|alternatives?|compare|comparison|vs)(?:[-_/]|$)/i;
+const BLOCKED_PAGE_EXTENSION=/\.(?:avif|bmp|css|gif|ico|jpe?g|js|map|mp3|mp4|mov|pdf|png|svg|webm|webp|woff2?|zip)$/i;
+const EXTERNAL_RESEARCH_HOSTS=new Map([
+  ['boards.greenhouse.io',{source:'greenhouse',kind:'greenhouse_jobs'}],
+  ['job-boards.greenhouse.io',{source:'greenhouse',kind:'greenhouse_jobs'}],
+  ['jobs.lever.co',{source:'lever',kind:'lever_jobs'}],
+  ['jobs.ashbyhq.com',{source:'ashby',kind:'ashby_jobs'}],
+  ['sec.gov',{source:'engineering_web',kind:'sec_edgar'}],
+  ['www.sec.gov',{source:'engineering_web',kind:'sec_edgar'}]
+]);
 const STEP_LABELS={
   identify:'Identify the company',research:'Research public sources',
   draft:'Draft seller facts and ideal customers',review:'Your review and approval'
@@ -41,6 +52,15 @@ function touch(research,at) {
   research.updatedAt=at;
 }
 
+function emitProgress(research,type,message,at) {
+  const usage={queriesReserved:0,pagesAttempted:0,pagesSaved:0,...research.usage};
+  const event={schemaVersion:1,sequence:(research.progressEvents?.at(-1)?.sequence||0)+1,type,
+    message:String(message||'').slice(0,200),at,pagesPlanned:research.plan?.targets?.length||research.plan?.urls?.length||0,
+    pagesAttempted:usage.pagesAttempted,pagesSaved:usage.pagesSaved};
+  research.progressEvents=[...(research.progressEvents||[]),event].slice(-MAX_PROGRESS_EVENTS);
+  research.progress=event;
+}
+
 function researchFor(workspace) {
   if(!workspace.research||workspace.research.schemaVersion!==1)throw new ResearchError('NO_RESEARCH','Start with a company name first.');
   return workspace.research;
@@ -68,30 +88,150 @@ function discoveryQueries(candidate) {
   const name=String(candidate.name||'').replace(/["\r\n]/g,' ').slice(0,120);
   const domain=String(candidate.domain||'').slice(0,253);
   return [
-    `site:${domain} ${name} product platform solutions`,
-    `site:${domain} ${name} customers case studies pricing`,
-    `site:${domain} ${name} industries about security`
+    `site:${domain} "${name}" product platform solutions pricing`,
+    `site:${domain} "${name}" customers "case studies" about careers`,
+    `"${name}" "${domain}" alternatives vs raises hiring Greenhouse Lever Ashby SEC EDGAR`
   ];
 }
 
 function rankUrl(url,candidate) {
   const parsed=new URL(url),path=parsed.pathname.toLowerCase();
   if(parsed.origin===new URL(candidate.website).origin&&path==='/')return 0;
-  if(/customer|case-stud/.test(path))return 1;
-  if(/product|platform|solution/.test(path))return 2;
-  if(/pricing/.test(path))return 3;
-  if(/industr|about|security/.test(path))return 4;
-  return 5;
+  if(/sitemap[^/]*\.xml$/.test(path))return 1;
+  if(/customer|case-stud|stories/.test(path))return 2;
+  if(/product|platform|solution/.test(path))return 3;
+  if(/pricing/.test(path))return 4;
+  if(/career|jobs?/.test(path))return 5;
+  if(/industr|about|company|security/.test(path))return 6;
+  if(/alternative|compare|comparison|(?:^|[-_/])vs(?:[-_/]|$)/.test(path))return 7;
+  return 10;
 }
 
-function selectResearchUrls(candidate,rows) {
-  const values=[candidate.website,...rows.map(row=>row?.url||row?.link)];
+function compactIdentity(value) {return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
+function identityKeys(candidate) {
+  const domainLabel=String(candidate.domain||'').toLowerCase().split('.')[0];
+  const name=String(candidate.name||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const generic=new Set(['the','and','company','corporation','corp','inc','llc','ltd','limited','technologies','technology']);
+  return [...new Set([compactIdentity(domainLabel),compactIdentity(name),...name.split(/\s+/).filter(token=>token.length>=4&&!generic.has(token)).map(compactIdentity)].filter(key=>key.length>=4))];
+}
+function rowTiesToCandidate(row,candidate) {
+  const haystack=` ${String(row?.title||'')} ${String(row?.snippet||'')} `.toLowerCase().replace(/[^a-z0-9]+/g,' ');
+  return identityKeys(candidate).some(key=>new RegExp(`(?:^|\\s)${key}(?:\\s|$)`).test(haystack));
+}
+function atsPathTiesToCandidate(parsed,candidate) {
+  let segment;
+  try {segment=compactIdentity(decodeURIComponent(parsed.pathname.split('/').filter(Boolean)[0]||''));} catch {return false;}
+  return Boolean(segment&&identityKeys(candidate).some(key=>segment===key||segment===`${key}inc`||segment===`${key}jobs`||segment===`${key}careers`));
+}
+function normalizeExternalResearchUrl(value) {
+  let parsed;
+  try {parsed=new URL(String(value||''));} catch {return null;}
+  const host=parsed.hostname.toLowerCase().replace(/^www\.(?!sec\.gov$)/,'');
+  if(parsed.protocol!=='https:'||parsed.username||parsed.password||(parsed.port&&parsed.port!=='443')||!EXTERNAL_RESEARCH_HOSTS.has(host)||BLOCKED_PAGE_EXTENSION.test(parsed.pathname))return null;
+  parsed.hash='';
+  for(const key of [...parsed.searchParams.keys()])if(/^utm_|^(?:gclid|fbclid|mc_cid|mc_eid)$/i.test(key))parsed.searchParams.delete(key);
+  parsed.searchParams.sort();
+  return parsed.href.length<=2000?parsed:null;
+}
+function externalTargetForRow(candidate,row) {
+  const parsed=normalizeExternalResearchUrl(row?.url||row?.link),settings=parsed&&EXTERNAL_RESEARCH_HOSTS.get(parsed.hostname.toLowerCase());
+  if(!parsed||!settings||!rowTiesToCandidate(row,candidate))return null;
+  if(settings.kind==='sec_edgar') {
+    if(!/^\/(?:Archives\/edgar|edgar|ixviewer)\//i.test(parsed.pathname))return null;
+  } else if(!atsPathTiesToCandidate(parsed,candidate))return null;
+  return {schemaVersion:1,url:parsed.href,source:settings.source,kind:settings.kind,expectedHost:parsed.hostname.toLowerCase(),
+    searchTitle:String(row?.title||'').slice(0,300),searchSnippet:String(row?.snippet||'').slice(0,500)};
+}
+function internalTarget(candidate,value) {
+  const normalized=normalizeResearchUrl(value,candidate.domain);
+  if(!normalized||BLOCKED_PAGE_EXTENSION.test(new URL(normalized).pathname))return null;
+  const path=new URL(normalized).pathname;
+  return {schemaVersion:1,url:normalized,source:'seller_site',kind:/sitemap[^/]*\.xml$/i.test(path)?'seller_sitemap':'seller_site',expectedHost:candidate.domain};
+}
+function targetRank(target,candidate) {
+  if(target.source==='seller_site')return rankUrl(target.url,candidate);
+  if(target.kind?.endsWith('_jobs'))return 8;
+  if(target.kind==='sec_edgar')return 9;
+  return 10;
+}
+function mergeTargets(candidate,current,added,visited=[]) {
   const unique=new Map();
-  for(const value of values) {
-    const normalized=normalizeResearchUrl(value,candidate.domain);
-    if(normalized&&!unique.has(normalized))unique.set(normalized,normalized);
+  for(const raw of [...current,...added]) {
+    const target=typeof raw==='string'?internalTarget(candidate,raw):raw;
+    if(target?.url&&!unique.has(target.url))unique.set(target.url,target);
   }
-  return [...unique.values()].sort((a,b)=>rankUrl(a,candidate)-rankUrl(b,candidate)||a.localeCompare(b)).slice(0,MAX_FETCHED_PAGES);
+  const visitedSet=new Set(visited),values=[...unique.values()];
+  const completed=values.filter(target=>visitedSet.has(target.url));
+  const pending=values.filter(target=>!visitedSet.has(target.url)).sort((a,b)=>targetRank(a,candidate)-targetRank(b,candidate)||a.url.localeCompare(b.url));
+  return [...completed,...pending].slice(0,MAX_FETCHED_PAGES);
+}
+function selectResearchTargets(candidate,rows) {
+  const homepage=internalTarget(candidate,candidate.website);
+  const sitemap=internalTarget(candidate,new URL('/sitemap.xml',candidate.website).href);
+  const discovered=[];
+  for(const row of rows) {
+    const target=internalTarget(candidate,row?.url||row?.link)||externalTargetForRow(candidate,row);
+    if(target)discovered.push(target);
+  }
+  return mergeTargets(candidate,[],[homepage,sitemap,...discovered].filter(Boolean));
+}
+function selectResearchUrls(candidate,rows) {
+  return selectResearchTargets(candidate,rows).map(target=>target.url);
+}
+function decodeMarkupUrl(value) {
+  return String(value||'').replace(/&amp;/gi,'&').replace(/&#38;/g,'&').replace(/&quot;/gi,'"').replace(/&#39;/g,"'").trim();
+}
+function relevantInternalTarget(candidate,value,baseUrl,{allowSitemap=false}={}) {
+  let absolute;
+  try {absolute=new URL(decodeMarkupUrl(value),baseUrl).href;} catch {return null;}
+  const target=internalTarget(candidate,absolute);
+  if(!target)return null;
+  const path=new URL(target.url).pathname;
+  return path==='/'||RESEARCH_PATH_PATTERN.test(path)||(allowSitemap&&/sitemap[^/]*\.xml$/i.test(path))?target:null;
+}
+function homepageTargets(candidate,html,baseUrl) {
+  const targets=[],pattern=/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;let match;
+  while((match=pattern.exec(String(html||'')))&&targets.length<100) {
+    const target=relevantInternalTarget(candidate,match[1]??match[2]??match[3],baseUrl,{allowSitemap:true});
+    if(target)targets.push(target);
+  }
+  return targets;
+}
+function sitemapTargets(candidate,xml,baseUrl) {
+  const targets=[],pattern=/<loc\b[^>]*>([\s\S]*?)<\/loc>/gi;let match;
+  while((match=pattern.exec(String(xml||'')))&&targets.length<200) {
+    const target=relevantInternalTarget(candidate,match[1],baseUrl,{allowSitemap:true});
+    if(target)targets.push(target);
+  }
+  return targets;
+}
+function targetsFromFetchedPage(candidate,target,page) {
+  const parsed=new URL(target.url),isHomepage=target.source==='seller_site'&&parsed.origin===new URL(candidate.website).origin&&parsed.pathname==='/';
+  if(isHomepage)return homepageTargets(candidate,page.text,page.url);
+  if(target.kind==='seller_sitemap')return sitemapTargets(candidate,page.text,page.url);
+  return [];
+}
+function restoredTargets(candidate,plan) {
+  const raw=Array.isArray(plan?.targets)?plan.targets:Array.isArray(plan?.urls)?plan.urls:[];
+  const targets=[];
+  for(const item of raw) {
+    if(typeof item==='string') {const target=internalTarget(candidate,item);if(target)targets.push(target);continue;}
+    const internal=internalTarget(candidate,item?.url);
+    if(internal) {targets.push(internal);continue;}
+    const external=externalTargetForRow(candidate,{url:item?.url,title:item?.searchTitle,snippet:item?.searchSnippet});
+    if(external)targets.push(external);
+  }
+  return mergeTargets(candidate,[],targets);
+}
+function finalFetchedUrl(candidate,target,value) {
+  if(target.source==='seller_site')return normalizeResearchUrl(value,candidate.domain);
+  const parsed=normalizeExternalResearchUrl(value),expected=String(target.expectedHost||'').toLowerCase();
+  if(!parsed||parsed.hostname.toLowerCase()!==expected)return null;
+  const settings=EXTERNAL_RESEARCH_HOSTS.get(expected);
+  if(!settings||settings.source!==target.source||settings.kind!==target.kind)return null;
+  if(settings.kind==='sec_edgar'&&!/^\/(?:Archives\/edgar|edgar|ixviewer)\//i.test(parsed.pathname))return null;
+  if(settings.kind!=='sec_edgar'&&!atsPathTiesToCandidate(parsed,candidate))return null;
+  return parsed.href;
 }
 
 function titleFromHtml(html) {
@@ -171,9 +311,11 @@ function createResearchCoordinator({
     await update(id,research=>{
       if(newRun||!research.runId)research.runId=randomId();
       runId=research.runId;
+      if(newRun)research.progressEvents=[];
       research.startedAt=research.startedAt||now();research.completedAt=null;research.error=null;
       research.usage=newRun||!research.usage?{queriesReserved:0,pagesAttempted:0,pagesSaved:0,storedChars:0,storedBytes:0}:research.usage;
       research.status=phase==='identify'?'identifying':'researching';setStep(research,phase,'running');
+      emitProgress(research,phase==='identify'?'identify_started':'research_started',phase==='identify'?'Finding possible official websites.':'Starting bounded public-page collection.',now());
     });
     return runId;
   }
@@ -193,9 +335,11 @@ function createResearchCoordinator({
         if(!candidates.length) {
           research.status='failed';research.error={code:'NO_CANDIDATES',message:'No official-company candidates were found. Try again or use the manual fallback.'};
           setStep(research,'identify','failed',research.error.message);
+          emitProgress(research,'identify_failed',research.error.message,now());
         } else {
           research.status='confirmation_required';setStep(research,'identify','complete');
           workspace.onboarding={schemaVersion:1,status:'confirmation_required',name:research.companyName,candidates:structuredClone(candidates)};
+          emitProgress(research,'candidates_ready',`${candidates.length} possible official ${candidates.length===1?'website':'websites'} ready for confirmation.`,now());
         }
       });
       return result(id);
@@ -216,11 +360,12 @@ function createResearchCoordinator({
     return {...runtime.snapshot(),day};
   }
 
-  async function persistPlan(id,runId,urls,warnings) {
+  async function persistPlan(id,runId,targets,warnings) {
     await update(id,research=>{
       if(research.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
-      research.plan={schemaVersion:1,runId,urls,createdAt:now()};
+      research.plan={schemaVersion:1,runId,urls:targets.map(target=>target.url),targets:structuredClone(targets),createdAt:now()};
       research.visitedUrls=[];research.pageErrors=[];research.warnings=warnings.slice(0,10);
+      emitProgress(research,'plan_ready',`${targets.length} bounded public ${targets.length===1?'page':'pages'} planned.`,now());
     });
   }
 
@@ -229,10 +374,10 @@ function createResearchCoordinator({
     if(!saved.selectedCandidate)throw new ResearchError('CONFIRMATION_REQUIRED','Confirm the company before collecting public pages.');
     const runId=await begin(id,'research',{newRun:!saved.runId});
     try {
-      const workspace=current(id),candidate=researchFor(workspace).selectedCandidate;
+      const workspace=current(id),savedResearch=researchFor(workspace),candidate={...savedResearch.selectedCandidate,name:savedResearch.companyName||savedResearch.selectedCandidate.name};
       const runtime=runtimeFactory({env});const day=restoreCollectorUsage(runtime,workspace);
-      let research=result(id),urls=research.plan?.runId===runId?research.plan.urls:null;
-      if(!Array.isArray(urls)) {
+      let research=result(id),targets=research.plan?.runId===runId?restoredTargets(candidate,research.plan):null;
+      if(!Array.isArray(targets)) {
         const rows=[],warnings=[];
         for(const query of discoveryQueries(candidate)) {
           research=result(id);
@@ -242,21 +387,26 @@ function createResearchCoordinator({
             rows.push(...await searchFn(query,{runtime,env,num:10,enforceEnabled:true}));
           } catch(error) {warnings.push(safeError(error));break;}
         }
-        urls=selectResearchUrls(candidate,rows);
-        await persistPlan(id,runId,urls,warnings);
+        targets=selectResearchTargets(candidate,rows);
+        await persistPlan(id,runId,targets,warnings);
       }
-      for(const url of urls.slice(0,Math.min(config.pageLimit,MAX_FETCHED_PAGES))) {
+      while(true) {
         research=result(id);
         if(research.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
-        if((research.visitedUrls||[]).includes(url))continue;
         if((research.usage?.pagesAttempted||0)>=Math.min(config.pageLimit,MAX_FETCHED_PAGES))break;
+        targets=restoredTargets(candidate,research.plan);
+        const target=targets.find(item=>!(research.visitedUrls||[]).includes(item.url));
+        if(!target)break;
         await update(id,r=>{
           if(r.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
           r.usage={queriesReserved:0,pagesAttempted:0,pagesSaved:0,storedChars:0,storedBytes:0,...r.usage,pagesAttempted:(r.usage?.pagesAttempted||0)+1};
+          emitProgress(r,'page_started','Checking another planned public page.',now());
         });
         try {
-          const page=await runtime.request('seller_site',url,{allowedRedirectDomain:candidate.domain});
-          if(!normalizeResearchUrl(page.url,candidate.domain))throw new ResearchError('OFF_DOMAIN_REDIRECT','The page redirected away from the confirmed company domain.');
+          const page=await runtime.request(target.source,target.url,{allowedRedirectDomain:target.source==='seller_site'?candidate.domain:target.expectedHost});
+          const finalUrl=finalFetchedUrl(candidate,target,page.url);
+          if(!finalUrl)throw new ResearchError('OFF_DOMAIN_REDIRECT','The page redirected away from its approved research host.');
+          const discoveredTargets=targetsFromFetchedPage(candidate,target,{...page,url:finalUrl});
           const latest=result(id),remaining=Math.max(0,MAX_STORED_TEXT_PER_RUN-(latest.usage?.storedBytes??latest.usage?.storedChars??0));
           const text=truncateUtf8(stripHtml(page.text),Math.min(MAX_STORED_TEXT_PER_PAGE,remaining));
           if(!text)throw new ResearchError('EMPTY_PAGE','This public page had no readable text.');
@@ -264,19 +414,22 @@ function createResearchCoordinator({
           await mutate(state=>{
             const base=getWorkspace(state,id),r=assertWritable(base);
             if(r.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
-            const recorded=recordSource(state,{url:page.url,fetchedAt:page.fetchedAt,title:titleFromHtml(page.text),text});
+            const recorded=recordSource(state,{url:finalUrl,fetchedAt:page.fetchedAt,title:titleFromHtml(page.text),text});
             return updateWorkspace(recorded.state,id,w=>{
               const currentResearch=assertWritable(w);
               if(currentResearch.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
               const metadata={schemaVersion:1,sourceId:recorded.source.id,url:recorded.source.url,title:recorded.source.title,
-                fetchedAt:recorded.source.fetchedAt,kind:'seller_site',ownerDomain:candidate.domain,chars:text.length,bytes:storedBytes};
+                fetchedAt:recorded.source.fetchedAt,kind:target.kind,ownerDomain:candidate.domain,chars:text.length,bytes:storedBytes};
               const sources=Array.isArray(currentResearch.sources)?currentResearch.sources:[];
               currentResearch.sources=[...sources.filter(item=>(typeof item==='string'?item:item.sourceId)!==metadata.sourceId),metadata];
-              currentResearch.visitedUrls=[...new Set([...(currentResearch.visitedUrls||[]),url])].slice(0,MAX_FETCHED_PAGES);
+              currentResearch.visitedUrls=[...new Set([...(currentResearch.visitedUrls||[]),target.url])].slice(0,MAX_FETCHED_PAGES);
+              const merged=mergeTargets(candidate,restoredTargets(candidate,currentResearch.plan),discoveredTargets,currentResearch.visitedUrls);
+              currentResearch.plan={...currentResearch.plan,urls:merged.map(item=>item.url),targets:structuredClone(merged)};
               currentResearch.usage={queriesReserved:0,pagesAttempted:0,pagesSaved:0,storedChars:0,storedBytes:0,...currentResearch.usage,
                 pagesSaved:(currentResearch.usage?.pagesSaved||0)+1,storedChars:(currentResearch.usage?.storedChars||0)+text.length,
                 storedBytes:(currentResearch.usage?.storedBytes??currentResearch.usage?.storedChars??0)+storedBytes};
               const snapshot=collectorSnapshot(runtime,day);if(snapshot)w.budgets.collector=snapshot;
+              emitProgress(currentResearch,'page_saved','Saved a public page and checked it for additional relevant links.',now());
               touch(currentResearch,now());
             });
           });
@@ -285,9 +438,10 @@ function createResearchCoordinator({
           if(['ARCHIVED','STALE_RUN'].includes(safe.code))throw error;
           await update(id,(r,w)=>{
             if(r.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
-            r.visitedUrls=[...new Set([...(r.visitedUrls||[]),url])].slice(0,MAX_FETCHED_PAGES);
-            r.pageErrors=[...(r.pageErrors||[]),{url,code:safe.code,message:safe.message}].slice(-MAX_FETCHED_PAGES);
+            r.visitedUrls=[...new Set([...(r.visitedUrls||[]),target.url])].slice(0,MAX_FETCHED_PAGES);
+            r.pageErrors=[...(r.pageErrors||[]),{url:target.url,code:safe.code,message:safe.message}].slice(-MAX_FETCHED_PAGES);
             const snapshot=collectorSnapshot(runtime,day);if(snapshot)w.budgets.collector=snapshot;
+            emitProgress(r,'page_failed','A planned page could not be saved; collection continued.',now());
           });
         }
       }
@@ -296,6 +450,7 @@ function createResearchCoordinator({
       await update(id,r=>{
         if(r.runId!==runId)throw new ResearchError('STALE_RUN','A newer research run replaced this one.');
         r.status='evidence_ready';r.completedAt=now();r.error=null;setStep(r,'research','complete');setStep(r,'draft','not_started');
+        emitProgress(r,'evidence_ready',`${r.usage?.pagesSaved||0} public ${r.usage?.pagesSaved===1?'page':'pages'} saved for review.`,now());
       });
       return result(id);
     } catch(error) {return fail(id,runId,'research',error);}
@@ -342,7 +497,7 @@ function createResearchCoordinator({
         if(!['failed','configuration_required'].includes(research.status))throw new ResearchError('RETRY_UNAVAILABLE','This research run does not need a retry.');
         research.runId=randomId();research.status='queued';research.error=null;research.completedAt=null;
         research.usage={queriesReserved:0,pagesAttempted:0,pagesSaved:0,storedChars:0,storedBytes:0};
-        research.plan=null;research.visitedUrls=[];research.pageErrors=[];research.warnings=[];research.sources=[];research.facts=[];research.icp=null;
+        research.plan=null;research.visitedUrls=[];research.pageErrors=[];research.warnings=[];research.sources=[];research.facts=[];research.icp=null;research.progress=null;research.progressEvents=[];
         setStep(research,'identify',research.selectedCandidate||research.candidates?.length?'complete':'not_started');
         setStep(research,'research','not_started');setStep(research,'draft','not_started');touch(research,now());
         return workspace;
@@ -368,5 +523,6 @@ function createResearchCoordinator({
 
 module.exports={
   createResearchCoordinator,ResearchError,safeError,normalizeResearchUrl,selectResearchUrls,discoveryQueries,
+  homepageTargets,sitemapTargets,externalTargetForRow,
   MAX_CANDIDATES,MAX_SERPER_QUERIES,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN
 };

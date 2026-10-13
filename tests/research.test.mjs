@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace}=require('../scripts/server/state.cjs');
 const {requestResearch}=require('../scripts/onboarding/research-request.cjs');
-const {createResearchCoordinator,normalizeResearchUrl,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN}=require('../scripts/onboarding/research.cjs');
+const {createResearchCoordinator,normalizeResearchUrl,discoveryQueries,homepageTargets,sitemapTargets,externalTargetForRow,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN}=require('../scripts/onboarding/research.cjs');
 const {search,serperSettings}=require('../scripts/serper.cjs');
 
 const enabledEnv={
@@ -42,9 +42,9 @@ function harness({state=requestResearch(defaultState(),'Example'),env=enabledEnv
   const runtimeFactory=()=>({
     usage:{seller_site:{requests:0,cacheHits:0,lastAt:null}},health:{},
     snapshot(){return {schemaVersion:1,usage:this.usage,health:this.health};},
-    async request(source,url){
-      pageCalls.push({source,url});this.usage.seller_site.requests++;
-      if(pageImpl)return pageImpl(source,url,pageCalls.length);
+    async request(source,url,options={}){
+      pageCalls.push({source,url,options});this.usage.seller_site.requests++;
+      if(pageImpl)return pageImpl(source,url,pageCalls.length,options);
       return {url,fetchedAt:'2026-09-17T12:00:00Z',text:`<title>Example</title><p>Public evidence from ${url}</p>`};
     }
   });
@@ -173,6 +173,73 @@ it('resumes an interrupted persisted run without crossing workspace or archive b
 it('normalizes only selected-domain HTTPS pages and strips tracking fragments',()=>{
   expect(normalizeResearchUrl('https://docs.example.com/a?utm_source=x&b=2#part','example.com')).toBe('https://docs.example.com/a?b=2');
   for(const value of ['http://example.com','https://evil.example/a','https://user:pass@example.com','https://example.com:8443'])expect(normalizeResearchUrl(value,'example.com')).toBeNull();
+});
+
+it('uses three bounded discovery queries covering the required seller, comparison, funding and hiring terms',()=>{
+  const queries=discoveryQueries({name:'Example',domain:'example.com'}),text=queries.join(' ').toLowerCase();
+  expect(queries).toHaveLength(3);
+  for(const term of ['product','solutions','pricing','customers','case studies','about','careers','alternatives','vs','raises','hiring'])expect(text).toContain(term);
+  expect(queries.slice(0,2).every(query=>query.includes('site:example.com'))).toBe(true);
+});
+
+it('discovers only relevant same-domain homepage and sitemap links',()=>{
+  const candidate={name:'Example',domain:'example.com',website:'https://example.com'};
+  const homepage=homepageTargets(candidate,`<a href="/product">Product</a><a href="https://docs.example.com/solutions">Solutions</a><a href="/careers">Careers</a><a href="/logo.svg">Logo</a><a href="https://evil.example/about">Wrong host</a><link rel="sitemap" href="/sitemap-products.xml">`,'https://example.com/');
+  expect(homepage.map(item=>item.url)).toEqual(['https://example.com/product','https://docs.example.com/solutions','https://example.com/careers','https://example.com/sitemap-products.xml']);
+  const sitemap=sitemapTargets(candidate,'<urlset><loc>https://example.com/customers/acme?utm_source=x</loc><loc>https://example.com/about</loc><loc>https://evil.example/careers</loc><loc>https://example.com/image.png</loc></urlset>','https://example.com/sitemap.xml');
+  expect(sitemap.map(item=>item.url)).toEqual(['https://example.com/customers/acme','https://example.com/about']);
+});
+
+it('admits only seller-tied allowlisted ATS and SEC search results',()=>{
+  const candidate={name:'Example',domain:'example.com',website:'https://example.com'};
+  expect(externalTargetForRow(candidate,{title:'Jobs at Example',url:'https://boards.greenhouse.io/example/jobs/123'})).toMatchObject({source:'greenhouse',kind:'greenhouse_jobs',expectedHost:'boards.greenhouse.io'});
+  expect(externalTargetForRow(candidate,{title:'Example, Inc. filing',snippet:'Example annual filing',url:'https://www.sec.gov/Archives/edgar/data/123/filing.htm'})).toMatchObject({source:'engineering_web',kind:'sec_edgar',expectedHost:'www.sec.gov'});
+  for(const row of [
+    {title:'Jobs at Example',url:'https://boards.greenhouse.io/unrelated/jobs/123'},
+    {title:'Unrelated filing',url:'https://www.sec.gov/Archives/edgar/data/123/filing.htm'},
+    {title:'Jobs at Example',url:'https://evil.example/example/jobs/123'},
+    {title:'Example home',url:'https://www.sec.gov/index.html'}
+  ])expect(externalTargetForRow(candidate,row)).toBeNull();
+});
+
+it('collects homepage and sitemap discoveries plus tied ATS and SEC pages within one twenty-page plan',async()=>{
+  const discoveryRows=[
+    {title:'Example pricing',url:'https://example.com/pricing',snippet:'Pricing'},
+    {title:'Jobs at Example',url:'https://boards.greenhouse.io/example/jobs/123',snippet:'Example engineering roles'},
+    {title:'Example filing',url:'https://www.sec.gov/Archives/edgar/data/123/filing.htm',snippet:'Example annual filing'},
+    {title:'Jobs at Example',url:'https://boards.greenhouse.io/unrelated/jobs/456',snippet:'Unrelated board'},
+    {title:'Unrelated filing',url:'https://www.sec.gov/Archives/edgar/data/999/filing.htm',snippet:'Another issuer'}
+  ];
+  const h=harness({searchImpl:(query,count)=>count===1?candidateRows():discoveryRows,pageImpl:async(source,url)=>{
+    if(url==='https://example.com/')return {url,fetchedAt:'2026-09-17T12:00:00Z',text:'<title>Example</title><a href="/product">Product</a><a href="/solutions">Solutions</a><a href="/customers/acme">Customer</a><a href="/about">About</a><a href="/careers">Careers</a><a href="https://evil.example/about">Wrong host</a>'};
+    if(url==='https://example.com/sitemap.xml')return {url,fetchedAt:'2026-09-17T12:00:00Z',text:'<urlset><loc>https://example.com/case-studies/acme</loc><loc>https://example.com/pricing</loc><loc>https://evil.example/careers</loc></urlset>'};
+    return {url,fetchedAt:'2026-09-17T12:00:00Z',text:`<title>Saved</title><p>Public evidence from ${url}</p>`};
+  }});
+  const identified=await h.coordinator.start(h.id),finished=await h.coordinator.confirm(h.id,identified.candidates[0].id,identified.revision);
+  const fetched=new Set(h.pageCalls.map(call=>call.url));
+  for(const url of ['https://example.com/','https://example.com/sitemap.xml','https://example.com/product','https://example.com/solutions','https://example.com/customers/acme','https://example.com/about','https://example.com/careers','https://example.com/case-studies/acme','https://boards.greenhouse.io/example/jobs/123','https://www.sec.gov/Archives/edgar/data/123/filing.htm'])expect(fetched.has(url)).toBe(true);
+  expect(fetched.has('https://evil.example/about')).toBe(false);
+  expect(fetched.has('https://boards.greenhouse.io/unrelated/jobs/456')).toBe(false);
+  expect(fetched.has('https://www.sec.gov/Archives/edgar/data/999/filing.htm')).toBe(false);
+  expect(h.pageCalls.length).toBeLessThanOrEqual(MAX_FETCHED_PAGES);
+  expect(h.pageCalls.find(call=>call.source==='greenhouse').options.allowedRedirectDomain).toBe('boards.greenhouse.io');
+  expect(h.pageCalls.find(call=>call.source==='engineering_web').options.allowedRedirectDomain).toBe('www.sec.gov');
+  expect(finished.sources.map(source=>source.kind)).toEqual(expect.arrayContaining(['seller_sitemap','greenhouse_jobs','sec_edgar']));
+  expect(finished.progress).toMatchObject({type:'evidence_ready',pagesAttempted:h.pageCalls.length,pagesSaved:finished.sources.length});
+  expect(finished.progressEvents.some(event=>event.type==='page_saved')).toBe(true);
+  expect(finished.plan.urls).toHaveLength(finished.plan.targets.length);
+  expect(finished.plan.urls.length).toBeLessThanOrEqual(MAX_FETCHED_PAGES);
+});
+
+it('rejects an allowlisted external result that redirects to a different host',async()=>{
+  const rows=[{title:'Jobs at Example',url:'https://boards.greenhouse.io/example/jobs/123',snippet:'Example jobs'}];
+  const h=harness({searchImpl:(query,count)=>count===1?candidateRows():rows,pageImpl:async(source,url)=>({
+    url:source==='greenhouse'?'https://jobs.lever.co/example/123':url,fetchedAt:'2026-09-17T12:00:00Z',text:'<title>Page</title><p>Evidence</p>'
+  })});
+  const identified=await h.coordinator.start(h.id),finished=await h.coordinator.confirm(h.id,identified.candidates[0].id,identified.revision);
+  expect(finished.status).toBe('evidence_ready');
+  expect(finished.pageErrors).toContainEqual(expect.objectContaining({url:'https://boards.greenhouse.io/example/jobs/123',code:'OFF_DOMAIN_REDIRECT'}));
+  expect(finished.sources.some(source=>source.url.startsWith('https://jobs.lever.co/'))).toBe(false);
 });
 
 it('rejects a final redirect outside the confirmed company domain',async()=>{

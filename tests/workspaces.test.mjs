@@ -8,6 +8,7 @@ const require=createRequire(import.meta.url);
 const {defaultState,loadState,saveState}=require('../scripts/server/state.cjs');
 const {requestResearch}=require('../scripts/onboarding/research-request.cjs');
 const {changeArchive,workspacesPage}=require('../scripts/server/workspaces.cjs');
+const {workspaceAction}=require('../scripts/server/actions.cjs');
 const {createRouter}=require('../scripts/server/router.cjs');
 const input={revision:0,profileRevision:0,now:()=> '2026-09-16T12:00:00.000Z'};
 
@@ -43,6 +44,14 @@ it('shows honest empty status, dates, safe names and explicit archive confirmati
   const page=workspacesPage(requestResearch(defaultState(),'<script>'));
   expect(page).toContain('&lt;script&gt;');expect(page).not.toContain('<h2><script>');
   expect(page).toContain('Profile approved: Not yet');expect(page).toContain('name="acknowledged" required');
+});
+it('hides system refresh workspaces and rejects direct switching to them',async()=>{
+  const state=requestResearch(defaultState(),'Vercel'),visibleId=state.activeWorkspaceId,hiddenId='refresh-hidden';
+  state.workspaces[hiddenId]={...structuredClone(state.workspaces[visibleId]),id:hiddenId,name:'Hidden monthly refresh',systemRole:'seller_refresh',ownerWorkspaceId:visibleId};
+  const page=workspacesPage(state);
+  expect(page).not.toContain('Hidden monthly refresh');expect(page).not.toContain(`value="${hiddenId}"`);
+  const req={headers:{host:'127.0.0.1'},async *[Symbol.asyncIterator](){yield Buffer.from(new URLSearchParams({id:hiddenId}).toString());}};
+  await expect(workspaceAction(req,state,'/workspaces/switch')).rejects.toThrow('System workspaces cannot be opened.');
 });
 it('protects archive routes, rejects archived switching and persists restore across restart',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-workspaces-')),stateFile=path.join(dir,'state.json');let server;

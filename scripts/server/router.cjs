@@ -14,9 +14,10 @@ const {randomUUID} = require('node:crypto');
 const {onboardingRoute} = require('../onboarding/routes.cjs');
 const {createResearchCoordinator}=require('../onboarding/research.cjs');
 const {createSynthesisCoordinator}=require('../onboarding/synthesis-runner.cjs');
+const {createRefreshCoordinator,refreshProvidersReady}=require('../onboarding/refresh-runner.cjs');
 const {createLlm}=require('../llm.cjs');
 const {changeArchive,workspacesPage}=require('./workspaces.cjs');
-function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,llm:providedLlm} = {}) {
+function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,llm:providedLlm} = {}) {
   loadState(stateFile);
   let writes = Promise.resolve();
   const jobs=new Map();
@@ -30,9 +31,15 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   const researchCoordinator=providedResearch||createResearchCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
   const llm=providedLlm||createLlm({read,mutate,env});
   const synthesisCoordinator=providedSynthesis||createSynthesisCoordinator({read,mutate,llm});
+  const refreshCoordinator=providedRefresh||createRefreshCoordinator({read,mutate,researchCoordinator,synthesisCoordinator,env});
   // Persisted interrupted research can resume after a local restart. Errors are
   // saved in the workspace and never crash the HTTP server.
   if(typeof researchCoordinator.resumePending==='function')void researchCoordinator.resumePending().catch(()=>{});
+  if(refreshProvidersReady(env)){
+    void refreshCoordinator.resumePending().then(()=>refreshCoordinator.runDue()).catch(()=>{});
+    const refreshTimer=setInterval(()=>{void refreshCoordinator.runDue().catch(()=>{});},6*60*60*1000);
+    refreshTimer.unref();
+  }
   return async (req,res) => {
     const html = (status, body) => {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(body);};
     try {
