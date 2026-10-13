@@ -10,7 +10,7 @@ Added `refresh-runner.cjs`, the persistent monthly coordinator. A due approved s
 
 Added complete recorded onboarding fixtures for Resolve AI, Shopify and Vercel. All three pass evidence collection, strict grounded drafting, at least 90% receipt coverage, editable review and explicit human approval without provider calls. Resolve's generated segments and buyer/champion personas overlap the frozen reference configuration as required. Browser verification used isolated local state and visibly confirmed the complete generated-review screen, 100% receipt report and monthly before/after approval screen at desktop and 768-pixel widths; no real workspace was changed.
 
-Verification: 18 test files and 93 tests passed. `npm audit --omit=dev --audit-level=high` found zero vulnerabilities. The ignored local `.env` and `.whynow/` state stayed outside Git. The Implementation Plan's real-key three-company paid acceptance is deliberately not claimed because the owner instructed that paid OpenAI remain off. Stage 2 is complete for the current local/no-paid-OpenAI configuration; Stage 3 has not started.
+Verification: 18 test files and 93 tests passed. `npm audit --omit=dev --audit-level=high` found zero vulnerabilities. The ignored local `.env` and `.whynow/` state stayed outside Git. Completion commit `9169eba` is published, and GitHub's Foundation checks run `38484528857` passed. The Implementation Plan's real-key three-company paid acceptance is deliberately not claimed because the owner instructed that paid OpenAI remain off. Stage 2 is complete for the current local/no-paid-OpenAI configuration; Stage 3 has not started.
 
 ## Stage 2 offline research core — 2026-09-17
 
