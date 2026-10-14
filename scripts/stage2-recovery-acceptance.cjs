@@ -14,6 +14,7 @@ const {CollectorRuntime}=require('./collectors/runtime.cjs');
 const ROOT=path.resolve(__dirname,'..');
 const ACCEPTANCE_STATE_FILE=path.join(ROOT,'.whynow','acceptance-state.json');
 const ACCEPTANCE_REPORT_FILE=path.join(ROOT,'.whynow','stage2-recovery-report.json');
+const ACCEPTANCE_PROGRESS_FILE=path.join(ROOT,'.whynow','stage2-recovery-progress.json');
 const SNAPSHOT_DIR=path.join(ROOT,'tests','fixtures','onboarding');
 const COMPANIES=Object.freeze([
   Object.freeze({name:'Resolve AI',domain:'resolve.ai',slug:'resolve-ai'}),
@@ -151,6 +152,17 @@ function actualCostUsd(usage) {
   return usage.reduce((sum,item)=>sum+(item.promptTokens*0.15+item.completionTokens*0.60)/1_000_000,0);
 }
 
+function readProgress() {
+  try{return JSON.parse(fs.readFileSync(ACCEPTANCE_PROGRESS_FILE,'utf8'));}
+  catch(error){if(error.code==='ENOENT')return {schemaVersion:1,events:[]};throw error;}
+}
+
+function recordProgress(event) {
+  const progress=readProgress();
+  progress.events.push({at:new Date().toISOString(),...event});
+  atomicWrite(ACCEPTANCE_PROGRESS_FILE,`${JSON.stringify(progress,null,2)}\n`);
+}
+
 async function paidRecovery() {
   if(!fs.existsSync(ACCEPTANCE_STATE_FILE))throw new Error('Run the cache-only preflight first.');
   const loaded=loadedEnvironment();
@@ -161,45 +173,68 @@ async function paidRecovery() {
   const targets=COMPANIES.map(company=>{
     const workspace=Object.values(state.workspaces).find(item=>item.research?.selectedCandidate?.domain?.replace(/^www\./,'')===company.domain);
     if(!workspace)throw new Error(`${company.name}: preflight workspace is missing.`);
-    if(workspace.research?.status!=='evidence_ready'||workspace.status!=='draft')throw new Error(`${company.name}: preflight workspace is not ready for one draft call.`);
-    if(workspace.llmCache&&Object.keys(workspace.llmCache).length)throw new Error(`${company.name}: an LLM cache already exists; refusing an ambiguous recovery run.`);
+    if(workspace.status==='needs_review'&&workspace.research?.status==='review_required') {
+      const snapshotFile=path.join(SNAPSHOT_DIR,`${company.slug}-live-icp.json`);
+      if(!fs.existsSync(snapshotFile))throw new Error(`${company.name}: persisted draft has no public snapshot.`);
+      return {company,workspaceId:workspace.id,action:'skip'};
+    }
+    if(workspace.research?.status!=='evidence_ready'||workspace.status!=='draft')throw new Error(`${company.name}: recovery workspace is not ready for drafting or review.`);
+    const attempts=workspace.budgets.openai?.calls||0;
+    if(attempts>=2)throw new Error(`${company.name}: the one permitted transient retry is already exhausted.`);
     buildSynthesisRequest(state,workspace.id);
-    return {company,workspaceId:workspace.id};
+    return {company,workspaceId:workspace.id,action:'generate'};
   });
   if(targets.length!==3)throw new Error('Recovery must contain exactly three seller workspaces.');
 
   const apiUsage=[];
-  let providerAttempts=0,logicalCalls=0;
+  let currentCompany='unknown',newProviderAttempts=0,newLogicalCalls=0;
   const fetchImpl=async(...args)=>{
-    providerAttempts++;
-    const response=await fetch(...args);
-    if(response.ok)try{
-      const payload=await response.clone().json(),usage=payload.usage||{};
-      apiUsage.push({model:payload.model||'gpt-4o-mini',promptTokens:usage.prompt_tokens||0,completionTokens:usage.completion_tokens||0,totalTokens:usage.total_tokens||0});
-    }catch{}
-    return response;
+    newProviderAttempts++;
+    try{
+      const response=await fetch(...args);
+      if(response.ok)try{
+        const payload=await response.clone().json(),usage=payload.usage||{};
+        const entry={company:currentCompany,model:payload.model||'gpt-4o-mini',promptTokens:usage.prompt_tokens||0,completionTokens:usage.completion_tokens||0,totalTokens:usage.total_tokens||0};
+        apiUsage.push(entry);recordProgress({type:'successful_provider_response',...entry,costUsd:Number(actualCostUsd([entry]).toFixed(6))});
+      }catch{recordProgress({type:'provider_response_usage_unavailable',company:currentCompany,httpStatus:response.status});}
+      else recordProgress({type:'provider_http_failure',company:currentCompany,httpStatus:response.status});
+      return response;
+    }catch(error){
+      recordProgress({type:'provider_transport_failure',company:currentCompany,errorName:String(error?.name||'Error').slice(0,80),errorCode:String(error?.code||'').slice(0,80)});
+      throw error;
+    }
   };
   const llm=createLlm({...adapter,env,fetchImpl});
-  const countedLlm={generate:request=>{logicalCalls++;if(logicalCalls>3)throw new Error('Exactly three logical GPT calls are allowed.');return llm.generate(request);}};
+  const countedLlm={generate:request=>{newLogicalCalls++;if(newLogicalCalls>3)throw new Error('At most three logical GPT calls are allowed in one recovery process.');return llm.generate(request);}};
   const synthesis=createSynthesisCoordinator({...adapter,llm:countedLlm});
   const commit=commitHash(),results=[];
 
-  for(const {company,workspaceId} of targets) {
+  for(const {company,workspaceId,action} of targets) {
     const started=Date.now();
-    await synthesis.start(workspaceId);
+    currentCompany=company.name;
+    if(action==='generate')try{await synthesis.start(workspaceId);}
+    catch(error){recordProgress({type:'logical_draft_failed',company:company.name,code:String(error?.code||'SYNTHESIS_FAILED').slice(0,80)});throw error;}
     const workspace=getWorkspace(adapter.read(),workspaceId);
     if(workspace.status!=='needs_review'||workspace.research?.status!=='review_required')throw new Error(`${company.name}: no reviewable profile was persisted.`);
-    const capturedOn=new Date().toISOString();
-    const snapshotFile=writeSnapshot(company,workspace,{capturedOn,commit});
+    const snapshotFile=action==='generate'?writeSnapshot(company,workspace,{capturedOn:new Date().toISOString(),commit}):path.join(SNAPSHOT_DIR,`${company.slug}-live-icp.json`);
     const report=workspace.research.synthesis.report||{};
     results.push({company:company.name,domain:company.domain,workspaceId,status:workspace.status,researchStatus:workspace.research.status,
-      elapsedSeconds:Number(((Date.now()-started)/1000).toFixed(1)),snapshotFile:path.relative(ROOT,snapshotFile),attemptedClaims:report.attemptedClaims||0,
+      recoveryAction:action,elapsedSeconds:Number(((Date.now()-started)/1000).toFixed(1)),snapshotFile:path.relative(ROOT,snapshotFile),attemptedClaims:report.attemptedClaims||0,
       receiptedClaims:report.receiptedClaims||0,receiptCoverage:report.receiptCoverage||0,reservedUsd:Number(((workspace.budgets.openai?.reservedMicros||0)/1e6).toFixed(6))});
   }
   await adapter.settled();
-  if(logicalCalls!==3||apiUsage.length!==3)throw new Error(`Expected three completed GPT calls; saw ${logicalCalls} logical calls and ${apiUsage.length} successful provider responses.`);
+  const finalState=adapter.read(),successfulProfiles=COMPANIES.filter(company=>Object.values(finalState.workspaces).some(workspace=>workspace.sellerProfile?.domain===company.domain&&workspace.status==='needs_review')).length;
+  if(successfulProfiles!==3)throw new Error(`Expected three persisted reviewable profiles; saw ${successfulProfiles}.`);
+  const allEvents=readProgress().events,knownUsage=allEvents.filter(event=>event.type==='successful_provider_response');
+  const providerAttempts=Object.values(finalState.workspaces).reduce((sum,workspace)=>sum+(workspace.budgets.openai?.calls||0),0);
+  const reservedMicros=Object.values(finalState.workspaces).reduce((sum,workspace)=>sum+(workspace.budgets.openai?.reservedMicros||0),0);
+  const usageComplete=knownUsage.length===3;
   const report={schemaVersion:1,completedAt:new Date().toISOString(),commitHash:commit,model:'gpt-4o-mini',promptVersion:PROMPT_VERSION,
-    localProcessCapUsd:0.05,logicalCalls,providerAttempts,actualCostUsd:Number(actualCostUsd(apiUsage).toFixed(6)),apiUsage,results,autoApproved:false};
+    localProcessCapUsd:0.05,successfulProfiles,providerAttempts,newProviderAttempts,newLogicalCalls,
+    actualCostUsdKnown:Number(actualCostUsd(knownUsage).toFixed(6)),actualCostComplete:usageComplete,
+    reservedCostCeilingUsd:Number((reservedMicros/1e6).toFixed(6)),
+    costNote:usageComplete?'All successful response token usage was recorded.':'Resolve AI completed before incremental usage logging was added; its exact token cost is unavailable locally and is bounded by its reserved ceiling.',
+    apiUsage:knownUsage,results,autoApproved:false};
   atomicWrite(ACCEPTANCE_REPORT_FILE,`${JSON.stringify(report,null,2)}\n`);
   return {stateFile:ACCEPTANCE_STATE_FILE,reportFile:ACCEPTANCE_REPORT_FILE,report};
 }
@@ -213,5 +248,5 @@ async function main() {
 
 if(require.main===module)main().catch(error=>{console.error(`[failed] ${error.message}`);process.exitCode=1;});
 
-module.exports={ROOT,ACCEPTANCE_STATE_FILE,ACCEPTANCE_REPORT_FILE,SNAPSHOT_DIR,COMPANIES,matchingCandidate,createPersistentAdapter,
+module.exports={ROOT,ACCEPTANCE_STATE_FILE,ACCEPTANCE_REPORT_FILE,ACCEPTANCE_PROGRESS_FILE,SNAPSHOT_DIR,COMPANIES,matchingCandidate,createPersistentAdapter,
   createCacheOnlyRuntimeFactory,snapshotFor,actualCostUsd,preflight,paidRecovery};
