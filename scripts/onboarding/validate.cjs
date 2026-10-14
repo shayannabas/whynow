@@ -8,8 +8,9 @@ const FACT_KEYS = ['category', 'productOneLiner', 'pricingModel', 'targetCompany
 const LIST_FACT_KEYS = ['valueProps', 'credentials', 'targetIndustries'];
 const SIGNAL_KEYS = Object.keys(WEIGHTS);
 const MAX_SYNTHESIS_SOURCES = 20;
-const MAX_EVIDENCE_PACKET_BYTES = 32000;
+const MAX_EVIDENCE_PACKET_BYTES = 24000;
 const MAX_SOURCE_EXCERPT_BYTES = 6000;
+const MAX_RECEIPT_TEXT = 200;
 const CUSTOMER_SOURCE_KINDS = new Set([
   'customer_case_study',
   'customer_press_release',
@@ -44,21 +45,20 @@ function array(value, name, min, max) {
   if (!Array.isArray(value) || value.length < min || value.length > max) throw new SynthesisValidationError('INVALID_OUTPUT', `${name} must contain ${min}–${max} entries.`);
   return value;
 }
-function fact(value, name, valueKey='value') {
-  exactKeys(value,[valueKey,'sourceId','evidenceQuote'],name);
-  string(value[valueKey],`${name}.${valueKey}`,2000);
-  string(value.sourceId,`${name}.sourceId`,100);
-  string(value.evidenceQuote,`${name}.evidenceQuote`,200);
+function fact(value, name, valueKey='value', {required=false}={}) {
+  exactKeys(value,[valueKey,'receiptId'],name);
+  const content=string(value[valueKey],`${name}.${valueKey}`,2000),receipt=string(value.receiptId,`${name}.receiptId`,40);
+  if(required&&(!content.trim()||!receipt))throw new SynthesisValidationError('INVALID_OUTPUT',`${name} needs a value and receipt.`);
+  if(Boolean(content.trim())!==Boolean(receipt))throw new SynthesisValidationError('INVALID_OUTPUT',`${name} must pair its value with one receipt.`);
 }
 function stringList(value, name, min=0, max=30, itemMax=200) {
   array(value,name,min,max).forEach((item,index)=>string(item,`${name}[${index}]`,itemMax,{empty:false}));
 }
 function organization(value, name) {
-  exactKeys(value,['name','domain','sourceId','evidenceQuote'],name);
+  exactKeys(value,['name','domain','receiptId'],name);
   string(value.name,`${name}.name`,200,{empty:false});
   string(value.domain,`${name}.domain`,253);
-  string(value.sourceId,`${name}.sourceId`,100);
-  string(value.evidenceQuote,`${name}.evidenceQuote`,200);
+  string(value.receiptId,`${name}.receiptId`,40,{empty:false});
 }
 function exampleTarget(value,name) { organization(value,name); }
 
@@ -66,9 +66,9 @@ function assertSynthesisOutput(value) {
   exactKeys(value,['sellerProfile','icpConfig'],'result');
   const profile=value.sellerProfile;
   exactKeys(profile,[...FACT_KEYS,...LIST_FACT_KEYS,'proofPoints','customers','competitors'],'sellerProfile');
-  FACT_KEYS.forEach(key=>fact(profile[key],`sellerProfile.${key}`));
-  LIST_FACT_KEYS.forEach(key=>array(profile[key],`sellerProfile.${key}`,0,30).forEach((item,index)=>fact(item,`sellerProfile.${key}[${index}]`)));
-  array(profile.proofPoints,'sellerProfile.proofPoints',0,30).forEach((item,index)=>fact(item,`sellerProfile.proofPoints[${index}]`,'claim'));
+  FACT_KEYS.forEach(key=>fact(profile[key],`sellerProfile.${key}`,'value',{required:['category','productOneLiner'].includes(key)}));
+  LIST_FACT_KEYS.forEach(key=>array(profile[key],`sellerProfile.${key}`,key==='targetIndustries'?1:0,30).forEach((item,index)=>fact(item,`sellerProfile.${key}[${index}]`,'value',{required:true})));
+  array(profile.proofPoints,'sellerProfile.proofPoints',0,30).forEach((item,index)=>fact(item,`sellerProfile.proofPoints[${index}]`,'claim',{required:true}));
   array(profile.customers,'sellerProfile.customers',0,30).forEach((item,index)=>organization(item,`sellerProfile.customers[${index}]`));
   array(profile.competitors,'sellerProfile.competitors',0,30).forEach((item,index)=>organization(item,`sellerProfile.competitors[${index}]`));
 
@@ -177,6 +177,52 @@ function buildResearchEvidence(state,workspace) {
   if(perSource<200)throw new SynthesisValidationError('INPUT_TOO_LARGE','There is not enough room for bounded source excerpts.');
   return refs.map((ref,index)=>({...ref,excerpt:truncateUtf8(normalizeWhitespace(ref.source.text),perSource),packet:metadata[index]}));
 }
+function receiptIdFor(sourceId,quote) {
+  return `r_${stableId(`${sourceId}\n${normalizeWhitespace(quote)}`)}`;
+}
+function receiptQuotes(value,max=MAX_RECEIPT_TEXT) {
+  const text=normalizeWhitespace(value), sentences=text?text.split(/(?<=[.!?])\s+/):[], result=[];
+  for(const sentence of sentences) {
+    let remaining=sentence.trim();
+    while(remaining) {
+      if(remaining.length<=max) { result.push(remaining);break; }
+      let end=remaining.lastIndexOf(' ',max);
+      if(end<Math.floor(max/2))end=max;
+      result.push(remaining.slice(0,end).trim());
+      remaining=remaining.slice(end).trim();
+    }
+  }
+  return [...new Set(result.filter(Boolean))];
+}
+function buildReceiptEvidence(state,workspace) {
+  const rows=buildResearchEvidence(state,workspace);
+  const sources=rows.map(row=>{
+    const {text:ignored,...metadata}=row.packet;
+    return {...metadata,receipts:[]};
+  });
+  const queues=rows.map(row=>receiptQuotes(row.excerpt)),receiptMap=new Map();
+  let more=true;
+  while(more) {
+    more=false;
+    for(let index=0;index<queues.length;index++) {
+      const quote=queues[index].shift();
+      if(!quote)continue;
+      more=true;
+      const receiptId=receiptIdFor(rows[index].sourceId,quote),entry={receiptId,text:quote};
+      sources[index].receipts.push(entry);
+      const serialized=JSON.stringify({schemaVersion:1,sources});
+      if(Buffer.byteLength(serialized)>MAX_EVIDENCE_PACKET_BYTES) {
+        sources[index].receipts.pop();more=false;
+        for(const queue of queues)queue.length=0;
+        break;
+      }
+      receiptMap.set(receiptId,{...rows[index],receiptId,evidenceQuote:quote});
+    }
+  }
+  const serialized=JSON.stringify({schemaVersion:1,sources});
+  if(!receiptMap.size)throw new SynthesisValidationError('NO_SOURCES','Collected pages did not contain usable receipt text.');
+  return {schemaVersion:1,sources,serialized,sourceIds:rows.map(row=>row.sourceId),receiptIds:[...receiptMap.keys()],receiptMap};
+}
 function selectedCandidate(workspace) {
   const candidate=workspace.research?.selectedCandidate||workspace.onboarding?.selectedCandidate;
   const domain=normalizeDomain(candidate?.domain);
@@ -185,11 +231,11 @@ function selectedCandidate(workspace) {
 }
 
 function evidenceFor(state,workspace,raw,value,context) {
-  const sourceId=clean(raw?.sourceId,100), quote=clean(raw?.evidenceQuote,200), ref=context.get(sourceId);
+  const receiptId=clean(raw?.receiptId,40),ref=context.get(receiptId),sourceId=ref?.sourceId||null,quote=ref?.evidenceQuote||'';
   const grounded=Boolean(ref&&quote&&quoteIsGrounded(state,sourceId,quote)&&normalizeWhitespace(ref.excerpt).includes(normalizeWhitespace(quote)));
-  return {schemaVersion:1,value,sourceUrl:ref?.source.url||null,sourceId:ref?.sourceId||null,evidenceQuote:quote,inferred:!grounded,
-    verification:grounded?'matched_saved_quote':ref?'quote_not_matched':sourceId?'source_not_in_research':'no_source',
-    reason:grounded?'Quote matched saved source text.':ref?'The quote did not match the saved source text.':sourceId?'The cited source was not included in this research run.':'No supporting source was cited.'};
+  return {schemaVersion:1,value,sourceUrl:ref?.source.url||null,sourceId,evidenceQuote:quote,inferred:!grounded,
+    verification:grounded?'matched_saved_quote':receiptId?'receipt_not_in_research':'no_source',
+    reason:grounded?'Quote matched saved source text.':receiptId?'The selected receipt was not included in this research run.':'No supporting receipt was selected.'};
 }
 function customerSourceAllowed(item,ref,sellerDomain) {
   if(!ref)return false;
@@ -200,7 +246,7 @@ function customerSourceAllowed(item,ref,sellerDomain) {
 
 function materializeGeneratedDraft(state,workspace,output,{now=()=>new Date().toISOString()}={}) {
   assertSynthesisOutput(output);
-  const candidate=selectedCandidate(workspace), context=new Map(buildResearchEvidence(state,workspace).map(ref=>[ref.sourceId,ref])), evidence={}, warnings=[], droppedCustomers=[], droppedCompetitors=[];
+  const candidate=selectedCandidate(workspace), context=buildReceiptEvidence(state,workspace).receiptMap, evidence={}, warnings=[], droppedCustomers=[], droppedCompetitors=[];
   let attemptedClaims=0, acceptedClaims=0, receiptedClaims=0;
   const count=item=>{attemptedClaims++;acceptedClaims++;if(!item.inferred)receiptedClaims++;else warnings.push({value:item.value,reason:item.reason});};
   const profile={schemaVersion:1,sellerName:candidate.name,domain:candidate.domain,deliveryAllowed:false,generatedAt:now(),approvedAt:null,updatedAt:now(),sources:[]};
@@ -228,7 +274,7 @@ function materializeGeneratedDraft(state,workspace,output,{now=()=>new Date().to
   for(const raw of output.sellerProfile.customers) {
     const name=clean(raw.name,200),domain=normalizeDomain(raw.domain),dedupe=domain||name.toLowerCase();
     if(!name||seenCustomers.has(dedupe))continue;seenCustomers.add(dedupe);attemptedClaims++;
-    const item=evidenceFor(state,workspace,raw,name,context),ref=context.get(clean(raw.sourceId,100));
+    const item=evidenceFor(state,workspace,raw,name,context),ref=context.get(clean(raw.receiptId,40));
     if(!name||item.inferred||!customerSourceAllowed(raw,ref,candidate.domain)) { droppedCustomers.push({name,reason:item.inferred?item.reason:'Customer evidence was not from an allowed first-party source.'});continue; }
     const index=profile.customers.length;profile.customers.push({name,domain,...item});evidence[`customers.${index}`]=item;acceptedClaims++;receiptedClaims++;
   }
@@ -295,4 +341,4 @@ function saveGeneratedProfile(state,id,{output,expectedResearchRevision,expected
   return next;
 }
 
-module.exports={FACT_KEYS,LIST_FACT_KEYS,SIGNAL_KEYS,DEFAULT_TIER_RULES,MAX_SYNTHESIS_SOURCES,MAX_EVIDENCE_PACKET_BYTES,MAX_SOURCE_EXCERPT_BYTES,SynthesisValidationError,assertSynthesisOutput,validateSynthesisOutput,researchSourceContext,buildResearchEvidence,sourceSetHash,materializeGeneratedDraft,saveGeneratedProfile};
+module.exports={FACT_KEYS,LIST_FACT_KEYS,SIGNAL_KEYS,DEFAULT_TIER_RULES,MAX_SYNTHESIS_SOURCES,MAX_EVIDENCE_PACKET_BYTES,MAX_SOURCE_EXCERPT_BYTES,MAX_RECEIPT_TEXT,SynthesisValidationError,assertSynthesisOutput,validateSynthesisOutput,researchSourceContext,buildResearchEvidence,buildReceiptEvidence,receiptIdFor,sourceSetHash,materializeGeneratedDraft,saveGeneratedProfile};

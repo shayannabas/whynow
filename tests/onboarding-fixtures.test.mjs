@@ -8,7 +8,7 @@ const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace,updateWorkspace}=require('../scripts/server/state.cjs');
 const {recordSource}=require('../scripts/sources.cjs');
 const {buildSynthesisRequest}=require('../scripts/onboarding/synthesize.cjs');
-const {SIGNAL_KEYS,saveGeneratedProfile}=require('../scripts/onboarding/validate.cjs');
+const {SIGNAL_KEYS,buildReceiptEvidence,saveGeneratedProfile}=require('../scripts/onboarding/validate.cjs');
 const {approveManualProfile,LABELS}=require('../scripts/onboarding/manual-profile.cjs');
 const {loadReferenceProfile}=require('../scripts/onboarding/reference-profile.cjs');
 
@@ -16,12 +16,19 @@ const directory=path.join(path.dirname(fileURLToPath(import.meta.url)),'fixtures
 const fixtures=fs.readdirSync(directory).filter(file=>file.endsWith('.json')).sort().map(file=>JSON.parse(fs.readFileSync(path.join(directory,file),'utf8')));
 const START='2026-09-17T12:00:00.000Z';
 
-function recordedFact(value,sourceIds,valueKey='value') {
-  if(!value)return {[valueKey]:'',sourceId:'',evidenceQuote:''};
-  return {[valueKey]:value[valueKey]??value.value,sourceId:sourceIds.get(value.sourceUrl),evidenceQuote:value.evidenceQuote};
+function recordedReceipt(value,sourceIds,receiptMap) {
+  const sourceId=sourceIds.get(value.sourceUrl),quote=String(value.evidenceQuote).replace(/\s+/g,' ').trim();
+  const receipt=[...receiptMap.values()].find(item=>item.sourceId===sourceId&&item.evidenceQuote.includes(quote));
+  if(!receipt)throw new Error(`Recorded receipt is missing for ${value.sourceUrl}`);
+  return receipt.receiptId;
 }
 
-function recordedOutput(fixture,sourceIds) {
+function recordedFact(value,sourceIds,receiptMap,valueKey='value') {
+  if(!value)return {[valueKey]:'',receiptId:''};
+  return {[valueKey]:value[valueKey]??value.value,receiptId:recordedReceipt(value,sourceIds,receiptMap)};
+}
+
+function recordedOutput(fixture,sourceIds,receiptMap) {
   const facts=fixture.sellerFacts;
   const segments=fixture.strategy.segments.map(label=>({
     label,
@@ -41,16 +48,16 @@ function recordedOutput(fixture,sourceIds) {
   }]));
   return {
     sellerProfile:{
-      category:recordedFact(facts.category,sourceIds),
-      productOneLiner:recordedFact(facts.productOneLiner,sourceIds),
-      pricingModel:recordedFact(facts.pricingModel,sourceIds),
-      targetCompanySize:recordedFact(facts.targetCompanySize,sourceIds),
-      valueProps:facts.valueProps.map(item=>recordedFact(item,sourceIds)),
-      proofPoints:facts.proofPoints.map(item=>recordedFact(item,sourceIds,'claim')),
-      credentials:facts.credentials.map(item=>recordedFact(item,sourceIds)),
-      targetIndustries:facts.targetIndustries.map(item=>recordedFact(item,sourceIds)),
-      customers:facts.customers.map(item=>({name:item.name,domain:item.domain,sourceId:sourceIds.get(item.sourceUrl),evidenceQuote:item.evidenceQuote})),
-      competitors:facts.competitors.map(item=>({name:item.name,domain:item.domain,sourceId:sourceIds.get(item.sourceUrl),evidenceQuote:item.evidenceQuote}))
+      category:recordedFact(facts.category,sourceIds,receiptMap),
+      productOneLiner:recordedFact(facts.productOneLiner,sourceIds,receiptMap),
+      pricingModel:recordedFact(facts.pricingModel,sourceIds,receiptMap),
+      targetCompanySize:recordedFact(facts.targetCompanySize,sourceIds,receiptMap),
+      valueProps:facts.valueProps.map(item=>recordedFact(item,sourceIds,receiptMap)),
+      proofPoints:facts.proofPoints.map(item=>recordedFact(item,sourceIds,receiptMap,'claim')),
+      credentials:facts.credentials.map(item=>recordedFact(item,sourceIds,receiptMap)),
+      targetIndustries:facts.targetIndustries.map(item=>recordedFact(item,sourceIds,receiptMap)),
+      customers:facts.customers.map(item=>({name:item.name,domain:item.domain,receiptId:recordedReceipt(item,sourceIds,receiptMap)})),
+      competitors:facts.competitors.map(item=>({name:item.name,domain:item.domain,receiptId:recordedReceipt(item,sourceIds,receiptMap)}))
     },
     icpConfig:{
       segments,
@@ -81,7 +88,7 @@ function prepare(fixture) {
       startedAt:START,completedAt,sources:sourceRows,usage:{queriesReserved:0,pagesAttempted:sourceRows.length,pagesSaved:sourceRows.length,storedChars:sourceRows.reduce((sum,row)=>sum+row.chars,0),storedBytes:sourceRows.reduce((sum,row)=>sum+row.bytes,0)},
       steps:[{key:'identify',status:'complete'},{key:'research',status:'complete'},{key:'draft',status:'not_started'},{key:'review',status:'not_started'}]};
   });
-  return {state,id,sourceIds};
+  return {state,id,sourceIds,receiptMap:buildReceiptEvidence(state,state.workspaces[id]).receiptMap};
 }
 
 it('runs three unrelated recorded sellers through research, grounded drafting, review and approval without provider calls',()=>{
@@ -89,7 +96,7 @@ it('runs three unrelated recorded sellers through research, grounded drafting, r
   const completed=new Map();
   for(const fixture of fixtures) {
     const prepared=prepare(fixture),built=buildSynthesisRequest(prepared.state,prepared.id);
-    let next=saveGeneratedProfile(prepared.state,prepared.id,{output:recordedOutput(fixture,prepared.sourceIds),...built.guard,model:'recorded-fixture',promptVersion:'recorded-fixture-v1',now:()=>new Date(Date.parse(START)+1000).toISOString()});
+    let next=saveGeneratedProfile(prepared.state,prepared.id,{output:recordedOutput(fixture,prepared.sourceIds,prepared.receiptMap),...built.guard,model:'recorded-fixture',promptVersion:'recorded-fixture-v1',now:()=>new Date(Date.parse(START)+1000).toISOString()});
     let workspace=next.workspaces[prepared.id];
     expect(workspace.status).toBe('needs_review');
     expect(workspace.research.synthesis.report.receiptCoverage).toBeGreaterThanOrEqual(0.9);

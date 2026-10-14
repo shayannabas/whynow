@@ -3,14 +3,17 @@ const {getWorkspace,updateWorkspace}=require('./server/state.cjs');
 
 const ENDPOINT='https://api.openai.com/v1/chat/completions';
 const DEFAULT_MODEL='gpt-4o-mini';
+const DEFAULT_TIMEOUT_MS=90000;
 class LlmError extends Error {constructor(code,message){super(message);this.code=code;}}
 function settings(env={}) {
   const model=env.OPENAI_MODEL||DEFAULT_MODEL;
   const dollars=Number(env.OPENAI_MONTHLY_LIMIT_USD||0);
   const callLimit=Number(env.OPENAI_WORKSPACE_MONTHLY_CALL_LIMIT||100);
+  const requestedTimeout=Number(env.OPENAI_TIMEOUT_MS||DEFAULT_TIMEOUT_MS);
   return {model,enabled:env.OPENAI_ENABLED==='true',keyPresent:Boolean(env.OPENAI_API_KEY?.trim()),
     limitMicros:Number.isFinite(dollars)&&dollars>0&&dollars<=1000?Math.floor(dollars*1e6):0,
-    callLimit:Number.isInteger(callLimit)&&callLimit>0&&callLimit<=1000?callLimit:0};
+    callLimit:Number.isInteger(callLimit)&&callLimit>0&&callLimit<=1000?callLimit:0,
+    timeoutMs:Number.isInteger(requestedTimeout)&&requestedTimeout>=1000&&requestedTimeout<=180000?requestedTimeout:DEFAULT_TIMEOUT_MS};
 }
 function assertReady(config) {
   if(!config.enabled)throw new LlmError('DISABLED','OpenAI calls are disabled.');
@@ -26,7 +29,7 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
     if(!promptVersion || typeof promptVersion!=='string' || promptVersion.length>100 || typeof validate!=='function' || !schema || !/^[a-zA-Z0-9_-]{1,64}$/.test(name))throw new LlmError('INVALID_INPUT','A versioned prompt, schema and local validator are required.');
     if(!Array.isArray(messages)||!messages.length||messages.length>20||messages.some(m=>!['system','user','assistant'].includes(m.role)||typeof m.content!=='string'))throw new LlmError('INVALID_INPUT','Use bounded text-only messages.');
     if(!Number.isInteger(maxOutputTokens)||maxOutputTokens<1||maxOutputTokens>4096)throw new LlmError('INVALID_INPUT','Output must be limited to 1–4096 tokens.');
-    const body=JSON.stringify({model:config.model,messages,store:false,max_completion_tokens:maxOutputTokens,
+    const body=JSON.stringify({model:config.model,messages,store:false,temperature:0,max_completion_tokens:maxOutputTokens,
       response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}});
     const bytes=Buffer.byteLength(body);
     if(bytes>48000)throw new LlmError('INPUT_TOO_LARGE','Source excerpts exceed the AI request limit.');
@@ -61,7 +64,7 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
         });
         let response,payload;
         try {
-          response=await fetchImpl(ENDPOINT,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:`Bearer ${env.OPENAI_API_KEY}`},body,signal:AbortSignal.timeout(20000)});
+          response=await fetchImpl(ENDPOINT,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:`Bearer ${env.OPENAI_API_KEY}`},body,signal:AbortSignal.timeout(config.timeoutMs)});
           // Never expose provider errors, response bodies or echoed credentials.
           if(!response.ok) {
             await response.body?.cancel();
@@ -93,4 +96,4 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
   }
   return {generate};
 }
-module.exports={createLlm,settings,LlmError,DEFAULT_MODEL,ENDPOINT};
+module.exports={createLlm,settings,LlmError,DEFAULT_MODEL,DEFAULT_TIMEOUT_MS,ENDPOINT};

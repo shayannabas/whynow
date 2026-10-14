@@ -24,7 +24,9 @@ it('fails closed with paid calls disabled, absent key or absent approved budget'
     const h=harness({env:config,fetchImpl:()=>{calls++;return success();}});
     await expect(h.run()).rejects.toThrow();
   }
-  expect(calls).toBe(0);expect(settings({}).model).toBe('gpt-4o-mini');
+  expect(calls).toBe(0);expect(settings({})).toMatchObject({model:'gpt-4o-mini',timeoutMs:90000});
+  expect(settings({OPENAI_TIMEOUT_MS:'60000'}).timeoutMs).toBe(60000);
+  expect(settings({OPENAI_TIMEOUT_MS:'999999'}).timeoutMs).toBe(90000);
 });
 it('matches the friend’s model and Chat Completions endpoint, with strict schema and no secret persistence',async()=>{
   let seen;
@@ -32,7 +34,7 @@ it('matches the friend’s model and Chat Completions endpoint, with strict sche
   expect(await h.run()).toMatchObject({value:{facts:[]},cached:false,model:'gpt-4o-mini'});
   expect(seen.url).toBe('https://api.openai.com/v1/chat/completions');
   const body=JSON.parse(seen.options.body);
-  expect(body).toMatchObject({model:'gpt-4o-mini',store:false,response_format:{type:'json_schema',json_schema:{strict:true,schema}}});
+  expect(body).toMatchObject({model:'gpt-4o-mini',store:false,temperature:0,response_format:{type:'json_schema',json_schema:{strict:true,schema}}});
   expect(seen.options.redirect).toBe('error');
   expect(JSON.stringify(h.read())).not.toContain(env.OPENAI_API_KEY);
   expect(h.read().workspaces[h.id].sellerProfile.approvedAt).toBeUndefined();
