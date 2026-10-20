@@ -1,6 +1,6 @@
-# Stage 2.5 — research-quality checkpoint; Stage 3 paused
+# Stage 2.5 — paused; port mode is the new direction
 
-Updated October 20, 2026 against Implementation Plan v4, PRD v4 and the trimmed portfolio plan.
+Updated October 20, 2026. The owner preserved the completed offline checkpoint but paused further Stage 2.5 work. Its extractor remains a future improvement. The trimmed roadmap is superseded by a phase-gated SignalScout port; Phase A has not started.
 
 ## Current Stage 2.5 checkpoint
 

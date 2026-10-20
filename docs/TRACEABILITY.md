@@ -1,5 +1,11 @@
 # WhyNow traceability
 
+## Port-mode direction and Stage 2.5 pause — 2026-10-20
+
+The owner superseded the active Stage 2.5 plan and `docs/IMPLEMENTATION-PLAN-TRIMMED.md` with a six-phase port of the permitted SignalScout functionality. SignalScout (`github.com/isaiqba-cell/flowfire`) by Isa Iqbal is read-only reference material used with permission; its environment files and secrets must never be read or copied. WhyNow retains workspace isolation, atomic JSON persistence, receipts, human approval and send-free Demo mode. Explicitly excluded services are Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway and uptime workflow.
+
+The green Stage 2.5 code remains committed at `3cdabaf` as a future research-quality improvement. Its extractor and tests are not removed. No ported module, provider call, profile approval or Stage 3 implementation occurred in this direction-change checkpoint. Phase A requires a separate owner OK.
+
 ## Stage 2.5 research-quality offline checkpoint — 2026-10-20
 
 `scripts/onboarding/extract-organizations.cjs` now derives organization candidates from saved first-party customer-story URLs/titles, index links/logo alt text and comparison pages. Customer domains are retained only when a matching outbound company link is present on the saved page; otherwise the field stays blank with `domain_missing`. Candidates with saved receipts are distinguished from uncertain raw-HTML-only candidates, and the focused organization-review request may only keep or drop supplied IDs.

@@ -1,6 +1,8 @@
 # Stage 2.5 — research quality offline checkpoint
 
-Updated October 20, 2026. This checkpoint improves the research fields that the later kill engine depends on. It does not approve a profile, make a paid generation call, fetch a page, query Serper or start Stage 3.
+**Status: paused and superseded by port mode on October 20, 2026.** The verified extractor, independent fixtures and focused-drafting design remain in the repository as a future research-quality improvement. Do not continue the Stage 2.5 plan or run its proposed paid experiment unless the owner explicitly revives it.
+
+Updated October 20, 2026. This checkpoint improved the research fields that the later kill engine would have depended on. It did not approve a profile, make a paid generation call, fetch a page, query Serper or start Stage 3.
 
 ## What changed
 

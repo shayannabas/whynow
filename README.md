@@ -1,5 +1,7 @@
 # WhyNow
 
+> Port-mode credit: Built on [SignalScout](https://github.com/isaiqba-cell/flowfire) by [Isa Iqbal](https://github.com/isaiqba-cell), used with permission. No SignalScout module has been ported at this checkpoint.
+
 WhyNow runs locally by default on `127.0.0.1`. This avoids hosting charges during development. External provider use is separate: Serper searches consume provider credits, and OpenAI requests are usage-billed. Both integrations are fail-closed behind environment switches and persisted caps; OpenAI paid calls remain disabled.
 
 ## Start with a company name
