@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "seller": {"name": "Resolve AI", "domain": "resolve.ai"},
+  "methodology": "Independently proposed by manually reading the saved first-party page URLs, titles, visible text and outbound anchors. The deterministic extractor was not run or reused to create this answer key.",
+  "customers": [
+    {"name": "Blueground", "domain": "", "domainStatus": "domain_missing", "sourceUrl": "https://resolve.ai/customers/blueground", "evidenceQuote": "Luxury Housing Meets Engineering Excellence: Blueground’s AI-Driven Path to Reliability", "foundBy": "The saved customer-story URL ends in /customers/blueground and the saved page title names Blueground. No Blueground outbound company link was present.", "labeledBy": "unconfirmed"},
+    {"name": "Coinbase", "domain": "", "domainStatus": "domain_missing", "sourceUrl": "https://resolve.ai/customers/coinbase", "evidenceQuote": "Making the Global Crypto Backbone More Resilient", "foundBy": "The saved first-party customer-story URL names Coinbase and the body explicitly says Coinbase adopted Resolve AI. No Coinbase outbound company link was present.", "labeledBy": "unconfirmed"},
+    {"name": "DoorDash", "domain": "", "domainStatus": "domain_missing", "sourceUrl": "https://resolve.ai/customers/doordash", "evidenceQuote": "Powering Uninterrupted Ads for DoorDash Advertisers", "foundBy": "The saved customer-story URL and title name DoorDash. No DoorDash outbound company link was present.", "labeledBy": "unconfirmed"},
+    {"name": "Gametime", "domain": "gametime.co", "domainStatus": "verified", "sourceUrl": "https://resolve.ai/customers/gametime", "evidenceQuote": "Keeping Last-Minute Ticketing Reliable for Fans Worldwide", "foundBy": "The saved customer-story URL names Gametime and its raw HTML links the Gametime label to https://gametime.co/.", "labeledBy": "unconfirmed"},
+    {"name": "Global NoSQL", "domain": "", "domainStatus": "domain_missing", "sourceUrl": "https://resolve.ai/customers/global-nosql", "evidenceQuote": "Global Uptime Unlocked - From Data to Action with Agentic AI", "foundBy": "The saved customer-story URL names Global NoSQL and the visible page text identifies the organization. No outbound company-domain link was present.", "labeledBy": "unconfirmed"},
+    {"name": "Salesforce", "domain": "salesforce.com", "domainStatus": "verified", "sourceUrl": "https://resolve.ai/customers/salesforce", "evidenceQuote": "From Hours to Minutes for the World's Leading CRM", "foundBy": "The saved customer-story URL names Salesforce and its raw HTML links the Salesforce label to https://www.salesforce.com/.", "labeledBy": "unconfirmed"},
+    {"name": "Zscaler", "domain": "", "domainStatus": "domain_missing", "sourceUrl": "https://resolve.ai/customers/zscaler", "evidenceQuote": "Accelerating Incident Response for a leading Zero-Trust Network", "foundBy": "The saved customer-story URL names Zscaler and the body discusses Zscaler’s SRE leadership. No Zscaler outbound company link was present.", "labeledBy": "unconfirmed"}
+  ],
+  "competitors": [
+    {"name": "PagerDuty", "domain": "pagerduty.com", "sourceUrl": "https://resolve.ai/glossary/pagerduty-sre-agent-vs-resolve-ai", "evidenceQuote": "PagerDuty SRE Agent vs. Resolve AI: Which Do You Need?", "foundBy": "The saved first-party comparison title names PagerDuty and the raw page links to www.pagerduty.com.", "labeledBy": "unconfirmed"},
+    {"name": "incident.io", "domain": "incident.io", "sourceUrl": "https://resolve.ai/glossary/incident-io-vs-resolve-ai", "evidenceQuote": "incident.io vs. Resolve AI: Coordination or Root Cause?", "foundBy": "The saved first-party comparison URL/title names incident.io and the raw page links to incident.io.", "labeledBy": "unconfirmed"}
+  ],
+  "buyerTitles": [
+    {"value": "CTO", "sourceUrl": "https://resolve.ai/customers", "evidenceQuote": "Trusted by Builders From Engineers to CTOs at Innovative Companies", "foundBy": "The saved customers page explicitly identifies CTOs among the trusted audience.", "labeledBy": "unconfirmed"},
+    {"value": "Engineering Leader", "sourceUrl": "https://resolve.ai/glossary/incident-io-vs-resolve-ai", "evidenceQuote": "Engineering leaders have to work out how to budget for this within their headcount, while also shipping the roadmap.", "foundBy": "The saved comparison page explicitly describes engineering leaders as responsible for the budget and roadmap tradeoff.", "labeledBy": "unconfirmed"}
+  ],
+  "championTitles": [
+    {"value": "SRE", "sourceUrl": "https://resolve.ai/glossary/incident-io-vs-resolve-ai", "evidenceQuote": "An alert fires and the on-call (SRE or an engineer) decides whether it's real", "foundBy": "The saved first-party page names the hands-on incident responder.", "labeledBy": "unconfirmed"},
+    {"value": "SRE Leader", "sourceUrl": "https://resolve.ai/customers/zscaler", "evidenceQuote": "Zscaler’s SRE leadership recognized that more dashboards or raw data would not materially reduce this impact.", "foundBy": "The saved Zscaler story directly describes SRE leadership as the problem owner.", "labeledBy": "unconfirmed"}
+  ],
+  "sizeMetric": {"label": "Employees", "floor": 200, "sourceUrl": "https://resolve.ai/customers/coinbase", "evidenceQuote": "supported by more than 4,700 employees globally", "foundBy": "Employee count is measurable and the saved enterprise customer story provides an explicit employee example; the proposed floor is a human judgment, not a quoted fact.", "labeledBy": "unconfirmed"}
+}

@@ -1,8 +1,13 @@
+const path=require('node:path');
 const { getWorkspace } = require('../server/state.cjs');
 const { SIGNAL_KEYS, assertSynthesisOutput, buildReceiptEvidence, sourceSetHash, SynthesisValidationError } = require('./validate.cjs');
 const { assertStructuredOutputSchemaWithinLimits } = require('../openai-schema.cjs');
+const {modelForPurpose}=require('../llm.cjs');
+const {extractOrganizationCandidates,rawPageMap}=require('./extract-organizations.cjs');
+const {loadReferenceProfile}=require('./reference-profile.cjs');
 
 const PROMPT_VERSION = 'seller-profile-quality-guards-v5';
+const FOCUSED_PROMPT_VERSION='stage2-5-focused-drafting-v1';
 const MAX_SCHEMA_RECEIPTS = 900;
 
 const text = (maxLength, minLength=0) => ({type:'string',minLength,maxLength});
@@ -42,7 +47,7 @@ SYNTHESIS_SCHEMA.$defs={receiptId:text(4,4)};
 
 function companyFor(workspace) {
   const candidate=workspace.research?.selectedCandidate||workspace.onboarding?.selectedCandidate;
-  const name=String(candidate?.name||'').trim(),domain=String(candidate?.domain||'').trim().toLowerCase().replace(/^www\./,'');
+  const name=String(workspace.name||candidate?.name||'').trim(),domain=String(candidate?.domain||'').trim().toLowerCase().replace(/^www\./,'');
   if(!name||!domain)throw new SynthesisValidationError('COMPANY_NOT_CONFIRMED','Confirm the seller company before generating its profile.');
   return {name,domain};
 }
@@ -79,6 +84,10 @@ function buildSynthesisSchema(receiptIds) {
 
 function validateRunLocalReceiptIds(value,receiptIds) {
   assertSynthesisOutput(value);
+  return validateKnownReceiptIds(value,receiptIds);
+}
+
+function validateKnownReceiptIds(value,receiptIds) {
   const allowed=new Set(receiptIds);
   function visit(node) {
     if(Array.isArray(node)){node.forEach(visit);return;}
@@ -140,10 +149,33 @@ function buildSynthesisRequest(state,workspaceId) {
   };
 }
 
-async function generateSynthesis({state,workspaceId,llm}) {
-  if(!llm||typeof llm.generate!=='function')throw new SynthesisValidationError('INVALID_INPUT','An injected LLM client is required.');
-  const built=buildSynthesisRequest(state,workspaceId),result=await llm.generate(built.request);
-  return {output:expandRunLocalReceiptIds(result.value,built.receiptIdMap),cached:Boolean(result.cached),model:result.model,guard:built.guard,evidence:built.evidence,promptVersion:PROMPT_VERSION};
+function defaultRawPages() {
+  return rawPageMap([path.resolve(__dirname,'../../.whynow/collector-cache'),path.resolve(__dirname,'../../.whynow/stage2-final-live-cache')]);
+}
+function buildFocusedSynthesisRequests(state,workspaceId,{env=process.env,rawPages=defaultRawPages(),referenceProfile=loadReferenceProfile()}={}) {
+  const workspace=getWorkspace(state,workspaceId);
+  if(workspace.status==='archived')throw new SynthesisValidationError('ARCHIVED','Restore this workspace before generating a profile.');
+  if(workspace.status==='active')throw new SynthesisValidationError('ACTIVE_PROFILE','Approved profiles require a reviewable refresh diff and cannot be overwritten.');
+  if(workspace.research?.status!=='evidence_ready')throw new SynthesisValidationError('RESEARCH_NOT_READY','Finish collecting public evidence before generating a profile.');
+  const company=companyFor(workspace),evidence=buildEvidencePacket(state,workspace),candidates=extractOrganizationCandidates({state,workspace,rawPages});
+  const validateReceiptIds=value=>validateKnownReceiptIds(value,evidence.receiptIds);
+  const sellerFacts=require('./draft-seller-facts.cjs').request({workspaceId,company,evidence:evidence.serialized,receiptIds:evidence.receiptIds,model:modelForPurpose(env,'seller_facts'),validateReceiptIds});
+  const organizationReview=require('./review-organizations.cjs').request({workspaceId,company,candidates,model:modelForPurpose(env,'organization_review')});
+  const icpTargeting=require('./draft-icp-targeting.cjs').request({workspaceId,company,evidence:evidence.serialized,receiptIds:evidence.receiptIds,referenceProfile,model:modelForPurpose(env,'icp_targeting'),validateReceiptIds});
+  return {requests:{sellerFacts,organizationReview,icpTargeting},candidates,receiptIdMap:evidence.receiptIdMap,
+    guard:{expectedResearchRevision:workspace.research?.revision??0,expectedRunId:workspace.research?.runId||null,expectedSourceSetHash:evidence.sourceSetHash,expectedProfileRevision:workspace.profileRevision||0},
+    evidence:{sourceIds:evidence.sourceIds,sourceSetHash:evidence.sourceSetHash,bytes:Buffer.byteLength(evidence.serialized),receiptCount:evidence.receiptIds.length,
+      customerCandidates:candidates.customers.length,competitorCandidates:candidates.competitors.length,customerDomains:candidates.customers.filter(item=>item.domain).length,rawHtml:candidates.rawHtml}};
 }
 
-module.exports={PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisSchema,buildSynthesisRequest,validateRunLocalReceiptIds,expandRunLocalReceiptIds,generateSynthesis};
+async function generateSynthesis({state,workspaceId,llm,env=process.env,rawPages,referenceProfile}) {
+  if(!llm||typeof llm.generate!=='function')throw new SynthesisValidationError('INVALID_INPUT','An injected LLM client is required.');
+  const built=buildFocusedSynthesisRequests(state,workspaceId,{env,...(rawPages?{rawPages}:{}),...(referenceProfile?{referenceProfile}:{})});
+  const seller=await llm.generate(built.requests.sellerFacts),organizations=await llm.generate(built.requests.organizationReview),icp=await llm.generate(built.requests.icpTargeting);
+  const sellerValue=expandRunLocalReceiptIds(seller.value,built.receiptIdMap),icpValue=expandRunLocalReceiptIds(icp.value,built.receiptIdMap);
+  const reviewed=require('./review-organizations.cjs').materializeReview(organizations.value,built.candidates);
+  const output={sellerProfile:{...sellerValue.sellerProfile,...reviewed},icpConfig:icpValue.icpConfig};assertSynthesisOutput(output);
+  return {output,cached:Boolean(seller.cached&&organizations.cached&&icp.cached),model:{sellerFacts:seller.model,organizationReview:organizations.model,icpTargeting:icp.model},guard:built.guard,evidence:built.evidence,promptVersion:FOCUSED_PROMPT_VERSION};
+}
+
+module.exports={PROMPT_VERSION,FOCUSED_PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisSchema,buildSynthesisRequest,buildFocusedSynthesisRequests,validateKnownReceiptIds,validateRunLocalReceiptIds,expandRunLocalReceiptIds,generateSynthesis};

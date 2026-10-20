@@ -1,6 +1,6 @@
 # WhyNow — trimmed portfolio implementation plan
 
-Updated October 19, 2026. This plan replaces the remaining Stage 3–12 scope for the portfolio build. Stages 0–2 remain governed by the existing PRD, implementation record and traceability documents. Stage 3 has not started.
+Updated October 20, 2026. This plan replaces the remaining Stage 3–12 scope for the portfolio build. Stages 0–2 remain governed by the existing PRD, implementation record and traceability documents. Stage 2.5 research quality is in progress; Stage 3 has not started.
 
 ## Portfolio outcome
 
@@ -25,7 +25,38 @@ For this trimmed demo, rule 6 is satisfied by keeping Demo mode permanently send
 
 ## Build order
 
-Build and verify one stage at a time in this order: **3 → 4 → 5 → 6 → 8 → 9 → 11**. Do not start the next stage until the current stage's tests and browser-verifiable Definition of Done pass.
+Finish and obtain owner acceptance for **Stage 2.5**, then build and verify one stage at a time in this order: **3 → 4 → 5 → 6 → 8 → 9 → 11**. Do not start the next stage until the current stage's tests and browser-verifiable Definition of Done pass.
+
+---
+
+## Stage 2.5 — research quality gate
+
+**Effort: M**
+
+### Goal
+
+Make customer, competitor, size, persona and buyer-search inputs reliable enough for deterministic Stage 3 rules with minimal manual correction. Extract organization candidates from saved first-party pages without AI, preserve exact evidence and missing domains honestly, evaluate against independently proposed owner-confirmed keys, and separate later drafting into seller facts, candidate review and ICP targeting.
+
+### Files
+
+- `scripts/onboarding/extract-organizations.cjs` — deterministic saved-page customer/competitor candidates and proven outbound domains.
+- `scripts/onboarding/draft-seller-facts.cjs`, `review-organizations.cjs`, `draft-icp-targeting.cjs` — focused request boundaries and no-invention review.
+- `scripts/onboarding/research-quality-eval.cjs`, `scripts/stage2-5-offline-eval.cjs` — confirmed-only evaluation plus explicitly provisional reporting.
+- `tests/fixtures/eval/*-expected.json` — independently read, sourced, unconfirmed owner proposals.
+- `docs/STAGE-2.5-RESEARCH-QUALITY.md` — checkpoint results and model/cost decision record.
+
+### Tests
+
+- Saved URL/title, logo-alt and comparison extraction with exact source evidence.
+- Customer domains are accepted only from matching outbound links; missing domains remain blank.
+- Raw-HTML absence skips logo-alt/domain extraction without inventing data.
+- Evaluation ignores unconfirmed labels by default and reports customer/competitor recall, personas, size sanity and blocking warnings.
+- Focused prompts cannot invent organization IDs and keep buyer searches distinct from seller-product/vendor searches.
+- Every focused Structured Outputs schema remains inside documented limits.
+
+### Definition of Done — browser verifiable
+
+After the owner confirms or corrects the answer keys and separately authorizes any bounded drafting test, the review screen shows the extracted customer/competitor evidence, blank missing domains, measurable size, present buyer/champion roles and buyer-oriented search phrases without silent rewrites. No profile is approved except by the owner. The current checkpoint is offline only; paid testing and browser acceptance remain separate decisions.
 
 ---
 
@@ -41,7 +72,6 @@ Turn the approved workspace ICP into deterministic account rules. Normalize the 
 
 - `scripts/icp-model.cjs` — signal keys, default weights, configuration normalization, segment inference and labels.
 - `scripts/kills.cjs` — kill evaluation, evidence requirements, precedence and retained kill records.
-- `scripts/security.cjs` — append-only workspace-scoped audit hash chain for account mutations.
 - `scripts/server/scorecard-page.cjs` — account × six-signal shell with receipt/inferred state.
 - `scripts/server/kill-log-page.cjs` — retained primary and secondary kill decisions.
 - `scripts/server/settings-page.cjs` — read-only approved ICP rules.
@@ -57,7 +87,6 @@ Turn the approved workspace ICP into deterministic account rules. Normalize the 
 - Below-size kills require a measurable profile metric and a size receipt.
 - Resolve gold-standard fixtures reproduce the expected keep/kill outcomes.
 - The hand-labeled golden set passes after the owner confirms labels; unconfirmed proposals are ignored.
-- Audit-log tampering is detected.
 - Two workspaces can produce different valid outcomes for the same account.
 
 ### Definition of Done — browser verifiable

@@ -9,7 +9,8 @@ const require=createRequire(import.meta.url);
 const {loadState}=require('../scripts/server/state.cjs');
 const {COMPANIES}=require('../scripts/stage2-recovery-acceptance.cjs');
 const {preparedState,workspaceForCompany}=require('../scripts/stage2-packet-redraft.cjs');
-const {buildSynthesisSchema,buildSynthesisRequest}=require('../scripts/onboarding/synthesize.cjs');
+const {buildSynthesisSchema,buildSynthesisRequest,buildFocusedSynthesisRequests}=require('../scripts/onboarding/synthesize.cjs');
+const {rawPageMap}=require('../scripts/onboarding/extract-organizations.cjs');
 const {STRUCTURED_OUTPUT_LIMITS,measureStructuredOutputSchema,assertStructuredOutputSchemaWithinLimits}=require('../scripts/openai-schema.cjs');
 const directory=path.dirname(fileURLToPath(import.meta.url));
 const fixture=JSON.parse(fs.readFileSync(path.join(directory,'fixtures','openai','stage2-structured-output-packets.json'),'utf8'));
@@ -43,6 +44,22 @@ it('keeps every saved Stage 2 packet schema inside documented Structured Outputs
       expect(createHash('sha256').update(serialized).digest('hex')).toBe(packet.packetSha256);
       expect(built.evidence.sourceSetHash).toBe(packet.sourceSetHash);
       expect(measureStructuredOutputSchema(built.request.schema)).toMatchObject(packet.expectedSchemaMetrics);
+    }
+  }
+
+  const finalStateFile=path.join(directory,'..','.whynow','stage2-final-state.json');
+  const finalCache=path.join(directory,'..','.whynow','stage2-final-live-cache');
+  if(fs.existsSync(finalStateFile)) {
+    const state=preparedState(loadState(finalStateFile)),rawPages=rawPageMap([finalCache]);
+    for(const workspace of Object.values(state.workspaces)) {
+      if(!['resolve.ai','shopify.com','vercel.com'].includes(workspace.research?.selectedCandidate?.domain))continue;
+      const built=buildFocusedSynthesisRequests(state,workspace.id,{rawPages});
+      for(const request of Object.values(built.requests)) {
+        const metrics=measureStructuredOutputSchema(request.schema);
+        expect(()=>assertStructuredOutputSchemaWithinLimits(request.schema),`${workspace.name}: ${request.name}`).not.toThrow();
+        expect(metrics.enumValues,`${workspace.name}: ${request.name}`).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.enumValues);
+        for(const item of metrics.enums)if(item.values>STRUCTURED_OUTPUT_LIMITS.largeEnumThreshold)expect(item.stringLength,`${workspace.name}: ${request.name}`).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.largeEnumStringLength);
+      }
     }
   }
 });

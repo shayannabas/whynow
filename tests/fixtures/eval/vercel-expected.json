@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "seller": {"name": "Vercel", "domain": "vercel.com"},
+  "methodology": "Independently proposed by manually reading the saved first-party page URLs, titles, visible text and outbound anchors. The deterministic extractor was not run or reused to create this answer key.",
+  "customers": [
+    {"name": "Rogo", "domain": "rogo.ai", "domainStatus": "verified", "sourceUrl": "https://vercel.com/customers/how-rogo-ships-agent-written-code-to-production-in-5-minutes-on-vercel", "evidenceQuote": "How Rogo ships agent-written code to production in 5 minutes on Vercel", "foundBy": "The saved customer-story title names Rogo and its raw page links Rogo to https://rogo.ai/.", "labeledBy": "unconfirmed"},
+    {"name": "Sensay", "domain": "sensay.io", "domainStatus": "verified", "sourceUrl": "https://vercel.com/customers/how-sensay-went-from-zero-to-product-in-six-weeks", "evidenceQuote": "How Sensay went from zero to product in six weeks", "foundBy": "The saved customer-story title names Sensay and its raw page links Sensay to https://sensay.io/.", "labeledBy": "unconfirmed"},
+    {"name": "The Weather Company", "domain": "", "domainStatus": "domain_missing", "sourceUrl": "https://vercel.com/customers/how-the-weather-company-serves-real-time-forecasts-to-350-million-daily-active-users-on-vercel", "evidenceQuote": "How the Weather Company serves real-time forecasts to 350 million daily active users on Vercel", "foundBy": "The saved first-party customer-story URL/title names The Weather Company. No outbound company-domain link was present.", "labeledBy": "unconfirmed"}
+  ],
+  "competitors": [
+    {"name": "Cloudflare", "domain": "", "sourceUrl": "https://domains.vercel.com/kb/comparisons", "evidenceQuote": "Vercel vs Cloudflare", "foundBy": "The saved first-party comparisons page contains a Vercel vs Cloudflare heading; no canonical Cloudflare outbound company link was present.", "labeledBy": "unconfirmed"},
+    {"name": "Netlify", "domain": "", "sourceUrl": "https://domains.vercel.com/kb/comparisons", "evidenceQuote": "Vercel vs Netlify", "foundBy": "The saved first-party comparisons page contains a Vercel vs Netlify heading; no canonical Netlify outbound company link was present.", "labeledBy": "unconfirmed"},
+    {"name": "Webflow", "domain": "", "sourceUrl": "https://domains.vercel.com/kb/comparisons", "evidenceQuote": "Vercel vs Webflow Cloud", "foundBy": "The saved first-party comparisons page contains a Vercel vs Webflow Cloud heading; no canonical Webflow outbound company link was present.", "labeledBy": "unconfirmed"}
+  ],
+  "buyerTitles": [
+    {"value": "CTO", "sourceUrl": "https://vercel.com/customers/how-sensay-went-from-zero-to-product-in-six-weeks", "evidenceQuote": "For CTO and co-founder Marco Bettiolo, the lesson was clear", "foundBy": "The saved Sensay story directly identifies its CTO as evaluating the infrastructure decision.", "labeledBy": "unconfirmed"},
+    {"value": "Engineering Leader", "sourceUrl": "https://vercel.com/solutions/platform-engineering", "evidenceQuote": "Your platform engineering toolkit.", "foundBy": "The saved platform-engineering solution page targets the team accountable for developer-platform decisions; the normalized title is proposed for owner review.", "labeledBy": "unconfirmed"}
+  ],
+  "championTitles": [
+    {"value": "Platform Engineer", "sourceUrl": "https://vercel.com/solutions/platform-engineering", "evidenceQuote": "Empowering developer velocity.", "foundBy": "The saved solution page is explicitly about platform engineering and developer velocity.", "labeledBy": "unconfirmed"},
+    {"value": "DevOps Engineer", "sourceUrl": "https://vercel.com/customers/how-sensay-went-from-zero-to-product-in-six-weeks", "evidenceQuote": "shipped without a DevOps team", "foundBy": "The saved customer story identifies DevOps ownership as the function Vercel replaced or reduced; the exact role is proposed for owner review.", "labeledBy": "unconfirmed"}
+  ],
+  "sizeMetric": {"label": "Employees", "floor": 50, "sourceUrl": "https://vercel.com/pricing", "evidenceQuote": "Enterprise is for teams seeking greater performance, collaboration, and security.", "foundBy": "Employee count is measurable; the saved pricing page distinguishes team and Enterprise use, while the proposed floor is a human judgment rather than a quoted number.", "labeledBy": "unconfirmed"}
+}

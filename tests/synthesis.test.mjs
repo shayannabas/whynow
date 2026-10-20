@@ -5,7 +5,7 @@ const {defaultState,createWorkspace,updateWorkspace}=require('../scripts/server/
 const {recordSource}=require('../scripts/sources.cjs');
 const {createLlm}=require('../scripts/llm.cjs');
 const {WEIGHTS,SLAS}=require('../scripts/onboarding/manual-profile.cjs');
-const {PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisRequest,generateSynthesis}=require('../scripts/onboarding/synthesize.cjs');
+const {PROMPT_VERSION,FOCUSED_PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisRequest,generateSynthesis}=require('../scripts/onboarding/synthesize.cjs');
 const {SIGNAL_KEYS,MAX_EVIDENCE_PACKET_BYTES,assertSynthesisOutput,materializeGeneratedDraft,receiptIdFor,saveGeneratedProfile}=require('../scripts/onboarding/validate.cjs');
 
 const NOW='2026-09-17T12:00:00.000Z';
@@ -168,17 +168,22 @@ it('rejects stale, archived and approved workspaces before generated output can 
 });
 
 it('uses an injected LLM interface and performs no network access in synthesis tests',async()=>{
-  const f=fixture(),raw=output(f.sellerSourceId),built=buildSynthesisRequest(f.state,f.id),runLocal=useRunLocalReceiptIds(raw,built.receiptIdMap);let calls=0,seen;
-  const result=await generateSynthesis({state:f.state,workspaceId:f.id,llm:{generate:async request=>{calls++;seen=request;expect(request.validate(runLocal)).toBe(true);return {value:runLocal,cached:false,model:'fixture-model'};}}});
-  expect(calls).toBe(1);expect(seen.messages[0].content).toContain('only the EVIDENCE');
-  expect(seen.messages[0].content).toContain('at least 90%');
-  expect(seen.messages[0].content).toContain('Keep those arrays empty unless');
-  expect(seen.messages[0].content).toContain('partner, marketplace, template or solution-partner');
-  expect(seen.messages[0].content).toContain('prospective buyer companies');
-  expect(seen.messages[0].content).toContain('Kill patterns must describe companies that will not buy');
-  expect(result).toMatchObject({output:raw,cached:false,model:'fixture-model',promptVersion:PROMPT_VERSION,guard:{expectedResearchRevision:4}});
-  const invalid=structuredClone(runLocal);invalid.sellerProfile.category.receiptId='R999';
-  expect(()=>seen.validate(invalid)).toThrow('outside this request');
+  const f=fixture(),raw=output(f.sellerSourceId),built=buildSynthesisRequest(f.state,f.id),runLocal=useRunLocalReceiptIds(raw,built.receiptIdMap),seen=[];
+  const values={
+    whynow_seller_facts:{sellerProfile:Object.fromEntries(Object.entries(runLocal.sellerProfile).filter(([key])=>!['customers','competitors'].includes(key)))},
+    whynow_organization_review:{customers:[],competitors:[]},whynow_icp_targeting:{icpConfig:runLocal.icpConfig}
+  };
+  const result=await generateSynthesis({state:f.state,workspaceId:f.id,rawPages:new Map(),llm:{generate:async request=>{seen.push(request);const value=values[request.name];expect(request.validate(value)).toBe(true);return {value,cached:false,model:request.model};}}});
+  expect(seen.map(item=>item.name)).toEqual(['whynow_seller_facts','whynow_organization_review','whynow_icp_targeting']);
+  expect(seen[0].messages[0].content).toContain('seller facts');
+  expect(seen[1].messages[0].content).toContain('may not invent');
+  expect(seen[2].messages[0].content).toContain('prospective buyer companies');
+  expect(seen[2].messages[0].content).toContain('Explicitly forbidden');
+  expect(JSON.parse(seen[2].messages[1].content).resolveWorkedExample.segments.length).toBeGreaterThanOrEqual(3);
+  const expected=structuredClone(raw);expected.sellerProfile.customers=[];expected.sellerProfile.competitors=[];
+  expect(result).toMatchObject({output:expected,cached:false,promptVersion:FOCUSED_PROMPT_VERSION,guard:{expectedResearchRevision:4},model:{sellerFacts:'gpt-4o-mini',organizationReview:'gpt-4o-mini',icpTargeting:'gpt-4o-mini'}});
+  const invalid=structuredClone(values.whynow_seller_facts);invalid.sellerProfile.category.receiptId='R999';
+  expect(()=>seen[0].validate(invalid)).toThrow('outside this request');
 });
 
 it('keeps OpenAI disabled when a key exists but the explicit enable switch is off',async()=>{

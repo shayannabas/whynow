@@ -1,6 +1,16 @@
-# Stage 2 — final automated iteration complete; manual close-out remains
+# Stage 2.5 — research-quality checkpoint; Stage 3 paused
 
-Updated October 19, 2026 against Implementation Plan v4 and PRD v4.
+Updated October 20, 2026 against Implementation Plan v4, PRD v4 and the trimmed portfolio plan.
+
+## Current Stage 2.5 checkpoint
+
+The owner paused manual corrections and Stage 3 to improve the research fields that deterministic kill rules will consume. The offline implementation now extracts customer and competitor candidates from saved first-party customer stories, indexes and comparison pages; domains are accepted only from matching saved outbound links and are otherwise blank with `domain_missing`. No model may invent an organization during candidate review.
+
+Independent answer-key proposals were created by manually reading saved pages, not by reusing extractor output. All labels remain `unconfirmed`, so confirmed-only evaluation correctly reports 0/0 until owner review. Provisional recall is Resolve AI 7/7 customers and 2/2 competitors, Shopify 3/3 and 2/2, and Vercel 3/3 and 3/3. Raw HTML exists for the relevant customer/comparison pages, so logo-alt and outbound-link extraction ran without a refetch. Details are in `docs/STAGE-2.5-RESEARCH-QUALITY.md`.
+
+Drafting is now designed as three focused calls: seller facts, keep/drop review of deterministic organization candidate IDs, and ICP targeting. Per-purpose model configuration exists but still defaults to GPT-4o mini. A non-generation `GET /v1/models` returned HTTP 200 and listed the proposed pinned GPT-5.4 mini model for this API key; official documentation confirms Structured Outputs support. No generation call occurred. The conservative maximum estimate for the three focused calls is $0.060889, $0.064908 and $0.054006 per seller, so a future paid test requires a new owner decision rather than reusing the old $0.04 cap.
+
+All profiles remain `needs_review`. The full offline suite passes with 27 test files, 125 active tests and one existing Stage 3 scaffold skip. No page fetch, Serper query, paid generation, profile approval or Stage 3 work occurred in this checkpoint. Normal OpenAI settings remain disabled with a zero local limit.
 
 | Requirement | Current status |
 | --- | --- |

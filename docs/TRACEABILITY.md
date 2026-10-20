@@ -1,5 +1,15 @@
 # WhyNow traceability
 
+## Stage 2.5 research-quality offline checkpoint — 2026-10-20
+
+`scripts/onboarding/extract-organizations.cjs` now derives organization candidates from saved first-party customer-story URLs/titles, index links/logo alt text and comparison pages. Customer domains are retained only when a matching outbound company link is present on the saved page; otherwise the field stays blank with `domain_missing`. Candidates with saved receipts are distinguished from uncertain raw-HTML-only candidates, and the focused organization-review request may only keep or drop supplied IDs.
+
+The independent `tests/fixtures/eval/*-expected.json` proposals were written by reading the saved sources directly, not from extractor output. A separate direct-source check verified every proposed URL and quote. All labels remain `unconfirmed`, so the default confirmed-only score has no denominator. Provisional recall is Resolve AI 7/7 customers and 2/2 competitors, Shopify 3/3 and 2/2, and Vercel 3/3 and 3/3. Extraction found 7/51/14 customer candidates, with proven domains for 2/3/2, and 2/2/3 competitor candidates respectively. Raw HTML matched 12/15, 9/14 and 8/14 first-party source records and covered the relevant organization pages; no refetch occurred.
+
+Drafting request construction is split into seller facts, deterministic organization review and ICP targeting. The targeting request includes the frozen Resolve configuration as a specificity example and explicitly bans product-category/vendor-seeking prospect searches. Per-purpose model configuration defaults remain GPT-4o mini. A read-only authenticated model-list request returned HTTP 200 and listed `gpt-5.4-mini-2026-03-17`; no generation was made. Official model documentation confirms Structured Outputs support. The conservative actual-request maximum estimates are $0.060889/$0.064908/$0.054006 per seller, so no paid test is proposed under the old cap.
+
+Offline tests cover synthetic positive and missing-HTML/domain cases, independent unconfirmed keys, confirmed-only filtering, organization/persona/size scoring, no-invention request boundaries, model routing and documented Structured Outputs limits. Full verification passes with 27 files, 125 active tests and one existing Stage 3 scaffold skip. No profile was edited or approved and Stage 3 did not start. See `docs/STAGE-2.5-RESEARCH-QUALITY.md`.
+
 ## Fixed-schema saved-pages draft — 2026-10-19
 
 The owner authorized one additional GPT-4o mini draft for Resolve AI, Shopify and Vercel using only the saved final-run pages, fixed evidence packet and fixed receipt schema from commit `6fd10a4`. Preflight passed every documented schema limit and estimated $0.026104 maximum cost, below the $0.04 stop line. The process made exactly three provider attempts—one successful attempt per seller—with no retry, no page fetch, no Serper query and no automatic approval.

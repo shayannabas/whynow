@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 19, 2026. Current stage: the authorized fixed-schema saved-pages draft completed with three new `needs_review` profiles; automated Stage 2 drafting is finished, manual correction remains, and Stage 3 has not started.
+Updated: October 20, 2026. Current stage: Stage 2.5 research quality has reached its offline checkpoint. Profiles remain `needs_review`; no profile was approved and Stage 3 has not started.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -15,6 +15,25 @@ The owner then authorized one saved-pages-only GPT-4o mini draft per seller. Pre
 The request was then reconstructed offline. The old schema duplicated 548/605/489 stable receipt IDs across optional and required enums, yielding 1,097/1,211/979 enum values. Resolve AI and Shopify exceeded OpenAI's 1,000-value limit; Shopify also exceeded the 15,000-character large-enum limit. The fix sends one enum of short run-local IDs, maps them back to stable IDs server-side, and caps a future packet at 900 receipts in source-priority order. Post-fix schemas contain 548/605/489 enum values and 2,192/2,420/1,956 enum characters. The original failure did not retain an HTTP status; future safe failures store and show only the numeric status, never the response body.
 
 The owner authorized one fixed-schema saved-pages draft per seller. Preflight passed all schema limits and estimated $0.026104 maximum cost, below the $0.04 stop line. Resolve AI, Shopify and Vercel each completed in one provider attempt with no retry. A local snapshot-path bug then interrupted finalization after all calls; the intact isolated outputs were finalized offline without another call. The exact provider token usage was lost with the interrupted in-memory usage array, so actual cost is unavailable; the persisted conservative reservation is $0.026104. All three remain `needs_review`: Resolve AI has 0 customers/0 competitors and 11 blocking/2 advisory warnings; Shopify has 0 customers/2 sourced competitors and 13/0; Vercel has 0/0 and 8/4. OpenAI is disabled/zero and no further automated draft is authorized.
+
+## Stage 2.5 — research quality
+
+- [x] Extract customer candidates deterministically from saved first-party customer-story URLs/titles and customer-index links/logo alt text.
+- [x] Extract competitor candidates from saved first-party comparison, versus and alternatives pages.
+- [x] Preserve a saved source URL and exact receipt/quote for each usable candidate; keep uncertain URL/logo results as candidates rather than facts.
+- [x] Accept customer domains only from matching outbound links on the saved customer/case-study page; leave every other domain blank as `domain_missing`.
+- [x] Confirm raw HTML exists for the relevant saved pages and skip/refetch nothing. Record unmatched raw-cache pages honestly.
+- [x] Create independent, source-backed `unconfirmed` answer-key proposals for Resolve AI, Shopify and Vercel by reading saved pages without extractor reuse.
+- [x] Add a confirmed-only offline evaluation harness for customer recall, competitor recall, persona match, size sanity and blocking-warning count.
+- [x] Split drafting into focused seller-facts, organization-review and ICP-targeting request builders; organization review can only keep/drop supplied IDs.
+- [x] Include the frozen Resolve targeting profile as a worked example and forbid seller-product/vendor-seeking prospect searches.
+- [x] Keep per-purpose model configuration on `gpt-4o-mini` by default; do not switch models without separate owner approval.
+- [x] Verify by read-only model listing that `gpt-5.4-mini-2026-03-17` is available to this account and verify Structured Outputs support from official documentation, without a generation call.
+- [x] Run provisional organization recall against unconfirmed proposals: Resolve AI 7/7 customers and 2/2 competitors; Shopify 3/3 and 2/2; Vercel 3/3 and 3/3. Confirmed-only scores remain 0/0 until owner labeling.
+- [x] Pass the full offline suite: 27 test files, 125 active tests passed and one existing Stage 3 scaffold test intentionally skipped (126 total).
+- [ ] Owner confirms or corrects the three answer keys.
+- [ ] Owner separately decides whether to authorize a bounded paid drafting test. Current maximum reservation estimate is $0.060889/$0.064908/$0.054006 per seller and exceeds the old $0.04 total cap.
+- [ ] Browser acceptance after any separately authorized draft. The owner alone approves profiles.
 
 ## Current decision
 
@@ -96,6 +115,7 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 
 ## Trimmed remaining portfolio stages — not started
 
+- [ ] **Stage 2.5 (M):** owner confirms/corrects independent eval keys and decides whether to authorize a bounded focused-drafting check.
 - [ ] **Stage 3 (L):** ICP normalization, evidence-backed kill engine and scorecard; pass confirmed hand-labeled golden set plus Resolve gold-standard fixtures.
 - [ ] **Stage 4 (M):** only ATS hiring (Greenhouse/Lever/Ashby) and news (Google News RSS/Serper) collectors.
 - [ ] **Stage 5 (M):** fit scoring and tiers using free public firmographics only; no PDL or paid enrichment.
@@ -113,6 +133,7 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 
 ## Change log
 
+- **2026-10-20:** Reached the Stage 2.5 offline checkpoint. Deterministic saved-page extraction found 7/51/14 customer candidates with 2/3/2 proven domains and 2/2/3 competitors for Resolve AI/Shopify/Vercel. Independent unconfirmed keys produce provisional recall of 7/7 + 2/2, 3/3 + 2/2 and 3/3 + 3/3; confirmed-only scoring remains empty pending owner review. Raw HTML was available, no page/provider call ran, and no profile was approved. A read-only account model listing confirmed the proposed pinned GPT-5.4 mini ID is available; it remains disabled and the conservative focused-call estimate exceeds the old cap. Full verification passed with 125 active tests and one intentional skip across 27 files.
 - **2026-10-19:** Recorded the authorized saved-pages-only redraft preflight ($0.032103 maximum estimate) and stopped attempt: one Resolve AI provider attempt ended `REQUEST_FAILED`; Shopify/Vercel were not called; no profile changed; settings remained disabled/zero; 113 tests pass with one intentional skip.
 - **2026-10-19:** Confirmed offline that duplicated receipt enums put Resolve AI at 1,097 and Shopify at 1,211 enum values. Replaced them with one short-ID enum (548/605/489 values), added stable-ID restoration, a 900-receipt priority cap, documented-limit schema tests and safe HTTP-status diagnostics. Full verification passed with 116 tests and one intentional Stage 3 skip. No provider call or approval occurred.
 - **2026-10-19:** Completed the fixed-schema saved-pages draft with one successful call per seller and no retry. Recovered finalization offline after a local snapshot-path error. New `needs_review` results are Resolve AI 0/0 organizations and 11/2 warnings, Shopify 0/2 and 13/0, Vercel 0/0 and 8/4. Exact token-priced cost was not retained; conservative reservation was $0.026104. No profile was approved and OpenAI returned to disabled/zero.

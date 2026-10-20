@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "seller": {"name": "Shopify", "domain": "shopify.com"},
+  "methodology": "Independently proposed by manually reading the saved first-party page URLs, titles, visible text and outbound anchors. The deterministic extractor was not run or reused to create this answer key.",
+  "customers": [
+    {"name": "Diane Von Furstenberg", "domain": "dvf.com", "domainStatus": "verified", "sourceUrl": "https://www.shopify.com/case-studies/diane-von-furstenberg", "evidenceQuote": "Diane Von Furstenberg Brings a Bespoke Clienteling Experience to their Store with Shopify POS", "foundBy": "The saved case-study URL/title names Diane Von Furstenberg and the raw page links DVF to https://www.dvf.com/.", "labeledBy": "unconfirmed"},
+    {"name": "Maggy London", "domain": "maggylondon.com", "domainStatus": "verified", "sourceUrl": "https://www.shopify.com/case-studies/maggy-london", "evidenceQuote": "How Maggy London uses Shopify Sidekick to power six brands with a 4-person ecom team", "foundBy": "The saved case-study URL/title names Maggy London and its raw page links to https://maggylondon.com/.", "labeledBy": "unconfirmed"},
+    {"name": "Anián", "domain": "anianmfg.com", "domainStatus": "verified", "sourceUrl": "https://www.shopify.com/blog/case-study-anian", "evidenceQuote": "Anián: Sustainable Fashion Inventory Case Study", "foundBy": "The saved Shopify case-study URL/title names Anián and its raw page links ANIÁN to https://anianmfg.com/.", "labeledBy": "unconfirmed"}
+  ],
+  "competitors": [
+    {"name": "BigCommerce", "domain": "bigcommerce.com", "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce", "evidenceQuote": "Shopify vs. BigCommerce: Commerce is bigger with Shopify", "foundBy": "The saved Shopify comparison URL/title names BigCommerce and the raw page links to www.bigcommerce.com.", "labeledBy": "unconfirmed"},
+    {"name": "WooCommerce", "domain": "", "sourceUrl": "https://www.shopify.com/compare/shopify-vs-woocommerce", "evidenceQuote": "Shopify vs. WooCommerce", "foundBy": "The saved Shopify first-party comparison URL/title names WooCommerce; the saved page had Woo developer links but no unambiguous canonical company-domain link.", "labeledBy": "unconfirmed"}
+  ],
+  "buyerTitles": [
+    {"value": "Vice President of Ecommerce", "sourceUrl": "https://www.shopify.com/compare/shopify-vs-custom-platform", "evidenceQuote": "Steve Bauer — Vice President of Ecommerce and Digital, Arhaus", "foundBy": "The saved Shopify comparison page quotes a senior ecommerce executive discussing the buying decision.", "labeledBy": "unconfirmed"},
+    {"value": "Director of Ecommerce", "sourceUrl": "https://www.shopify.com/compare/shopify-vs-custom-platform", "evidenceQuote": "Stephen Pinto — Director of Products, Ecommerce, Dr. Squatch", "foundBy": "The saved page quotes an ecommerce product director discussing Shopify’s customer experience and results.", "labeledBy": "unconfirmed"}
+  ],
+  "championTitles": [
+    {"value": "Assistant Store Manager", "sourceUrl": "https://www.shopify.com/case-studies/diane-von-furstenberg", "evidenceQuote": "Joanna Puccio — Assistant Store Manager", "foundBy": "The saved DVF case study identifies a hands-on retail operator using the solution.", "labeledBy": "unconfirmed"},
+    {"value": "Ecommerce Manager", "sourceUrl": "https://www.shopify.com/case-studies", "evidenceQuote": "its ecommerce team no longer has to go through IT for everyday changes", "foundBy": "The saved customer index describes the ecommerce team as the hands-on operator; the exact title is a proposed normalization for owner review.", "labeledBy": "unconfirmed"}
+  ],
+  "sizeMetric": {"label": "Annual Revenue", "floor": 1000000, "sourceUrl": "https://www.shopify.com/case-studies", "evidenceQuote": "grown from €2.5 million to an expected €26 million in annual revenue", "foundBy": "Annual revenue is measurable and explicitly present in a saved Shopify customer story; the proposed floor is a human judgment.", "labeledBy": "unconfirmed"}
+}

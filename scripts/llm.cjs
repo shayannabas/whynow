@@ -3,6 +3,12 @@ const {getWorkspace,updateWorkspace}=require('./server/state.cjs');
 
 const ENDPOINT='https://api.openai.com/v1/chat/completions';
 const DEFAULT_MODEL='gpt-4o-mini';
+const PROPOSED_STRONG_MODEL='gpt-5.4-mini-2026-03-17';
+const SUPPORTED_MODELS=new Set([DEFAULT_MODEL,'gpt-4o-mini-2024-07-18','gpt-5.4-mini',PROPOSED_STRONG_MODEL]);
+const MODEL_PRICING_USD_PER_MILLION=Object.freeze({
+  'gpt-4o-mini':{input:0.15,output:0.60},'gpt-4o-mini-2024-07-18':{input:0.15,output:0.60},
+  'gpt-5.4-mini':{input:0.75,output:4.50},[PROPOSED_STRONG_MODEL]:{input:0.75,output:4.50}
+});
 const DEFAULT_TIMEOUT_MS=90000;
 const MAX_REQUEST_BYTES=360000;
 const ESTIMATED_BYTES_PER_INPUT_TOKEN=3;
@@ -20,12 +26,18 @@ function settings(env={}) {
 function assertReady(config) {
   if(!config.enabled)throw new LlmError('DISABLED','OpenAI calls are disabled.');
   if(!config.keyPresent)throw new LlmError('KEY_MISSING','Add your own OpenAI API key privately.');
-  if(![DEFAULT_MODEL,'gpt-4o-mini-2024-07-18'].includes(config.model))throw new LlmError('MODEL_UNSUPPORTED','This integration is configured for GPT-4o mini only; review pricing before changing models.');
+  if(!SUPPORTED_MODELS.has(config.model))throw new LlmError('MODEL_UNSUPPORTED','This OpenAI model is not approved for the bounded drafting workflow.');
   if(!config.limitMicros||!config.callLimit)throw new LlmError('BUDGET_MISSING','Set an approved positive spending limit and request limit before enabling calls.');
 }
-function estimatedUsage({bodyBytes,maxOutputTokens}) {
+function modelForPurpose(env={},purpose='seller_facts') {
+  const key={seller_facts:'OPENAI_SELLER_FACTS_MODEL',organization_review:'OPENAI_ORGANIZATION_REVIEW_MODEL',icp_targeting:'OPENAI_ICP_TARGETING_MODEL'}[purpose];
+  return String(key&&env[key]||env.OPENAI_MODEL||DEFAULT_MODEL).trim();
+}
+function estimatedUsage({bodyBytes,maxOutputTokens,model=DEFAULT_MODEL}) {
   const inputTokens=Math.ceil((bodyBytes+2048)/ESTIMATED_BYTES_PER_INPUT_TOKEN);
-  const inputMicros=inputTokens*0.15,outputMicros=maxOutputTokens*0.60;
+  const pricing=MODEL_PRICING_USD_PER_MILLION[model];
+  if(!pricing)throw new LlmError('MODEL_UNSUPPORTED','No reviewed pricing is configured for this model.');
+  const inputMicros=inputTokens*pricing.input,outputMicros=maxOutputTokens*pricing.output;
   return {inputTokens,maxOutputTokens,inputMicros,outputMicros,reserveMicros:Math.ceil(inputMicros+outputMicros)};
 }
 function serializeRequestBody({model,messages,schema,name,maxOutputTokens}) {
@@ -35,19 +47,19 @@ function serializeRequestBody({model,messages,schema,name,maxOutputTokens}) {
 function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date().toISOString(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}) {
   if(typeof read!=='function'||typeof mutate!=='function')throw new Error('A serialized persistent state adapter is required');
   const pending=new Map();
-  async function generate({workspaceId,promptVersion,messages,schema,name='whynow_result',validate,maxOutputTokens=4096}) {
-    const config=settings(env);assertReady(config);
+  async function generate({workspaceId,promptVersion,messages,schema,name='whynow_result',validate,maxOutputTokens=4096,model}) {
+    const config={...settings(env),model:model||settings(env).model};assertReady(config);
     if(!promptVersion || typeof promptVersion!=='string' || promptVersion.length>100 || typeof validate!=='function' || !schema || !/^[a-zA-Z0-9_-]{1,64}$/.test(name))throw new LlmError('INVALID_INPUT','A versioned prompt, schema and local validator are required.');
     if(!Array.isArray(messages)||!messages.length||messages.length>20||messages.some(m=>!['system','user','assistant'].includes(m.role)||typeof m.content!=='string'))throw new LlmError('INVALID_INPUT','Use bounded text-only messages.');
     if(!Number.isInteger(maxOutputTokens)||maxOutputTokens<1||maxOutputTokens>4096)throw new LlmError('INVALID_INPUT','Output must be limited to 1–4096 tokens.');
     const body=serializeRequestBody({model:config.model,messages,schema,name,maxOutputTokens});
     const bytes=Buffer.byteLength(body);
     if(bytes>MAX_REQUEST_BYTES)throw new LlmError('INPUT_TOO_LARGE','Source excerpts exceed the AI request limit.');
-    // Standard mini pricing: $0.15 / 1M input, $0.60 / 1M output tokens.
-    // JSON and receipt IDs tokenize more densely than prose, so use a conservative
+    // Pricing is selected from the reviewed per-model table above. JSON and
+    // receipt IDs tokenize more densely than prose, so use a conservative
     // three UTF-8 bytes per input token plus fixed overhead. Reserve that estimate
     // before EVERY attempt and never refund uncertain or failed requests.
-    const {reserveMicros}=estimatedUsage({bodyBytes:bytes,maxOutputTokens});
+    const {reserveMicros}=estimatedUsage({bodyBytes:bytes,maxOutputTokens,model:config.model});
     const key=createHash('sha256').update(JSON.stringify({promptVersion,body})).digest('hex');
     const pendingKey=`${workspaceId}:${key}`;
     const check=value=>{try {if(validate(structuredClone(value))!==true)throw Error();}catch {throw new LlmError('INVALID_OUTPUT','OpenAI output did not pass local validation.');}return value;};
@@ -106,4 +118,4 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
   }
   return {generate};
 }
-module.exports={createLlm,settings,estimatedUsage,serializeRequestBody,LlmError,DEFAULT_MODEL,DEFAULT_TIMEOUT_MS,MAX_REQUEST_BYTES,ESTIMATED_BYTES_PER_INPUT_TOKEN,ENDPOINT};
+module.exports={createLlm,settings,modelForPurpose,estimatedUsage,serializeRequestBody,LlmError,DEFAULT_MODEL,PROPOSED_STRONG_MODEL,SUPPORTED_MODELS,MODEL_PRICING_USD_PER_MILLION,DEFAULT_TIMEOUT_MS,MAX_REQUEST_BYTES,ESTIMATED_BYTES_PER_INPUT_TOKEN,ENDPOINT};
