@@ -7,6 +7,7 @@ import path from 'node:path';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace,loadState,saveState,updateWorkspace}=require('../scripts/server/state.cjs');
 const {createPersistentAdapter,snapshotFor,actualCostUsd}=require('../scripts/stage2-recovery-acceptance.cjs');
+const {COMPANIES,MAX_SOURCES,validateFinalPlan,chooseSourceRefs,resetWorkspaceForFinalDraft}=require('../scripts/stage2-final-rerun.cjs');
 
 describe('Stage 2 recovery acceptance persistence',()=>{
   it('serializes every mutation through the normal saveState path',async()=>{
@@ -37,5 +38,39 @@ describe('Stage 2 recovery acceptance persistence',()=>{
 
   it('computes GPT-4o mini token cost from successful API usage',()=>{
     expect(actualCostUsd([{promptTokens:1_000_000,completionTokens:1_000_000}])).toBeCloseTo(0.75,8);
+  });
+});
+
+describe('final Stage 2 rerun plan',()=>{
+  function source(id,url){return {schemaVersion:1,id,url,fetchedAt:'2026-10-19T00:00:00.000Z',contentHash:id.padEnd(64,'0'),title:url,text:'Readable public seller evidence.'};}
+  function stateForPlan(){
+    let state=defaultState();
+    for(const company of COMPANIES){
+      state=createWorkspace(state,{name:company.name});const id=state.activeWorkspaceId,w=state.workspaces[id];
+      w.sellerProfile.domain=company.domain;w.research={schemaVersion:1,selectedCandidate:{name:company.name,domain:company.domain,website:`https://${company.domain}/`},
+        plan:{urls:company.name==='Vercel'?[]:[...company.customerPages]},sources:[],steps:[]};
+      for(const [index,url] of [...company.livePages,...company.retainedPages].entries()){
+        const sourceId=`${company.slug}-${index}`,saved=source(sourceId,url);state.sources[sourceId]=saved;
+        w.research.sources.push({schemaVersion:1,sourceId,url,title:saved.title,fetchedAt:saved.fetchedAt,kind:/customer|case-stud/i.test(url)?'seller_customer_page':'seller_site',ownerDomain:company.domain,chars:saved.text.length,bytes:saved.text.length});
+      }
+    }
+    return state;
+  }
+
+  it('uses only first-party pages, needs no Serper queries and stays within the source ceiling',()=>{
+    const report=validateFinalPlan(stateForPlan());
+    expect(report).toHaveLength(3);
+    expect(report.every(item=>item.serperQueries===0&&item.maximumSynthesisSources<=MAX_SOURCES)).toBe(true);
+    expect(report.find(item=>item.company==='Resolve AI').customerPageCount).toBeGreaterThanOrEqual(4);
+    expect(report.find(item=>item.company==='Shopify').customerPageCount).toBeGreaterThanOrEqual(4);
+  });
+
+  it('prepares a fresh review draft without carrying approval or paid-call state',()=>{
+    let state=stateForPlan(),workspace=Object.values(state.workspaces)[0];workspace.status='needs_review';workspace.llmCache={old:{value:{}}};workspace.budgets.openai={month:'2026-10',calls:2,reservedMicros:2000};
+    const refs=chooseSourceRefs(state,workspace,COMPANIES[0]);
+    state=resetWorkspaceForFinalDraft(state,workspace.id,COMPANIES[0],refs);
+    const reset=state.workspaces[workspace.id];
+    expect(reset.status).toBe('draft');expect(reset.research.status).toBe('evidence_ready');expect(reset.research.sources.length).toBeLessThanOrEqual(MAX_SOURCES);
+    expect(reset.llmCache).toEqual({});expect(reset.budgets.openai).toEqual({});expect(reset.sellerProfile).toEqual({schemaVersion:1,deliveryAllowed:false});
   });
 });
