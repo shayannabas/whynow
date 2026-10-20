@@ -1,0 +1,7 @@
+title = "WhyNow gitleaks configuration"
+
+[[allowlists]]
+description = "Generated non-secret segment IDs in public Stage 2 ICP snapshots"
+paths = ['''tests/fixtures/onboarding/(?:resolve-ai|shopify|vercel)-live-icp\.json''']
+regexTarget = "line"
+regexes = ['''^\s*"key":\s*"[a-f0-9]{24}",?\s*$''']
