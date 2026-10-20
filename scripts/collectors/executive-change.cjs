@@ -56,7 +56,8 @@ function executiveNewsEvents(target, searchResults = [], now = new Date(), slaCo
     const text = `${result.title || ""}. ${result.snippet || result.text || ""}`;
     if (!result.url || !EXEC_ACTION.test(text) || !EXEC_ROLE.test(text) || !evidenceBelongsToTarget(target, result) || !appointmentBelongsToTarget(target, result)) return [];
     const reportedAt = parsedDate(result.date, now);
-    const occurredAt = reportedAt || now.toISOString();
+    if(!reportedAt)return [];
+    const occurredAt = reportedAt;
     if (!withinDays(occurredAt, 120, now)) return [];
     return [stage3Signals.decorateTrigger(event({
       type: "exec_change",
@@ -75,7 +76,8 @@ function executiveDepartureEvents(target, searchResults = [], now = new Date(), 
     const text = `${result.title || ""}. ${result.snippet || result.text || ""}`;
     if (!result.url || !DEPARTURE_ACTION.test(text) || !EXEC_ROLE.test(text) || !evidenceBelongsToTarget(target, result) || !departureBelongsToTarget(target, result)) return [];
     const reportedAt = parsedDate(result.date, now);
-    const occurredAt = reportedAt || now.toISOString();
+    if(!reportedAt)return [];
+    const occurredAt = reportedAt;
     if (!withinDays(occurredAt, 120, now)) return [];
     return [stage3Signals.decorateTrigger(event({
       type: "executive_departure",

@@ -8,6 +8,7 @@ function ageDays(value,now=new Date()){const timestamp=Date.parse(value||'');ret
 function activeTriggers(account={},now=new Date()){
   return (account.triggers||[]).filter(trigger=>{
     if(!trigger.evidenceUrl||trigger.weakEvidenceFlag===true||trigger.reviewState==='needs_more_research')return false;
+    if(['serper','public_search','google_news_rss'].includes(trigger.sourceId)&&trigger.metadata?.eventDateReported===false)return false;
     const end=Date.parse(trigger.decaysAt||''),start=Date.parse(trigger.occurredAt||trigger.detectedAt||'');
     if(Number.isFinite(end))return now.getTime()<end;
     return Number.isFinite(start)&&ageDays(trigger.occurredAt||trigger.detectedAt,now)>=0&&ageDays(trigger.occurredAt||trigger.detectedAt,now)<90;
@@ -31,4 +32,4 @@ function applyDecisioning(account={},config={},now=new Date()){
   return {...killed,primaryKill,alsoKilledBy:(killed.kills||[]).slice(1),killReason:primaryKill?.reason||'',killEvidenceUrl:primaryKill?.evidenceUrl||'',hiringForWhatWeSell:prioritized.priorityBreakdown.hiringForWhatWeSell,...prioritized};
 }
 function decisionReport(accounts=[]){const killed=accounts.filter(account=>account.killStatus==='killed'),count=value=>accounts.filter(account=>account.tier===value).length,killCodes=killed.reduce((result,account)=>{const code=account.primaryKill?.code||'unknown';result[code]=(result[code]||0)+1;return result;},{});return {total:accounts.length,tier1:count(1),tier2:count(2),tier3:count(3),parked:count('parked'),killed:killed.length,prioritized:accounts.filter(account=>account.priority>0).length,maximumPriority:accounts.length?Math.max(...accounts.map(account=>Number(account.priority||0))):0,killCodes};}
-module.exports={DECISION_SCHEMA_VERSION,DEFAULT_MAX_PRIORITY_RAW,DEFAULT_TIER_WEIGHTS,applyDecisioning,decisionReport,hasFreshTrigger,priorityForAccount,signalStack};
+module.exports={DECISION_SCHEMA_VERSION,DEFAULT_MAX_PRIORITY_RAW,DEFAULT_TIER_WEIGHTS,activeTriggers,applyDecisioning,decisionReport,hasFreshTrigger,priorityForAccount,signalStack};

@@ -17,6 +17,9 @@ const {phaseBQueryPlan}=require('./collectors/search-evidence.cjs');
 const {collectorConfigForWorkspace,collectorTargetForAccount}=require('./phase-b-config.cjs');
 const {phaseAConfigForWorkspace}=require('./phase-a-config.cjs');
 const {scoreAccount}=require('./score-account.cjs');
+const {activeTriggers}=require('./decisioning.cjs');
+const {decorateTrigger}=require('./collector-triggers.cjs');
+const {operationalPainEvidence}=require('./collectors/active-pain.cjs');
 
 const defaultCollectors={collectHiring,collectActivePain,collectSerperEvidence,collectExecutiveChange,collectTechCulture,collectAiCompatibility,collectCompetitiveWedge,collectRevenueSensitivity,collectFirmographics,collectEdgarFormDUniverse};
 function phaseBSerperLimit(env={}){const requested=Number(env.PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT);return Number.isInteger(requested)&&requested>0?Math.min(5,requested):Math.min(5,Math.max(1,serperSettings(env).perRunLimit));}
@@ -26,6 +29,13 @@ function signalWins(current={},incoming={}){
   if(incomingReceipt!==currentReceipt)return incomingReceipt;
   if(Number(incoming.score||0)!==Number(current.score||0))return Number(incoming.score||0)>Number(current.score||0);
   return Date.parse(incoming.observedAt||0)>Date.parse(current.observedAt||0);
+}
+function dedupeTriggers(rows=[]){return [...new Map(rows.filter(Boolean).map(row=>[`${String(row.type||row.triggerType||'').toLowerCase()}:${String(row.evidenceUrl||'').replace(/[?#].*$/,'')}`,row])).values()];}
+function sanitizeWhyNow(account={},config={},now=new Date()){
+  const all=dedupeTriggers(account.triggers||[]).map(trigger=>trigger.decaysAt?trigger:decorateTrigger(trigger,config.slaDays||{})),history=uniq([...(account.triggerHistory||[]),...all],row=>row.id||`${row.type}:${row.evidenceUrl}:${row.occurredAt}`),triggers=activeTriggers({...account,triggers:all},now);
+  const signals={...(account.signals||{})},pain=signals.activePain;
+  if(pain){const external=['serper','public_search','google_news_rss'].includes(pain.sourceId),dated=pain.metadata?.eventDateReported!==false&&(!external||pain.metadata?.eventDateReported===true),fresh=Number.isFinite(Date.parse(pain.observedAt))&&now.getTime()<Date.parse(pain.observedAt)+(Number(config.slaDays?.outage)||30)*86400000;if(!dated||!fresh||!operationalPainEvidence(account,{url:pain.evidenceUrl,title:pain.evidenceText,date:pain.observedAt}))delete signals.activePain;}
+  return {...account,signals,triggers,triggerHistory:history};
 }
 function mergeCollectorResult(account={},result={},runId=''){
   const next={...structuredClone(account),...(result.targetPatch||{})},signals={...(next.signals||{})};
@@ -53,7 +63,7 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
   });
   const apply=async(workspaceId,accountId,runId,collectorId,result,runtime)=>mutate(state=>{
     const workspace=state.workspaces[workspaceId],index=workspace.accounts.findIndex(row=>row.id===accountId);if(index<0)throw new Error('Account disappeared during refresh.');
-    const merged=mergeCollectorResult(workspace.accounts[index],result,runId),config=phaseAConfigForWorkspace(workspace);workspace.accounts[index]=scoreAccount(merged,config,now());
+    const merged=mergeCollectorResult(workspace.accounts[index],result,runId),config=phaseAConfigForWorkspace(workspace),sanitized=sanitizeWhyNow(merged,config,now());workspace.accounts[index]=scoreAccount(sanitized,config,now());
     const run=findRun(workspace,runId);run.collectors.push({collectorId,status:'complete',signals:(result.signals||[]).length,events:(result.events||[]).length,killHints:(result.killHints||[]).length,itemsFound:Number(result.itemsFound||0)});persistRuntime(workspace,runtime);return state;
   });
   const fail=async(workspaceId,runId,collectorId,error,runtime)=>updateRun(workspaceId,runId,(run,workspace)=>{run.collectors.push({collectorId,status:'error',signals:0,events:0,killHints:0,itemsFound:0});run.errors.push({collectorId,...safeError(error)});persistRuntime(workspace,runtime);});
@@ -74,7 +84,7 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
     const steps=[
       ['firmographics',()=>collectors.collectFirmographics(target,{runtime,now:now(),searchResults})],
       ['hiring',()=>collectors.collectHiring(target,{runtime,now:now(),painThemeConfig:collectorConfig.painThemeConfig,slaConfig:collectorConfig.slaDays})],
-      ['active_pain',()=>collectors.collectActivePain(target,{runtime,now:now(),searchResults,painThemeConfig:collectorConfig.painThemeConfig})],
+      ['active_pain',()=>collectors.collectActivePain(target,{runtime,now:now(),searchResults,painThemeConfig:collectorConfig.painThemeConfig,strictFreshness:true,windowDays:Number(collectorConfig.slaDays?.outage)||30,slaConfig:collectorConfig.slaDays})],
       ['executive_change',()=>collectors.collectExecutiveChange(target,{now:now(),searchResults,slaConfig:collectorConfig.slaDays})],
       ['tech_culture',()=>collectors.collectTechCulture(target,{runtime,now:now(),searchResults,slaConfig:collectorConfig.slaDays})],
       ['ai_compatibility',()=>collectors.collectAiCompatibility(target,{searchResults})],
@@ -101,4 +111,4 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
   return {start,wait};
 }
 
-module.exports={createPhaseBRefreshCoordinator,defaultCollectors,mergeCollectorResult,phaseBSerperLimit,signalWins};
+module.exports={createPhaseBRefreshCoordinator,dedupeTriggers,defaultCollectors,mergeCollectorResult,phaseBSerperLimit,sanitizeWhyNow,signalWins};

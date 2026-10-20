@@ -1,6 +1,7 @@
 const { domainForTarget, event, normalizeEntityText, signal, stripHtml, withinDays } = require("./common.cjs");
 const painThemes = require("../pain-themes.cjs");
 const incidentAttribution = require("../incident-attribution.cjs");
+const triggerRules = require("../collector-triggers.cjs");
 
 const IMPACT_SCORE = { critical: 5, major: 5, minor: 4, none: 3, maintenance: 1 };
 
@@ -120,6 +121,7 @@ function operationalPainEvidence(target, result = {}) {
   if (!stronglyAttributedToTarget(target, result)) return false;
   const evidenceUrl = String(result.url || result.link || result.evidenceUrl || "");
   const text = stripHtml(`${result.title || ""} ${result.snippet || result.text || result.evidenceText || ""}`).toLowerCase();
+  if (/\b(no current (?:problems?|issues?|outages?)|all systems operational|currently (?:healthy|operational)|no incidents? reported|service is operating normally)\b/.test(text)) return false;
   const strongIncident = /\b(outage|downtime|degraded|service disruption|unavailable)\b/.test(text);
   const genericIncident = /\b(incident|down)\b/.test(text);
   const operationalContext = /\b(api|app|application|software|platform|service|website|system|technical|technology|production|infrastructure|database|server|cloud|latency|errors?|status page|users?|customers?|checkout|payments?|booking|orders?|calls?|voice ai|automation)\b/.test(text);
@@ -131,23 +133,31 @@ function operationalPainEvidence(target, result = {}) {
   return true;
 }
 
-function searchPainItems(target, results = [], now = new Date(), painThemeConfig = {}) {
+function parsedPublishedAt(value='',nowInput=new Date()){
+  const now=nowInput instanceof Date?nowInput:new Date(nowInput),direct=Date.parse(value);if(Number.isFinite(direct))return new Date(direct).toISOString();
+  const relative=String(value).match(/(\d+)\s+(hour|day|week|month)s?\s+ago/i);if(!relative)return '';const units={hour:3600000,day:86400000,week:7*86400000,month:30*86400000};return new Date(now.getTime()-Number(relative[1])*units[relative[2].toLowerCase()]).toISOString();
+}
+function statusAggregator(value=''){try{const host=new URL(value).hostname.replace(/^www\./,'').toLowerCase();return ['downdetector.com','statusgator.com','istheservicedown.com','outage.report'].some(domain=>host===domain||host.endsWith(`.${domain}`));}catch{return false;}}
+function searchPainItems(target, results = [], now = new Date(), painThemeConfig = {}, options={}) {
   const events = [];
   const signals = [];
   const quoteReceipts = [];
   for (const result of results) {
     const text = `${result.title || ""} ${result.snippet || result.text || ""}`;
     if (!operationalPainEvidence(target, result)) continue;
-    const occurredAt = result.date || result.publishedAt || now.toISOString();
-    if (!withinDays(occurredAt, 365, now)) continue;
     const evidenceUrl = result.url || result.link || "";
     if (!evidenceUrl) continue;
+    const reportedAt=parsedPublishedAt(result.date||result.publishedAt,now),windowDays=Number(options.windowDays)||90;
+    if((options.strictFreshness||statusAggregator(evidenceUrl))&&!reportedAt)continue;
+    const occurredAt=options.strictFreshness?reportedAt:(result.date||result.publishedAt||now.toISOString());
+    if(!withinDays(occurredAt,options.strictFreshness?windowDays:365,now))continue;
     const themes = painThemes.classifyPainThemes(text, painThemeConfig);
     const attributionOptions = { sourceKind: result.sourceId || "public_search", companyOwned: companyOwnedSource(target, evidenceUrl) };
     const attributed = incidentAttribution.classifyIncidentAttribution({ type: "outage_news", evidenceText: text, sourceId: result.sourceId || "public_search" }, attributionOptions);
-    const painEvent = themedPainEvent({ type: "outage_news", title: result.title || `${target.name} outage evidence`, evidenceUrl, evidenceText: text, occurredAt, sourceId: result.sourceId || "public_search" }, painThemeConfig, attributionOptions);
+    let painEvent = themedPainEvent({ type: "outage_news", title: result.title || `${target.name} outage evidence`, evidenceUrl, evidenceText: text, occurredAt, sourceId: result.sourceId || "public_search",...(options.strictFreshness?{metadata:{eventDateReported:Boolean(reportedAt)}}:{}) }, painThemeConfig, attributionOptions);
+    if(options.strictFreshness)painEvent=triggerRules.decorateTrigger(painEvent,options.slaConfig||{});
     events.push(painEvent);
-    signals.push(signal({ key: "activePain", score: withinDays(occurredAt, 90, now) ? 4 : 3, evidenceUrl, evidenceText: text, observedAt: occurredAt, sourceId: result.sourceId || "public_search", metadata: { painThemes: themes.letters, attribution: attributed.attribution, citable: attributed.citable, citationStatus: attributed.citable ? "citable" : "not_citable", notCitableReason: attributed.citable ? "" : attributed.reason }, confidence: incidentAttribution.confidenceForAttribution(attributed.attribution) }));
+    signals.push(signal({ key: "activePain", score: withinDays(occurredAt, 90, now) ? 4 : 3, evidenceUrl, evidenceText: text, observedAt: occurredAt, sourceId: result.sourceId || "public_search", metadata: { ...(options.strictFreshness?{eventDateReported:Boolean(reportedAt)}:{}),painThemes: themes.letters, attribution: attributed.attribution, citable: attributed.citable, citationStatus: attributed.citable ? "citable" : "not_citable", notCitableReason: attributed.citable ? "" : attributed.reason }, confidence: incidentAttribution.confidenceForAttribution(attributed.attribution) }));
     quoteReceipts.push({ kind: "outage_news", text, sourceUrl: evidenceUrl, postingDate: occurredAt, attribution: attributed.attribution, citable: attributed.citable, citationStatus: attributed.citable ? "citable" : "not_citable", notCitableReason: attributed.citable ? "" : attributed.reason });
   }
   return { events, signals, quotebook: painThemes.quotebookFromReceipts(quoteReceipts, painThemeConfig) };
@@ -217,17 +227,7 @@ async function collectActivePain(target, context) {
     }
   }
   if (!context.statusOnly) {
-    try {
-      const news = await googleNewsPain(target, runtime, now, painThemeConfig);
-      signals.push(...news.signals);
-      events.push(...news.events);
-      quoteEntries.push(...(news.quotebook || []));
-    } catch {
-      // Google News RSS is a free fallback; a failure cannot suppress other receipts.
-    }
-  }
-  if (!context.statusOnly) {
-    const search = searchPainItems(target, context.searchResults || [], now, painThemeConfig);
+    const search = searchPainItems(target, context.searchResults || [], now, painThemeConfig,{strictFreshness:Boolean(context.strictFreshness),windowDays:context.windowDays,slaConfig:context.slaConfig});
     signals.push(...search.signals);
     events.push(...search.events);
     quoteEntries.push(...(search.quotebook || []));
@@ -236,4 +236,4 @@ async function collectActivePain(target, context) {
   return { collectorId: "active_pain", signals, events, targetPatch, itemsFound: events.length };
 }
 
-module.exports = { collectActivePain, discoverStatusPage, googleNewsPain, googleNewsRssItems, incidentDurationMinutes, operationalPainEvidence, searchPainItems, statusApiUrl, statuspageItems, stronglyAttributedToTarget };
+module.exports = { collectActivePain, discoverStatusPage, googleNewsPain, googleNewsRssItems, incidentDurationMinutes, operationalPainEvidence, parsedPublishedAt,searchPainItems, statusAggregator,statusApiUrl, statuspageItems, stronglyAttributedToTarget };
