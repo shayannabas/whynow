@@ -17,10 +17,11 @@ const {createSynthesisCoordinator}=require('../onboarding/synthesis-runner.cjs')
 const {createRefreshCoordinator,refreshProvidersReady}=require('../onboarding/refresh-runner.cjs');
 const {createLlm}=require('../llm.cjs');
 const {changeArchive,workspacesPage}=require('./workspaces.cjs');
-const {accountsPage,killLogPage,scorecardPage}=require('./phase-a-pages.cjs');
+const {accountPage,accountsPage,killLogPage,scorecardPage}=require('./phase-a-pages.cjs');
 const {loadResolveReferenceDemo}=require('../reference-demo.cjs');
 const {addManualAccountToState}=require('../accounts.cjs');
-function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,llm:providedLlm} = {}) {
+const {createPhaseBRefreshCoordinator}=require('../phase-b-runner.cjs');
+function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,phaseBRefreshCoordinator:providedPhaseBRefresh,llm:providedLlm} = {}) {
   stateFile=stateFile||statePath(env);
   loadState(stateFile);
   let writes = Promise.resolve();
@@ -36,6 +37,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   const llm=providedLlm||createLlm({read,mutate,env});
   const synthesisCoordinator=providedSynthesis||createSynthesisCoordinator({read,mutate,llm});
   const refreshCoordinator=providedRefresh||createRefreshCoordinator({read,mutate,researchCoordinator,synthesisCoordinator,env});
+  const phaseBRefreshCoordinator=providedPhaseBRefresh||createPhaseBRefreshCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
   // Persisted interrupted research can resume after a local restart. Errors are
   // saved in the workspace and never crash the HTTP server.
   if(typeof researchCoordinator.resumePending==='function')void researchCoordinator.resumePending().catch(()=>{});
@@ -50,6 +52,16 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       const pathname = new URL(req.url,'http://localhost').pathname;
       const localAdmin=env.NODE_ENV!=='production'&&['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)&&/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||'');
       if(req.method==='GET'&&pathname==='/accounts')return html(200,accountsPage(loadState(stateFile)));
+      const accountMatch=pathname.match(/^\/accounts\/([^/]+)$/),refreshMatch=pathname.match(/^\/accounts\/([^/]+)\/refresh$/);
+      if(req.method==='GET'&&accountMatch)return html(200,accountPage(loadState(stateFile),decodeURIComponent(accountMatch[1])));
+      if(req.method==='POST'&&refreshMatch){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const current=loadState(stateFile),accountId=decodeURIComponent(refreshMatch[1]);
+        try{await phaseBRefreshCoordinator.start(current.activeWorkspaceId,accountId);}
+        catch(error){return html(409,accountPage(loadState(stateFile),accountId,error.message));}
+        res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}`});return res.end();
+      }
       if(req.method==='GET'&&pathname==='/scorecard')return html(200,scorecardPage(loadState(stateFile)));
       if(req.method==='GET'&&pathname==='/kill-log')return html(200,killLogPage(loadState(stateFile)));
       if(req.method==='POST'&&pathname==='/reference-demo/load'){

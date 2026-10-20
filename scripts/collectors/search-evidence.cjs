@@ -43,20 +43,25 @@ async function collectTrackedPeopleEvidence(trackedPeople = [], context = {}) {
 }
 
 async function collectSerperEvidence(target, context) {
-  if (!context.serperApiKey) return [];
+  if (!context.search && !context.serperApiKey) return [];
   const results = [];
   const kinds = new Set(context.kinds || []);
-  for (const descriptor of serperQueries(target).filter((item) => !kinds.size || kinds.has(item.kind))) {
-    const { value } = await context.runtime.requestJsonPost("https://google.serper.dev/search", "serper", {
-      q: descriptor.query,
-      gl: "us",
-      hl: "en",
-      num: 10,
-      tbs: descriptor.kind === "active_pain" ? "qdr:y" : descriptor.kind === "exec_change" ? "qdr:m" : undefined,
-    }, { headers: { "X-API-KEY": context.serperApiKey } });
-    for (const item of value.organic || []) {
-      if (!item.link) continue;
-      const evidence = { kind: descriptor.kind, title: item.title, snippet: item.snippet, url: item.link, date: item.date, sourceId: "serper" };
+  const limit=Number.isInteger(context.maxQueries)&&context.maxQueries>=0?context.maxQueries:Infinity;
+  for (const descriptor of serperQueries(target).filter((item) => !kinds.size || kinds.has(item.kind)).slice(0,limit)) {
+    if(context.beforeQuery)await context.beforeQuery(descriptor);
+    const organic=context.search
+      ? await context.search(descriptor.query,{num:10,kind:descriptor.kind})
+      : (await context.runtime.requestJsonPost("https://google.serper.dev/search", "serper", {
+        q: descriptor.query,
+        gl: "us",
+        hl: "en",
+        num: 10,
+        tbs: descriptor.kind === "active_pain" ? "qdr:y" : descriptor.kind === "exec_change" ? "qdr:m" : undefined,
+      }, { headers: { "X-API-KEY": context.serperApiKey } })).value.organic || [];
+    for (const item of organic) {
+      const itemUrl=item.url||item.link;
+      if (!itemUrl) continue;
+      const evidence = { kind: descriptor.kind, title: item.title, snippet: item.snippet, url: itemUrl, date: item.date, sourceId: "serper" };
       if (evidenceBelongsToTarget(target, evidence)) results.push(evidence);
     }
   }
