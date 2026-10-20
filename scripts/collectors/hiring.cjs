@@ -12,7 +12,8 @@ const TOOL_PATTERNS = ["Datadog", "Grafana", "PagerDuty", "OpenTelemetry", "Kube
 function slugCandidates(target) {
   const domain = domainForTarget(target).split(".")[0];
   const name = String(target.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
-  return unique([target.ats?.slug, domain, name]).slice(0, 3);
+  const aliases=[...(target.ats?.slugCandidates||[]),...(target.atsSlugCandidates||[]),...(target.aliases||[])].map(value=>String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,''));
+  return unique([target.ats?.slug,...aliases,domain,name]).filter(Boolean).slice(0,6);
 }
 
 function providerEndpoints(slug) {

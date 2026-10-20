@@ -9,13 +9,13 @@ const {atomicWrite} = require('../server/state.cjs');
 
 const minute=60000,hour=60*minute,day=24*hour;
 const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
-  ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000],['lever',20,500,6*hour,12000],['ashby',20,500,6*hour,12000],
+  ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000,8*1024*1024],['lever',20,500,6*hour,12000,8*1024*1024],['ashby',20,500,6*hour,12000,8*1024*1024],
   ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
   ['wikidata',60,250,7*day,12000],
   ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
   ['engineering_web',20,1500,12*hour,12000],
   ['seller_site',25,1000,day,12000],['seller_customers',2,2000,30*day,12000],['robots',30,500,day,8000]
-].map(([key,limit,minIntervalMs,ttlMs,timeoutMs])=>[key,Object.freeze({limit,minIntervalMs,ttlMs,timeoutMs})])));
+].map(([key,limit,minIntervalMs,ttlMs,timeoutMs,maxBytes])=>[key,Object.freeze({limit,minIntervalMs,ttlMs,timeoutMs,...(maxBytes?{maxBytes}:{})})])));
 
 class CollectorHttpError extends Error {
   constructor(code,message,status=null) {super(message);this.name='CollectorHttpError';this.code=code;this.status=status;}
@@ -59,7 +59,7 @@ function publicFetch(url,{addresses,method='GET',headers={},body,signal,maxBytes
       if (options.all) callback(null,addresses); else callback(null,addresses[0].address,addresses[0].family);
     }},res=>{
       const chunks=[];let size=0;
-      res.on('data',chunk=>{size+=chunk.length;if(size>maxBytes)res.destroy(new CollectorHttpError('TOO_LARGE','Page exceeds the 2 MB limit'));else chunks.push(chunk);});
+      res.on('data',chunk=>{size+=chunk.length;if(size>maxBytes)res.destroy(new CollectorHttpError('TOO_LARGE',`Page exceeds the ${Math.round(maxBytes/1024/1024)} MB limit`));else chunks.push(chunk);});
       res.on('error',reject);
       res.on('end',()=>resolve({status:res.statusCode,headers:new Headers(res.headers),text:async()=>Buffer.concat(chunks).toString('utf8')}));
     });
@@ -79,9 +79,10 @@ class CollectorRuntime {
     this.queues=new Map();this.hostLast=new Map();this.usage={};this.health={};
     for(const key of Object.keys(budgets))this.usage[key]={requests:0,cacheHits:0,lastAt:null};
   }
-  identity() {
+  identity(source='') {
     const email=this.env.CRAWLER_CONTACT_EMAIL;
     if(typeof email!=='string' || !/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(email))throw new CollectorHttpError('CONTACT_REQUIRED','Set CRAWLER_CONTACT_EMAIL before fetching public pages');
+    if(String(source).startsWith('edgar_'))return `${String(this.env.CRAWLER_NAME||'WhyNow').trim()||'WhyNow'} ${email}`;
     return `WhyNow/0.1 (+mailto:${email})`;
   }
   snapshot() {return structuredClone({schemaVersion:1,usage:this.usage,health:this.health});}
@@ -117,10 +118,10 @@ class CollectorRuntime {
     let crawlDelay=0;
     if(source!=='robots' && source!=='serper') {
       const robotsUrl=new URL('/robots.txt',url).href;
-      const response=await this.request('robots',robotsUrl,options.allowedRedirectDomain?{allowedRedirectDomain:options.allowedRedirectDomain}:{});
+      const response=await this.request('robots',robotsUrl,{...(options.allowedRedirectDomain?{allowedRedirectDomain:options.allowedRedirectDomain}:{}),userAgent:this.identity(source)});
       const rules=robotsParser(robotsUrl,response.status===404?'':response.text);
-      if(rules.isAllowed(url.href,this.identity())===false)throw new CollectorHttpError('ROBOTS_DISALLOWED','This site disallows crawling this page');
-      crawlDelay=(rules.getCrawlDelay(this.identity())||0)*1000;
+      if(rules.isAllowed(url.href,this.identity(source))===false)throw new CollectorHttpError('ROBOTS_DISALLOWED','This site disallows crawling this page');
+      crawlDelay=(rules.getCrawlDelay(this.identity(source))||0)*1000;
     }
     const budget=this.budgets[source], usage=this.usage[source];
     const cacheFile=path.join(this.cacheDir,`${stableId(JSON.stringify([source,url.href,options.method||'GET',options.body||'']))}.json`),ttlMs=Number(options.cacheTtlMs)||budget.ttlMs;
@@ -140,7 +141,8 @@ class CollectorRuntime {
       const response=await Promise.race([
         (async()=>{
           const method=options.method||(source==='serper'?'POST':'GET');
-          const response=await this.fetch(url.href,{...checked,method,body:options.body,headers:{...(options.headers||{}),'User-Agent':this.identity(),'Accept':'text/html, application/json, text/plain, application/xml;q=0.9','Accept-Encoding':'identity'},signal:controller.signal});
+          const maxBytes=Number(options.maxBytes)||Number(budget.maxBytes)||2*1024*1024,sec=String(source).startsWith('edgar_');
+          const response=await this.fetch(url.href,{...checked,method,body:options.body,maxBytes,headers:{...(options.headers||{}),'User-Agent':options.userAgent||this.identity(source),'Accept':sec?'application/json, text/plain, application/octet-stream, application/x-gzip;q=0.9':'text/html, application/json, text/plain, application/xml;q=0.9','Accept-Encoding':'identity'},signal:controller.signal});
           let text=await response.text();
           if(typeof options.transformValue==='function'){
             try{text=JSON.stringify(options.transformValue(JSON.parse(text)));}catch{throw new CollectorHttpError('INVALID_JSON',`${source} returned unreadable JSON`,response.status);}
@@ -158,9 +160,10 @@ class CollectorRuntime {
         return this.perform(source,destination,options,depth+1);
       }
       if(!(response.status>=200 && response.status<300) && !(source==='robots' && response.status===404))throw new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);
-      if(Buffer.byteLength(response.text)>2*1024*1024)throw new CollectorHttpError('TOO_LARGE','Page exceeds the 2 MB limit');
+      const maxBytes=Number(options.maxBytes)||Number(budget.maxBytes)||2*1024*1024;
+      if(Buffer.byteLength(response.text)>maxBytes)throw new CollectorHttpError('TOO_LARGE',`Page exceeds the ${Math.round(maxBytes/1024/1024)} MB limit`);
       const contentType=response.headers.get('content-type')||'';
-      const secPlainText=(source==='edgar_index'||source==='edgar_filing')&&url.hostname==='www.sec.gov'&&/application\/octet-stream/i.test(contentType);
+      const secPlainText=String(source).startsWith('edgar_')&&url.hostname==='www.sec.gov'&&/application\/(?:octet-stream|x-gzip)/i.test(contentType);
       if(contentType && !/text\/|json|xml/i.test(contentType)&&!secPlainText)throw new CollectorHttpError('CONTENT_TYPE','Only text pages are supported');
       const result={schemaVersion:1,url:url.href,status:response.status,text:response.text,contentType,savedAt:this.now(),fetchedAt:new Date(this.now()).toISOString()};
       atomicWrite(cacheFile,JSON.stringify(result));return {...result,fromCache:false};

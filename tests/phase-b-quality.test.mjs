@@ -1,6 +1,6 @@
 import {describe,expect,it} from 'vitest';
 import {createRequire} from 'node:module';
-const require=createRequire(import.meta.url),pain=require('../scripts/collectors/active-pain.cjs'),executive=require('../scripts/collectors/executive-change.cjs'),{sanitizeWhyNow}=require('../scripts/phase-b-runner.cjs');
+const require=createRequire(import.meta.url),pain=require('../scripts/collectors/active-pain.cjs'),executive=require('../scripts/collectors/executive-change.cjs'),hiring=require('../scripts/collectors/hiring.cjs'),{sanitizeWhyNow}=require('../scripts/phase-b-runner.cjs'),{collectorConfigForWorkspace,collectorTargetForAccount}=require('../scripts/phase-b-config.cjs'),{defaultState}=require('../scripts/server/state.cjs'),{loadResolveReferenceDemo}=require('../scripts/reference-demo.cjs');
 const NOW=new Date('2026-10-20T12:00:00.000Z'),target={name:'Acme',domain:'acme.example'};
 
 describe('Phase B demo-quality gates',()=>{
@@ -38,5 +38,10 @@ describe('Phase B demo-quality gates',()=>{
     ]};
     const clean=sanitizeWhyNow(account,{slaDays:{default:90,outage:30,reliability_hiring:90,exec_change:30}},NOW);
     expect(clean.signals).not.toHaveProperty('activePain');expect(clean.triggers.map(row=>row.id)).toEqual(['hire-duplicate']);expect(clean.triggerHistory).toHaveLength(3);
+  });
+
+  it('derives ATS slugs from configured entity aliases as well as name and domain',()=>{
+    const state=loadResolveReferenceDemo(defaultState()),workspace=state.workspaces[state.activeWorkspaceId],config=collectorConfigForWorkspace(workspace),resolved=collectorTargetForAccount({name:'Uber Eats',domain:'ubereats.com',icpSegment:'delivery_marketplaces'},config);
+    expect(hiring.slugCandidates(resolved)).toEqual(expect.arrayContaining(['ubereats','uber']));
   });
 });

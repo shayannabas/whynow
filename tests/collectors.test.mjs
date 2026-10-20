@@ -70,11 +70,18 @@ it('rejects timeouts, oversized bodies, and unsupported content',async()=>{
   const binary=harness({fetch:async()=>response('binary',200,{'content-type':'image/png'})});await expect(binary.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'CONTENT_TYPE'});
 });
 it('allows SEC plain-text indexes served as octet-stream and keeps safe HTTP status diagnostics',async()=>{
-  const sec=harness({fetch:async url=>url.endsWith('/robots.txt')?response('User-agent: *\nAllow: /'):response('D  Example  1  20261020  edgar/data/1/file.txt',200,{'content-type':'application/octet-stream'})});
+  const headers=[];const sec=harness({fetch:async(url,options)=>{headers.push(options.headers);return url.endsWith('/robots.txt')?response('User-agent: *\nAllow: /'):response('D  Example  1  20261020  edgar/data/1/file.txt',200,{'content-type':'application/octet-stream'});}});
   expect((await sec.runtime.requestText('https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261020.idx','edgar_index')).value).toContain('Example');
+  expect(headers[1]['User-Agent']).toBe('WhyNow crawler@example.org');
+  expect(headers[1].Accept).toContain('application/octet-stream');
   const failed=harness({fetch:async url=>url.endsWith('/robots.txt')?response('',404):response('blocked',429)});
   await expect(failed.runtime.request('seller_site','https://example.org/page')).rejects.toMatchObject({status:429});
   expect(failed.runtime.snapshot().health.seller_site).toMatchObject({code:'HTTP_ERROR',httpStatus:429});
+});
+it('allows larger ATS JSON while preserving the two-megabyte general ceiling',async()=>{
+  const body='a'.repeat(3*1024*1024),ats=harness({fetch:async url=>url.endsWith('/robots.txt')?response(''):response(body,200,{'content-type':'application/json'})});
+  expect((await ats.runtime.request('greenhouse','https://boards-api.greenhouse.io/v1/boards/acme/jobs')).text).toHaveLength(body.length);
+  const general=harness({fetch:async()=>response(body)});await expect(general.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'TOO_LARGE'});
 });
 it('retains source revisions and accepts exact whitespace-normalized quotes only',()=>{
   const a=recordSource(defaultState(),{url:'https://example.org',fetchedAt:'2026-09-16T00:00:00Z',title:'Source',text:'The public\n page has evidence.'});
