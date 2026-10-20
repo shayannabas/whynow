@@ -5,7 +5,7 @@ const {loadReferenceProfile,validateReferenceProfile,SIGNAL_KEYS}=require('../sc
 
 it('loads a frozen, load-only Resolve reference without seller facts or runtime state',()=>{
   const reference=loadReferenceProfile();
-  expect(reference).toMatchObject({schemaVersion:1,id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
+  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v2-phase-a',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
   expect(reference.sellerProfile).toBeUndefined();
   expect(reference.status).toBeUndefined();
   expect(reference.provenance.customerEvidenceStatus).toBe('requires_live_research');
@@ -22,6 +22,9 @@ it('matches the reference implementation constants and keeps unsupported fields 
   expect(config.personas.buyerTitles).toEqual(['CTO','SVP Engineering','VP Engineering']);
   expect(config.weights).toEqual({techStack:1.3,activePain:1.2,revenueSensitivity:1.1,observabilityScale:1,aiCompatibility:0.9,competitiveWedge:0.8});
   expect(config.killPatterns.sizeMetric).toEqual({label:'minEngineeringHeadcount',floor:200});
+  expect(config.killPatterns.solvingInHousePatterns).toHaveLength(1);
+  expect(config.killPatterns.buildCulturePatterns).toHaveLength(3);
+  expect(reference.provenance.movedRuntimeConstants.every(row=>row.sourceFile&&row.sourceLines)).toBe(true);
   expect(config.tierRules.tier1).toEqual({revenue:500000000,employees:2000,valuation:5000000000});
   expect(config.pitch).toEqual({receiptOpenerStyle:'',oneSentenceProduct:'',credentialLine:'',ctaStyle:''});
   expect(config.objectionTemplates).toEqual([]);

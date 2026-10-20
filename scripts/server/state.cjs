@@ -2,7 +2,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const { nowIso } = require('../utils.cjs');
-const STATE_FILE = path.resolve(__dirname, '../../.whynow/local-state.json');
+function statePath(env=process.env) {
+  const directory=String(env.STATE_DIR||path.resolve(__dirname,'../../.whynow')).trim();
+  if(!directory)throw new Error('STATE_DIR cannot be empty.');
+  return path.resolve(directory,'local-state.json');
+}
+const STATE_FILE = statePath();
 const defaultState = () => ({schemaVersion:1, activeWorkspaceId:null, workspaces:{}, companyCache:{}, sources:{}, auditLog:[]});
 function validate(state) {
   if (state?.schemaVersion !== 1 || !state.workspaces || Array.isArray(state.workspaces) || !state.companyCache || !state.sources || !Array.isArray(state.auditLog)) throw new Error('Invalid state schema');
@@ -61,4 +66,4 @@ function createWorkspace(state, {name}) {
   next.workspaces[id] = {schemaVersion:1, id, name:name.trim(), createdAt:nowIso(), status:'draft', deliveryMode:'demo', sellerProfile:{schemaVersion:1, deliveryAllowed:false}, icpConfig:{schemaVersion:1}, accounts:[], universeSeeds:[], runs:[], suppression:[], drafts:[], outcomes:[], budgets:{}};
   next.activeWorkspaceId = id; return next;
 }
-module.exports = { defaultState, loadState, saveState, getWorkspace, updateWorkspace, createWorkspace, atomicWrite };
+module.exports = { STATE_FILE, defaultState, loadState, saveState, getWorkspace, updateWorkspace, createWorkspace, atomicWrite, statePath };

@@ -1,6 +1,6 @@
 # WhyNow
 
-> Port-mode credit: Built on [SignalScout](https://github.com/isaiqba-cell/flowfire) by [Isa Iqbal](https://github.com/isaiqba-cell), used with permission. No SignalScout module has been ported at this checkpoint.
+> Port-mode credit: Built on [SignalScout](https://github.com/isaiqba-cell/flowfire) by [Isa Iqbal](https://github.com/isaiqba-cell), used with permission. WhyNow ports the permitted behavior one phase at a time while keeping its own workspace, receipt and human-review architecture.
 
 WhyNow runs locally by default on `127.0.0.1`. This avoids hosting charges during development. External provider use is separate: Serper searches consume provider credits, and OpenAI requests are usage-billed. Both integrations are fail-closed behind environment switches and persisted caps; OpenAI paid calls remain disabled.
 
@@ -16,7 +16,7 @@ A prospecting engine that explains who to contact, why now, and where the proof 
 
 ## Run locally
 
-Use Node 22 (`nvm use` if installed), then `npm ci`, `npm test`, and `npm start`. Open http://127.0.0.1:3000. Optional `.env` settings are documented in `.env.example`; existing environment variables take precedence. The app binds to localhost by default.
+Use Node 22 (`nvm use` if installed), then `npm ci`, `npm test`, and `npm start`. Open http://127.0.0.1:3000. Optional `.env` settings are documented in `.env.example`; existing environment variables take precedence. The app binds to localhost by default, honors `PORT`, and stores its atomic document under `STATE_DIR` (default `.whynow/`).
 
 Create a workspace with a name of your choosing. It starts empty, in Draft status and Demo mode. Stop and restart the server: the workspace still appears. Create another workspace and use the header switcher to move between them. `/health` returns JSON with status `ok`; other unrecognized paths return 404.
 
@@ -28,7 +28,13 @@ The state module saves `.whynow/local-state.json`. It flushes a complete tempora
 
 Workspace reads return copies; updates target one workspace ID. HTTP mutations run in sequence to prevent one save overwriting another. Blank workspace names are user labels, not researched seller facts. No prospect data is seeded.
 
-Tests use temporary directories and local HTTP servers, never external providers. CI targets Node 22 and runs installation, tests, production dependency audit, and Gitleaks. Public deployment and authentication belong to Stage 10.
+Tests use temporary directories and local HTTP servers, never external providers. CI targets Node 22 and runs installation, tests, production dependency audit, and Gitleaks. Railway deployment is deferred to Phase G and requires the owner's explicit OK.
+
+## Port mode — Phase A scoring core
+
+Open Overview and choose **Load Resolve reference demo** to create a load-only, non-approved demo workspace from `config/reference-profiles/resolve-ai.json`. Open **Accounts**, enter a public company name, domain, segment and source URL, then choose **Add and score**. WhyNow applies the workspace's six signal weights, firmographic tier rules, kill rules and decision formula without calling a provider. **Scorecard** explains fit, tier and priority; **Kill Log** retains every disqualification with its code, reason and evidence URL.
+
+Normal seller workspaces must still be owner-approved before this scoring core can use their configuration. The frozen reference demo is an explicit local parity exception; it never writes `approvedAt`, never records a profile approval and never enables delivery.
 
 ## Interview explanation
 

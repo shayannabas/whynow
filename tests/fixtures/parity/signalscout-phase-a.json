@@ -1,0 +1,4804 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-20T00:00:00.000Z",
+  "source": {
+    "product": "SignalScout",
+    "repository": "https://github.com/isaiqba-cell/flowfire",
+    "commit": "130789f1bac1d5e11f5f5154f269155dc17f2d21",
+    "functions": [
+      "resolve-gtm.cjs#scoreSignals",
+      "resolve-gtm.cjs#evaluateKills",
+      "tiering.cjs#tierCompany",
+      "decisioning.cjs#applyDecisioning"
+    ]
+  },
+  "now": "2026-07-12T12:00:00.000Z",
+  "configuration": {
+    "scoring": {
+      "version": "resolve-scoring-priority-v2",
+      "weights": {
+        "techStack": 1.3,
+        "activePain": 1.2,
+        "revenueSensitivity": 1.1,
+        "observabilityScale": 1,
+        "aiCompatibility": 0.9,
+        "competitiveWedge": 0.8
+      },
+      "liveTriggerDays": 90
+    },
+    "resolve": {
+      "killThresholds": {
+        "minEngineeringHeadcount": 200
+      },
+      "signalSlaDays": {
+        "default": 90,
+        "form_d_filing": 14,
+        "outage": 30,
+        "exec_change": 30,
+        "hiring_surge": 45,
+        "first_infra_hire": 45,
+        "headcount_surge": 45,
+        "otel_adoption": 90,
+        "otel_contributor": 180,
+        "risk_factor_added": 120,
+        "conference_talk": 120,
+        "public_postmortem": 30,
+        "reliability_hiring": 90,
+        "ai_rca_hiring": 60,
+        "funding": 30
+      },
+      "themeBBoost": {
+        "enabled": true,
+        "multiplier": 1.08
+      }
+    },
+    "tierRules": {
+      "tier1": {
+        "revenue": 500000000,
+        "employees": 2000,
+        "valuation": 5000000000
+      },
+      "tier2": {
+        "revenue": 25000000,
+        "employees": 150,
+        "fundingStages": [
+          "series a",
+          "series b",
+          "series c",
+          "series d",
+          "growth",
+          "private equity"
+        ]
+      },
+      "tier3": {
+        "maxEmployees": 149,
+        "minimumRaised": 2000000
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "databricks-like-solving-in-house",
+      "input": {
+        "id": "acct_databricks",
+        "name": "Databricks",
+        "domain": "databricks.com",
+        "icpSegment": "data_ai_infrastructure",
+        "segmentClassification": {
+          "segment": "data_ai_infrastructure",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 5,
+            "evidenceUrl": "https://databricks.com/evidence/techStack",
+            "evidenceText": "techStack evidence for databricks.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 4,
+            "evidenceUrl": "https://databricks.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for databricks.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 5,
+            "evidenceUrl": "https://databricks.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for databricks.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 5,
+            "evidenceUrl": "https://databricks.com/evidence/activePain",
+            "evidenceText": "activePain evidence for databricks.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 5,
+            "evidenceUrl": "https://databricks.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for databricks.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 5,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for databricks.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 7000,
+          "revenueEstimate": 2000000000,
+          "fundingStage": "growth",
+          "totalRaised": 4000000000,
+          "valuation": 43000000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://www.databricks.com/company/about-us",
+          "fields": {
+            "employeeCount": {
+              "value": 7000,
+              "provider": "free",
+              "sourceUrl": "https://www.databricks.com/company/about-us"
+            },
+            "revenueEstimate": {
+              "value": 2000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.databricks.com/company/about-us"
+            },
+            "fundingStage": {
+              "value": "growth",
+              "provider": "free",
+              "sourceUrl": "https://www.databricks.com/company/about-us"
+            },
+            "totalRaised": {
+              "value": 4000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.databricks.com/company/about-us"
+            },
+            "valuation": {
+              "value": 43000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.databricks.com/company/about-us"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://www.databricks.com/company/about-us"
+            }
+          }
+        },
+        "hypothesis": {
+          "whyNow": "Databricks developed an internal AI-powered debugging platform for production incidents.",
+          "citations": [
+            {
+              "text": "Databricks described the internal debugging system.",
+              "url": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code"
+            }
+          ]
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 29,
+          "signalMax": 30,
+          "weightedTotal": 29.6,
+          "weightedMax": 31.5,
+          "weightedPercent": 94,
+          "fitScore": 94,
+          "totalScore": 94,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "94/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 5,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6.5,
+              "evidenceUrl": "https://databricks.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 20.63
+            },
+            "revenueSensitivity": {
+              "rawScore": 4,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.4,
+              "evidenceUrl": "https://databricks.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 13.97
+            },
+            "observabilityScale": {
+              "rawScore": 5,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5,
+              "evidenceUrl": "https://databricks.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 15.87
+            },
+            "activePain": {
+              "rawScore": 5,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6,
+              "evidenceUrl": "https://databricks.com/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 19.05
+            },
+            "aiCompatibility": {
+              "rawScore": 5,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.5,
+              "evidenceUrl": "https://databricks.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 14.29
+            },
+            "competitiveWedge": {
+              "rawScore": 5,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 3.2,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 10.16
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [
+          {
+            "code": "KILL_SOLVING_IN_HOUSE",
+            "reason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+            "evidenceUrl": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code",
+            "evidenceText": "In-house production-investigation evidence detected in the account's public receipts."
+          }
+        ],
+        "tier": {
+          "tier": 1,
+          "tierReason": "Tier 1: estimated revenue $2B meets the $500M threshold. Evidence: public-web firmographics (receipt: https://www.databricks.com/company/about-us).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.databricks.com/company/about-us",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_databricks",
+          "name": "Databricks",
+          "domain": "databricks.com",
+          "icpSegment": "data_ai_infrastructure",
+          "segmentClassification": {
+            "segment": "data_ai_infrastructure",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 5,
+              "evidenceUrl": "https://databricks.com/evidence/techStack",
+              "evidenceText": "techStack evidence for databricks.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 4,
+              "evidenceUrl": "https://databricks.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for databricks.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 5,
+              "evidenceUrl": "https://databricks.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for databricks.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 5,
+              "evidenceUrl": "https://databricks.com/evidence/activePain",
+              "evidenceText": "activePain evidence for databricks.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 5,
+              "evidenceUrl": "https://databricks.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for databricks.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 5,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for databricks.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 7000,
+            "revenueEstimate": 2000000000,
+            "fundingStage": "growth",
+            "totalRaised": 4000000000,
+            "valuation": 43000000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://www.databricks.com/company/about-us",
+            "fields": {
+              "employeeCount": {
+                "value": 7000,
+                "provider": "free",
+                "sourceUrl": "https://www.databricks.com/company/about-us"
+              },
+              "revenueEstimate": {
+                "value": 2000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.databricks.com/company/about-us"
+              },
+              "fundingStage": {
+                "value": "growth",
+                "provider": "free",
+                "sourceUrl": "https://www.databricks.com/company/about-us"
+              },
+              "totalRaised": {
+                "value": 4000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.databricks.com/company/about-us"
+              },
+              "valuation": {
+                "value": 43000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.databricks.com/company/about-us"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://www.databricks.com/company/about-us"
+              }
+            }
+          },
+          "hypothesis": {
+            "whyNow": "Databricks developed an internal AI-powered debugging platform for production incidents.",
+            "citations": [
+              {
+                "text": "Databricks described the internal debugging system.",
+                "url": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code"
+              }
+            ]
+          },
+          "tier": 1,
+          "tierReason": "Tier 1: estimated revenue $2B meets the $500M threshold. Evidence: public-web firmographics (receipt: https://www.databricks.com/company/about-us).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.databricks.com/company/about-us",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 94,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 29,
+            "signalMax": 30,
+            "weightedTotal": 29.6,
+            "weightedMax": 31.5,
+            "weightedPercent": 94,
+            "fitScore": 94,
+            "totalScore": 94,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "94/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 5,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6.5,
+                "evidenceUrl": "https://databricks.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 20.63
+              },
+              "revenueSensitivity": {
+                "rawScore": 4,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.4,
+                "evidenceUrl": "https://databricks.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 13.97
+              },
+              "observabilityScale": {
+                "rawScore": 5,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5,
+                "evidenceUrl": "https://databricks.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 15.87
+              },
+              "activePain": {
+                "rawScore": 5,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6,
+                "evidenceUrl": "https://databricks.com/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 19.05
+              },
+              "aiCompatibility": {
+                "rawScore": 5,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.5,
+                "evidenceUrl": "https://databricks.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 14.29
+              },
+              "competitiveWedge": {
+                "rawScore": 5,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 3.2,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 10.16
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [
+            {
+              "code": "KILL_SOLVING_IN_HOUSE",
+              "reason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+              "evidenceUrl": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code",
+              "evidenceText": "In-house production-investigation evidence detected in the account's public receipts."
+            }
+          ],
+          "killStatus": "killed",
+          "primaryKill": {
+            "code": "KILL_SOLVING_IN_HOUSE",
+            "reason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+            "evidenceUrl": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code",
+            "evidenceText": "In-house production-investigation evidence detected in the account's public receipts."
+          },
+          "alsoKilledBy": [],
+          "killReason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+          "killEvidenceUrl": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code",
+          "hiringForWhatWeSell": false,
+          "priority": 0,
+          "priorityBreakdown": {
+            "tier": 1,
+            "tierWeight": 3,
+            "fitScore": 94,
+            "fitFactor": 0.94,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": true,
+            "rawBeforeThemeB": 0,
+            "raw": 0,
+            "normalized": 0,
+            "formula": "Killed → 0"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "uber-eats-like-build-culture",
+      "input": {
+        "id": "acct_uber_eats",
+        "name": "Uber Eats",
+        "domain": "ubereats.com",
+        "icpSegment": "delivery_marketplaces",
+        "segmentClassification": {
+          "segment": "delivery_marketplaces",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 5,
+            "evidenceUrl": "https://ubereats.com/evidence/techStack",
+            "evidenceText": "techStack evidence for ubereats.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 5,
+            "evidenceUrl": "https://ubereats.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for ubereats.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 5,
+            "evidenceUrl": "https://ubereats.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for ubereats.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 4,
+            "evidenceUrl": "https://ubereats.com/evidence/activePain",
+            "evidenceText": "activePain evidence for ubereats.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 4,
+            "evidenceUrl": "https://ubereats.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for ubereats.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 5,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for ubereats.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 32000,
+          "revenueEstimate": 52000000000,
+          "fundingStage": "public",
+          "totalRaised": 0,
+          "valuation": 150000000000,
+          "isPublic": true,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://www.uber.com/us/en/about/",
+          "fields": {
+            "employeeCount": {
+              "value": 32000,
+              "provider": "free",
+              "sourceUrl": "https://www.uber.com/us/en/about/"
+            },
+            "revenueEstimate": {
+              "value": 52000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.uber.com/us/en/about/"
+            },
+            "fundingStage": {
+              "value": "public",
+              "provider": "free",
+              "sourceUrl": "https://www.uber.com/us/en/about/"
+            },
+            "totalRaised": {
+              "value": 0,
+              "provider": "free",
+              "sourceUrl": "https://www.uber.com/us/en/about/"
+            },
+            "valuation": {
+              "value": 150000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.uber.com/us/en/about/"
+            },
+            "isPublic": {
+              "value": true,
+              "provider": "free",
+              "sourceUrl": "https://www.uber.com/us/en/about/"
+            }
+          }
+        },
+        "hypothesis": {
+          "whyNow": "Uber invented Jaeger and open sourced its tracing system for thousands of microservices.",
+          "citations": [
+            {
+              "text": "Uber engineering describes Jaeger distributed tracing.",
+              "url": "https://www.uber.com/us/en/blog/distributed-tracing/"
+            }
+          ]
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 28,
+          "signalMax": 30,
+          "weightedTotal": 28.6,
+          "weightedMax": 31.5,
+          "weightedPercent": 91,
+          "fitScore": 91,
+          "totalScore": 91,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "91/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 5,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6.5,
+              "evidenceUrl": "https://ubereats.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 20.63
+            },
+            "revenueSensitivity": {
+              "rawScore": 5,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.5,
+              "evidenceUrl": "https://ubereats.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 17.46
+            },
+            "observabilityScale": {
+              "rawScore": 5,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5,
+              "evidenceUrl": "https://ubereats.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 15.87
+            },
+            "activePain": {
+              "rawScore": 4,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.8,
+              "evidenceUrl": "https://ubereats.com/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 15.24
+            },
+            "aiCompatibility": {
+              "rawScore": 4,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://ubereats.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "competitiveWedge": {
+              "rawScore": 5,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 3.2,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 10.16
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [
+          {
+            "code": "KILL_BUILD_CULTURE",
+            "reason": "Public evidence shows a strong build-in-house observability culture.",
+            "evidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+            "evidenceText": "Build-culture evidence detected in the account's public receipts."
+          }
+        ],
+        "tier": {
+          "tier": 1,
+          "tierReason": "Tier 1: verified public company. Evidence: public-web firmographics (receipt: https://www.uber.com/us/en/about/).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.uber.com/us/en/about/",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_uber_eats",
+          "name": "Uber Eats",
+          "domain": "ubereats.com",
+          "icpSegment": "delivery_marketplaces",
+          "segmentClassification": {
+            "segment": "delivery_marketplaces",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 5,
+              "evidenceUrl": "https://ubereats.com/evidence/techStack",
+              "evidenceText": "techStack evidence for ubereats.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 5,
+              "evidenceUrl": "https://ubereats.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for ubereats.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 5,
+              "evidenceUrl": "https://ubereats.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for ubereats.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 4,
+              "evidenceUrl": "https://ubereats.com/evidence/activePain",
+              "evidenceText": "activePain evidence for ubereats.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 4,
+              "evidenceUrl": "https://ubereats.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for ubereats.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 5,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for ubereats.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 32000,
+            "revenueEstimate": 52000000000,
+            "fundingStage": "public",
+            "totalRaised": 0,
+            "valuation": 150000000000,
+            "isPublic": true,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://www.uber.com/us/en/about/",
+            "fields": {
+              "employeeCount": {
+                "value": 32000,
+                "provider": "free",
+                "sourceUrl": "https://www.uber.com/us/en/about/"
+              },
+              "revenueEstimate": {
+                "value": 52000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.uber.com/us/en/about/"
+              },
+              "fundingStage": {
+                "value": "public",
+                "provider": "free",
+                "sourceUrl": "https://www.uber.com/us/en/about/"
+              },
+              "totalRaised": {
+                "value": 0,
+                "provider": "free",
+                "sourceUrl": "https://www.uber.com/us/en/about/"
+              },
+              "valuation": {
+                "value": 150000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.uber.com/us/en/about/"
+              },
+              "isPublic": {
+                "value": true,
+                "provider": "free",
+                "sourceUrl": "https://www.uber.com/us/en/about/"
+              }
+            }
+          },
+          "hypothesis": {
+            "whyNow": "Uber invented Jaeger and open sourced its tracing system for thousands of microservices.",
+            "citations": [
+              {
+                "text": "Uber engineering describes Jaeger distributed tracing.",
+                "url": "https://www.uber.com/us/en/blog/distributed-tracing/"
+              }
+            ]
+          },
+          "tier": 1,
+          "tierReason": "Tier 1: verified public company. Evidence: public-web firmographics (receipt: https://www.uber.com/us/en/about/).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.uber.com/us/en/about/",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 91,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 28,
+            "signalMax": 30,
+            "weightedTotal": 28.6,
+            "weightedMax": 31.5,
+            "weightedPercent": 91,
+            "fitScore": 91,
+            "totalScore": 91,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "91/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 5,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6.5,
+                "evidenceUrl": "https://ubereats.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 20.63
+              },
+              "revenueSensitivity": {
+                "rawScore": 5,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.5,
+                "evidenceUrl": "https://ubereats.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 17.46
+              },
+              "observabilityScale": {
+                "rawScore": 5,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5,
+                "evidenceUrl": "https://ubereats.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 15.87
+              },
+              "activePain": {
+                "rawScore": 4,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.8,
+                "evidenceUrl": "https://ubereats.com/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 15.24
+              },
+              "aiCompatibility": {
+                "rawScore": 4,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://ubereats.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "competitiveWedge": {
+                "rawScore": 5,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 3.2,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 10.16
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [
+            {
+              "code": "KILL_BUILD_CULTURE",
+              "reason": "Public evidence shows a strong build-in-house observability culture.",
+              "evidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+              "evidenceText": "Build-culture evidence detected in the account's public receipts."
+            }
+          ],
+          "killStatus": "killed",
+          "primaryKill": {
+            "code": "KILL_BUILD_CULTURE",
+            "reason": "Public evidence shows a strong build-in-house observability culture.",
+            "evidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+            "evidenceText": "Build-culture evidence detected in the account's public receipts."
+          },
+          "alsoKilledBy": [],
+          "killReason": "Public evidence shows a strong build-in-house observability culture.",
+          "killEvidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+          "hiringForWhatWeSell": false,
+          "priority": 0,
+          "priorityBreakdown": {
+            "tier": 1,
+            "tierWeight": 3,
+            "fitScore": 91,
+            "fitFactor": 0.91,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": true,
+            "rawBeforeThemeB": 0,
+            "raw": 0,
+            "normalized": 0,
+            "formula": "Killed → 0"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "binance-like-unsellable",
+      "input": {
+        "id": "acct_binance",
+        "name": "Binance",
+        "domain": "binance.com",
+        "icpSegment": "crypto_fintech",
+        "segmentClassification": {
+          "segment": "crypto_fintech",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 4,
+            "evidenceUrl": "https://binance.com/evidence/techStack",
+            "evidenceText": "techStack evidence for binance.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 5,
+            "evidenceUrl": "https://binance.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for binance.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 5,
+            "evidenceUrl": "https://binance.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for binance.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 5,
+            "evidenceUrl": "https://binance.com/evidence/activePain",
+            "evidenceText": "activePain evidence for binance.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 4,
+            "evidenceUrl": "https://binance.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for binance.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 5,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for binance.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 8000,
+          "revenueEstimate": 10000000000,
+          "fundingStage": "private",
+          "totalRaised": 0,
+          "valuation": 80000000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://www.binance.com/en/about",
+          "fields": {
+            "employeeCount": {
+              "value": 8000,
+              "provider": "free",
+              "sourceUrl": "https://www.binance.com/en/about"
+            },
+            "revenueEstimate": {
+              "value": 10000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.binance.com/en/about"
+            },
+            "fundingStage": {
+              "value": "private",
+              "provider": "free",
+              "sourceUrl": "https://www.binance.com/en/about"
+            },
+            "totalRaised": {
+              "value": 0,
+              "provider": "free",
+              "sourceUrl": "https://www.binance.com/en/about"
+            },
+            "valuation": {
+              "value": 80000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.binance.com/en/about"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://www.binance.com/en/about"
+            }
+          }
+        },
+        "prospectingSurface": "unavailable",
+        "prospectingSurfaceEvidenceUrl": "https://www.binance.com/en/legal/licenses",
+        "prospectingSurfaceEvidenceText": "The public legal and operating surface does not support this sales motion."
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 28,
+          "signalMax": 30,
+          "weightedTotal": 28.5,
+          "weightedMax": 31.5,
+          "weightedPercent": 90,
+          "fitScore": 90,
+          "totalScore": 90,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "90/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 4,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.2,
+              "evidenceUrl": "https://binance.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 16.51
+            },
+            "revenueSensitivity": {
+              "rawScore": 5,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.5,
+              "evidenceUrl": "https://binance.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 17.46
+            },
+            "observabilityScale": {
+              "rawScore": 5,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5,
+              "evidenceUrl": "https://binance.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 15.87
+            },
+            "activePain": {
+              "rawScore": 5,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6,
+              "evidenceUrl": "https://binance.com/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 19.05
+            },
+            "aiCompatibility": {
+              "rawScore": 4,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://binance.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "competitiveWedge": {
+              "rawScore": 5,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 3.2,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 10.16
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [
+          {
+            "code": "KILL_UNSELLABLE_ORG",
+            "reason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+            "evidenceUrl": "https://www.binance.com/en/legal/licenses",
+            "evidenceText": "The public legal and operating surface does not support this sales motion."
+          }
+        ],
+        "tier": {
+          "tier": 1,
+          "tierReason": "Tier 1: estimated revenue $10B meets the $500M threshold. Evidence: public-web firmographics (receipt: https://www.binance.com/en/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.binance.com/en/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_binance",
+          "name": "Binance",
+          "domain": "binance.com",
+          "icpSegment": "crypto_fintech",
+          "segmentClassification": {
+            "segment": "crypto_fintech",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 4,
+              "evidenceUrl": "https://binance.com/evidence/techStack",
+              "evidenceText": "techStack evidence for binance.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 5,
+              "evidenceUrl": "https://binance.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for binance.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 5,
+              "evidenceUrl": "https://binance.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for binance.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 5,
+              "evidenceUrl": "https://binance.com/evidence/activePain",
+              "evidenceText": "activePain evidence for binance.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 4,
+              "evidenceUrl": "https://binance.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for binance.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 5,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for binance.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 8000,
+            "revenueEstimate": 10000000000,
+            "fundingStage": "private",
+            "totalRaised": 0,
+            "valuation": 80000000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://www.binance.com/en/about",
+            "fields": {
+              "employeeCount": {
+                "value": 8000,
+                "provider": "free",
+                "sourceUrl": "https://www.binance.com/en/about"
+              },
+              "revenueEstimate": {
+                "value": 10000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.binance.com/en/about"
+              },
+              "fundingStage": {
+                "value": "private",
+                "provider": "free",
+                "sourceUrl": "https://www.binance.com/en/about"
+              },
+              "totalRaised": {
+                "value": 0,
+                "provider": "free",
+                "sourceUrl": "https://www.binance.com/en/about"
+              },
+              "valuation": {
+                "value": 80000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.binance.com/en/about"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://www.binance.com/en/about"
+              }
+            }
+          },
+          "prospectingSurface": "unavailable",
+          "prospectingSurfaceEvidenceUrl": "https://www.binance.com/en/legal/licenses",
+          "prospectingSurfaceEvidenceText": "The public legal and operating surface does not support this sales motion.",
+          "tier": 1,
+          "tierReason": "Tier 1: estimated revenue $10B meets the $500M threshold. Evidence: public-web firmographics (receipt: https://www.binance.com/en/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.binance.com/en/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 90,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 28,
+            "signalMax": 30,
+            "weightedTotal": 28.5,
+            "weightedMax": 31.5,
+            "weightedPercent": 90,
+            "fitScore": 90,
+            "totalScore": 90,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "90/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 4,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.2,
+                "evidenceUrl": "https://binance.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 16.51
+              },
+              "revenueSensitivity": {
+                "rawScore": 5,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.5,
+                "evidenceUrl": "https://binance.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 17.46
+              },
+              "observabilityScale": {
+                "rawScore": 5,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5,
+                "evidenceUrl": "https://binance.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 15.87
+              },
+              "activePain": {
+                "rawScore": 5,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6,
+                "evidenceUrl": "https://binance.com/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 19.05
+              },
+              "aiCompatibility": {
+                "rawScore": 4,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://binance.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "competitiveWedge": {
+                "rawScore": 5,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 3.2,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 10.16
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [
+            {
+              "code": "KILL_UNSELLABLE_ORG",
+              "reason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+              "evidenceUrl": "https://www.binance.com/en/legal/licenses",
+              "evidenceText": "The public legal and operating surface does not support this sales motion."
+            }
+          ],
+          "killStatus": "killed",
+          "primaryKill": {
+            "code": "KILL_UNSELLABLE_ORG",
+            "reason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+            "evidenceUrl": "https://www.binance.com/en/legal/licenses",
+            "evidenceText": "The public legal and operating surface does not support this sales motion."
+          },
+          "alsoKilledBy": [],
+          "killReason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+          "killEvidenceUrl": "https://www.binance.com/en/legal/licenses",
+          "hiringForWhatWeSell": false,
+          "priority": 0,
+          "priorityBreakdown": {
+            "tier": 1,
+            "tierWeight": 3,
+            "fitScore": 90,
+            "fitFactor": 0.9,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": true,
+            "rawBeforeThemeB": 0,
+            "raw": 0,
+            "normalized": 0,
+            "formula": "Killed → 0"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "replicate-like-below-size",
+      "input": {
+        "id": "acct_replicate",
+        "name": "Replicate",
+        "domain": "replicate.com",
+        "icpSegment": "data_ai_infrastructure",
+        "segmentClassification": {
+          "segment": "data_ai_infrastructure",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 5,
+            "evidenceUrl": "https://replicate.com/evidence/techStack",
+            "evidenceText": "techStack evidence for replicate.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 3,
+            "evidenceUrl": "https://replicate.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for replicate.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 4,
+            "evidenceUrl": "https://replicate.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for replicate.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 3,
+            "evidenceUrl": "https://replicate.com/evidence/activePain",
+            "evidenceText": "activePain evidence for replicate.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 5,
+            "evidenceUrl": "https://replicate.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for replicate.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 5,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for replicate.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 80,
+          "revenueEstimate": 12000000,
+          "fundingStage": "seed",
+          "totalRaised": 17000000,
+          "valuation": 100000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://replicate.com/about",
+          "fields": {
+            "employeeCount": {
+              "value": 80,
+              "provider": "free",
+              "sourceUrl": "https://replicate.com/about"
+            },
+            "revenueEstimate": {
+              "value": 12000000,
+              "provider": "free",
+              "sourceUrl": "https://replicate.com/about"
+            },
+            "fundingStage": {
+              "value": "seed",
+              "provider": "free",
+              "sourceUrl": "https://replicate.com/about"
+            },
+            "totalRaised": {
+              "value": 17000000,
+              "provider": "free",
+              "sourceUrl": "https://replicate.com/about"
+            },
+            "valuation": {
+              "value": 100000000,
+              "provider": "free",
+              "sourceUrl": "https://replicate.com/about"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://replicate.com/about"
+            }
+          }
+        },
+        "engineeringHeadcount": 75,
+        "engineeringHeadcountSourceUrl": "https://replicate.com/about"
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 25,
+          "signalMax": 30,
+          "weightedTotal": 25.1,
+          "weightedMax": 31.5,
+          "weightedPercent": 80,
+          "fitScore": 80,
+          "totalScore": 80,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "80/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 5,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6.5,
+              "evidenceUrl": "https://replicate.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 20.63
+            },
+            "revenueSensitivity": {
+              "rawScore": 3,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.3,
+              "evidenceUrl": "https://replicate.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 10.48
+            },
+            "observabilityScale": {
+              "rawScore": 4,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4,
+              "evidenceUrl": "https://replicate.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 12.7
+            },
+            "activePain": {
+              "rawScore": 3,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://replicate.com/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "aiCompatibility": {
+              "rawScore": 5,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.5,
+              "evidenceUrl": "https://replicate.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 14.29
+            },
+            "competitiveWedge": {
+              "rawScore": 5,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 3.2,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 10.16
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [
+          {
+            "code": "KILL_BELOW_ICP_SIZE",
+            "reason": "Verified engineering headcount (75) is below the configured 200-engineer ICP floor.",
+            "evidenceUrl": "https://replicate.com/about",
+            "evidenceText": "Engineering headcount evidence."
+          }
+        ],
+        "tier": {
+          "tier": 3,
+          "tierReason": "Tier 3: no more than 149 employees with meaningful seed funding; retain for nurture and verification. Evidence: public-web firmographics (receipt: https://replicate.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://replicate.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_replicate",
+          "name": "Replicate",
+          "domain": "replicate.com",
+          "icpSegment": "data_ai_infrastructure",
+          "segmentClassification": {
+            "segment": "data_ai_infrastructure",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 5,
+              "evidenceUrl": "https://replicate.com/evidence/techStack",
+              "evidenceText": "techStack evidence for replicate.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 3,
+              "evidenceUrl": "https://replicate.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for replicate.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 4,
+              "evidenceUrl": "https://replicate.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for replicate.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 3,
+              "evidenceUrl": "https://replicate.com/evidence/activePain",
+              "evidenceText": "activePain evidence for replicate.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 5,
+              "evidenceUrl": "https://replicate.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for replicate.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 5,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for replicate.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 80,
+            "revenueEstimate": 12000000,
+            "fundingStage": "seed",
+            "totalRaised": 17000000,
+            "valuation": 100000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://replicate.com/about",
+            "fields": {
+              "employeeCount": {
+                "value": 80,
+                "provider": "free",
+                "sourceUrl": "https://replicate.com/about"
+              },
+              "revenueEstimate": {
+                "value": 12000000,
+                "provider": "free",
+                "sourceUrl": "https://replicate.com/about"
+              },
+              "fundingStage": {
+                "value": "seed",
+                "provider": "free",
+                "sourceUrl": "https://replicate.com/about"
+              },
+              "totalRaised": {
+                "value": 17000000,
+                "provider": "free",
+                "sourceUrl": "https://replicate.com/about"
+              },
+              "valuation": {
+                "value": 100000000,
+                "provider": "free",
+                "sourceUrl": "https://replicate.com/about"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://replicate.com/about"
+              }
+            }
+          },
+          "engineeringHeadcount": 75,
+          "engineeringHeadcountSourceUrl": "https://replicate.com/about",
+          "tier": 3,
+          "tierReason": "Tier 3: no more than 149 employees with meaningful seed funding; retain for nurture and verification. Evidence: public-web firmographics (receipt: https://replicate.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://replicate.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 80,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 25,
+            "signalMax": 30,
+            "weightedTotal": 25.1,
+            "weightedMax": 31.5,
+            "weightedPercent": 80,
+            "fitScore": 80,
+            "totalScore": 80,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "80/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 5,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6.5,
+                "evidenceUrl": "https://replicate.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 20.63
+              },
+              "revenueSensitivity": {
+                "rawScore": 3,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.3,
+                "evidenceUrl": "https://replicate.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 10.48
+              },
+              "observabilityScale": {
+                "rawScore": 4,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4,
+                "evidenceUrl": "https://replicate.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 12.7
+              },
+              "activePain": {
+                "rawScore": 3,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://replicate.com/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "aiCompatibility": {
+                "rawScore": 5,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.5,
+                "evidenceUrl": "https://replicate.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 14.29
+              },
+              "competitiveWedge": {
+                "rawScore": 5,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 3.2,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 10.16
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [
+            {
+              "code": "KILL_BELOW_ICP_SIZE",
+              "reason": "Verified engineering headcount (75) is below the configured 200-engineer ICP floor.",
+              "evidenceUrl": "https://replicate.com/about",
+              "evidenceText": "Engineering headcount evidence."
+            }
+          ],
+          "killStatus": "killed",
+          "primaryKill": {
+            "code": "KILL_BELOW_ICP_SIZE",
+            "reason": "Verified engineering headcount (75) is below the configured 200-engineer ICP floor.",
+            "evidenceUrl": "https://replicate.com/about",
+            "evidenceText": "Engineering headcount evidence."
+          },
+          "alsoKilledBy": [],
+          "killReason": "Verified engineering headcount (75) is below the configured 200-engineer ICP floor.",
+          "killEvidenceUrl": "https://replicate.com/about",
+          "hiringForWhatWeSell": false,
+          "priority": 0,
+          "priorityBreakdown": {
+            "tier": 3,
+            "tierWeight": 1,
+            "fitScore": 80,
+            "fitFactor": 0.8,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": true,
+            "rawBeforeThemeB": 0,
+            "raw": 0,
+            "normalized": 0,
+            "formula": "Killed → 0"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "draftkings-like-clean-winner",
+      "input": {
+        "id": "acct_draftkings",
+        "name": "DraftKings",
+        "domain": "draftkings.com",
+        "icpSegment": "sports_betting",
+        "segmentClassification": {
+          "segment": "sports_betting",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 4,
+            "evidenceUrl": "https://draftkings.com/evidence/techStack",
+            "evidenceText": "techStack evidence for draftkings.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 5,
+            "evidenceUrl": "https://draftkings.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for draftkings.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 5,
+            "evidenceUrl": "https://draftkings.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for draftkings.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 5,
+            "evidenceUrl": "https://draftkings.com/evidence/activePain",
+            "evidenceText": "activePain evidence for draftkings.com",
+            "inferred": false,
+            "confidence": 1,
+            "observedAt": "2026-07-02T00:00:00.000Z"
+          },
+          "aiCompatibility": {
+            "score": 4,
+            "evidenceUrl": "https://draftkings.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for draftkings.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 4,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for draftkings.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 5000,
+          "revenueEstimate": 4600000000,
+          "fundingStage": "public",
+          "totalRaised": 0,
+          "valuation": 18000000000,
+          "isPublic": true,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://www.draftkings.com/about",
+          "fields": {
+            "employeeCount": {
+              "value": 5000,
+              "provider": "free",
+              "sourceUrl": "https://www.draftkings.com/about"
+            },
+            "revenueEstimate": {
+              "value": 4600000000,
+              "provider": "free",
+              "sourceUrl": "https://www.draftkings.com/about"
+            },
+            "fundingStage": {
+              "value": "public",
+              "provider": "free",
+              "sourceUrl": "https://www.draftkings.com/about"
+            },
+            "totalRaised": {
+              "value": 0,
+              "provider": "free",
+              "sourceUrl": "https://www.draftkings.com/about"
+            },
+            "valuation": {
+              "value": 18000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.draftkings.com/about"
+            },
+            "isPublic": {
+              "value": true,
+              "provider": "free",
+              "sourceUrl": "https://www.draftkings.com/about"
+            }
+          }
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 27,
+          "signalMax": 30,
+          "weightedTotal": 27.86,
+          "weightedMax": 31.5,
+          "weightedPercent": 88,
+          "fitScore": 88,
+          "totalScore": 88,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "88/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 4,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.2,
+              "evidenceUrl": "https://draftkings.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 16.51
+            },
+            "revenueSensitivity": {
+              "rawScore": 5,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.5,
+              "evidenceUrl": "https://draftkings.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 17.46
+            },
+            "observabilityScale": {
+              "rawScore": 5,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5,
+              "evidenceUrl": "https://draftkings.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 15.87
+            },
+            "activePain": {
+              "rawScore": 5,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6,
+              "evidenceUrl": "https://draftkings.com/evidence/activePain",
+              "observedAt": "2026-07-02T00:00:00.000Z",
+              "fitPoints": 19.05
+            },
+            "aiCompatibility": {
+              "rawScore": 4,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://draftkings.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "competitiveWedge": {
+              "rawScore": 4,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 2.56,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 8.13
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": true,
+          "liveTriggerAt": "2026-07-02T00:00:00.000Z",
+          "liveTriggerUrl": "https://draftkings.com/evidence/activePain"
+        },
+        "kills": [],
+        "tier": {
+          "tier": 1,
+          "tierReason": "Tier 1: verified public company. Evidence: public-web firmographics (receipt: https://www.draftkings.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.draftkings.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_draftkings",
+          "name": "DraftKings",
+          "domain": "draftkings.com",
+          "icpSegment": "sports_betting",
+          "segmentClassification": {
+            "segment": "sports_betting",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 4,
+              "evidenceUrl": "https://draftkings.com/evidence/techStack",
+              "evidenceText": "techStack evidence for draftkings.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 5,
+              "evidenceUrl": "https://draftkings.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for draftkings.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 5,
+              "evidenceUrl": "https://draftkings.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for draftkings.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 5,
+              "evidenceUrl": "https://draftkings.com/evidence/activePain",
+              "evidenceText": "activePain evidence for draftkings.com",
+              "inferred": false,
+              "confidence": 1,
+              "observedAt": "2026-07-02T00:00:00.000Z"
+            },
+            "aiCompatibility": {
+              "score": 4,
+              "evidenceUrl": "https://draftkings.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for draftkings.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 4,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for draftkings.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 5000,
+            "revenueEstimate": 4600000000,
+            "fundingStage": "public",
+            "totalRaised": 0,
+            "valuation": 18000000000,
+            "isPublic": true,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://www.draftkings.com/about",
+            "fields": {
+              "employeeCount": {
+                "value": 5000,
+                "provider": "free",
+                "sourceUrl": "https://www.draftkings.com/about"
+              },
+              "revenueEstimate": {
+                "value": 4600000000,
+                "provider": "free",
+                "sourceUrl": "https://www.draftkings.com/about"
+              },
+              "fundingStage": {
+                "value": "public",
+                "provider": "free",
+                "sourceUrl": "https://www.draftkings.com/about"
+              },
+              "totalRaised": {
+                "value": 0,
+                "provider": "free",
+                "sourceUrl": "https://www.draftkings.com/about"
+              },
+              "valuation": {
+                "value": 18000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.draftkings.com/about"
+              },
+              "isPublic": {
+                "value": true,
+                "provider": "free",
+                "sourceUrl": "https://www.draftkings.com/about"
+              }
+            }
+          },
+          "tier": 1,
+          "tierReason": "Tier 1: verified public company. Evidence: public-web firmographics (receipt: https://www.draftkings.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.draftkings.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 88,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 27,
+            "signalMax": 30,
+            "weightedTotal": 27.86,
+            "weightedMax": 31.5,
+            "weightedPercent": 88,
+            "fitScore": 88,
+            "totalScore": 88,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "88/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 4,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.2,
+                "evidenceUrl": "https://draftkings.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 16.51
+              },
+              "revenueSensitivity": {
+                "rawScore": 5,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.5,
+                "evidenceUrl": "https://draftkings.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 17.46
+              },
+              "observabilityScale": {
+                "rawScore": 5,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5,
+                "evidenceUrl": "https://draftkings.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 15.87
+              },
+              "activePain": {
+                "rawScore": 5,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6,
+                "evidenceUrl": "https://draftkings.com/evidence/activePain",
+                "observedAt": "2026-07-02T00:00:00.000Z",
+                "fitPoints": 19.05
+              },
+              "aiCompatibility": {
+                "rawScore": 4,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://draftkings.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "competitiveWedge": {
+                "rawScore": 4,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 2.56,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 8.13
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": true,
+            "liveTriggerAt": "2026-07-02T00:00:00.000Z",
+            "liveTriggerUrl": "https://draftkings.com/evidence/activePain"
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [],
+          "killStatus": null,
+          "primaryKill": null,
+          "alsoKilledBy": [],
+          "killReason": "",
+          "killEvidenceUrl": "",
+          "hiringForWhatWeSell": false,
+          "priority": 0.352,
+          "priorityBreakdown": {
+            "tier": 1,
+            "tierWeight": 3,
+            "fitScore": 88,
+            "fitFactor": 0.88,
+            "freshnessBoost": 1.25,
+            "liveTriggerUnder90Days": true,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": false,
+            "rawBeforeThemeB": 3.3,
+            "raw": 3.3,
+            "normalized": 0.352,
+            "formula": "3 × (88/100) × 1.25 × 1 ÷ 9.375"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "clean-tier-1-enterprise",
+      "input": {
+        "id": "acct_enterprise",
+        "name": "Northstar Cloud",
+        "domain": "northstar.example",
+        "icpSegment": "enterprise_platforms",
+        "segmentClassification": {
+          "segment": "enterprise_platforms",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 4,
+            "evidenceUrl": "https://northstar.example/evidence/techStack",
+            "evidenceText": "techStack evidence for northstar.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 4,
+            "evidenceUrl": "https://northstar.example/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for northstar.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 4,
+            "evidenceUrl": "https://northstar.example/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for northstar.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 3,
+            "evidenceUrl": "https://northstar.example/evidence/activePain",
+            "evidenceText": "activePain evidence for northstar.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 4,
+            "evidenceUrl": "https://northstar.example/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for northstar.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 3,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for northstar.example",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 3000,
+          "revenueEstimate": 800000000,
+          "fundingStage": "growth",
+          "totalRaised": 500000000,
+          "valuation": 8000000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://evidence.example/company-profile",
+          "fields": {
+            "employeeCount": {
+              "value": 3000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "revenueEstimate": {
+              "value": 800000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "fundingStage": {
+              "value": "growth",
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "totalRaised": {
+              "value": 500000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "valuation": {
+              "value": 8000000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            }
+          }
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 22,
+          "signalMax": 30,
+          "weightedTotal": 22.72,
+          "weightedMax": 31.5,
+          "weightedPercent": 72,
+          "fitScore": 72,
+          "totalScore": 72,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "72/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 4,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.2,
+              "evidenceUrl": "https://northstar.example/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 16.51
+            },
+            "revenueSensitivity": {
+              "rawScore": 4,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.4,
+              "evidenceUrl": "https://northstar.example/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 13.97
+            },
+            "observabilityScale": {
+              "rawScore": 4,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4,
+              "evidenceUrl": "https://northstar.example/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 12.7
+            },
+            "activePain": {
+              "rawScore": 3,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://northstar.example/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "aiCompatibility": {
+              "rawScore": 4,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://northstar.example/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "competitiveWedge": {
+              "rawScore": 3,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 1.92,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 6.1
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [],
+        "tier": {
+          "tier": 1,
+          "tierReason": "Tier 1: estimated revenue $800M meets the $500M threshold. Evidence: public-web firmographics (receipt: https://evidence.example/company-profile).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://evidence.example/company-profile",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_enterprise",
+          "name": "Northstar Cloud",
+          "domain": "northstar.example",
+          "icpSegment": "enterprise_platforms",
+          "segmentClassification": {
+            "segment": "enterprise_platforms",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 4,
+              "evidenceUrl": "https://northstar.example/evidence/techStack",
+              "evidenceText": "techStack evidence for northstar.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 4,
+              "evidenceUrl": "https://northstar.example/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for northstar.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 4,
+              "evidenceUrl": "https://northstar.example/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for northstar.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 3,
+              "evidenceUrl": "https://northstar.example/evidence/activePain",
+              "evidenceText": "activePain evidence for northstar.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 4,
+              "evidenceUrl": "https://northstar.example/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for northstar.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 3,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for northstar.example",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 3000,
+            "revenueEstimate": 800000000,
+            "fundingStage": "growth",
+            "totalRaised": 500000000,
+            "valuation": 8000000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://evidence.example/company-profile",
+            "fields": {
+              "employeeCount": {
+                "value": 3000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "revenueEstimate": {
+                "value": 800000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "fundingStage": {
+                "value": "growth",
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "totalRaised": {
+                "value": 500000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "valuation": {
+                "value": 8000000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              }
+            }
+          },
+          "tier": 1,
+          "tierReason": "Tier 1: estimated revenue $800M meets the $500M threshold. Evidence: public-web firmographics (receipt: https://evidence.example/company-profile).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://evidence.example/company-profile",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 72,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 22,
+            "signalMax": 30,
+            "weightedTotal": 22.72,
+            "weightedMax": 31.5,
+            "weightedPercent": 72,
+            "fitScore": 72,
+            "totalScore": 72,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "72/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 4,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.2,
+                "evidenceUrl": "https://northstar.example/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 16.51
+              },
+              "revenueSensitivity": {
+                "rawScore": 4,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.4,
+                "evidenceUrl": "https://northstar.example/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 13.97
+              },
+              "observabilityScale": {
+                "rawScore": 4,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4,
+                "evidenceUrl": "https://northstar.example/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 12.7
+              },
+              "activePain": {
+                "rawScore": 3,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://northstar.example/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "aiCompatibility": {
+                "rawScore": 4,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://northstar.example/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "competitiveWedge": {
+                "rawScore": 3,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 1.92,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 6.1
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [],
+          "killStatus": null,
+          "primaryKill": null,
+          "alsoKilledBy": [],
+          "killReason": "",
+          "killEvidenceUrl": "",
+          "hiringForWhatWeSell": false,
+          "priority": 0.2304,
+          "priorityBreakdown": {
+            "tier": 1,
+            "tierWeight": 3,
+            "fitScore": 72,
+            "fitFactor": 0.72,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": false,
+            "rawBeforeThemeB": 2.16,
+            "raw": 2.16,
+            "normalized": 0.2304,
+            "formula": "3 × (72/100) × 1 × 1 ÷ 9.375"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "clean-tier-2-growth",
+      "input": {
+        "id": "acct_growth",
+        "name": "Harbor Systems",
+        "domain": "harbor.example",
+        "icpSegment": "cybersecurity",
+        "segmentClassification": {
+          "segment": "cybersecurity",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 4,
+            "evidenceUrl": "https://harbor.example/evidence/techStack",
+            "evidenceText": "techStack evidence for harbor.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 3,
+            "evidenceUrl": "https://harbor.example/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for harbor.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 4,
+            "evidenceUrl": "https://harbor.example/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for harbor.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 3,
+            "evidenceUrl": "https://harbor.example/evidence/activePain",
+            "evidenceText": "activePain evidence for harbor.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 4,
+            "evidenceUrl": "https://harbor.example/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for harbor.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 3,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for harbor.example",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 350,
+          "revenueEstimate": 40000000,
+          "fundingStage": "series b",
+          "totalRaised": 60000000,
+          "valuation": 600000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://evidence.example/company-profile",
+          "fields": {
+            "employeeCount": {
+              "value": 350,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "revenueEstimate": {
+              "value": 40000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "fundingStage": {
+              "value": "series b",
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "totalRaised": {
+              "value": 60000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "valuation": {
+              "value": 600000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            }
+          }
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 21,
+          "signalMax": 30,
+          "weightedTotal": 21.62,
+          "weightedMax": 31.5,
+          "weightedPercent": 69,
+          "fitScore": 69,
+          "totalScore": 69,
+          "fitBand": "moderate",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "69/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 4,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.2,
+              "evidenceUrl": "https://harbor.example/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 16.51
+            },
+            "revenueSensitivity": {
+              "rawScore": 3,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.3,
+              "evidenceUrl": "https://harbor.example/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 10.48
+            },
+            "observabilityScale": {
+              "rawScore": 4,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4,
+              "evidenceUrl": "https://harbor.example/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 12.7
+            },
+            "activePain": {
+              "rawScore": 3,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://harbor.example/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "aiCompatibility": {
+              "rawScore": 4,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://harbor.example/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "competitiveWedge": {
+              "rawScore": 3,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 1.92,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 6.1
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [],
+        "tier": {
+          "tier": 2,
+          "tierReason": "Tier 2: estimated revenue $40M meets the $25M growth threshold. Evidence: public-web firmographics (receipt: https://evidence.example/company-profile).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://evidence.example/company-profile",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_growth",
+          "name": "Harbor Systems",
+          "domain": "harbor.example",
+          "icpSegment": "cybersecurity",
+          "segmentClassification": {
+            "segment": "cybersecurity",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 4,
+              "evidenceUrl": "https://harbor.example/evidence/techStack",
+              "evidenceText": "techStack evidence for harbor.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 3,
+              "evidenceUrl": "https://harbor.example/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for harbor.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 4,
+              "evidenceUrl": "https://harbor.example/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for harbor.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 3,
+              "evidenceUrl": "https://harbor.example/evidence/activePain",
+              "evidenceText": "activePain evidence for harbor.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 4,
+              "evidenceUrl": "https://harbor.example/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for harbor.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 3,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for harbor.example",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 350,
+            "revenueEstimate": 40000000,
+            "fundingStage": "series b",
+            "totalRaised": 60000000,
+            "valuation": 600000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://evidence.example/company-profile",
+            "fields": {
+              "employeeCount": {
+                "value": 350,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "revenueEstimate": {
+                "value": 40000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "fundingStage": {
+                "value": "series b",
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "totalRaised": {
+                "value": 60000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "valuation": {
+                "value": 600000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              }
+            }
+          },
+          "tier": 2,
+          "tierReason": "Tier 2: estimated revenue $40M meets the $25M growth threshold. Evidence: public-web firmographics (receipt: https://evidence.example/company-profile).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://evidence.example/company-profile",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 69,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 21,
+            "signalMax": 30,
+            "weightedTotal": 21.62,
+            "weightedMax": 31.5,
+            "weightedPercent": 69,
+            "fitScore": 69,
+            "totalScore": 69,
+            "fitBand": "moderate",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "69/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 4,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.2,
+                "evidenceUrl": "https://harbor.example/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 16.51
+              },
+              "revenueSensitivity": {
+                "rawScore": 3,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.3,
+                "evidenceUrl": "https://harbor.example/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 10.48
+              },
+              "observabilityScale": {
+                "rawScore": 4,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4,
+                "evidenceUrl": "https://harbor.example/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 12.7
+              },
+              "activePain": {
+                "rawScore": 3,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://harbor.example/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "aiCompatibility": {
+                "rawScore": 4,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://harbor.example/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "competitiveWedge": {
+                "rawScore": 3,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 1.92,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 6.1
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [],
+          "killStatus": null,
+          "primaryKill": null,
+          "alsoKilledBy": [],
+          "killReason": "",
+          "killEvidenceUrl": "",
+          "hiringForWhatWeSell": false,
+          "priority": 0.1472,
+          "priorityBreakdown": {
+            "tier": 2,
+            "tierWeight": 2,
+            "fitScore": 69,
+            "fitFactor": 0.69,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": false,
+            "rawBeforeThemeB": 1.38,
+            "raw": 1.38,
+            "normalized": 0.1472,
+            "formula": "2 × (69/100) × 1 × 1 ÷ 9.375"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "clean-tier-3-seed",
+      "input": {
+        "id": "acct_seed",
+        "name": "Cinder AI",
+        "domain": "cinder.example",
+        "icpSegment": "data_ai_infrastructure",
+        "segmentClassification": {
+          "segment": "data_ai_infrastructure",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 3,
+            "evidenceUrl": "https://cinder.example/evidence/techStack",
+            "evidenceText": "techStack evidence for cinder.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 3,
+            "evidenceUrl": "https://cinder.example/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for cinder.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 4,
+            "evidenceUrl": "https://cinder.example/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for cinder.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 2,
+            "evidenceUrl": "https://cinder.example/evidence/activePain",
+            "evidenceText": "activePain evidence for cinder.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 5,
+            "evidenceUrl": "https://cinder.example/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for cinder.example",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 3,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for cinder.example",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 80,
+          "revenueEstimate": 1000000,
+          "fundingStage": "seed",
+          "totalRaised": 3000000,
+          "valuation": 20000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://evidence.example/company-profile",
+          "fields": {
+            "employeeCount": {
+              "value": 80,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "revenueEstimate": {
+              "value": 1000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "fundingStage": {
+              "value": "seed",
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "totalRaised": {
+              "value": 3000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "valuation": {
+              "value": 20000000,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://evidence.example/company-profile"
+            }
+          }
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 20,
+          "signalMax": 30,
+          "weightedTotal": 20.02,
+          "weightedMax": 31.5,
+          "weightedPercent": 64,
+          "fitScore": 64,
+          "totalScore": 64,
+          "fitBand": "moderate",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "64/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 3,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.9,
+              "evidenceUrl": "https://cinder.example/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 12.38
+            },
+            "revenueSensitivity": {
+              "rawScore": 3,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.3,
+              "evidenceUrl": "https://cinder.example/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 10.48
+            },
+            "observabilityScale": {
+              "rawScore": 4,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4,
+              "evidenceUrl": "https://cinder.example/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 12.7
+            },
+            "activePain": {
+              "rawScore": 2,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 2.4,
+              "evidenceUrl": "https://cinder.example/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 7.62
+            },
+            "aiCompatibility": {
+              "rawScore": 5,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.5,
+              "evidenceUrl": "https://cinder.example/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 14.29
+            },
+            "competitiveWedge": {
+              "rawScore": 3,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 1.92,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 6.1
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [],
+        "tier": {
+          "tier": 3,
+          "tierReason": "Tier 3: no more than 149 employees with meaningful seed funding; retain for nurture and verification. Evidence: public-web firmographics (receipt: https://evidence.example/company-profile).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://evidence.example/company-profile",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_seed",
+          "name": "Cinder AI",
+          "domain": "cinder.example",
+          "icpSegment": "data_ai_infrastructure",
+          "segmentClassification": {
+            "segment": "data_ai_infrastructure",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 3,
+              "evidenceUrl": "https://cinder.example/evidence/techStack",
+              "evidenceText": "techStack evidence for cinder.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 3,
+              "evidenceUrl": "https://cinder.example/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for cinder.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 4,
+              "evidenceUrl": "https://cinder.example/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for cinder.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 2,
+              "evidenceUrl": "https://cinder.example/evidence/activePain",
+              "evidenceText": "activePain evidence for cinder.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 5,
+              "evidenceUrl": "https://cinder.example/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for cinder.example",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 3,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for cinder.example",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 80,
+            "revenueEstimate": 1000000,
+            "fundingStage": "seed",
+            "totalRaised": 3000000,
+            "valuation": 20000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://evidence.example/company-profile",
+            "fields": {
+              "employeeCount": {
+                "value": 80,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "revenueEstimate": {
+                "value": 1000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "fundingStage": {
+                "value": "seed",
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "totalRaised": {
+                "value": 3000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "valuation": {
+                "value": 20000000,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://evidence.example/company-profile"
+              }
+            }
+          },
+          "tier": 3,
+          "tierReason": "Tier 3: no more than 149 employees with meaningful seed funding; retain for nurture and verification. Evidence: public-web firmographics (receipt: https://evidence.example/company-profile).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://evidence.example/company-profile",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 64,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 20,
+            "signalMax": 30,
+            "weightedTotal": 20.02,
+            "weightedMax": 31.5,
+            "weightedPercent": 64,
+            "fitScore": 64,
+            "totalScore": 64,
+            "fitBand": "moderate",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "64/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 3,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.9,
+                "evidenceUrl": "https://cinder.example/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 12.38
+              },
+              "revenueSensitivity": {
+                "rawScore": 3,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.3,
+                "evidenceUrl": "https://cinder.example/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 10.48
+              },
+              "observabilityScale": {
+                "rawScore": 4,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4,
+                "evidenceUrl": "https://cinder.example/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 12.7
+              },
+              "activePain": {
+                "rawScore": 2,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 2.4,
+                "evidenceUrl": "https://cinder.example/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 7.62
+              },
+              "aiCompatibility": {
+                "rawScore": 5,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.5,
+                "evidenceUrl": "https://cinder.example/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 14.29
+              },
+              "competitiveWedge": {
+                "rawScore": 3,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 1.92,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 6.1
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [],
+          "killStatus": null,
+          "primaryKill": null,
+          "alsoKilledBy": [],
+          "killReason": "",
+          "killEvidenceUrl": "",
+          "hiringForWhatWeSell": false,
+          "priority": 0.0683,
+          "priorityBreakdown": {
+            "tier": 3,
+            "tierWeight": 1,
+            "fitScore": 64,
+            "fitFactor": 0.64,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": false,
+            "rawBeforeThemeB": 0.64,
+            "raw": 0.64,
+            "normalized": 0.0683,
+            "formula": "1 × (64/100) × 1 × 1 ÷ 9.375"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "existing-customer",
+      "input": {
+        "id": "acct_coinbase",
+        "name": "Coinbase",
+        "domain": "coinbase.com",
+        "icpSegment": "crypto_fintech",
+        "segmentClassification": {
+          "segment": "crypto_fintech",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 5,
+            "evidenceUrl": "https://coinbase.com/evidence/techStack",
+            "evidenceText": "techStack evidence for coinbase.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 5,
+            "evidenceUrl": "https://coinbase.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for coinbase.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 5,
+            "evidenceUrl": "https://coinbase.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for coinbase.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 5,
+            "evidenceUrl": "https://coinbase.com/evidence/activePain",
+            "evidenceText": "activePain evidence for coinbase.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 4,
+            "evidenceUrl": "https://coinbase.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for coinbase.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 5,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for coinbase.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 3400,
+          "revenueEstimate": 6200000000,
+          "fundingStage": "public",
+          "totalRaised": 0,
+          "valuation": 65000000000,
+          "isPublic": true,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://www.coinbase.com/about",
+          "fields": {
+            "employeeCount": {
+              "value": 3400,
+              "provider": "free",
+              "sourceUrl": "https://www.coinbase.com/about"
+            },
+            "revenueEstimate": {
+              "value": 6200000000,
+              "provider": "free",
+              "sourceUrl": "https://www.coinbase.com/about"
+            },
+            "fundingStage": {
+              "value": "public",
+              "provider": "free",
+              "sourceUrl": "https://www.coinbase.com/about"
+            },
+            "totalRaised": {
+              "value": 0,
+              "provider": "free",
+              "sourceUrl": "https://www.coinbase.com/about"
+            },
+            "valuation": {
+              "value": 65000000000,
+              "provider": "free",
+              "sourceUrl": "https://www.coinbase.com/about"
+            },
+            "isPublic": {
+              "value": true,
+              "provider": "free",
+              "sourceUrl": "https://www.coinbase.com/about"
+            }
+          }
+        }
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 29,
+          "signalMax": 30,
+          "weightedTotal": 29.8,
+          "weightedMax": 31.5,
+          "weightedPercent": 95,
+          "fitScore": 95,
+          "totalScore": 95,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "95/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 5,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6.5,
+              "evidenceUrl": "https://coinbase.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 20.63
+            },
+            "revenueSensitivity": {
+              "rawScore": 5,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.5,
+              "evidenceUrl": "https://coinbase.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 17.46
+            },
+            "observabilityScale": {
+              "rawScore": 5,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5,
+              "evidenceUrl": "https://coinbase.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 15.87
+            },
+            "activePain": {
+              "rawScore": 5,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6,
+              "evidenceUrl": "https://coinbase.com/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 19.05
+            },
+            "aiCompatibility": {
+              "rawScore": 4,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 3.6,
+              "evidenceUrl": "https://coinbase.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 11.43
+            },
+            "competitiveWedge": {
+              "rawScore": 5,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 3.2,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 10.16
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [
+          {
+            "code": "KILL_EXISTING_CUSTOMER",
+            "reason": "Coinbase is listed as an existing Resolve customer.",
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "Resolve customer list."
+          }
+        ],
+        "tier": {
+          "tier": 1,
+          "tierReason": "Tier 1: verified public company. Evidence: public-web firmographics (receipt: https://www.coinbase.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.coinbase.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "icpSegment": "crypto_fintech",
+          "segmentClassification": {
+            "segment": "crypto_fintech",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 5,
+              "evidenceUrl": "https://coinbase.com/evidence/techStack",
+              "evidenceText": "techStack evidence for coinbase.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 5,
+              "evidenceUrl": "https://coinbase.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for coinbase.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 5,
+              "evidenceUrl": "https://coinbase.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for coinbase.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 5,
+              "evidenceUrl": "https://coinbase.com/evidence/activePain",
+              "evidenceText": "activePain evidence for coinbase.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 4,
+              "evidenceUrl": "https://coinbase.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for coinbase.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 5,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for coinbase.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 3400,
+            "revenueEstimate": 6200000000,
+            "fundingStage": "public",
+            "totalRaised": 0,
+            "valuation": 65000000000,
+            "isPublic": true,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://www.coinbase.com/about",
+            "fields": {
+              "employeeCount": {
+                "value": 3400,
+                "provider": "free",
+                "sourceUrl": "https://www.coinbase.com/about"
+              },
+              "revenueEstimate": {
+                "value": 6200000000,
+                "provider": "free",
+                "sourceUrl": "https://www.coinbase.com/about"
+              },
+              "fundingStage": {
+                "value": "public",
+                "provider": "free",
+                "sourceUrl": "https://www.coinbase.com/about"
+              },
+              "totalRaised": {
+                "value": 0,
+                "provider": "free",
+                "sourceUrl": "https://www.coinbase.com/about"
+              },
+              "valuation": {
+                "value": 65000000000,
+                "provider": "free",
+                "sourceUrl": "https://www.coinbase.com/about"
+              },
+              "isPublic": {
+                "value": true,
+                "provider": "free",
+                "sourceUrl": "https://www.coinbase.com/about"
+              }
+            }
+          },
+          "tier": 1,
+          "tierReason": "Tier 1: verified public company. Evidence: public-web firmographics (receipt: https://www.coinbase.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://www.coinbase.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 95,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 29,
+            "signalMax": 30,
+            "weightedTotal": 29.8,
+            "weightedMax": 31.5,
+            "weightedPercent": 95,
+            "fitScore": 95,
+            "totalScore": 95,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "95/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 5,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6.5,
+                "evidenceUrl": "https://coinbase.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 20.63
+              },
+              "revenueSensitivity": {
+                "rawScore": 5,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.5,
+                "evidenceUrl": "https://coinbase.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 17.46
+              },
+              "observabilityScale": {
+                "rawScore": 5,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5,
+                "evidenceUrl": "https://coinbase.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 15.87
+              },
+              "activePain": {
+                "rawScore": 5,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6,
+                "evidenceUrl": "https://coinbase.com/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 19.05
+              },
+              "aiCompatibility": {
+                "rawScore": 4,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 3.6,
+                "evidenceUrl": "https://coinbase.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 11.43
+              },
+              "competitiveWedge": {
+                "rawScore": 5,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 3.2,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 10.16
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [
+            {
+              "code": "KILL_EXISTING_CUSTOMER",
+              "reason": "Coinbase is listed as an existing Resolve customer.",
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "Resolve customer list."
+            }
+          ],
+          "killStatus": "killed",
+          "primaryKill": {
+            "code": "KILL_EXISTING_CUSTOMER",
+            "reason": "Coinbase is listed as an existing Resolve customer.",
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "Resolve customer list."
+          },
+          "alsoKilledBy": [],
+          "killReason": "Coinbase is listed as an existing Resolve customer.",
+          "killEvidenceUrl": "https://resolve.ai/customers",
+          "hiringForWhatWeSell": false,
+          "priority": 0,
+          "priorityBreakdown": {
+            "tier": 1,
+            "tierWeight": 3,
+            "fitScore": 95,
+            "fitFactor": 0.95,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": true,
+            "rawBeforeThemeB": 0,
+            "raw": 0,
+            "normalized": 0,
+            "formula": "Killed → 0"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    },
+    {
+      "id": "multi-kill-precedence",
+      "input": {
+        "id": "acct_multi",
+        "name": "DoorDash",
+        "domain": "doordash.com",
+        "icpSegment": "delivery_marketplaces",
+        "segmentClassification": {
+          "segment": "delivery_marketplaces",
+          "confidence": 1,
+          "requiresReview": false
+        },
+        "signals": {
+          "techStack": {
+            "score": 5,
+            "evidenceUrl": "https://doordash.com/evidence/techStack",
+            "evidenceText": "techStack evidence for doordash.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "revenueSensitivity": {
+            "score": 5,
+            "evidenceUrl": "https://doordash.com/evidence/revenueSensitivity",
+            "evidenceText": "revenueSensitivity evidence for doordash.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "observabilityScale": {
+            "score": 5,
+            "evidenceUrl": "https://doordash.com/evidence/observabilityScale",
+            "evidenceText": "observabilityScale evidence for doordash.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "activePain": {
+            "score": 5,
+            "evidenceUrl": "https://doordash.com/evidence/activePain",
+            "evidenceText": "activePain evidence for doordash.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "aiCompatibility": {
+            "score": 5,
+            "evidenceUrl": "https://doordash.com/evidence/aiCompatibility",
+            "evidenceText": "aiCompatibility evidence for doordash.com",
+            "inferred": false,
+            "confidence": 1
+          },
+          "competitiveWedge": {
+            "score": 5,
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "competitiveWedge evidence for doordash.com",
+            "inferred": false,
+            "confidence": 0.8
+          }
+        },
+        "triggers": [],
+        "firmographics": {
+          "employeeCount": 100,
+          "revenueEstimate": 10000000,
+          "fundingStage": "seed",
+          "totalRaised": 3000000,
+          "valuation": 100000000,
+          "isPublic": false,
+          "confidence": 0.9,
+          "source": "free",
+          "sourceUrl": "https://doordash.com/about",
+          "fields": {
+            "employeeCount": {
+              "value": 100,
+              "provider": "free",
+              "sourceUrl": "https://doordash.com/about"
+            },
+            "revenueEstimate": {
+              "value": 10000000,
+              "provider": "free",
+              "sourceUrl": "https://doordash.com/about"
+            },
+            "fundingStage": {
+              "value": "seed",
+              "provider": "free",
+              "sourceUrl": "https://doordash.com/about"
+            },
+            "totalRaised": {
+              "value": 3000000,
+              "provider": "free",
+              "sourceUrl": "https://doordash.com/about"
+            },
+            "valuation": {
+              "value": 100000000,
+              "provider": "free",
+              "sourceUrl": "https://doordash.com/about"
+            },
+            "isPublic": {
+              "value": false,
+              "provider": "free",
+              "sourceUrl": "https://doordash.com/about"
+            }
+          }
+        },
+        "hypothesis": {
+          "whyNow": "DoorDash invented Jaeger and developed an internal AI debugging platform.",
+          "citations": [
+            {
+              "text": "Engineering evidence.",
+              "url": "https://doordash.engineering/observability"
+            }
+          ]
+        },
+        "engineeringHeadcount": 100,
+        "engineeringHeadcountSourceUrl": "https://doordash.engineering/about",
+        "prospectingSurface": "unavailable",
+        "prospectingSurfaceEvidenceUrl": "https://doordash.com/legal",
+        "prospectingSurfaceEvidenceText": "Prospecting unavailable."
+      },
+      "output": {
+        "score": {
+          "scoringVersion": "resolve-confidence-fit-v6",
+          "signalTotal": 30,
+          "signalMax": 30,
+          "weightedTotal": 30.7,
+          "weightedMax": 31.5,
+          "weightedPercent": 97,
+          "fitScore": 97,
+          "totalScore": 97,
+          "fitBand": "strong",
+          "fitConfidence": 0.97,
+          "confidenceBand": "high-confidence",
+          "fitReason": "97/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+          "receiptedSignals": 6,
+          "breakdown": {
+            "techStack": {
+              "rawScore": 5,
+              "weight": 1.3,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6.5,
+              "evidenceUrl": "https://doordash.com/evidence/techStack",
+              "observedAt": "",
+              "fitPoints": 20.63
+            },
+            "revenueSensitivity": {
+              "rawScore": 5,
+              "weight": 1.1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5.5,
+              "evidenceUrl": "https://doordash.com/evidence/revenueSensitivity",
+              "observedAt": "",
+              "fitPoints": 17.46
+            },
+            "observabilityScale": {
+              "rawScore": 5,
+              "weight": 1,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 5,
+              "evidenceUrl": "https://doordash.com/evidence/observabilityScale",
+              "observedAt": "",
+              "fitPoints": 15.87
+            },
+            "activePain": {
+              "rawScore": 5,
+              "weight": 1.2,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 6,
+              "evidenceUrl": "https://doordash.com/evidence/activePain",
+              "observedAt": "",
+              "fitPoints": 19.05
+            },
+            "aiCompatibility": {
+              "rawScore": 5,
+              "weight": 0.9,
+              "receiptFactor": 1,
+              "confidence": 1,
+              "recencyFactor": 1,
+              "contribution": 4.5,
+              "evidenceUrl": "https://doordash.com/evidence/aiCompatibility",
+              "observedAt": "",
+              "fitPoints": 14.29
+            },
+            "competitiveWedge": {
+              "rawScore": 5,
+              "weight": 0.8,
+              "receiptFactor": 0.8,
+              "confidence": 0.8,
+              "recencyFactor": 1,
+              "contribution": 3.2,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "observedAt": "",
+              "fitPoints": 10.16
+            }
+          },
+          "weights": {
+            "techStack": 1.3,
+            "revenueSensitivity": 1.1,
+            "observabilityScale": 1,
+            "activePain": 1.2,
+            "aiCompatibility": 0.9,
+            "competitiveWedge": 0.8
+          },
+          "liveTriggerDays": 90,
+          "liveTrigger": false,
+          "liveTriggerAt": "",
+          "liveTriggerUrl": ""
+        },
+        "kills": [
+          {
+            "code": "KILL_EXISTING_CUSTOMER",
+            "reason": "DoorDash is listed as an existing Resolve customer.",
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "Resolve customer list."
+          },
+          {
+            "code": "KILL_UNSELLABLE_ORG",
+            "reason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+            "evidenceUrl": "https://doordash.com/legal",
+            "evidenceText": "Prospecting unavailable."
+          },
+          {
+            "code": "KILL_SOLVING_IN_HOUSE",
+            "reason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+            "evidenceUrl": "https://doordash.engineering/observability",
+            "evidenceText": "In-house production-investigation evidence detected in the account's public receipts."
+          },
+          {
+            "code": "KILL_BUILD_CULTURE",
+            "reason": "Public evidence shows a strong build-in-house observability culture.",
+            "evidenceUrl": "https://doordash.engineering/observability",
+            "evidenceText": "Build-culture evidence detected in the account's public receipts."
+          },
+          {
+            "code": "KILL_BELOW_ICP_SIZE",
+            "reason": "Verified engineering headcount (100) is below the configured 200-engineer ICP floor.",
+            "evidenceUrl": "https://doordash.engineering/about",
+            "evidenceText": "Engineering headcount evidence."
+          }
+        ],
+        "tier": {
+          "tier": 3,
+          "tierReason": "Tier 3: no more than 149 employees with meaningful seed funding; retain for nurture and verification. Evidence: public-web firmographics (receipt: https://doordash.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://doordash.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only"
+        },
+        "decision": {
+          "id": "acct_multi",
+          "name": "DoorDash",
+          "domain": "doordash.com",
+          "icpSegment": "delivery_marketplaces",
+          "segmentClassification": {
+            "segment": "delivery_marketplaces",
+            "confidence": 1,
+            "requiresReview": false
+          },
+          "signals": {
+            "techStack": {
+              "score": 5,
+              "evidenceUrl": "https://doordash.com/evidence/techStack",
+              "evidenceText": "techStack evidence for doordash.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "revenueSensitivity": {
+              "score": 5,
+              "evidenceUrl": "https://doordash.com/evidence/revenueSensitivity",
+              "evidenceText": "revenueSensitivity evidence for doordash.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "observabilityScale": {
+              "score": 5,
+              "evidenceUrl": "https://doordash.com/evidence/observabilityScale",
+              "evidenceText": "observabilityScale evidence for doordash.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "activePain": {
+              "score": 5,
+              "evidenceUrl": "https://doordash.com/evidence/activePain",
+              "evidenceText": "activePain evidence for doordash.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "aiCompatibility": {
+              "score": 5,
+              "evidenceUrl": "https://doordash.com/evidence/aiCompatibility",
+              "evidenceText": "aiCompatibility evidence for doordash.com",
+              "inferred": false,
+              "confidence": 1
+            },
+            "competitiveWedge": {
+              "score": 5,
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "competitiveWedge evidence for doordash.com",
+              "inferred": false,
+              "confidence": 0.8
+            }
+          },
+          "triggers": [],
+          "firmographics": {
+            "employeeCount": 100,
+            "revenueEstimate": 10000000,
+            "fundingStage": "seed",
+            "totalRaised": 3000000,
+            "valuation": 100000000,
+            "isPublic": false,
+            "confidence": 0.9,
+            "source": "free",
+            "sourceUrl": "https://doordash.com/about",
+            "fields": {
+              "employeeCount": {
+                "value": 100,
+                "provider": "free",
+                "sourceUrl": "https://doordash.com/about"
+              },
+              "revenueEstimate": {
+                "value": 10000000,
+                "provider": "free",
+                "sourceUrl": "https://doordash.com/about"
+              },
+              "fundingStage": {
+                "value": "seed",
+                "provider": "free",
+                "sourceUrl": "https://doordash.com/about"
+              },
+              "totalRaised": {
+                "value": 3000000,
+                "provider": "free",
+                "sourceUrl": "https://doordash.com/about"
+              },
+              "valuation": {
+                "value": 100000000,
+                "provider": "free",
+                "sourceUrl": "https://doordash.com/about"
+              },
+              "isPublic": {
+                "value": false,
+                "provider": "free",
+                "sourceUrl": "https://doordash.com/about"
+              }
+            }
+          },
+          "hypothesis": {
+            "whyNow": "DoorDash invented Jaeger and developed an internal AI debugging platform.",
+            "citations": [
+              {
+                "text": "Engineering evidence.",
+                "url": "https://doordash.engineering/observability"
+              }
+            ]
+          },
+          "engineeringHeadcount": 100,
+          "engineeringHeadcountSourceUrl": "https://doordash.engineering/about",
+          "prospectingSurface": "unavailable",
+          "prospectingSurfaceEvidenceUrl": "https://doordash.com/legal",
+          "prospectingSurfaceEvidenceText": "Prospecting unavailable.",
+          "tier": 3,
+          "tierReason": "Tier 3: no more than 149 employees with meaningful seed funding; retain for nurture and verification. Evidence: public-web firmographics (receipt: https://doordash.com/about).",
+          "tierProvisional": false,
+          "tierConfidence": 0.9,
+          "tierEvidenceSource": "free",
+          "tierEvidenceReceipt": "https://doordash.com/about",
+          "firmographicVerificationRequired": false,
+          "tierSchemaVersion": "firmographic-tier-v3-evidence-only",
+          "fitScore": 97,
+          "fitConfidence": 0.97,
+          "score": {
+            "scoringVersion": "resolve-confidence-fit-v6",
+            "signalTotal": 30,
+            "signalMax": 30,
+            "weightedTotal": 30.7,
+            "weightedMax": 31.5,
+            "weightedPercent": 97,
+            "fitScore": 97,
+            "totalScore": 97,
+            "fitBand": "strong",
+            "fitConfidence": 0.97,
+            "confidenceBand": "high-confidence",
+            "fitReason": "97/100 at 97% evidence confidence (high-confidence); 6 of 6 signals carry URL receipts.",
+            "receiptedSignals": 6,
+            "breakdown": {
+              "techStack": {
+                "rawScore": 5,
+                "weight": 1.3,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6.5,
+                "evidenceUrl": "https://doordash.com/evidence/techStack",
+                "observedAt": "",
+                "fitPoints": 20.63
+              },
+              "revenueSensitivity": {
+                "rawScore": 5,
+                "weight": 1.1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5.5,
+                "evidenceUrl": "https://doordash.com/evidence/revenueSensitivity",
+                "observedAt": "",
+                "fitPoints": 17.46
+              },
+              "observabilityScale": {
+                "rawScore": 5,
+                "weight": 1,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 5,
+                "evidenceUrl": "https://doordash.com/evidence/observabilityScale",
+                "observedAt": "",
+                "fitPoints": 15.87
+              },
+              "activePain": {
+                "rawScore": 5,
+                "weight": 1.2,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 6,
+                "evidenceUrl": "https://doordash.com/evidence/activePain",
+                "observedAt": "",
+                "fitPoints": 19.05
+              },
+              "aiCompatibility": {
+                "rawScore": 5,
+                "weight": 0.9,
+                "receiptFactor": 1,
+                "confidence": 1,
+                "recencyFactor": 1,
+                "contribution": 4.5,
+                "evidenceUrl": "https://doordash.com/evidence/aiCompatibility",
+                "observedAt": "",
+                "fitPoints": 14.29
+              },
+              "competitiveWedge": {
+                "rawScore": 5,
+                "weight": 0.8,
+                "receiptFactor": 0.8,
+                "confidence": 0.8,
+                "recencyFactor": 1,
+                "contribution": 3.2,
+                "evidenceUrl": "https://resolve.ai/customers",
+                "observedAt": "",
+                "fitPoints": 10.16
+              }
+            },
+            "weights": {
+              "techStack": 1.3,
+              "revenueSensitivity": 1.1,
+              "observabilityScale": 1,
+              "activePain": 1.2,
+              "aiCompatibility": 0.9,
+              "competitiveWedge": 0.8
+            },
+            "liveTriggerDays": 90,
+            "liveTrigger": false,
+            "liveTriggerAt": "",
+            "liveTriggerUrl": ""
+          },
+          "stage3SchemaVersion": "leading-indicators-v4-seed-watch-promotion",
+          "kills": [
+            {
+              "code": "KILL_EXISTING_CUSTOMER",
+              "reason": "DoorDash is listed as an existing Resolve customer.",
+              "evidenceUrl": "https://resolve.ai/customers",
+              "evidenceText": "Resolve customer list."
+            },
+            {
+              "code": "KILL_UNSELLABLE_ORG",
+              "reason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+              "evidenceUrl": "https://doordash.com/legal",
+              "evidenceText": "Prospecting unavailable."
+            },
+            {
+              "code": "KILL_SOLVING_IN_HOUSE",
+              "reason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+              "evidenceUrl": "https://doordash.engineering/observability",
+              "evidenceText": "In-house production-investigation evidence detected in the account's public receipts."
+            },
+            {
+              "code": "KILL_BUILD_CULTURE",
+              "reason": "Public evidence shows a strong build-in-house observability culture.",
+              "evidenceUrl": "https://doordash.engineering/observability",
+              "evidenceText": "Build-culture evidence detected in the account's public receipts."
+            },
+            {
+              "code": "KILL_BELOW_ICP_SIZE",
+              "reason": "Verified engineering headcount (100) is below the configured 200-engineer ICP floor.",
+              "evidenceUrl": "https://doordash.engineering/about",
+              "evidenceText": "Engineering headcount evidence."
+            }
+          ],
+          "killStatus": "killed",
+          "primaryKill": {
+            "code": "KILL_EXISTING_CUSTOMER",
+            "reason": "DoorDash is listed as an existing Resolve customer.",
+            "evidenceUrl": "https://resolve.ai/customers",
+            "evidenceText": "Resolve customer list."
+          },
+          "alsoKilledBy": [
+            {
+              "code": "KILL_UNSELLABLE_ORG",
+              "reason": "Verified prospecting constraints make this organization unsuitable for the current motion.",
+              "evidenceUrl": "https://doordash.com/legal",
+              "evidenceText": "Prospecting unavailable."
+            },
+            {
+              "code": "KILL_SOLVING_IN_HOUSE",
+              "reason": "Public evidence indicates the account is already solving AI production investigation in-house.",
+              "evidenceUrl": "https://doordash.engineering/observability",
+              "evidenceText": "In-house production-investigation evidence detected in the account's public receipts."
+            },
+            {
+              "code": "KILL_BUILD_CULTURE",
+              "reason": "Public evidence shows a strong build-in-house observability culture.",
+              "evidenceUrl": "https://doordash.engineering/observability",
+              "evidenceText": "Build-culture evidence detected in the account's public receipts."
+            },
+            {
+              "code": "KILL_BELOW_ICP_SIZE",
+              "reason": "Verified engineering headcount (100) is below the configured 200-engineer ICP floor.",
+              "evidenceUrl": "https://doordash.engineering/about",
+              "evidenceText": "Engineering headcount evidence."
+            }
+          ],
+          "killReason": "DoorDash is listed as an existing Resolve customer.",
+          "killEvidenceUrl": "https://resolve.ai/customers",
+          "hiringForWhatWeSell": false,
+          "priority": 0,
+          "priorityBreakdown": {
+            "tier": 3,
+            "tierWeight": 1,
+            "fitScore": 97,
+            "fitFactor": 0.97,
+            "freshnessBoost": 1,
+            "liveTriggerUnder90Days": false,
+            "liveTriggerCount": 0,
+            "liveTriggerTypes": [],
+            "stackMultiplier": 1,
+            "stackNamedBoost": "single_or_none",
+            "hiringForWhatWeSell": false,
+            "themeBBoostApplied": false,
+            "themeBBoostMultiplier": 1,
+            "themeBBoostReason": "No usable Theme B quote.",
+            "confidenceDampener": 1,
+            "killed": true,
+            "rawBeforeThemeB": 0,
+            "raw": 0,
+            "normalized": 0,
+            "formula": "Killed → 0"
+          },
+          "decisionSchemaVersion": "priority-v5-playbook-signals"
+        }
+      }
+    }
+  ]
+}

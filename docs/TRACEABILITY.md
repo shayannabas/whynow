@@ -1,10 +1,20 @@
 # WhyNow traceability
 
+## Port-mode Phase A — 2026-10-20
+
+The owner authorized Phase A after the Stage 2.5 pause. The immutable fixture `tests/fixtures/parity/signalscout-phase-a.json` records full inputs and exact outputs from SignalScout's `scoreSignals`, `evaluateKills`, `tierCompany` and `applyDecisioning` functions at commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. It covers the five named gold-standard shapes, clean Tier 1/2/3 accounts, an existing customer and a simultaneous five-rule precedence case. WhyNow tests load only this saved fixture; SignalScout is never imported at test runtime. All ten cases match exactly.
+
+Resolve reference profile v2 remains load-only and now records line-level provenance for every moved runtime constant: segments/personas, scoring weights and trigger window, customer exclusions, kill floor/patterns/precedence, tier rules, decision rules and the Uber identity alias. Normal workspaces require owner approval before scoring; the explicit `reference_demo` adapter is a non-approved local parity surface with delivery disabled.
+
+Phase A adds `scoring.cjs`, `kills.cjs`, `tiering.cjs`, `decisioning.cjs`, `signal-rubric.cjs`, `entity-rules.cjs`, the workspace config adapter, score orchestrator, manual account persistence and local reference loader. The browser exposes Accounts, Scorecard and Kill Log. A real isolated walkthrough loaded Resolve, added Coinbase, displayed 8/100 inferred fit, retained `KILL_EXISTING_CUSTOMER` with `https://resolve.ai/customers`, restarted and preserved the same record. `STATE_DIR` selects the durable state directory and the existing server continues to honor `PORT`; Railway deployment is explicitly deferred to Phase G after owner approval.
+
+Verification: 31 test files passed, 144 active tests passed and one pre-existing future scaffold remains skipped. No Serper, OpenAI or other provider ran; no seller profile was approved; no deployment occurred. Phase B is not authorized.
+
 ## Port-mode direction and Stage 2.5 pause — 2026-10-20
 
 The owner superseded the active Stage 2.5 plan and `docs/IMPLEMENTATION-PLAN-TRIMMED.md` with a six-phase port of the permitted SignalScout functionality. SignalScout (`github.com/isaiqba-cell/flowfire`) by Isa Iqbal is read-only reference material used with permission; its environment files and secrets must never be read or copied. WhyNow retains workspace isolation, atomic JSON persistence, receipts, human approval and send-free Demo mode. Explicitly excluded services are Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway and uptime workflow.
 
-The green Stage 2.5 code remains committed at `3cdabaf` as a future research-quality improvement. Its extractor and tests are not removed. No ported module, provider call, profile approval or Stage 3 implementation occurred in this direction-change checkpoint. Phase A requires a separate owner OK.
+The green Stage 2.5 code remains committed at `3cdabaf` as a future research-quality improvement. Its extractor and tests are not removed. This paragraph records the direction-change checkpoint before Phase A was later authorized and completed above.
 
 ## Stage 2.5 research-quality offline checkpoint — 2026-10-20
 

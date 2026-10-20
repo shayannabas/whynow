@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { json } = require('../utils.cjs');
-const { loadState, saveState } = require('./state.cjs');
+const { loadState, saveState, statePath } = require('./state.cjs');
 const { overview, shell } = require('./pages.cjs');
 const { workspaceAction } = require('./actions.cjs');
 const {CollectorRuntime} = require('../collectors/runtime.cjs');
@@ -17,7 +17,11 @@ const {createSynthesisCoordinator}=require('../onboarding/synthesis-runner.cjs')
 const {createRefreshCoordinator,refreshProvidersReady}=require('../onboarding/refresh-runner.cjs');
 const {createLlm}=require('../llm.cjs');
 const {changeArchive,workspacesPage}=require('./workspaces.cjs');
+const {accountsPage,killLogPage,scorecardPage}=require('./phase-a-pages.cjs');
+const {loadResolveReferenceDemo}=require('../reference-demo.cjs');
+const {addManualAccountToState}=require('../accounts.cjs');
 function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,llm:providedLlm} = {}) {
+  stateFile=stateFile||statePath(env);
   loadState(stateFile);
   let writes = Promise.resolve();
   const jobs=new Map();
@@ -44,6 +48,25 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
     const html = (status, body) => {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(body);};
     try {
       const pathname = new URL(req.url,'http://localhost').pathname;
+      const localAdmin=env.NODE_ENV!=='production'&&['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)&&/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||'');
+      if(req.method==='GET'&&pathname==='/accounts')return html(200,accountsPage(loadState(stateFile)));
+      if(req.method==='GET'&&pathname==='/scorecard')return html(200,scorecardPage(loadState(stateFile)));
+      if(req.method==='GET'&&pathname==='/kill-log')return html(200,killLogPage(loadState(stateFile)));
+      if(req.method==='POST'&&pathname==='/reference-demo/load'){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        await mutate(state=>loadResolveReferenceDemo(state));
+        res.writeHead(303,{Location:'/accounts'});return res.end();
+      }
+      if(req.method==='POST'&&pathname==='/accounts'){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192)return json(res,413,{error:'Form too large'});}
+        const fields=Object.fromEntries(new URLSearchParams(body));
+        try{await mutate(state=>addManualAccountToState(state,state.activeWorkspaceId,fields));}
+        catch(error){return html(400,accountsPage(loadState(stateFile),error.message));}
+        res.writeHead(303,{Location:'/scorecard'});return res.end();
+      }
       if(['/workspaces','/workspaces/archive','/workspaces/restore'].includes(pathname) && !(req.method==='POST' && pathname==='/workspaces')) {
         if(env.NODE_ENV==='production' || !['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress) || !/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||''))return json(res,403,{error:'Local administrator access only'});
         if(req.method==='GET' && pathname==='/workspaces')return html(200,workspacesPage(loadState(stateFile)));

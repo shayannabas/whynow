@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v1",
+  "referenceProfileVersion": "resolve-ai-v2-phase-a",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -11,6 +11,7 @@
   },
   "provenance": {
     "sourceProject": "flowfire",
+    "sourceCommit": "130789f1bac1d5e11f5f5154f269155dc17f2d21",
     "sourceModules": [
       "scripts/resolve-gtm.cjs",
       "scripts/stage3-signals.cjs",
@@ -35,6 +36,21 @@
       "Upwind",
       "Fireworks",
       "Blueground"
+    ],
+    "movedRuntimeConstants": [
+      {"target":"icpConfig.segments and icpConfig.personas","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"51-185","note":"Ten Resolve segments and shared buyer/champion titles moved out of runtime code."},
+      {"target":"icpConfig.scoring and icpConfig.weights","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"28-49","note":"Six-signal weights, scoring version and live-trigger window moved out of runtime code."},
+      {"target":"icpConfig.exclusions.existingCustomers","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"8,243-247","note":"Resolve customer source URL and names moved out of runtime code."},
+      {"target":"icpConfig.killPatterns.sizeMetric","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"187","note":"The 200-engineer minimum moved out of runtime code."},
+      {"target":"icpConfig.killRules.precedence","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"195-201","note":"SignalScout's five-code kill precedence moved out of runtime code."},
+      {"target":"icpConfig.killPatterns.buildCulturePatterns","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"611-612","note":"Build-culture receipt matcher moved out of runtime code."},
+      {"target":"icpConfig.killPatterns.solvingInHousePatterns","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"614-615","note":"In-house production-investigation matcher moved out of runtime code."},
+      {"target":"icpConfig.tierRules","sourceFile":"scripts/tiering.cjs","sourceLines":"3-8","note":"Tier thresholds moved out of runtime code."},
+      {"target":"icpConfig.decisionRules","sourceFile":"scripts/decisioning.cjs","sourceLines":"6-11,25-70","note":"Tier weights, normalization ceiling and Theme B multiplier moved out of runtime code."},
+      {"target":"icpConfig.entityRules","sourceFile":"scripts/entity-rules.cjs","sourceLines":"5-7","note":"Uber parent/alias identity rule moved out of runtime code."}
+    ],
+    "whyNowExtensions": [
+      {"target":"icpConfig.killRules.whyNowExtension","note":"WhyNow additionally excludes the seller and configured competitors. This does not alter SignalScout's five-code precedence fixture."}
     ]
   },
   "icpConfig": {
@@ -240,8 +256,10 @@
       "competitor_names": []
     },
     "killPatterns": {
-      "solvingInHouse": [],
-      "buildCulture": [],
+      "solvingInHouse": ["internal AI debugging", "in-house production investigation"],
+      "buildCulture": ["invented Jaeger", "invented M3", "open sourced observability", "built internal observability"],
+      "solvingInHousePatterns": ["(built|developed|uses) (an? )?(internal|in-house) ((ai|ai[- ]powered) )?(debugging|incident|root[- ]cause|production investigation) (platform|system|tool)"],
+      "buildCulturePatterns": ["invented (jaeger|m3)", "open[- ]sourc(?:ed|ing) (its|their|an?)? ?(jaeger|m3|observability|tracing|monitoring)", "built (its|their|an?)? ?(own|internal) (observability|monitoring|tracing) (platform|system|stack)"],
       "sizeMetric": {"label": "minEngineeringHeadcount", "floor": 200}
     },
     "painSources": {"statuspage": false, "hn": false, "news": false, "filings": false},
@@ -254,6 +272,10 @@
       "observabilityScale": 1,
       "aiCompatibility": 0.9,
       "competitiveWedge": 0.8
+    },
+    "scoring": {
+      "version": "resolve-scoring-priority-v2",
+      "liveTriggerDays": 90
     },
     "slaDays": {
       "default": 90,
@@ -276,6 +298,26 @@
       "tier1": {"revenue": 500000000, "employees": 2000, "valuation": 5000000000},
       "tier2": {"revenue": 25000000, "employees": 150, "fundingStages": ["series a", "series b", "series c", "series d", "growth", "private equity"]},
       "tier3": {"maxEmployees": 149, "minimumRaised": 2000000}
-    }
+    },
+    "decisionRules": {
+      "tierWeights": {"1": 3, "2": 2, "3": 1, "parked": 0},
+      "maxPriorityRaw": 9.375,
+      "themeBBoost": {"enabled": true, "multiplier": 1.08}
+    },
+    "exclusions": {
+      "sellerLabel": "Resolve",
+      "existingCustomers": [
+        "Coinbase", "DoorDash", "Salesforce", "Snowflake", "Zscaler", "MongoDB", "Expedia Group", "Toast", "Eventbrite", "Pinecone", "MSCI", "Guidewire", "Gametime", "Upwind", "Fireworks", "Blueground"
+      ],
+      "customerSourceUrl": "https://resolve.ai/customers",
+      "competitors": []
+    },
+    "killRules": {
+      "precedence": ["KILL_EXISTING_CUSTOMER", "KILL_UNSELLABLE_ORG", "KILL_SOLVING_IN_HOUSE", "KILL_BUILD_CULTURE", "KILL_BELOW_ICP_SIZE"],
+      "whyNowExtension": "KILL_SELLER_OR_COMPETITOR"
+    },
+    "entityRules": [
+      {"canonicalName":"Uber","aliases":["uber technologies","uber eats","ubereats"],"domains":["uber.com","ubereats.com"]}
+    ]
   }
 }
