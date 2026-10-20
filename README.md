@@ -26,7 +26,7 @@ Node's built-in HTTP server routes requests. Pages are HTML rendered on the serv
 
 The state module saves `.whynow/local-state.json`. It flushes a complete temporary file to disk, then renames it into place. The preceding valid document is retained as `.bak`. A broken primary file restores that backup; if neither is valid, the app reports an error rather than resetting saved work. A backup can be one successful change behind. This is designed for one local server process.
 
-Workspace reads return copies; updates target one workspace ID. HTTP mutations run in sequence to prevent one save overwriting another. Blank workspace names are user labels, not researched seller facts. No prospect data is seeded.
+Workspace reads return copies; updates target one workspace ID. HTTP mutations run in sequence to prevent one save overwriting another. Blank workspace names are user labels, not researched seller facts. The Resolve reference demo may explicitly load its frozen, provenance-marked SignalScout prospect universe; ordinary workspaces remain empty until their own approved configuration or manual input supplies prospects.
 
 Tests use temporary directories and local HTTP servers, never external providers. CI targets Node 22 and runs installation, tests, production dependency audit, and Gitleaks. Railway deployment is deferred to Phase G and requires the owner's explicit OK.
 
@@ -35,6 +35,12 @@ Tests use temporary directories and local HTTP servers, never external providers
 Open Overview and choose **Load Resolve reference demo** to create a load-only, non-approved demo workspace from `config/reference-profiles/resolve-ai.json`. Open **Accounts**, enter a public company name, domain, segment and source URL, then choose **Add and score**. WhyNow applies the workspace's six signal weights, firmographic tier rules, kill rules and decision formula without calling a provider. **Scorecard** explains fit, tier and priority; **Kill Log** retains every disqualification with its code, reason and evidence URL.
 
 Normal seller workspaces must still be owner-approved before this scoring core can use their configuration. The frozen reference demo is an explicit local parity exception; it never writes `approvedAt`, never records a profile approval and never enables delivery.
+
+## Chunk 2: discovery and Today
+
+In the Resolve reference demo, open **Discovery** to see the last background run and its source-backed prospects. Discovery reads the active workspace's configured universe and segment labels, then applies a strict noise gate: the seller, customers, competitors, blocked directories, duplicate domains and existing accounts cannot become prospects. Serper expansion is separately disabled by default with a hard 60-query ceiling when an owner authorizes a run.
+
+Open **Today** for the ranked work queue. Current receipted signals appear as the why-now line; accounts without one say that a refresh is still needed. Killed and skipped accounts stay in state for audit but leave the active queue. Account detail shows size/tier evidence, the six-signal scorecard, active triggers, Refresh account and `new / working / skipped`; skipping requires a typed reason.
 
 ## Interview explanation
 
@@ -58,7 +64,7 @@ Source records contain URL, fetch time, title, extracted text and a SHA-256 cont
 
 “I built the evidence pipeline before adding AI. It identifies itself to sites, follows their crawling rules, limits requests and reuses cached pages. Each saved source includes its URL, time and text fingerprint. Later, I can check that a claimed quote actually appears in that source, instead of trusting the model's wording.”
 
-The Collectors page remains a one-page infrastructure check. Stage 2 seller research uses that guarded runtime; prospect-signal collectors and scoring belong to later stages and have not started.
+The original Collectors page started as a one-page infrastructure check. It now sits behind the Phase B account-refresh workflow: guarded collectors write receipted signals into the six-signal scorecard, kills and tiers while preserving source-level errors.
 
 ## Stage 2: seller research and review
 

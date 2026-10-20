@@ -150,6 +150,19 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Full regression | All tests | 39 files passed; 194 active tests passed, 1 intentional skip |
 | Live verification | `.whynow/phase-b-live-report.json`; `docs/PHASE-B-LIVE-VERIFICATION.md` | Five Resolve-segment accounts; 20-query initial run plus 25-query quality re-check; final correction from saved evidence used 0 queries; 0 OpenAI calls throughout |
 
+## Port mode Chunk 2 traceability — October 20, 2026
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| Workspace-configured Resolve universe | `config/reference-profiles/resolve-ai-discovery.json`; `discovery-universe.cjs`; `reference-demo.cjs` | 52 SignalScout seeds frozen from source commit `130789f1...`, lines 22–145; active discovery reads `workspace.universeSeeds` |
+| Noise gate and exclusions | `company-discovery.cjs` | Recorded tests reject blocked hosts, mismatched name/domain, seller, customers, competitors, duplicates and existing accounts; Fireworks AI/Fireworks alias regression covered |
+| Bounded background discovery | `discovery-runner.cjs`; `chunk2-live-discovery.cjs` | Per-query reservation, separate fail-closed cap, monthly persistence, partial-error isolation and 20–30 target tests |
+| Live Resolve set | `.whynow/chunk2-discovery-report.json`; `docs/CHUNK-2-STATUS.md` | 10 Serper queries, 0 OpenAI, 25 prospects across all 10 segments, 0 errors, 0 forbidden leaks |
+| Today and account detail | `account-lifecycle.cjs`; `server/phase-a-pages.cjs`; `server/router.cjs` | Current-trigger ranking, receipt links, honest no-signal copy, local-only mutation and HTTP browser tests |
+| Simple lifecycle | `updateAccountStatus` | `new / working / skipped`; skip reason required, audited and cleared after status changes; stale edit guarded |
+| Persistence browser check | Atomic state + `/discovery`, `/today`, `/accounts/:id` | Completed run and 25 prospects visible after server restart |
+| Full regression | All tests | 43 files passed; 205 active tests passed, 1 intentional future scaffold skipped |
+
 | Requirement | Implementation | Verification |
 | --- | --- | --- |
 | Node 22, CommonJS, allowed dependencies | package.json, .nvmrc, CI | Seven tests passed on Node 22.23.2 |
