@@ -1,40 +1,43 @@
-const { stableId } = require('../utils.cjs');
+'use strict';
 
-function stripHtml(html) {
-  return String(html).replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
-    .replace(/<[^>]*>/g, ' ').replace(/&(amp|lt|gt|quot|apos|nbsp);/g, (_, key) => ({amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' '}[key]))
-    .replace(/&#(x[\da-f]+|\d+);/gi, (whole, value) => {
-      const code = value[0].toLowerCase() === 'x' ? parseInt(value.slice(1),16) : Number(value);
-      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
-    }).replace(/\s+/g, ' ').trim();
+const crypto=require('node:crypto');
+
+function stripHtml(value='') {
+  return String(value)
+    .replace(/<script\b[\s\S]*?<\/script>/gi,' ')
+    .replace(/<style\b[\s\S]*?<\/style>/gi,' ')
+    .replace(/<[^>]+>/g,' ')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'")
+    .replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
 }
-const normalizeEntityText = value => String(value ?? '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
-const clampScore = value => Math.max(1, Math.min(5, Number(value) || 1));
-function publicReceipt(value) {
-  try { const url = new URL(value); return ['http:','https:'].includes(url.protocol) && !url.username && !url.password ? url.href : null; } catch { return null; }
+function stableId(prefix,value) {
+  if(value===undefined)return crypto.createHash('sha256').update(String(prefix)).digest('hex').slice(0,24);
+  return `${prefix}_${crypto.createHash('sha256').update(String(value)).digest('hex').slice(0,16)}`;
 }
-function signal({score=1, evidenceUrl=null, evidenceText='', observedAt, ...rest} = {}) {
-  const receipt = publicReceipt(evidenceUrl);
-  return {...rest, schemaVersion:1, score:clampScore(score), evidenceUrl:receipt, evidenceText:String(evidenceText), observedAt:observedAt ?? null, inferred:!receipt || rest.inferred === true};
+function clampScore(value){return Math.max(1,Math.min(5,Math.round(Number(value)||1)));}
+function signal({key,score,evidenceUrl,evidenceText,observedAt,sourceId,inferred=false,metadata={},confidence}={}) {
+  const url=String(evidenceUrl||'').trim();
+  return {id:stableId('sig',`${key}:${url}:${evidenceText}:${observedAt||''}`),key,score:clampScore(score),evidenceUrl:url,evidenceText:stripHtml(evidenceText),observedAt:observedAt||new Date().toISOString(),sourceId,inferred:Boolean(inferred||!url),...(Number.isFinite(Number(confidence))?{confidence:Math.max(.2,Math.min(1,Number(confidence)))}:{}),metadata};
 }
-function event({type, evidenceUrl=null, detectedAt, ...rest}) {
-  const receipt = publicReceipt(evidenceUrl);
-  return {...rest, schemaVersion:1, id:stableId(JSON.stringify([type,receipt,detectedAt])), type, evidenceUrl:receipt, detectedAt, inferred:!receipt};
+function event({type,title,evidenceUrl,evidenceText,occurredAt,sourceId,metadata={},painThemes=[],strength}={}) {
+  return {id:stableId('evt',`${type}:${evidenceUrl}:${title}:${occurredAt||''}`),type,title:stripHtml(title),evidenceUrl:String(evidenceUrl||''),evidenceText:stripHtml(evidenceText),occurredAt:occurredAt||new Date().toISOString(),sourceId,painThemes:Array.isArray(painThemes)?painThemes:[],...(Number.isFinite(Number(strength))?{strength:Math.max(1,Math.min(3,Math.round(Number(strength))))}:{}),metadata};
 }
-function withinDays(value, days, now=Date.now()) {
-  const age = Number(new Date(now)) - Date.parse(value);
-  return Number.isFinite(age) && age >= 0 && age <= days * 86400000;
+function unique(values=[]){return Array.from(new Set(values.filter(Boolean)));}
+function withinDays(value,days,now=new Date()) {const time=Date.parse(value||'');return Number.isFinite(time)&&now.getTime()-time<=days*86400000&&time<=now.getTime()+86400000;}
+function domainForTarget(target={}) {if(target.domain)return String(target.domain).replace(/^www\./,'').toLowerCase();try{return new URL(target.website).hostname.replace(/^www\./,'').toLowerCase();}catch{return '';}}
+function normalizeEntityText(value=''){return stripHtml(value).toLowerCase().replace(/\b(inc|incorporated|llc|ltd|limited|corp|corporation|company|technologies|technology)\b/g,' ').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();}
+function evidenceBelongsToTarget(target={},evidenceOrUrl={},fallbackText='') {
+  const evidence=typeof evidenceOrUrl==='string'?{url:evidenceOrUrl,text:fallbackText}:evidenceOrUrl||{};
+  const targetDomain=domainForTarget(target),evidenceUrl=String(evidence.url||evidence.link||evidence.evidenceUrl||'');
+  if(targetDomain&&evidenceUrl){try{const host=new URL(evidenceUrl).hostname.replace(/^www\./,'').toLowerCase();if(host===targetDomain||host.endsWith(`.${targetDomain}`))return true;}catch{}}
+  const targetName=normalizeEntityText(target.discoveryQuality?.targetAccountName||target.name||'');
+  if(targetName.length<4)return false;
+  const text=normalizeEntityText(`${evidence.title||''} ${evidence.snippet||evidence.text||evidence.evidenceText||''}`);
+  if(!text)return false;
+  if(!targetName.includes(' '))return new RegExp(`(?:^|\\s)${targetName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:$|\\s)`).test(text);
+  if(` ${text} `.includes(` ${targetName} `))return true;
+  const compactTarget=targetName.replace(/\s+/g,''),compactText=text.replace(/\s+/g,'');
+  return compactTarget.length>=7&&compactText.includes(compactTarget);
 }
-function domainForTarget(target) {
-  try { return new URL(target.website || `https://${target.domain}`).hostname.toLowerCase().replace(/^www\./,''); } catch { return ''; }
-}
-function evidenceBelongsToTarget(target, url, text='') {
-  const domain = domainForTarget(target);
-  try {
-    const host = new URL(url).hostname.toLowerCase().replace(/^www\./,'');
-    if (domain && (host === domain || host.endsWith(`.${domain}`))) return true;
-  } catch { return false; }
-  const name = normalizeEntityText(target.name);
-  return name.length >= 3 && ` ${normalizeEntityText(text)} `.includes(` ${name} `);
-}
-module.exports = {stripHtml,stableId,clampScore,signal,event,withinDays,domainForTarget,normalizeEntityText,evidenceBelongsToTarget};
+module.exports={clampScore,domainForTarget,evidenceBelongsToTarget,event,normalizeEntityText,signal,stableId,stripHtml,unique,withinDays};

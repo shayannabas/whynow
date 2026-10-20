@@ -7,13 +7,15 @@ const robotsParser = require('robots-parser');
 const {stableId} = require('../utils.cjs');
 const {atomicWrite} = require('../server/state.cjs');
 
-const minute=60000, hour=60*minute;
-const DEFAULT_BUDGETS = Object.freeze(Object.fromEntries([
-  ['statuspage',30,350,15*minute], ['greenhouse',20,500,6*hour],
-  ['lever',20,500,6*hour], ['ashby',20,500,6*hour], ['hn',40,400,hour],
-  ['google_news_rss',20,750,30*minute], ['serper',150,500,6*hour],
-  ['seller_site',25,1000,24*hour], ['engineering_web',20,1500,12*hour], ['robots',30,500,24*hour]
-].map(([key,limit,minIntervalMs,ttlMs])=>[key,Object.freeze({limit,minIntervalMs,ttlMs})])));
+const minute=60000,hour=60*minute,day=24*hour;
+const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
+  ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000],['lever',20,500,6*hour,12000],['ashby',20,500,6*hour,12000],
+  ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
+  ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
+  ['edgar_company_directory',1,500,30*day,15000],['edgar_submissions',20,500,day,15000],['edgar_risk_filing',32,500,day,20000],
+  ['github',20,1000,6*hour,15000],['github_otel',48,1000,7*day,15000],['engineering_web',20,1500,12*hour,12000],
+  ['seller_site',25,1000,day,12000],['seller_customers',2,2000,30*day,12000],['robots',30,500,day,8000]
+].map(([key,limit,minIntervalMs,ttlMs,timeoutMs])=>[key,Object.freeze({limit,minIntervalMs,ttlMs,timeoutMs})])));
 
 class CollectorHttpError extends Error {
   constructor(code,message,status=null) {super(message);this.name='CollectorHttpError';this.code=code;this.status=status;}
@@ -72,7 +74,7 @@ function redirectStaysInDomain(value,domain) {
 }
 
 class CollectorRuntime {
-  constructor({env=process.env,now=Date.now,fetch=publicFetch,lookup=dns.lookup.bind(dns),sleep=ms=>new Promise(r=>setTimeout(r,ms)),cacheDir=path.resolve(__dirname,'../../.whynow/collector-cache'),budgets=DEFAULT_BUDGETS,timeoutMs=8000}={}) {
+  constructor({env=process.env,now=Date.now,fetch=publicFetch,lookup=dns.lookup.bind(dns),sleep=ms=>new Promise(r=>setTimeout(r,ms)),cacheDir=path.resolve(__dirname,'../../.whynow/collector-cache'),budgets=DEFAULT_BUDGETS,timeoutMs}={}) {
     Object.assign(this,{env,now,fetch,lookup,sleep,cacheDir,budgets,timeoutMs});
     this.queues=new Map();this.hostLast=new Map();this.usage={};this.health={};
     for(const key of Object.keys(budgets))this.usage[key]={requests:0,cacheHits:0,lastAt:null};
@@ -99,6 +101,14 @@ class CollectorRuntime {
     const work=(this.queues.get(source)||Promise.resolve()).then(execute);
     this.queues.set(source,work.catch(()=>{}));return work;
   }
+  async requestText(url,source,options={}){const result=await this.request(source,url,options);return {...result,value:result.text};}
+  async requestPublicText(url,source,options={}){return this.requestText(url,source,options);}
+  async requestJson(url,source,options={}){
+    const result=await this.request(source,url,options);let value;
+    try{value=JSON.parse(result.text);}catch{throw new CollectorHttpError('INVALID_JSON',`${source} returned unreadable JSON`,result.status);}
+    return {...result,value};
+  }
+  async requestJsonPost(url,source,payload,options={}){return this.requestJson(url,source,{...options,method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json',...(options.headers||{})}});}
   async perform(source,value,options,depth) {
     if(depth>3)throw new CollectorHttpError('REDIRECT_LIMIT','Too many redirects');
     const checked=await assertPublicHttpsUrl(value,{lookup:this.lookup});
@@ -113,10 +123,10 @@ class CollectorRuntime {
       crawlDelay=(rules.getCrawlDelay(this.identity())||0)*1000;
     }
     const budget=this.budgets[source], usage=this.usage[source];
-    const cacheFile=path.join(this.cacheDir,`${stableId(JSON.stringify([source,url.href,options.method||'GET',options.body||'']))}.json`);
+    const cacheFile=path.join(this.cacheDir,`${stableId(JSON.stringify([source,url.href,options.method||'GET',options.body||'']))}.json`),ttlMs=Number(options.cacheTtlMs)||budget.ttlMs;
     try {
       const cached=JSON.parse(fs.readFileSync(cacheFile,'utf8'));
-      if(cached.schemaVersion===1 && cached.url===url.href && typeof cached.text==='string' && this.now()>=cached.savedAt && this.now()-cached.savedAt<budget.ttlMs) {usage.cacheHits++;return {...cached,fromCache:true};}
+      if(cached.schemaVersion===1 && cached.url===url.href && typeof cached.text==='string' && this.now()>=cached.savedAt && this.now()-cached.savedAt<ttlMs) {usage.cacheHits++;return {...cached,fromCache:true};}
     } catch(error) {if(error.code!=='ENOENT' && !(error instanceof SyntaxError))throw error;}
     if(usage.requests>=budget.limit)throw new CollectorHttpError('BUDGET_EXHAUSTED',`The ${source} request budget is exhausted`);
     const last=Math.max(usage.lastAt??-Infinity,this.hostLast.get(url.host)??-Infinity);
@@ -129,10 +139,15 @@ class CollectorRuntime {
     try {
       const response=await Promise.race([
         (async()=>{
-          const response=await this.fetch(url.href,{...checked,method:source==='serper'?'POST':'GET',body:source==='serper'?options.body:undefined,headers:{...(source==='serper'?options.headers:{}),'User-Agent':this.identity(),'Accept':'text/html, application/json, text/plain, application/xml;q=0.9','Accept-Encoding':'identity'},signal:controller.signal});
-          return {status:response.status,headers:response.headers,text:await response.text()};
+          const method=options.method||(source==='serper'?'POST':'GET');
+          const response=await this.fetch(url.href,{...checked,method,body:options.body,headers:{...(options.headers||{}),'User-Agent':this.identity(),'Accept':'text/html, application/json, text/plain, application/xml;q=0.9','Accept-Encoding':'identity'},signal:controller.signal});
+          let text=await response.text();
+          if(typeof options.transformValue==='function'){
+            try{text=JSON.stringify(options.transformValue(JSON.parse(text)));}catch{throw new CollectorHttpError('INVALID_JSON',`${source} returned unreadable JSON`,response.status);}
+          }
+          return {status:response.status,headers:response.headers,text};
         })(),
-        new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new CollectorHttpError('TIMEOUT','The page request timed out'));},this.timeoutMs);})
+        new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new CollectorHttpError('TIMEOUT','The page request timed out'));},Number(options.timeoutMs)||Number(this.timeoutMs)||budget.timeoutMs||8000);})
       ]);
       if([301,302,303,307,308].includes(response.status)) {
         if(source==='serper')throw new CollectorHttpError('REDIRECT_BLOCKED','Search API redirects are not allowed');

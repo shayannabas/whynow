@@ -77,10 +77,16 @@ it('retains source revisions and accepts exact whitespace-normalized quotes only
   const copy=getSource(b.state,a.source.id);copy.text='overwrite';expect(getSource(b.state,a.source.id).text).toBe(a.source.text);
 });
 it('normalizes evidence without inventing a receipt',()=>{
-  expect(signal({score:8})).toMatchObject({score:5,inferred:true,evidenceUrl:null});
+  expect(signal({score:8})).toMatchObject({score:5,inferred:true,evidenceUrl:''});
   expect(stripHtml('<script>secret()</script><p>A &amp; B</p>')).toBe('A & B');
   expect(evidenceBelongsToTarget({name:'Example',domain:'example.org'},'https://example.org/blog')).toBe(true);
   expect(evidenceBelongsToTarget({name:'Example',domain:'example.org'},'https://news.org','Examples are many')).toBe(false);
+});
+it('exposes recorded-response helpers without bypassing the guarded runtime',async()=>{
+  const h=harness();
+  h.runtime.fetch=async(url,opts)=>{h.calls.push({url,opts});return response(url.endsWith('/robots.txt')?'User-agent: *\nAllow: /':'{"ok":true}',200,{'content-type':'application/json'});};
+  expect((await h.runtime.requestJson('https://api.example.org/data','seller_site')).value).toEqual({ok:true});
+  expect(h.calls[1].opts.headers['User-Agent']).toContain('WhyNow/0.1');
 });
 it('search uses the runtime and never puts API keys in cache or health',async()=>{
   const h=harness({fetch:async()=>response('{"organic":[]} ',200,{'content-type':'application/json'})});
