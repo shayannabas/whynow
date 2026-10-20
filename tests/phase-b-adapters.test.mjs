@@ -17,15 +17,15 @@ describe('guarded live adapters over recorded responses',()=>{
     expect(calls).toHaveLength(1);expect(calls[0].source).toBe('greenhouse');expect(output.signals.map(row=>row.key)).toEqual(['observabilityScale','techStack']);expect(output.events[0].evidenceUrl).toBe('https://jobs.example/j1');
   });
 
-  it('combines Statuspage, HN and Google News recorded responses while keeping zeros honest',async()=>{
-    const target={id:'a1',name:'Acme',domain:'acme.example',statusPageUrl:'https://status.acme.example'},incident=fixture('statuspage-incident').incidents[0],rss=fixture('google-news-rss').xml;
+  it('combines Statuspage, HN and dated Serper News responses while keeping zeros honest',async()=>{
+    const target={id:'a1',name:'Acme',domain:'acme.example',statusPageUrl:'https://status.acme.example'},incident=fixture('statuspage-incident').incidents[0];
     const runtime={requestJson:async(url,source)=>{
       if(source==='statuspage'&&url.endsWith('/status.json'))return {value:{page:{id:'acme'}}};
       if(source==='statuspage')return {value:{incidents:[incident]}};
       if(source==='hn')return {value:{hits:[]}};
       throw new Error(`unexpected ${source}`);
-    },requestText:async(_url,source)=>{expect(source).toBe('google_news_rss');return {value:rss.replaceAll('Coinbase','Acme')};}};
-    const output=await collectActivePain(target,{runtime,now:new Date('2026-07-12T12:00:00Z')});
+    },requestText:async()=>{throw new Error('Google News RSS must not run.');}};
+    const output=await collectActivePain(target,{runtime,now:new Date('2026-07-12T12:00:00Z'),strictFreshness:true,windowDays:30,slaConfig:{outage:30},searchResults:[{kind:'active_pain_news',title:'Acme API outage affected customers',snippet:'The Acme production platform was unavailable during a service incident.',url:'https://news.example/acme-incident',date:'1 day ago',sourceId:'serper'}]});
     expect(output.events).toHaveLength(2);expect(output.signals).toHaveLength(2);expect(output.events.every(row=>row.evidenceUrl)).toBe(true);
   });
 
