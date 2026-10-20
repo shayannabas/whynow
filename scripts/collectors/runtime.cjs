@@ -88,7 +88,7 @@ class CollectorRuntime {
   async request(source,value,options={}) {
     this.identity();
     if(!Object.hasOwn(this.budgets,source))throw new CollectorHttpError('UNKNOWN_SOURCE','Unknown collector source');
-    if(source==='serper' && new URL(value).href!=='https://google.serper.dev/search')throw new CollectorHttpError('UNSAFE_URL','Search API destination is fixed');
+    if(source==='serper' && !['https://google.serper.dev/search','https://google.serper.dev/news'].includes(new URL(value).href))throw new CollectorHttpError('UNSAFE_URL','Search API destination is fixed');
     const execute=async()=>{
       try {
         const result=await this.perform(source,value,options,0);

@@ -10,13 +10,16 @@ const {collectTechCulture}=require('./collectors/tech-culture.cjs');
 const {collectAiCompatibility}=require('./collectors/ai-compatibility.cjs');
 const {collectCompetitiveWedge}=require('./collectors/competitive-wedge.cjs');
 const {collectRevenueSensitivity}=require('./collectors/revenue-sensitivity.cjs');
+const {collectFirmographics}=require('./collectors/firmographics.cjs');
 const {collectEdgarFormDUniverse}=require('./collectors/edgar-form-d.cjs');
-const {search,serperSettings,assertSerperReady}=require('./serper.cjs');
+const {search,searchNews,serperSettings,assertSerperReady}=require('./serper.cjs');
+const {phaseBQueryPlan}=require('./collectors/search-evidence.cjs');
 const {collectorConfigForWorkspace,collectorTargetForAccount}=require('./phase-b-config.cjs');
 const {phaseAConfigForWorkspace}=require('./phase-a-config.cjs');
 const {scoreAccount}=require('./score-account.cjs');
 
-const defaultCollectors={collectHiring,collectActivePain,collectSerperEvidence,collectExecutiveChange,collectTechCulture,collectAiCompatibility,collectCompetitiveWedge,collectRevenueSensitivity,collectEdgarFormDUniverse};
+const defaultCollectors={collectHiring,collectActivePain,collectSerperEvidence,collectExecutiveChange,collectTechCulture,collectAiCompatibility,collectCompetitiveWedge,collectRevenueSensitivity,collectFirmographics,collectEdgarFormDUniverse};
+function phaseBSerperLimit(env={}){const requested=Number(env.PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT);return Number.isInteger(requested)&&requested>0?Math.min(5,requested):Math.min(5,Math.max(1,serperSettings(env).perRunLimit));}
 function uniq(rows=[],key=row=>row.id||JSON.stringify(row)){return [...new Map(rows.filter(Boolean).map(row=>[key(row),row])).values()];}
 function signalWins(current={},incoming={}){
   const currentReceipt=Boolean(current.evidenceUrl)&&!current.inferred,incomingReceipt=Boolean(incoming.evidenceUrl)&&!incoming.inferred;
@@ -39,7 +42,7 @@ function safeError(error){const status=Number.isInteger(error?.status)?error.sta
 function sourceErrors(runtime){return Object.entries(runtime.snapshot().health||{}).filter(([,row])=>row.status==='error').map(([source,row])=>({collectorId:source,...safeError(row)}));}
 function findRun(workspace,id){return workspace.runs.find(row=>row.id===id&&row.type==='account_collector_refresh');}
 
-function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),now=()=>new Date(),id=()=>randomUUID(),collectors=defaultCollectors,searchProvider=search}={}){
+function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),now=()=>new Date(),id=()=>randomUUID(),collectors=defaultCollectors,searchProvider=(query,options)=>options.kind==='active_pain_news'?searchNews(query,options):search(query,options)}={}){
   const pending=new Map();
   const updateRun=async(workspaceId,runId,fn)=>mutate(state=>{const workspace=state.workspaces[workspaceId],run=findRun(workspace,runId);if(!run)throw new Error('Collector run disappeared.');fn(run,workspace);return state;});
   const persistRuntime=(workspace,runtime)=>{workspace.budgets.phaseBCollector={day:now().toISOString().slice(0,10),...runtime.snapshot()};};
@@ -64,11 +67,12 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
     if(settings.enabled){
       try{
         assertSerperReady(settings);
-        searchResults=await collectors.collectSerperEvidence(target,{runtime,maxQueries:settings.perRunLimit,search:query=>searchProvider(query,{runtime,env,num:10}),beforeQuery:()=>reserveSerper(workspaceId,runId,settings.monthlyLimit)});
+        searchResults=await collectors.collectSerperEvidence(target,{runtime,maxQueries:phaseBSerperLimit(env),queryPlan:phaseBQueryPlan,search:(query,descriptor)=>searchProvider(query,{runtime,env,num:10,kind:descriptor.kind}),beforeQuery:()=>reserveSerper(workspaceId,runId,settings.monthlyLimit)});
         await apply(workspaceId,accountId,runId,'search_evidence',{signals:[],events:[],killHints:[],itemsFound:searchResults.length},runtime);
       }catch(error){await fail(workspaceId,runId,'search_evidence',error,runtime);}
     }else await updateRun(workspaceId,runId,run=>run.collectors.push({collectorId:'search_evidence',status:'disabled',signals:0,events:0,killHints:0,itemsFound:0}));
     const steps=[
+      ['firmographics',()=>collectors.collectFirmographics(target,{runtime,now:now(),searchResults})],
       ['hiring',()=>collectors.collectHiring(target,{runtime,now:now(),painThemeConfig:collectorConfig.painThemeConfig,slaConfig:collectorConfig.slaDays})],
       ['active_pain',()=>collectors.collectActivePain(target,{runtime,now:now(),searchResults,painThemeConfig:collectorConfig.painThemeConfig})],
       ['executive_change',()=>collectors.collectExecutiveChange(target,{now:now(),searchResults,slaConfig:collectorConfig.slaDays})],
@@ -97,4 +101,4 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
   return {start,wait};
 }
 
-module.exports={createPhaseBRefreshCoordinator,defaultCollectors,mergeCollectorResult,signalWins};
+module.exports={createPhaseBRefreshCoordinator,defaultCollectors,mergeCollectorResult,phaseBSerperLimit,signalWins};

@@ -11,6 +11,21 @@ function serperQueries(target) {
   ];
 }
 
+// The live adapter stays within five queries per account: one dated news query,
+// one combined engineering/AI query, leadership, and two firmographic passes.
+// The frozen SignalScout query plan above remains unchanged for parity tests.
+function phaseBQueryPlan(target){
+  const name=String(target.name||'').replace(/["\n\r]/g,' ').trim();
+  if(!name)return [];
+  return [
+    {kind:'active_pain_news',query:`"${name}" outage OR incident OR downtime OR degraded`},
+    {kind:'tech_and_ai',query:`"${name}" Kubernetes OR microservices OR observability OR SRE OR LLM OR Copilot OR Cursor engineering`},
+    {kind:'exec_change',query:`"${name}" (appoints OR joins OR hires OR names OR leaves OR departs OR resigns OR "steps down") ("VP Engineering" OR CTO OR SVP OR "Head of Platform" OR "Head of SRE")`},
+    {kind:'firmographics_size',query:`"${name}" employees revenue public company`},
+    {kind:'firmographics_funding',query:`"${name}" raised funding valuation founded headquartered`},
+  ];
+}
+
 function trackedPersonQueries(trackedPeople = []) {
   return (trackedPeople || [])
     .filter((person) => person?.watch !== false && String(person.name || "").trim())
@@ -47,7 +62,8 @@ async function collectSerperEvidence(target, context) {
   const results = [];
   const kinds = new Set(context.kinds || []);
   const limit=Number.isInteger(context.maxQueries)&&context.maxQueries>=0?context.maxQueries:Infinity;
-  for (const descriptor of serperQueries(target).filter((item) => !kinds.size || kinds.has(item.kind)).slice(0,limit)) {
+  const plan=typeof context.queryPlan==='function'?context.queryPlan(target):serperQueries(target);
+  for (const descriptor of plan.filter((item) => !kinds.size || kinds.has(item.kind)).slice(0,limit)) {
     if(context.beforeQuery)await context.beforeQuery(descriptor);
     const organic=context.search
       ? await context.search(descriptor.query,{num:10,kind:descriptor.kind})
@@ -68,4 +84,4 @@ async function collectSerperEvidence(target, context) {
   return results;
 }
 
-module.exports = { collectSerperEvidence, collectTrackedPeopleEvidence, serperQueries, trackedPersonQueries };
+module.exports = { collectSerperEvidence, collectTrackedPeopleEvidence, phaseBQueryPlan, serperQueries, trackedPersonQueries };

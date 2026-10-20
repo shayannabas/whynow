@@ -8,7 +8,8 @@ const {CollectorRuntime,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress}=re
 const {recordSource,quoteIsGrounded,getSource}=require('../scripts/sources.cjs');
 const {defaultState}=require('../scripts/server/state.cjs');
 const {signal,stripHtml,evidenceBelongsToTarget}=require('../scripts/collectors/common.cjs');
-const {search}=require('../scripts/serper.cjs');
+const {search,searchNews}=require('../scripts/serper.cjs');
+const {phaseBQueryPlan}=require('../scripts/collectors/search-evidence.cjs');
 const dirs=[];
 afterEach(()=>{for(const dir of dirs.splice(0))fs.rmSync(dir,{recursive:true,force:true});});
 const lookup=async()=>[{address:'93.184.215.14',family:4}];
@@ -100,4 +101,9 @@ it('search uses the runtime and never puts API keys in cache or health',async()=
   expect(await search('public company',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'},enforceEnabled:false})).toEqual([]);
   const cached=fs.readdirSync(h.runtime.cacheDir).map(f=>fs.readFileSync(path.join(h.runtime.cacheDir,f),'utf8')).join('');
   expect(cached).not.toContain('test-secret');expect(JSON.stringify(h.runtime.snapshot())).not.toContain('test-secret');
+});
+it('uses a five-query collector plan and preserves dated Serper News receipts',async()=>{
+  expect(phaseBQueryPlan({name:'Acme'}).map(row=>row.kind)).toEqual(['active_pain_news','tech_and_ai','exec_change','firmographics_size','firmographics_funding']);
+  const h=harness({fetch:async(_url,_options)=>response('{"news":[{"title":"Acme incident","link":"https://news.example/acme","snippet":"Acme outage","date":"2 days ago","source":"Example News"}]}',200,{'content-type':'application/json'})});
+  expect(await searchNews('Acme outage',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'},enforceEnabled:false})).toEqual([{title:'Acme incident',url:'https://news.example/acme',snippet:'Acme outage',date:'2 days ago',source:'Example News'}]);
 });
