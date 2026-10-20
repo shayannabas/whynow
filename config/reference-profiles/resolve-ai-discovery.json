@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "kind": "load_only_discovery_reference",
+  "seller": "Resolve AI",
+  "sourceProject": "flowfire",
+  "sourceCommit": "130789f1bac1d5e11f5f5154f269155dc17f2d21",
+  "sourceFile": "scripts/icp-universe.cjs",
+  "sourceLines": "22-145",
+  "segments": {
+    "crypto_fintech": [
+      {"name":"Coinbase","domain":"coinbase.com","subIndustry":"exchange"},
+      {"name":"Kraken","domain":"kraken.com","subIndustry":"exchange"},
+      {"name":"Gemini","domain":"gemini.com","subIndustry":"exchange"},
+      {"name":"Robinhood","domain":"robinhood.com","subIndustry":"broker"},
+      {"name":"Circle","domain":"circle.com","subIndustry":"payments"},
+      {"name":"Fireblocks","domain":"fireblocks.com","subIndustry":"custody"}
+    ],
+    "delivery_marketplaces": [
+      {"name":"Uber Eats","domain":"ubereats.com","subIndustry":"restaurant delivery"},
+      {"name":"Instacart","domain":"instacart.com","subIndustry":"grocery delivery"},
+      {"name":"Gopuff","domain":"gopuff.com","subIndustry":"last mile"},
+      {"name":"Deliveroo","domain":"deliveroo.com","subIndustry":"restaurant delivery"},
+      {"name":"Wolt","domain":"wolt.com","subIndustry":"restaurant delivery"}
+    ],
+    "ticketing_live_events": [
+      {"name":"Ticketmaster","domain":"ticketmaster.com","subIndustry":"primary ticketing"},
+      {"name":"SeatGeek","domain":"seatgeek.com","subIndustry":"resale marketplace"},
+      {"name":"StubHub","domain":"stubhub.com","subIndustry":"resale marketplace"},
+      {"name":"AXS","domain":"axs.com","subIndustry":"primary ticketing"},
+      {"name":"DICE","domain":"dice.fm","subIndustry":"event discovery"}
+    ],
+    "sports_betting": [
+      {"name":"DraftKings","domain":"draftkings.com","subIndustry":"sportsbook"},
+      {"name":"FanDuel","domain":"fanduel.com","subIndustry":"sportsbook"},
+      {"name":"BetMGM","domain":"betmgm.com","subIndustry":"sportsbook"},
+      {"name":"Caesars Sportsbook","domain":"caesars.com","subIndustry":"sportsbook"},
+      {"name":"Flutter Entertainment","domain":"flutter.com","subIndustry":"betting platform"}
+    ],
+    "data_ai_infrastructure": [
+      {"name":"Databricks","domain":"databricks.com","subIndustry":"data platform"},
+      {"name":"Confluent","domain":"confluent.io","subIndustry":"data platform"},
+      {"name":"Pinecone","domain":"pinecone.io","subIndustry":"database"},
+      {"name":"Together AI","domain":"together.ai","subIndustry":"ai infrastructure"},
+      {"name":"Fireworks AI","domain":"fireworks.ai","subIndustry":"ai infrastructure"},
+      {"name":"Grafana Labs","domain":"grafana.com","subIndustry":"observability"}
+    ],
+    "cybersecurity": [
+      {"name":"CrowdStrike","domain":"crowdstrike.com","subIndustry":"endpoint security"},
+      {"name":"Wiz","domain":"wiz.io","subIndustry":"cloud security"},
+      {"name":"Snyk","domain":"snyk.io","subIndustry":"application security"},
+      {"name":"Vanta","domain":"vanta.com","subIndustry":"security compliance"},
+      {"name":"Zscaler","domain":"zscaler.com","subIndustry":"cloud security"}
+    ],
+    "travel_hospitality": [
+      {"name":"Airbnb","domain":"airbnb.com","subIndustry":"travel marketplace"},
+      {"name":"Booking.com","domain":"booking.com","subIndustry":"booking platform"},
+      {"name":"Hopper","domain":"hopper.com","subIndustry":"travel marketplace"},
+      {"name":"Sonder","domain":"sonder.com","subIndustry":"property operations"},
+      {"name":"Expedia Group","domain":"expediagroup.com","subIndustry":"booking platform"}
+    ],
+    "restaurant_commerce_saas": [
+      {"name":"Toast","domain":"toasttab.com","subIndustry":"point of sale"},
+      {"name":"Olo","domain":"olo.com","subIndustry":"online ordering"},
+      {"name":"ChowNow","domain":"chownow.com","subIndustry":"online ordering"},
+      {"name":"Owner.com","domain":"owner.com","subIndustry":"restaurant operations"},
+      {"name":"SpotOn","domain":"spoton.com","subIndustry":"merchant platform"}
+    ],
+    "insurance_vertical_saas": [
+      {"name":"Guidewire","domain":"guidewire.com","subIndustry":"core insurance platform"},
+      {"name":"Duck Creek Technologies","domain":"duckcreek.com","subIndustry":"core insurance platform"},
+      {"name":"Coalition","domain":"coalitioninc.com","subIndustry":"cyber insurance"},
+      {"name":"Lemonade","domain":"lemonade.com","subIndustry":"insurtech carrier"},
+      {"name":"Snapsheet","domain":"snapsheetclaims.com","subIndustry":"claims platform"}
+    ],
+    "enterprise_platforms": [
+      {"name":"Salesforce","domain":"salesforce.com","subIndustry":"crm"},
+      {"name":"ServiceNow","domain":"servicenow.com","subIndustry":"workflow platform"},
+      {"name":"Atlassian","domain":"atlassian.com","subIndustry":"developer collaboration"},
+      {"name":"Workday","domain":"workday.com","subIndustry":"hr platform"},
+      {"name":"HubSpot","domain":"hubspot.com","subIndustry":"marketing platform"}
+    ]
+  }
+}

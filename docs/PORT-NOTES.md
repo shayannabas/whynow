@@ -167,3 +167,13 @@ ATS JSON has a source-specific 16 MB ceiling because large public boards such as
 `tests/fixtures/parity/signalscout-phase-b.json` freezes 18 pure collector outputs from the same SignalScout commit. WhyNow reproduces them exactly without importing SignalScout at test time. For example, the Binance fixture turns its public Greenhouse reliability/AI-RCA roles into stack and hiring triggers, then the Phase A engine recalculates fit and priority; the job URLs remain the explanation for every point earned. Live adapters add network safety and persistence around that unchanged classification contract.
 
 The live Binance account is not automatically `KILL_UNSELLABLE_ORG`. The parity fixture supplies an explicit unavailable prospecting surface and receipt; the saved live evidence does not. WhyNow never infers a kill from size or fit alone.
+
+## Chunk 2 discovery and SDR surface
+
+### `config/reference-profiles/resolve-ai-discovery.json` and `scripts/discovery-universe.cjs`
+
+**What they do:** Freeze SignalScout's curated Resolve prospect universe as load-only configuration with its source commit and lines. **How they decide:** Each seed has a real name, canonical domain, segment and official-site receipt; the reference loader copies those values into the demo workspace's `universeSeeds`. **What changed from SignalScout:** Resolve companies are not hidden module constants. Discovery code reads the active workspace, so another approved seller can provide a different universe without changing code.
+
+### `scripts/company-discovery.cjs`
+
+**What it does:** Builds a bounded workspace-segment search matrix, applies the noise/exclusion gate, balances candidates across segments and promotes receipted companies into atomic state. **How it decides:** Search results need an official-looking name/domain match plus segment terms. The seller, customers, competitors, existing accounts, blocked publishers/directories, duplicates and unclassified rows never become prospects. **What changed from SignalScout:** The 60-query hard ceiling is the owner-authorized light-demo limit rather than SignalScout's 150-query production matrix. SignalScout's seed behavior is retained through workspace configuration, and every promoted account starts with honest uncollected signals rather than invented fit evidence.
