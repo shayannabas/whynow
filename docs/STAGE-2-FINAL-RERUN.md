@@ -1,6 +1,6 @@
 # Stage 2 final automated rerun
 
-Run once on October 19, 2026. This was the last automated Stage 2 iteration. Stage 3 was not started and no profile was approved.
+Run once on October 19, 2026. This was the last automated Stage 2 iteration that included page research. A later saved-pages-only draft attempt is recorded below. Stage 3 was not started and no profile was approved.
 
 ## Execution controls
 
@@ -106,6 +106,35 @@ This check searches receipt text for the principal organization named by each sa
 
 Offline tests use saved-page excerpts plus a synthetic 20-source stress case. They prove priority weighting, deep customer/competitor-name inclusion, navigation exclusion and the 120,000-byte hard limit. The complete suite passes: 22 files, 112 passed tests and one intentionally skipped Stage 3 scaffold test (113 total). This is an offline checkpoint only. A draft-only GPT-4o mini rerun against these already-saved pages requires a separate owner OK; it will make no fetch or Serper call and will not approve any profile.
 
+## Authorized saved-pages packet redraft attempt
+
+On October 19, the owner authorized one GPT-4o mini drafting call per seller against the already-saved final-run pages and fixed evidence packet from commit `68774af`. The authorization allowed no page fetches or Serper queries, the existing single transient retry only, a temporary process-only $0.05 cap, no automatic approval, and an immediate return to disabled/zero normal OpenAI settings.
+
+The executable preflight used each complete serialized request, including prompt and receipt-ID schema, with a conservative estimate of one input token per three UTF-8 request bytes plus fixed overhead:
+
+| Seller | Packet bytes | Request bytes | Estimated input tokens | Estimated input cost | Maximum estimated call cost |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Resolve AI | 119,824 | 171,685 | 57,911 | $0.008687 | $0.011145 |
+| Shopify | 119,852 | 175,534 | 59,194 | $0.008879 | $0.011337 |
+| Vercel | 93,160 | 141,203 | 47,751 | $0.007163 | $0.009621 |
+| **Total** | **332,836** | **488,422** | **164,856** | **$0.024729** | **$0.032103** |
+
+The $0.032103 maximum estimate was below both the owner's $0.04 stop threshold and the temporary $0.05 process cap. The old 48 KB client request guard was raised to a bounded 360 KB guard, and cost reservation now uses the same conservative three-bytes-per-token estimate. Offline tests cover the larger request range and spending reservation.
+
+The run then stopped on the first seller. Resolve AI made one provider attempt and persisted the safe `REQUEST_FAILED` status in the isolated working state. No transient retry condition was triggered. Shopify and Vercel made zero provider attempts. The safe client intentionally discarded the provider response body, so no unsupported diagnosis is claimed and actual token usage/cost is unavailable. No generated profile or new snapshot was produced, and the main acceptance state was never overwritten.
+
+Post-attempt checks confirmed `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. No page fetch, Serper query, approval or Stage 3 work occurred. The previous three profiles remain unchanged in `needs_review`; another provider attempt requires a new explicit owner authorization.
+
+### Current pass-bar state after the stopped attempt
+
+| Seller | Customers with first-party sources | Competitors with sources | Size metric and target match | Buyer titles | Champion titles | Blocking / advisory | Top blocking reasons |
+| --- | --- | --- | --- | --- | --- | ---: | --- |
+| Resolve AI | 2 — Coinbase, DoorDash | 0 | Employees, floor 1,000; matches “1,000+ employees” | CTO; Head of Engineering; IT Operations Manager | Site Reliability Engineer; DevOps Engineer; Product Manager | 8 / 4 | vendor-seeking queries (5); weak claim/receipt overlap (2); empty competitors (1) |
+| Shopify | 0 | 0 | Employee Count, floor 50; compatible with “small to large enterprises” | Chief Marketing Officer; E-commerce Manager; Retail Operations Director | Store Manager; Digital Marketing Specialist; Product Manager | 25 / 1 | vendor-seeking queries (21); weak claim/receipt overlap (2); empty customers (1); empty competitors (1) |
+| Vercel | 0 | 0 | employees, floor 100; compatible with “mid-sized to large enterprises” | CTO; VP of Engineering; Head of DevOps; Product Manager | Software Engineer; Platform Engineer; DevOps Engineer; Technical Architect | 16 / 5 | vendor-seeking queries (10); weak claim/receipt overlap (4); empty customers (1); empty competitors (1) |
+
+Final offline verification after recording the stopped attempt: 22 test files, 113 passed tests and one intentionally skipped Stage 3 scaffold test (114 total).
+
 ## Owner action
 
-Do not begin manual fixes yet. The owner will first review the offline evidence-packet report and decide whether to authorize one draft-only GPT-4o mini call per seller against the saved pages. No profile will be auto-approved. If the owner authorizes it, the authorization must be recorded in `AGENTS.md` before the calls and the normal OpenAI settings must be restored to disabled/zero immediately afterward.
+Do not begin manual fixes yet. The authorized saved-pages drafting attempt stopped before producing a new profile. No retry is authorized. The owner must decide the next action; no profile may be auto-approved, and normal OpenAI settings remain disabled/zero.

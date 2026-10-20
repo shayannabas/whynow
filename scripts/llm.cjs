@@ -4,6 +4,8 @@ const {getWorkspace,updateWorkspace}=require('./server/state.cjs');
 const ENDPOINT='https://api.openai.com/v1/chat/completions';
 const DEFAULT_MODEL='gpt-4o-mini';
 const DEFAULT_TIMEOUT_MS=90000;
+const MAX_REQUEST_BYTES=360000;
+const ESTIMATED_BYTES_PER_INPUT_TOKEN=3;
 class LlmError extends Error {constructor(code,message){super(message);this.code=code;}}
 function settings(env={}) {
   const model=env.OPENAI_MODEL||DEFAULT_MODEL;
@@ -21,6 +23,15 @@ function assertReady(config) {
   if(![DEFAULT_MODEL,'gpt-4o-mini-2024-07-18'].includes(config.model))throw new LlmError('MODEL_UNSUPPORTED','This integration is configured for GPT-4o mini only; review pricing before changing models.');
   if(!config.limitMicros||!config.callLimit)throw new LlmError('BUDGET_MISSING','Set an approved positive spending limit and request limit before enabling calls.');
 }
+function estimatedUsage({bodyBytes,maxOutputTokens}) {
+  const inputTokens=Math.ceil((bodyBytes+2048)/ESTIMATED_BYTES_PER_INPUT_TOKEN);
+  const inputMicros=inputTokens*0.15,outputMicros=maxOutputTokens*0.60;
+  return {inputTokens,maxOutputTokens,inputMicros,outputMicros,reserveMicros:Math.ceil(inputMicros+outputMicros)};
+}
+function serializeRequestBody({model,messages,schema,name,maxOutputTokens}) {
+  return JSON.stringify({model,messages,store:false,temperature:0,max_completion_tokens:maxOutputTokens,
+    response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}});
+}
 function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date().toISOString(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}) {
   if(typeof read!=='function'||typeof mutate!=='function')throw new Error('A serialized persistent state adapter is required');
   const pending=new Map();
@@ -29,15 +40,14 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
     if(!promptVersion || typeof promptVersion!=='string' || promptVersion.length>100 || typeof validate!=='function' || !schema || !/^[a-zA-Z0-9_-]{1,64}$/.test(name))throw new LlmError('INVALID_INPUT','A versioned prompt, schema and local validator are required.');
     if(!Array.isArray(messages)||!messages.length||messages.length>20||messages.some(m=>!['system','user','assistant'].includes(m.role)||typeof m.content!=='string'))throw new LlmError('INVALID_INPUT','Use bounded text-only messages.');
     if(!Number.isInteger(maxOutputTokens)||maxOutputTokens<1||maxOutputTokens>4096)throw new LlmError('INVALID_INPUT','Output must be limited to 1–4096 tokens.');
-    const body=JSON.stringify({model:config.model,messages,store:false,temperature:0,max_completion_tokens:maxOutputTokens,
-      response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}});
+    const body=serializeRequestBody({model:config.model,messages,schema,name,maxOutputTokens});
     const bytes=Buffer.byteLength(body);
-    if(bytes>48000)throw new LlmError('INPUT_TOO_LARGE','Source excerpts exceed the AI request limit.');
+    if(bytes>MAX_REQUEST_BYTES)throw new LlmError('INPUT_TOO_LARGE','Source excerpts exceed the AI request limit.');
     // Standard mini pricing: $0.15 / 1M input, $0.60 / 1M output tokens.
-    // UTF-8 request bytes + overhead overestimate text tokens. Reserve this full
-    // upper bound before EVERY attempt; never refund uncertain/failed requests.
-    // It intentionally overcounts usage, rather than risk spending after a crash.
-    const reserveMicros=Math.ceil((bytes+2048)*0.15+maxOutputTokens*0.60);
+    // JSON and receipt IDs tokenize more densely than prose, so use a conservative
+    // three UTF-8 bytes per input token plus fixed overhead. Reserve that estimate
+    // before EVERY attempt and never refund uncertain or failed requests.
+    const {reserveMicros}=estimatedUsage({bodyBytes:bytes,maxOutputTokens});
     const key=createHash('sha256').update(JSON.stringify({promptVersion,body})).digest('hex');
     const pendingKey=`${workspaceId}:${key}`;
     const check=value=>{try {if(validate(structuredClone(value))!==true)throw Error();}catch {throw new LlmError('INVALID_OUTPUT','OpenAI output did not pass local validation.');}return value;};
@@ -96,4 +106,4 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
   }
   return {generate};
 }
-module.exports={createLlm,settings,LlmError,DEFAULT_MODEL,DEFAULT_TIMEOUT_MS,ENDPOINT};
+module.exports={createLlm,settings,estimatedUsage,serializeRequestBody,LlmError,DEFAULT_MODEL,DEFAULT_TIMEOUT_MS,MAX_REQUEST_BYTES,ESTIMATED_BYTES_PER_INPUT_TOKEN,ENDPOINT};

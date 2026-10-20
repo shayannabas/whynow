@@ -1,5 +1,15 @@
 # WhyNow traceability
 
+## Saved-pages packet redraft attempt — 2026-10-19
+
+The owner authorized one GPT-4o mini drafting call for each of Resolve AI, Shopify and Vercel using only the saved final-run pages and fixed packet from commit `68774af`. `AGENTS.md` records the exact limits: no page fetches, no Serper, existing single transient retry only, temporary process-only $0.05 cap, no automatic approval and immediate confirmation that normal settings are disabled/zero.
+
+Preflight measured the complete requests at 171,685, 175,534 and 141,203 bytes. Using a conservative three request bytes per input token plus fixed overhead, the estimated input cost was $0.024729 and maximum estimated input-plus-output cost was $0.032103. This passed the owner's $0.04 stop threshold. The client now accepts a bounded 360 KB request and reserves against the same conservative token estimate; its larger-request and budget behavior are offline-tested.
+
+The run stopped on the first seller. Resolve AI made one provider attempt and the isolated working state recorded safe status `REQUEST_FAILED`; the existing transient retry condition was not triggered. Shopify and Vercel made zero attempts. No generated output reached the main acceptance state, so the existing three `needs_review` profiles and their pass-bar results remain unchanged. The safe client did not expose the provider response body, and this record does not speculate about its contents.
+
+After the stopped attempt, `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0` were confirmed without displaying secrets. There were zero page fetches, zero Serper queries, no approvals and no Stage 3 work. The full suite passes with 113 tests across 22 files and one intentional Stage 3 skip. No further provider attempt is authorized.
+
 ## Stage 2 evidence-packet root-cause audit — 2026-10-19
 
 The final-run pages were present, but the old drafting input capped the complete receipt menu at 24,000 bytes, split excerpt space across every selected source and sampled from each page's beginning. Resolve AI and Shopify nearly filled that ceiling with only 101 and 122 receipts; Vercel produced 74. This favored headers, navigation and hero copy over customer names and comparison evidence farther down the saved pages.
@@ -8,7 +18,7 @@ The offline fix raises the hard ceiling to 120,000 bytes, assigns larger page bu
 
 Rebuilding the unchanged saved sources produced 119,824 bytes/548 receipts for Resolve AI, 119,852/605 for Shopify and 93,160/489 for Vercel. All checked organization names on the individual customer and comparison pages now occur in their source's receipt menu. Names not actually present in an index page's saved text are reported as `not present in saved source`, not as packet failures. The source-by-source counts and before/after name matrix are in `docs/STAGE-2-FINAL-RERUN.md`.
 
-Three new tests cover saved-page customer/competitor excerpts, priority-weighted budgets, navigation exclusion and a 20-source limit stress case. Full verification passed: 22 files, 112 tests passed and one intentionally skipped Stage 3 scaffold test (113 total). The first sandboxed run could not bind local HTTP test ports; the unchanged suite passed when rerun with localhost permission. No page fetch, Serper query, OpenAI call, profile edit or approval occurred. `AGENTS.md` was not changed and Stage 3 was not started.
+Three new tests cover saved-page customer/competitor excerpts, priority-weighted budgets, navigation exclusion and a 20-source limit stress case. Full verification passed: 22 files, 112 tests passed and one intentionally skipped Stage 3 scaffold test (113 total). The first sandboxed run could not bind local HTTP test ports; the unchanged suite passed when rerun with localhost permission. No page fetch, Serper query, OpenAI call, profile edit or approval occurred. At that offline checkpoint `AGENTS.md` had not been changed and Stage 3 had not started.
 
 The earlier instruction to proceed directly to manual correction is superseded by this checkpoint. Manual fixes are paused. A saved-pages-only GPT-4o mini drafting run requires a new explicit owner authorization and is not part of this commit.
 

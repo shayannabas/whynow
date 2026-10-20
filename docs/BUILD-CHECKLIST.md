@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 19, 2026. Current stage: Stage 2 evidence-packet quality fix proven offline; waiting for owner approval before any draft-only paid rerun; Stage 3 has not started.
+Updated: October 19, 2026. Current stage: the authorized saved-pages-only Stage 2 redraft stopped on Resolve AI with no new profile; no retry is authorized; Stage 3 has not started.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -8,7 +8,9 @@ The October 19 offline quality audit keeps the original 9/23/27 findings but sep
 
 The one authorized final rerun then fetched all 29 allowlisted first-party pages with zero errors, used zero Serper queries and made exactly three GPT-4o mini calls with no retry. Token-reported cost was $0.007646 under the temporary $0.05 process cap. The normal local OpenAI settings remained disabled/zero. Final drafts remain `needs_review`: Resolve AI has 2 customers, 0 competitors and 8 blocking/4 advisory warnings; Shopify has 0/0 and 25/1; Vercel has 0/0 and 16/5.
 
-The subsequent offline root-cause audit found that the 24 KB evidence menu divided space across all saved sources and selected text from page starts, so deeper customer and comparison evidence often never reached the model. The corrected menu has a 120 KB hard ceiling, weights customer/case-study, comparison, pricing and about/enterprise pages, ranks relevant sentences and preserves every existing grounding/quality gate. On the unchanged saved pages, receipt totals increased from 101/122/74 to 548/605/489 for Resolve AI/Shopify/Vercel; all checked individual customer and competitor names now reach their source's receipt menu. No live page, Serper or OpenAI call was used. A draft-only paid rerun is pending explicit owner approval.
+The subsequent offline root-cause audit found that the 24 KB evidence menu divided space across all saved sources and selected text from page starts, so deeper customer and comparison evidence often never reached the model. The corrected menu has a 120 KB hard ceiling, weights customer/case-study, comparison, pricing and about/enterprise pages, ranks relevant sentences and preserves every existing grounding/quality gate. On the unchanged saved pages, receipt totals increased from 101/122/74 to 548/605/489 for Resolve AI/Shopify/Vercel; all checked individual customer and competitor names now reach their source's receipt menu.
+
+The owner then authorized one saved-pages-only GPT-4o mini draft per seller. Preflight estimated $0.024729 input cost and $0.032103 maximum total, below the $0.04 stop line. The run stopped on Resolve AI after one provider attempt with safe status `REQUEST_FAILED`; Shopify and Vercel made zero attempts. The isolated working state prevented partial output from replacing the prior profiles. No page fetch, Serper query, new profile or approval occurred. Normal OpenAI settings are confirmed disabled/zero, and no retry is authorized.
 
 ## Current decision
 
@@ -54,8 +56,11 @@ Do not paste API keys into chat. Store keys in the local ignored `.env` file, ne
 - [x] Persist the three final snapshots and acceptance workspaces through the normal save path, leave every profile in `needs_review`, and confirm normal OpenAI settings stayed disabled/zero.
 - [x] Prove offline that the 24 KB start-of-page evidence menu omitted deeper customer and comparison names; replace it with a priority-weighted, relevance-ranked 120 KB packet without weakening grounding or quote-quality rules.
 - [x] Rebuild all three saved final-run menus offline and verify the checked customer/competitor names reach receipt text and every packet remains within the new ceiling.
-- [x] Pass the post-fix full offline suite: 22 test files, 112 passed tests and one intentionally skipped Stage 3 scaffold test (113 total).
-- [ ] Owner decides whether to authorize one draft-only GPT-4o mini call per seller on already-saved pages. Until then: no provider calls, no fetches, no Serper, no manual fixes and no approvals.
+- [x] Pass the post-fix full offline suite: 22 test files, 113 passed tests and one intentionally skipped Stage 3 scaffold test (114 total).
+- [x] Record the owner's saved-pages-only drafting authorization in `AGENTS.md`, preflight the real request sizes and confirm the $0.032103 maximum estimate is below the $0.04 stop line.
+- [x] Attempt the bounded saved-pages redraft. It stopped on Resolve AI after one `REQUEST_FAILED` provider attempt; Shopify and Vercel made zero attempts; prior profiles stayed unchanged in `needs_review`.
+- [x] Confirm after the stopped attempt that there were zero page fetches, zero Serper queries, no approvals, and normal OpenAI settings are disabled with a zero local limit.
+- [ ] Owner decides the next action. No further provider attempt is authorized.
 - [ ] After the owner-reviewed draft-only result, manually fix any remaining pass-bar failures in the review screen and approve each profile.
 - [x] Update README, status and traceability documents, run the production audit and scan tracked/untracked project files for credentials before publishing.
 - [ ] Mark Stage 2 complete only after the revised bounded run and owner review. Do not begin Stage 3 in this increment.
@@ -99,7 +104,8 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 
 ## Change log
 
-- **2026-10-19:** Confirmed the 24 KB start-of-page evidence menu was hiding deeper saved customer/comparison evidence. Added a priority-weighted, relevance-ranked 120 KB packet and offline coverage/cap tests; the full suite is green at 112 passed plus one intentional skip. No provider call was made; a saved-pages-only drafting rerun is awaiting explicit owner approval.
+- **2026-10-19:** Recorded the authorized saved-pages-only redraft preflight ($0.032103 maximum estimate) and stopped attempt: one Resolve AI provider attempt ended `REQUEST_FAILED`; Shopify/Vercel were not called; no profile changed; settings remained disabled/zero; 113 tests pass with one intentional skip.
+- **2026-10-19:** Confirmed the 24 KB start-of-page evidence menu was hiding deeper saved customer/comparison evidence. Added a priority-weighted, relevance-ranked 120 KB packet and offline coverage/cap tests.
 - **2026-10-19:** Replaced the broad remaining Stage 3–12 roadmap with `docs/IMPLEMENTATION-PLAN-TRIMMED.md`: stages 3, 4, 5, 6, 8, draft-only 9 and 11 remain; stages 7, 10, advanced Stage 9 delivery/contact work and Stage 12 are deferred.
 - **2026-10-19:** Recorded the last automated Stage 2 rerun and its real page, call, cost and pass-bar results. Remaining profile work is manual.
 

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 const require=createRequire(import.meta.url);
-const {createLlm,settings}=require('../scripts/llm.cjs');
+const {createLlm,settings,estimatedUsage,MAX_REQUEST_BYTES}=require('../scripts/llm.cjs');
 const {defaultState,createWorkspace,loadState,saveState}=require('../scripts/server/state.cjs');
 const env={OPENAI_ENABLED:'true',OPENAI_API_KEY:'test-only-placeholder',OPENAI_MONTHLY_LIMIT_USD:'1'};
 const schema={type:'object',properties:{facts:{type:'array',items:{type:'string'}}},required:['facts'],additionalProperties:false};
@@ -73,10 +73,19 @@ it('bounds retries, handles refusal/incomplete/invalid output, never logs provid
 });
 it('rejects oversized inputs, invalid schemas/validators and archived workspace requests',async()=>{
   const h=harness({fetchImpl:()=>{throw Error('Must not call');}});
-  await expect(h.run({messages:[{role:'user',content:'a'.repeat(49000)}]})).rejects.toMatchObject({code:'INPUT_TOO_LARGE'});
+  await expect(h.run({messages:[{role:'user',content:'a'.repeat(MAX_REQUEST_BYTES+1)}]})).rejects.toMatchObject({code:'INPUT_TOO_LARGE'});
   await expect(h.run({validate:null})).rejects.toMatchObject({code:'INVALID_INPUT'});
   await h.mutate(state=>{state.workspaces[h.id].status='archived';return state;});
   await expect(h.run()).rejects.toMatchObject({code:'ARCHIVED'});
+});
+it('accepts the fixed Stage 2 packet request range and reserves a conservative token estimate',async()=>{
+  let calls=0;const h=harness({env:{...env,OPENAI_MONTHLY_LIMIT_USD:'0.05'},fetchImpl:async()=>{calls++;return success();}});
+  await h.run({messages:[{role:'user',content:'customer and competitor evidence '.repeat(5500)}]});
+  expect(calls).toBe(1);
+  const reserved=h.read().workspaces[h.id].budgets.openai.reservedMicros;
+  expect(reserved).toBeGreaterThan(0);
+  expect(reserved).toBeLessThan(50000);
+  expect(estimatedUsage({bodyBytes:175534,maxOutputTokens:4096})).toMatchObject({inputTokens:59194,reserveMicros:11337});
 });
 it('persists charges and cached responses across restart without a network request',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-llm-')),file=path.join(dir,'state.json');
