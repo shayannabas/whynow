@@ -181,3 +181,7 @@ The live Binance account is not automatically `KILL_UNSELLABLE_ORG`. The parity 
 ### `scripts/discovery-runner.cjs`
 
 **What it does:** Runs discovery as a persisted background job and saves its funnel counts, errors, selected account IDs and exact Serper usage. **How it decides:** It requires Serper's normal enable/key/monthly guards plus a separate positive discovery-run cap, reserves each query before sending it, searches every enabled segment once before it may stop, and targets 20–30 balanced accounts. **What changed from SignalScout:** A failed query is isolated and the curated workspace universe can still produce a demo; interrupted or failed work is explicit state rather than an in-memory-only task. No OpenAI call or account collector is started by discovery.
+
+### `scripts/account-lifecycle.cjs` and the Today/account pages
+
+**What they do:** Turn saved prospects into a small seller work queue and let the user mark an account `new`, `working` or `skipped`. **How they decide:** Killed and skipped accounts remain saved but leave Today; working accounts rank first, then priority, active receipted triggers and fit. A skip requires a typed reason and every change enters the audit log. The why-now line uses only a currently active trigger and otherwise says that the account still needs a refresh. **What changed from SignalScout:** Contacts, drafts, sends and full CRM stages are deliberately absent. The account page adds the receipted size reason, current triggers and a compact status form while preserving WhyNow's existing Refresh account action.
