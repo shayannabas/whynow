@@ -9,11 +9,11 @@ const {defaultState,createWorkspace,updateWorkspace}=require('../scripts/server/
 const {recordSource}=require('../scripts/sources.cjs');
 const {buildSynthesisRequest}=require('../scripts/onboarding/synthesize.cjs');
 const {SIGNAL_KEYS,buildReceiptEvidence,saveGeneratedProfile}=require('../scripts/onboarding/validate.cjs');
-const {approveManualProfile,LABELS}=require('../scripts/onboarding/manual-profile.cjs');
+const {approveManualProfile,qualityFindings,LABELS}=require('../scripts/onboarding/manual-profile.cjs');
 const {loadReferenceProfile}=require('../scripts/onboarding/reference-profile.cjs');
 
 const directory=path.join(path.dirname(fileURLToPath(import.meta.url)),'fixtures','onboarding');
-const fixtures=fs.readdirSync(directory).filter(file=>file.endsWith('.json')).sort().map(file=>JSON.parse(fs.readFileSync(path.join(directory,file),'utf8')));
+const fixtures=fs.readdirSync(directory).filter(file=>file.endsWith('.json')&&!file.endsWith('-live-icp.json')).sort().map(file=>JSON.parse(fs.readFileSync(path.join(directory,file),'utf8')));
 const START='2026-09-17T12:00:00.000Z';
 
 function recordedReceipt(value,sourceIds,receiptMap) {
@@ -102,7 +102,8 @@ it('runs three unrelated recorded sellers through research, grounded drafting, r
     expect(workspace.research.synthesis.report.receiptCoverage).toBeGreaterThanOrEqual(0.9);
     expect(workspace.research.synthesis.report.warnings).toEqual([]);
     expect(workspace.sellerProfile.sources.length).toBeGreaterThan(0);
-    next=approveManualProfile(next,prepared.id,{revision:workspace.profileRevision,acknowledged:true,now:()=>new Date(Date.parse(START)+2000).toISOString()});
+    const qualityReasons=Object.fromEntries(qualityFindings(workspace).filter(item=>item.severity==='blocking').map(item=>[item.id,'Reviewed recorded fixture warning for this revision.']));
+    next=approveManualProfile(next,prepared.id,{revision:workspace.profileRevision,acknowledged:true,qualityReasons,now:()=>new Date(Date.parse(START)+2000).toISOString()});
     workspace=next.workspaces[prepared.id];
     expect(workspace).toMatchObject({status:'active',deliveryMode:'demo',sellerProfile:{deliveryAllowed:false},research:{status:'approved'}});
     expect(next.auditLog.map(item=>item.type)).toEqual(['seller_profile_generated','seller_profile_approved']);

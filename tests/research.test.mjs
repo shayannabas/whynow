@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace}=require('../scripts/server/state.cjs');
 const {requestResearch}=require('../scripts/onboarding/research-request.cjs');
-const {createResearchCoordinator,normalizeResearchUrl,discoveryQueries,homepageTargets,sitemapTargets,externalTargetForRow,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN}=require('../scripts/onboarding/research.cjs');
+const {createResearchCoordinator,normalizeResearchUrl,selectResearchTargets,discoveryQueries,homepageTargets,sitemapTargets,externalTargetForRow,COMMON_SELLER_PATHS,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN}=require('../scripts/onboarding/research.cjs');
 const {search,serperSettings}=require('../scripts/serper.cjs');
 
 const enabledEnv={
@@ -180,6 +180,29 @@ it('uses three bounded discovery queries covering the required seller, compariso
   expect(queries).toHaveLength(3);
   for(const term of ['product','solutions','pricing','customers','case studies','about','careers','alternatives','vs','raises','hiring'])expect(text).toContain(term);
   expect(queries.slice(0,2).every(query=>query.includes('site:example.com'))).toBe(true);
+});
+
+it('prioritizes customer, case-study, enterprise, pricing, about and comparison coverage before low-value partner pages',()=>{
+  const candidate={name:'Example',domain:'example.com',website:'https://example.com'};
+  const rows=[
+    {url:'https://example.com/partners/solution-partners/agency'},
+    {url:'https://example.com/marketplace/template'},
+    {url:'https://example.com/products/deployments'},
+    {url:'https://example.com/vs/rival'},
+    ...Array.from({length:25},(_,index)=>({url:`https://example.com/resources/item-${index}`}))
+  ];
+  const targets=selectResearchTargets(candidate,rows),urls=targets.map(item=>new URL(item.url).pathname);
+  expect(urls.slice(0,2)).toEqual(['/','/sitemap.xml']);
+  for(const required of COMMON_SELLER_PATHS)expect(urls).toContain(required);
+  const lastRequired=Math.max(...COMMON_SELLER_PATHS.map(required=>urls.indexOf(required)));
+  const partnerIndexes=targets.map((item,index)=>item.kind==='seller_partner_page'?index:-1).filter(index=>index>=0);
+  expect(partnerIndexes.every(index=>index>lastRequired)).toBe(true);
+  expect(targets.some(item=>item.kind==='seller_partner_page')).toBe(false);
+  expect(targets.length).toBeLessThanOrEqual(MAX_FETCHED_PAGES);
+
+  const roomy=selectResearchTargets(candidate,rows.slice(0,3));
+  expect(roomy.find(item=>item.url.includes('/partners/'))).toMatchObject({kind:'seller_partner_page'});
+  expect(roomy.findIndex(item=>item.kind==='seller_partner_page')).toBeGreaterThan(Math.max(...COMMON_SELLER_PATHS.map(required=>roomy.findIndex(item=>new URL(item.url).pathname===required))));
 });
 
 it('discovers only relevant same-domain homepage and sitemap links',()=>{

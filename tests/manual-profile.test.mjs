@@ -6,12 +6,13 @@ import path from 'node:path';
 import http from 'node:http';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace,updateWorkspace,saveState,loadState}=require('../scripts/server/state.cjs');
-const {WEIGHTS,SLAS,saveManualProfile,approveManualProfile,profileWarnings}=require('../scripts/onboarding/manual-profile.cjs');
+const {WEIGHTS,SLAS,saveManualProfile,approveManualProfile,profileWarnings,qualityFindings,blockingQualityFindings}=require('../scripts/onboarding/manual-profile.cjs');
 const {recordSource}=require('../scripts/sources.cjs');
 const {profilePage}=require('../scripts/onboarding/profile-page.cjs');
 const {createRouter}=require('../scripts/server/router.cjs');
 function initial(){let state=createWorkspace(defaultState(),{name:'Test only'});return updateWorkspace(state,state.activeWorkspaceId,w=>{w.onboarding={schemaVersion:1,status:'selected',selectedCandidate:{name:'Fixture seller',domain:'example.org',website:'https://example.org'}};});}
 function form(revision=0){return new URLSearchParams({revision:String(revision),category:'Fixture category',productOneLiner:'Fixture product description',targetCompanySize:'Mid-sized teams','targetIndustries.0.value':'Fixture industry','segments.0.label':'Segment A','segments.1.label':'Segment B','segments.2.label':'Segment C',buyerTitles:'Director\nDirector',championTitles:'Team lead'});}
+function reasons(state,id,message='Reviewed fixture warning for this revision.') {return Object.fromEntries(blockingQualityFindings(state.workspaces[id]).map(item=>[item.id,message]));}
 it('saves a complete manual draft without calling providers and fills strategy defaults',()=>{
   const state=initial(),id=state.activeWorkspaceId,next=saveManualProfile(state,id,form());
   expect(next.workspaces[id].status).toBe('needs_review');expect(next.workspaces[id].profileRevision).toBe(1);
@@ -23,16 +24,32 @@ it('saves a complete manual draft without calling providers and fills strategy d
 it('retains unverified claims through explicit approval and keeps delivery off',()=>{
   let state=initial();const id=state.activeWorkspaceId;state=saveManualProfile(state,id,form());
   expect(()=>approveManualProfile(state,id,{revision:1})).toThrow('Confirm');
-  const approved=approveManualProfile(state,id,{revision:1,acknowledged:true});
+  expect(()=>approveManualProfile(state,id,{revision:1,acknowledged:true})).toThrow('Explain why');
+  const approved=approveManualProfile(state,id,{revision:1,acknowledged:true,qualityReasons:reasons(state,id)});
   expect(approved.workspaces[id].status).toBe('active');expect(profileWarnings(approved.workspaces[id].sellerProfile)).toHaveLength(4);
   expect(approved.workspaces[id].sellerProfile.deliveryAllowed).toBe(false);expect(approved.workspaces[id].deliveryMode).toBe('demo');
-  expect(approved.auditLog[0]).toMatchObject({workspaceId:id,type:'seller_profile_approved',unverifiedClaims:4});
+  expect(approved.auditLog[0]).toMatchObject({workspaceId:id,type:'seller_profile_approved',unverifiedClaims:4,qualityAcknowledgments:[
+    expect.objectContaining({code:'EMPTY_COMPETITORS',reason:'Reviewed fixture warning for this revision.'}),
+    expect.objectContaining({code:'EMPTY_CUSTOMERS',reason:'Reviewed fixture warning for this revision.'})
+  ]});
+});
+it('shows advisory warnings beside fields without requiring typed approval reasons',()=>{
+  let state=initial();const id=state.activeWorkspaceId,f=form();f.set('productOneLiner','Build the platform of your dreams.');state=saveManualProfile(state,id,f);
+  const findings=qualityFindings(state.workspaces[id]);
+  expect(findings.find(item=>item.code==='SLOGAN_LIKE_FACT')).toMatchObject({severity:'advisory',field:'productOneLiner'});
+  const html=profilePage(state);
+  expect(html).toContain('<strong>Advisory:</strong> This reads like a headline or marketing slogan');
+  expect(html).not.toContain(`name="qualityReason.${findings.find(item=>item.code==='SLOGAN_LIKE_FACT').id}"`);
+  const approved=approveManualProfile(state,id,{revision:1,acknowledged:true,qualityReasons:reasons(state,id)});
+  expect(approved.workspaces[id].status).toBe('active');
+  expect(approved.auditLog[0].qualityAcknowledgments.every(item=>item.code!=='SLOGAN_LIKE_FACT')).toBe(true);
 });
 it('blocks incomplete approvals and requires fresh approval after edits',()=>{
   let state=initial();const id=state.activeWorkspaceId;state=saveManualProfile(state,id,new URLSearchParams({revision:'0'}));
   expect(()=>approveManualProfile(state,id,{revision:1,acknowledged:true})).toThrow('3–10');
-  state=saveManualProfile(state,id,form(1));state=approveManualProfile(state,id,{revision:2,acknowledged:true});
+  state=saveManualProfile(state,id,form(1));state=approveManualProfile(state,id,{revision:2,acknowledged:true,qualityReasons:reasons(state,id)});
   state=saveManualProfile(state,id,form(3));expect(state.workspaces[id].status).toBe('needs_review');expect(state.workspaces[id].sellerProfile.approvedAt).toBeNull();
+  expect(()=>approveManualProfile(state,id,{revision:4,acknowledged:true})).toThrow('Explain why');
 });
 it('rejects stale edits and approvals without changing another workspace',()=>{
   let state=initial();const id=state.activeWorkspaceId;state=createWorkspace(state,{name:'Other'});const other=state.activeWorkspaceId;
@@ -43,11 +60,11 @@ it('rejects stale edits and approvals without changing another workspace',()=>{
 it('requires URLs for customer/competitor entries and first-party saved quotes for customer evidence',()=>{
   let state=initial();const id=state.activeWorkspaceId,f=form();f.set('customers.0.value','Fixture customer');
   expect(()=>saveManualProfile(state,id,f)).toThrow('source link');
-  f.set('customers.0.url','https://news.example.org/page');f.set('customers.0.quote','Fixture customer');
-  state=recordSource(state,{url:'https://news.example.org/page',text:'Fixture customer',fetchedAt:'2026-09-16T00:00:00Z'}).state;
+  f.set('customers.0.url','https://news.example.org/page');f.set('customers.0.quote','Fixture customer uses this seller for production workflows.');
+  state=recordSource(state,{url:'https://news.example.org/page',text:'Fixture customer uses this seller for production workflows.',fetchedAt:'2026-09-16T00:00:00Z'}).state;
   // A subdomain of the selected seller qualifies as first-party.
   expect(saveManualProfile(state,id,f).workspaces[id].sellerProfile.customers[0].inferred).toBe(false);
-  state=recordSource(state,{url:'https://other.org/page',text:'Fixture customer',fetchedAt:'2026-09-16T00:00:00Z'}).state;
+  state=recordSource(state,{url:'https://other.org/page',text:'Fixture customer uses this seller for production workflows.',fetchedAt:'2026-09-16T00:00:00Z'}).state;
   f.set('customers.0.url','https://other.org/page');expect(saveManualProfile(state,id,f).workspaces[id].sellerProfile.customers[0].inferred).toBe(true);
 });
 it('links without a saved exact quote remain unverified; paraphrases fail',()=>{
@@ -75,11 +92,11 @@ it('escapes saved claims and preserves posted edits when rendering errors',()=>{
 });
 it('shows and saves the deeper targeting and messaging rules before approval',()=>{
   let state=initial();const id=state.activeWorkspaceId;state=saveManualProfile(state,id,form());
-  state=recordSource(state,{url:'https://example.org/example-target',text:'Example Target',fetchedAt:'2026-09-17T00:00:00Z'}).state;
+  state=recordSource(state,{url:'https://example.org/example-target',text:'Example Target uses Fixture Seller for production workflows.',fetchedAt:'2026-09-17T00:00:00Z'}).state;
   const f=form(1);
   f.set('segments.0.enabled','false');f.set('segments.0.revenueSensitivityBase','5');f.set('segments.0.wedgeCustomers','Customer One\nCustomer Two');
   f.set('segments.0.exampleTargets.0.name','Example Target');f.set('segments.0.exampleTargets.0.domain','target.example');
-  f.set('segments.0.exampleTargets.0.url','https://example.org/example-target');f.set('segments.0.exampleTargets.0.quote','Example Target');
+  f.set('segments.0.exampleTargets.0.url','https://example.org/example-target');f.set('segments.0.exampleTargets.0.quote','Example Target uses Fixture Seller for production workflows.');
   f.set('signals.techStack.label','Technical environment fit');f.set('signals.techStack.description','Review the public technical environment.');
   f.set('signals.techStack.evidenceKeywords','Node.js\nTypeScript');f.set('signals.techStack.negativeKeywords','Legacy only');
   f.set('signals.techStack.preferredSources','Engineering blog');f.set('signals.techStack.rubric.1','No matching environment');
@@ -115,8 +132,13 @@ it('saves, reviews and approves through local HTTP; rejects forged workspace and
     const f=form();f.set('workspaceId',id);
     expect((await post('/onboarding/profile/save',f,'https://other.org')).status).toBe(403);
     expect((await post('/onboarding/profile/save',f)).status).toBe(303);
-    expect(await(await fetch(base+'/onboarding/profile')).text()).toContain('Approve saved profile');
-    const approval=new URLSearchParams({workspaceId:id,revision:'1',acknowledged:'on'});
+    const reviewHtml=await(await fetch(base+'/onboarding/profile')).text();
+    expect(reviewHtml).toContain('Approve saved profile');expect(reviewHtml).toContain('Reason for accepting this warning');
+    expect(reviewHtml).not.toMatch(/name="qualityReason\.[^"]+"[^>]*>[^<]+<\/textarea>/);
+    expect((await post('/onboarding/profile/approve',new URLSearchParams({workspaceId:id,revision:'1',acknowledged:'on'}))).status).toBe(400);
+    expect(loadState(file).workspaces[id].status).toBe('needs_review');
+    const stored=loadState(file),approval=new URLSearchParams({workspaceId:id,revision:'1',acknowledged:'on'});
+    for(const item of blockingQualityFindings(stored.workspaces[id]))approval.set(`qualityReason.${item.id}`,'Reviewed and accepted for this HTTP persistence test.');
     expect((await post('/onboarding/profile/approve',approval)).status).toBe(303);
     expect(loadState(file).workspaces[id].status).toBe('active');
     expect(await(await fetch(base)).text()).toContain('Seller profile approved');

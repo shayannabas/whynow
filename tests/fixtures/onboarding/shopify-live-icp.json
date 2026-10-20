@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-14T02:03:57.608Z",
+  "model": "gpt-4o-mini",
+  "promptVersion": "seller-profile-approvable-receipts-v4",
+  "commitHash": "42e7e2bc8fdfd0679575e118970a9035f903efd0",
+  "source": "Owner-authorized Stage 2 recovery run using saved public-page research responses.",
+  "seller": {
+    "name": "Shopify: The All-in-One Commerce Platform for Businesses ...",
+    "domain": "shopify.com"
+  },
+  "sellerProfile": {
+    "schemaVersion": 1,
+    "sellerName": "Shopify: The All-in-One Commerce Platform for Businesses ...",
+    "domain": "shopify.com",
+    "deliveryAllowed": false,
+    "generatedAt": "2026-10-14T02:03:57.569Z",
+    "approvedAt": null,
+    "updatedAt": "2026-10-14T02:03:57.569Z",
+    "sources": [
+      "2028830bb5ef084561370018",
+      "db1e8aca59d14716aed2cbb7",
+      "26ff31a7f8640a4175f06dc2",
+      "24982eddb36fd667efa9b6b9",
+      "54b1432aad91c05d77a1b95d"
+    ],
+    "category": "E-commerce Platform",
+    "productOneLiner": "Shopify: The All-in-One Commerce Platform for Businesses",
+    "pricingModel": "Subscription-based",
+    "targetCompanySize": "Small to Enterprise",
+    "valueProps": [
+      "Get started fast; you could be selling by tomorrow.",
+      "Trusted by enterprise brands, no matter your size, complexity, or ambition.",
+      "Built into every store: World's best checkout, proven to convert better."
+    ],
+    "credentials": [
+      "Trusted by enterprise brands"
+    ],
+    "targetIndustries": [
+      "Retail",
+      "E-commerce"
+    ],
+    "proofPoints": [
+      {
+        "claim": "Shopify powered over 875M unique shoppers in 2024.",
+        "schemaVersion": 1,
+        "value": "Shopify powered over 875M unique shoppers in 2024.",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-enterprise-vs-custom-platform",
+        "sourceId": "54b1432aad91c05d77a1b95d",
+        "evidenceQuote": "2 Shopify advantages Shopify powered over 875M unique shoppers in 2024.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      }
+    ],
+    "customers": [],
+    "competitors": [],
+    "evidence": {
+      "category": {
+        "schemaVersion": 1,
+        "value": "E-commerce Platform",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "productOneLiner": {
+        "schemaVersion": 1,
+        "value": "Shopify: The All-in-One Commerce Platform for Businesses",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "pricingModel": {
+        "schemaVersion": 1,
+        "value": "Subscription-based",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-custom-platform",
+        "sourceId": "db1e8aca59d14716aed2cbb7",
+        "evidenceQuote": "Custom Platform: Commerce just works on Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetCompanySize": {
+        "schemaVersion": 1,
+        "value": "Small to Enterprise",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "valueProps.0": {
+        "schemaVersion": 1,
+        "value": "Get started fast; you could be selling by tomorrow.",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "valueProps.1": {
+        "schemaVersion": 1,
+        "value": "Trusted by enterprise brands, no matter your size, complexity, or ambition.",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "valueProps.2": {
+        "schemaVersion": 1,
+        "value": "Built into every store: World's best checkout, proven to convert better.",
+        "sourceUrl": "https://www.shopify.com/customer-accounts",
+        "sourceId": "26ff31a7f8640a4175f06dc2",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "credentials.0": {
+        "schemaVersion": 1,
+        "value": "Trusted by enterprise brands",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetIndustries.0": {
+        "schemaVersion": 1,
+        "value": "Retail",
+        "sourceUrl": "https://www.shopify.com/pos/retail-customer-experience",
+        "sourceId": "24982eddb36fd667efa9b6b9",
+        "evidenceQuote": "Retail Customer Experience | Shopify POS - Shopify Skip to Content Get in touch Start for free Get in touch Retail customer experiences Create the best retail experiences at scale?",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetIndustries.1": {
+        "schemaVersion": 1,
+        "value": "E-commerce",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "proofPoints.0": {
+        "schemaVersion": 1,
+        "value": "Shopify powered over 875M unique shoppers in 2024.",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-enterprise-vs-custom-platform",
+        "sourceId": "54b1432aad91c05d77a1b95d",
+        "evidenceQuote": "2 Shopify advantages Shopify powered over 875M unique shoppers in 2024.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      }
+    }
+  },
+  "icpConfig": {
+    "schemaVersion": 1,
+    "segments": [
+      {
+        "key": "30c5b4a050480b7631334db6",
+        "label": "Retail and E-commerce",
+        "enabled": true,
+        "subIndustries": [
+          "Online Retail",
+          "Brick-and-Mortar Retail"
+        ],
+        "queryTemplates": [
+          "E-commerce solutions for retail",
+          "Best platforms for online stores",
+          "Shopify alternatives for retail",
+          "E-commerce platforms for small businesses"
+        ],
+        "revenueSensitivityBase": 3,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "041428d9b1d265b7b8a1d6c3",
+        "label": "Enterprise Solutions",
+        "enabled": true,
+        "subIndustries": [
+          "Large Scale E-commerce",
+          "Enterprise Retail"
+        ],
+        "queryTemplates": [
+          "Enterprise e-commerce solutions",
+          "Best platforms for large businesses",
+          "Shopify for enterprise",
+          "E-commerce platforms for large scale"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "3d8a0a8bea28657a8988bfad",
+        "label": "Small Business",
+        "enabled": true,
+        "subIndustries": [
+          "Startups",
+          "Small Retailers"
+        ],
+        "queryTemplates": [
+          "E-commerce for small businesses",
+          "Best platforms for startups",
+          "Shopify for small retailers",
+          "Affordable e-commerce solutions"
+        ],
+        "revenueSensitivityBase": 2,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      }
+    ],
+    "personas": {
+      "buyerTitles": [
+        "E-commerce Manager",
+        "Retail Director",
+        "Small Business Owner"
+      ],
+      "championTitles": [
+        "Marketing Manager",
+        "Product Manager",
+        "Operations Manager"
+      ],
+      "wrongOrgTitles": [
+        "IT Manager",
+        "HR Director",
+        "Finance Officer"
+      ]
+    },
+    "signalDefinitions": {
+      "techStack": {
+        "label": "E-commerce Technology",
+        "description": "Technologies used by businesses to facilitate online sales and retail operations.",
+        "evidenceKeywords": [
+          "E-commerce platform",
+          "Online store",
+          "Payment processing",
+          "Inventory management"
+        ],
+        "negativeKeywords": [
+          "Custom-built solutions",
+          "Legacy systems"
+        ],
+        "preferredSources": [
+          "Shopify",
+          "E-commerce blogs",
+          "Retail technology news"
+        ],
+        "rubric": {
+          "1": "Not using any e-commerce technology",
+          "3": "Using basic e-commerce tools",
+          "5": "Fully integrated e-commerce solutions"
+        }
+      },
+      "activePain": {
+        "label": "Complexity in E-commerce Management",
+        "description": "Challenges faced by businesses in managing online sales and retail operations.",
+        "evidenceKeywords": [
+          "Inventory issues",
+          "Customer service challenges",
+          "Sales conversion problems"
+        ],
+        "negativeKeywords": [
+          "Smooth operations",
+          "High customer satisfaction"
+        ],
+        "preferredSources": [
+          "Retail case studies",
+          "E-commerce success stories"
+        ],
+        "rubric": {
+          "1": "No pain points identified",
+          "3": "Some challenges in operations",
+          "5": "Significant operational difficulties"
+        }
+      },
+      "revenueSensitivity": {
+        "label": "Revenue Impact of E-commerce Solutions",
+        "description": "The effect of e-commerce solutions on business revenue.",
+        "evidenceKeywords": [
+          "Sales growth",
+          "Revenue increase",
+          "Customer acquisition"
+        ],
+        "negativeKeywords": [
+          "Stagnant sales",
+          "Declining revenue"
+        ],
+        "preferredSources": [
+          "E-commerce analytics",
+          "Business growth reports"
+        ],
+        "rubric": {
+          "1": "No revenue growth",
+          "3": "Moderate revenue increase",
+          "5": "Significant revenue growth"
+        }
+      },
+      "observabilityScale": {
+        "label": "Visibility in Retail Operations",
+        "description": "The level of insight businesses have into their retail operations.",
+        "evidenceKeywords": [
+          "Inventory visibility",
+          "Sales tracking",
+          "Customer insights"
+        ],
+        "negativeKeywords": [
+          "Lack of visibility",
+          "Poor data access"
+        ],
+        "preferredSources": [
+          "Retail management tools",
+          "E-commerce analytics"
+        ],
+        "rubric": {
+          "1": "No visibility into operations",
+          "3": "Some insights available",
+          "5": "Full visibility and insights"
+        }
+      },
+      "aiCompatibility": {
+        "label": "Integration of AI in E-commerce",
+        "description": "The use of AI technologies in e-commerce operations.",
+        "evidenceKeywords": [
+          "AI chatbots",
+          "Personalization",
+          "Predictive analytics"
+        ],
+        "negativeKeywords": [
+          "No AI usage",
+          "Manual processes"
+        ],
+        "preferredSources": [
+          "AI in retail articles",
+          "E-commerce technology news"
+        ],
+        "rubric": {
+          "1": "No AI integration",
+          "3": "Basic AI tools",
+          "5": "Advanced AI technologies"
+        }
+      },
+      "competitiveWedge": {
+        "label": "Competitive Advantage in E-commerce",
+        "description": "Unique selling propositions that differentiate a business in the e-commerce space.",
+        "evidenceKeywords": [
+          "Unique features",
+          "Customer loyalty",
+          "Brand reputation"
+        ],
+        "negativeKeywords": [
+          "No differentiation",
+          "Weak brand presence"
+        ],
+        "preferredSources": [
+          "Market analysis reports",
+          "E-commerce strategy articles"
+        ],
+        "rubric": {
+          "1": "No competitive advantage",
+          "3": "Some differentiation",
+          "5": "Strong competitive edge"
+        }
+      }
+    },
+    "triggerMapping": {
+      "pain_event": [
+        "Inventory shortages",
+        "Customer service complaints",
+        "High cart abandonment rates"
+      ],
+      "buying_intent": [
+        "Looking for e-commerce solutions",
+        "Researching online retail platforms",
+        "Seeking to improve sales"
+      ],
+      "function_roles": [
+        "E-commerce Manager",
+        "Retail Operations Director",
+        "Marketing Specialist"
+      ],
+      "tech_adoption": [
+        "Adopting new e-commerce technologies",
+        "Integrating AI into retail operations",
+        "Upgrading payment processing systems"
+      ],
+      "competitor_names": []
+    },
+    "killPatterns": {
+      "solvingInHouse": [
+        "Building custom e-commerce solutions",
+        "Using outdated systems"
+      ],
+      "buildCulture": [
+        "Resistance to change",
+        "Preference for traditional retail methods"
+      ],
+      "sizeMetric": {
+        "label": "Business Size",
+        "floor": 1
+      }
+    },
+    "painSources": {
+      "statuspage": true,
+      "hn": false,
+      "news": true,
+      "filings": false
+    },
+    "pitch": {
+      "receiptOpenerStyle": "Engaging and informative",
+      "oneSentenceProduct": "Shopify: The All-in-One Commerce Platform for Businesses",
+      "credentialLine": "Trusted by enterprise brands",
+      "ctaStyle": "Direct and action-oriented"
+    },
+    "objectionTemplates": [
+      "Too expensive",
+      "Not suitable for my business size",
+      "I prefer custom solutions"
+    ],
+    "weights": {
+      "techStack": 1.3,
+      "activePain": 1.2,
+      "revenueSensitivity": 1.1,
+      "observabilityScale": 1,
+      "aiCompatibility": 0.9,
+      "competitiveWedge": 0.8
+    },
+    "slaDays": {
+      "form_d_filing": 14,
+      "funding": 30,
+      "exec_change": 30,
+      "executive_departure": 30,
+      "new_account_with_warm_champion": 30,
+      "old_account_inherited_pain": 30,
+      "hiring_surge": 45,
+      "first_function_hire": 45,
+      "headcount_surge": 45,
+      "risk_factor_added": 120,
+      "pain_event": 30,
+      "public_postmortem": 30,
+      "public_pain_writeup": 30,
+      "buying_intent_hiring": 60,
+      "function_hiring": 90,
+      "internal_tool_maintenance": 90,
+      "tech_adoption": 90,
+      "competitor_adoption": 120,
+      "conference_talk": 120
+    },
+    "tierRules": {
+      "tier1": {
+        "public": true,
+        "revenue": 500000000,
+        "employees": 2000,
+        "valuation": 5000000000
+      },
+      "tier2": {
+        "revenue": 25000000,
+        "employees": 150,
+        "fundingStages": [
+          "Series A",
+          "Series B",
+          "Series C",
+          "Series D",
+          "growth",
+          "PE"
+        ]
+      },
+      "tier3": {
+        "maxEmployees": 149,
+        "minRaised": 2000000
+      },
+      "unclassified": "parked"
+    },
+    "defaultsReviewRequired": true
+  },
+  "receiptReport": {
+    "schemaVersion": 1,
+    "attemptedClaims": 11,
+    "acceptedClaims": 11,
+    "receiptedClaims": 11,
+    "receiptCoverage": 1,
+    "warnings": [],
+    "droppedCustomers": [],
+    "droppedCompetitors": []
+  }
+}

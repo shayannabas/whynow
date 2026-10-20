@@ -12,7 +12,9 @@ const MAX_FETCHED_PAGES=20;
 const MAX_STORED_TEXT_PER_PAGE=50000;
 const MAX_STORED_TEXT_PER_RUN=500000;
 const MAX_PROGRESS_EVENTS=50;
-const RESEARCH_PATH_PATTERN=/(?:^|[-_/])(?:products?|platform|solutions?|pricing|customers?|case-stud(?:y|ies)|stories|about|company|careers?|jobs?|industr(?:y|ies)|security|docs?|resources?|alternatives?|compare|comparison|vs)(?:[-_/]|$)/i;
+const COMMON_SELLER_PATHS=Object.freeze(['/customers','/case-studies','/enterprise','/pricing','/about','/compare','/alternatives']);
+const LOW_PRIORITY_PATH_PATTERN=/(?:^|\/)(?:partners?|marketplace|templates?|solution-partners?)(?:\/|$)/i;
+const RESEARCH_PATH_PATTERN=/(?:^|[-_/])(?:products?|platform|solutions?|pricing|customers?|case-stud(?:y|ies)|stories|enterprise|about|company|careers?|jobs?|industr(?:y|ies)|security|docs?|resources?|alternatives?|compare|comparison|vs|partners?|marketplace|templates?)(?:[-_/]|$)/i;
 const BLOCKED_PAGE_EXTENSION=/\.(?:avif|bmp|css|gif|ico|jpe?g|js|map|mp3|mp4|mov|pdf|png|svg|webm|webp|woff2?|zip)$/i;
 const EXTERNAL_RESEARCH_HOSTS=new Map([
   ['boards.greenhouse.io',{source:'greenhouse',kind:'greenhouse_jobs'}],
@@ -98,12 +100,15 @@ function rankUrl(url,candidate) {
   const parsed=new URL(url),path=parsed.pathname.toLowerCase();
   if(parsed.origin===new URL(candidate.website).origin&&path==='/')return 0;
   if(/sitemap[^/]*\.xml$/.test(path))return 1;
+  if(LOW_PRIORITY_PATH_PATTERN.test(path))return 50;
   if(/customer|case-stud|stories/.test(path))return 2;
-  if(/product|platform|solution/.test(path))return 3;
+  if(/(?:^|\/)enterprise(?:\/|$)/.test(path))return 3;
   if(/pricing/.test(path))return 4;
-  if(/career|jobs?/.test(path))return 5;
-  if(/industr|about|company|security/.test(path))return 6;
-  if(/alternative|compare|comparison|(?:^|[-_/])vs(?:[-_/]|$)/.test(path))return 7;
+  if(/alternative|compare|comparison|(?:^|[-_/])vs(?:[-_/]|$)/.test(path))return 5;
+  if(/about|company/.test(path))return 6;
+  if(/product|platform|solution/.test(path))return 7;
+  if(/industr|security/.test(path))return 8;
+  if(/career|jobs?/.test(path))return 9;
   return 10;
 }
 
@@ -146,7 +151,9 @@ function internalTarget(candidate,value) {
   const normalized=normalizeResearchUrl(value,candidate.domain);
   if(!normalized||BLOCKED_PAGE_EXTENSION.test(new URL(normalized).pathname))return null;
   const path=new URL(normalized).pathname;
-  return {schemaVersion:1,url:normalized,source:'seller_site',kind:/sitemap[^/]*\.xml$/i.test(path)?'seller_sitemap':'seller_site',expectedHost:candidate.domain};
+  const kind=/sitemap[^/]*\.xml$/i.test(path)?'seller_sitemap':LOW_PRIORITY_PATH_PATTERN.test(path)?'seller_partner_page':
+    /customer|case-stud|stories/i.test(path)?'seller_customer_page':'seller_site';
+  return {schemaVersion:1,url:normalized,source:'seller_site',kind,expectedHost:candidate.domain};
 }
 function targetRank(target,candidate) {
   if(target.source==='seller_site')return rankUrl(target.url,candidate);
@@ -168,12 +175,13 @@ function mergeTargets(candidate,current,added,visited=[]) {
 function selectResearchTargets(candidate,rows) {
   const homepage=internalTarget(candidate,candidate.website);
   const sitemap=internalTarget(candidate,new URL('/sitemap.xml',candidate.website).href);
+  const common=COMMON_SELLER_PATHS.map(value=>internalTarget(candidate,new URL(value,candidate.website).href));
   const discovered=[];
   for(const row of rows) {
     const target=internalTarget(candidate,row?.url||row?.link)||externalTargetForRow(candidate,row);
     if(target)discovered.push(target);
   }
-  return mergeTargets(candidate,[],[homepage,sitemap,...discovered].filter(Boolean));
+  return mergeTargets(candidate,[],[homepage,sitemap,...common,...discovered].filter(Boolean));
 }
 function selectResearchUrls(candidate,rows) {
   return selectResearchTargets(candidate,rows).map(target=>target.url);
@@ -522,7 +530,7 @@ function createResearchCoordinator({
 }
 
 module.exports={
-  createResearchCoordinator,ResearchError,safeError,normalizeResearchUrl,selectResearchUrls,discoveryQueries,
+  createResearchCoordinator,ResearchError,safeError,normalizeResearchUrl,selectResearchTargets,selectResearchUrls,discoveryQueries,
   homepageTargets,sitemapTargets,externalTargetForRow,
-  MAX_CANDIDATES,MAX_SERPER_QUERIES,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN
+  COMMON_SELLER_PATHS,LOW_PRIORITY_PATH_PATTERN,MAX_CANDIDATES,MAX_SERPER_QUERIES,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN
 };

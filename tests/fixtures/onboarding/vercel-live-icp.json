@@ -1,0 +1,496 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-14T02:04:12.433Z",
+  "model": "gpt-4o-mini",
+  "promptVersion": "seller-profile-approvable-receipts-v4",
+  "commitHash": "42e7e2bc8fdfd0679575e118970a9035f903efd0",
+  "source": "Owner-authorized Stage 2 recovery run using saved public-page research responses.",
+  "seller": {
+    "name": "Vercel: Agentic Infrastructure",
+    "domain": "vercel.com"
+  },
+  "sellerProfile": {
+    "schemaVersion": 1,
+    "sellerName": "Vercel: Agentic Infrastructure",
+    "domain": "vercel.com",
+    "deliveryAllowed": false,
+    "generatedAt": "2026-10-14T02:04:12.393Z",
+    "approvedAt": null,
+    "updatedAt": "2026-10-14T02:04:12.393Z",
+    "sources": [
+      "0197578fcde917f436bb4dfe",
+      "e40ecb037bc41a5c78ff8e44",
+      "24b545e92cf06c221df0d5c7",
+      "6aeabcd98d1ab464213fef99",
+      "3c5ce6bd887e39eb8770d171",
+      "51f9225877c9bb418d8f77a1"
+    ],
+    "category": "Multi-tenant SaaS",
+    "productOneLiner": "Build the platform of your dreams.",
+    "pricingModel": "Flexible Pro plan for modern teams.",
+    "targetCompanySize": "Enterprise",
+    "valueProps": [
+      "Supercharge developer velocity.",
+      "Enable your dev teams to do their best work, faster."
+    ],
+    "credentials": [
+      "Recognized by industry leaders for high-quality solutions."
+    ],
+    "targetIndustries": [
+      "Ecommerce",
+      "Marketing"
+    ],
+    "proofPoints": [
+      {
+        "claim": "Combine Turborepo’s intelligent build system with Vercel infrastructure for faster builds without the maintenance burden.",
+        "schemaVersion": 1,
+        "value": "Combine Turborepo’s intelligent build system with Vercel infrastructure for faster builds without the maintenance burden.",
+        "sourceUrl": "https://vercel.com/solutions/turborepo",
+        "sourceId": "24b545e92cf06c221df0d5c7",
+        "evidenceQuote": "Combine Turborepo’s intelligent build system with Vercel infrastructure for faster builds without the maintenance burden.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      }
+    ],
+    "customers": [],
+    "competitors": [],
+    "evidence": {
+      "category": {
+        "schemaVersion": 1,
+        "value": "Multi-tenant SaaS",
+        "sourceUrl": "https://vercel.com/solutions/multi-tenant-saas",
+        "sourceId": "0197578fcde917f436bb4dfe",
+        "evidenceQuote": "Multi-tenant SaaS Skip to content Copy Wordmark Copy Logo Download Brand Assets Brand Guidelines Products Agent Stack AI SDK AI Gateway Sandbox Passport Connect eve Core Platform Security Content",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "productOneLiner": {
+        "schemaVersion": 1,
+        "value": "Build the platform of your dreams.",
+        "sourceUrl": "https://vercel.com/solutions/multi-tenant-saas",
+        "sourceId": "0197578fcde917f436bb4dfe",
+        "evidenceQuote": "Infinite domains.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "pricingModel": {
+        "schemaVersion": 1,
+        "value": "Flexible Pro plan for modern teams.",
+        "sourceUrl": "https://vercel.com/blog/new-pro-pricing-plan",
+        "sourceId": "e40ecb037bc41a5c78ff8e44",
+        "evidenceQuote": "Enterprise Pricing Get a Demo Log In Sign Up A more flexible Pro plan for modern teams Tom Occhino Chief Product Officer Blog Company News 9 Sep 2025 3 min read Copy We’re updating Vercel’s Pro plan",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetCompanySize": {
+        "schemaVersion": 1,
+        "value": "Enterprise",
+        "sourceUrl": "https://vercel.com/solutions/turborepo",
+        "sourceId": "24b545e92cf06c221df0d5c7",
+        "evidenceQuote": "Enterprise scale.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "valueProps.0": {
+        "schemaVersion": 1,
+        "value": "Supercharge developer velocity.",
+        "sourceUrl": "https://vercel.com/solutions/platform-engineering",
+        "sourceId": "6aeabcd98d1ab464213fef99",
+        "evidenceQuote": "Sandbox Passport Connect eve Core Platform Security Content Delivery Fluid Compute Observability Workflows CI/CD Tools Next.js Vercel Agent Vercel Plugin Open Source Domains ↗ v0 ↗ Resources Learn",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "valueProps.1": {
+        "schemaVersion": 1,
+        "value": "Enable your dev teams to do their best work, faster.",
+        "sourceUrl": "https://vercel.com/solutions/platform-engineering",
+        "sourceId": "6aeabcd98d1ab464213fef99",
+        "evidenceQuote": "Enable your dev teams to do their best work, faster, with an automated platform to drive performance optimizations and decentralize iteration.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "credentials.0": {
+        "schemaVersion": 1,
+        "value": "Recognized by industry leaders for high-quality solutions.",
+        "sourceUrl": "https://vercel.com/partners/solution-partners/unlikely",
+        "sourceId": "3c5ce6bd887e39eb8770d171",
+        "evidenceQuote": "Using modern technologies, its experienced team delivers high-quality solutions across industries, from fashion ecommerce to startup websites.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetIndustries.0": {
+        "schemaVersion": 1,
+        "value": "Ecommerce",
+        "sourceUrl": "https://vercel.com/partners/solution-partners/unlikely",
+        "sourceId": "3c5ce6bd887e39eb8770d171",
+        "evidenceQuote": "Using modern technologies, its experienced team delivers high-quality solutions across industries, from fashion ecommerce to startup websites.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetIndustries.1": {
+        "schemaVersion": 1,
+        "value": "Marketing",
+        "sourceUrl": "https://vercel.com/solutions/marketing-sites",
+        "sourceId": "51f9225877c9bb418d8f77a1",
+        "evidenceQuote": "Marketing Sites Platforms Commerce Explore Customers Marketplace Partner Finder AWS Community ↗ Enterprise Pricing Get a Demo Log In Sign Up Ask AI Dashboard Products Agent Stack AI SDK AI Gateway",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "proofPoints.0": {
+        "schemaVersion": 1,
+        "value": "Combine Turborepo’s intelligent build system with Vercel infrastructure for faster builds without the maintenance burden.",
+        "sourceUrl": "https://vercel.com/solutions/turborepo",
+        "sourceId": "24b545e92cf06c221df0d5c7",
+        "evidenceQuote": "Combine Turborepo’s intelligent build system with Vercel infrastructure for faster builds without the maintenance burden.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      }
+    }
+  },
+  "icpConfig": {
+    "schemaVersion": 1,
+    "segments": [
+      {
+        "key": "2df19fd8915911c8eed7ab5e",
+        "label": "Enterprise SaaS",
+        "enabled": true,
+        "subIndustries": [
+          "Ecommerce",
+          "Marketing"
+        ],
+        "queryTemplates": [
+          "multi-tenant SaaS solutions",
+          "enterprise web applications",
+          "scalable marketing platforms",
+          "AI-driven ecommerce solutions"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "2f9b6526af93dd58e2009b33",
+        "label": "Development Tools",
+        "enabled": true,
+        "subIndustries": [
+          "DevOps",
+          "CI/CD"
+        ],
+        "queryTemplates": [
+          "developer velocity tools",
+          "CI/CD platforms",
+          "automated deployment solutions",
+          "observability tools"
+        ],
+        "revenueSensitivityBase": 4,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "1863f25f7077a25dcef8eda8",
+        "label": "Design and Engineering",
+        "enabled": true,
+        "subIndustries": [
+          "Design Systems",
+          "Product Development"
+        ],
+        "queryTemplates": [
+          "design engineering platforms",
+          "collaborative design tools",
+          "integrated development environments",
+          "design to code solutions"
+        ],
+        "revenueSensitivityBase": 3,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      }
+    ],
+    "personas": {
+      "buyerTitles": [
+        "CTO",
+        "Head of Engineering",
+        "Product Manager"
+      ],
+      "championTitles": [
+        "Lead Developer",
+        "DevOps Engineer",
+        "UX Designer"
+      ],
+      "wrongOrgTitles": [
+        "Sales Manager",
+        "HR Director"
+      ]
+    },
+    "signalDefinitions": {
+      "techStack": {
+        "label": "Modern Web Technologies",
+        "description": "Focus on companies using frameworks like Next.js and tools for CI/CD.",
+        "evidenceKeywords": [
+          "Next.js",
+          "CI/CD",
+          "Turborepo",
+          "observability"
+        ],
+        "negativeKeywords": [
+          "legacy systems",
+          "on-premise solutions"
+        ],
+        "preferredSources": [
+          "developer blogs",
+          "tech news",
+          "industry reports"
+        ],
+        "rubric": {
+          "1": "Not using modern frameworks",
+          "3": "Using some modern tools",
+          "5": "Fully integrated modern tech stack"
+        }
+      },
+      "activePain": {
+        "label": "Inefficient Development Processes",
+        "description": "Companies struggling with slow deployment and high maintenance costs.",
+        "evidenceKeywords": [
+          "slow deployment",
+          "high maintenance",
+          "inefficient workflows"
+        ],
+        "negativeKeywords": [
+          "smooth operations",
+          "automated processes"
+        ],
+        "preferredSources": [
+          "customer feedback",
+          "industry surveys",
+          "case studies"
+        ],
+        "rubric": {
+          "1": "No pain points",
+          "3": "Some inefficiencies",
+          "5": "Severe operational issues"
+        }
+      },
+      "revenueSensitivity": {
+        "label": "High Revenue Sensitivity",
+        "description": "Target companies that are highly sensitive to operational costs and efficiency.",
+        "evidenceKeywords": [
+          "cost reduction",
+          "operational efficiency",
+          "scalability"
+        ],
+        "negativeKeywords": [
+          "stable revenue",
+          "low sensitivity"
+        ],
+        "preferredSources": [
+          "financial reports",
+          "market analysis",
+          "business news"
+        ],
+        "rubric": {
+          "1": "Low sensitivity",
+          "3": "Moderate sensitivity",
+          "5": "High sensitivity"
+        }
+      },
+      "observabilityScale": {
+        "label": "High Observability Needs",
+        "description": "Focus on companies that require robust monitoring and observability tools.",
+        "evidenceKeywords": [
+          "monitoring tools",
+          "observability",
+          "real-time analytics"
+        ],
+        "negativeKeywords": [
+          "basic monitoring",
+          "no observability"
+        ],
+        "preferredSources": [
+          "tech blogs",
+          "product reviews",
+          "industry benchmarks"
+        ],
+        "rubric": {
+          "1": "Minimal observability",
+          "3": "Some observability",
+          "5": "Comprehensive observability"
+        }
+      },
+      "aiCompatibility": {
+        "label": "AI-Driven Solutions",
+        "description": "Target companies looking to integrate AI into their workflows.",
+        "evidenceKeywords": [
+          "AI integration",
+          "machine learning",
+          "automated solutions"
+        ],
+        "negativeKeywords": [
+          "manual processes",
+          "non-AI solutions"
+        ],
+        "preferredSources": [
+          "AI research",
+          "tech news",
+          "industry reports"
+        ],
+        "rubric": {
+          "1": "No AI integration",
+          "3": "Some AI features",
+          "5": "Fully AI-integrated solutions"
+        }
+      },
+      "competitiveWedge": {
+        "label": "Unique Value Proposition",
+        "description": "Highlight the unique benefits of using Vercel's platform over competitors.",
+        "evidenceKeywords": [
+          "faster builds",
+          "lower maintenance",
+          "developer-friendly"
+        ],
+        "negativeKeywords": [
+          "generic solutions",
+          "high maintenance"
+        ],
+        "preferredSources": [
+          "customer testimonials",
+          "case studies",
+          "competitive analysis"
+        ],
+        "rubric": {
+          "1": "No unique value",
+          "3": "Some differentiation",
+          "5": "Strong competitive advantage"
+        }
+      }
+    },
+    "triggerMapping": {
+      "pain_event": [
+        "slow deployment times",
+        "high operational costs",
+        "inefficient workflows"
+      ],
+      "buying_intent": [
+        "looking for CI/CD solutions",
+        "interested in modern web frameworks",
+        "seeking to improve developer productivity"
+      ],
+      "function_roles": [
+        "engineering",
+        "product management",
+        "design"
+      ],
+      "tech_adoption": [
+        "adopting new frameworks",
+        "integrating CI/CD tools",
+        "implementing observability solutions"
+      ],
+      "competitor_names": []
+    },
+    "killPatterns": {
+      "solvingInHouse": [
+        "building custom solutions",
+        "relying on legacy systems"
+      ],
+      "buildCulture": [
+        "favoring manual processes",
+        "avoiding automation"
+      ],
+      "sizeMetric": {
+        "label": "Small to Medium Enterprises",
+        "floor": 10
+      }
+    },
+    "painSources": {
+      "statuspage": true,
+      "hn": true,
+      "news": true,
+      "filings": false
+    },
+    "pitch": {
+      "receiptOpenerStyle": "Engaging and informative",
+      "oneSentenceProduct": "Build the platform of your dreams.",
+      "credentialLine": "Trusted by leading brands for high-quality digital solutions.",
+      "ctaStyle": "Direct and action-oriented"
+    },
+    "objectionTemplates": [
+      "We already have a solution in place.",
+      "We're not ready to switch platforms.",
+      "Our team is comfortable with our current tools."
+    ],
+    "weights": {
+      "techStack": 1.3,
+      "activePain": 1.2,
+      "revenueSensitivity": 1.1,
+      "observabilityScale": 1,
+      "aiCompatibility": 0.9,
+      "competitiveWedge": 0.8
+    },
+    "slaDays": {
+      "form_d_filing": 14,
+      "funding": 30,
+      "exec_change": 30,
+      "executive_departure": 30,
+      "new_account_with_warm_champion": 30,
+      "old_account_inherited_pain": 30,
+      "hiring_surge": 45,
+      "first_function_hire": 45,
+      "headcount_surge": 45,
+      "risk_factor_added": 120,
+      "pain_event": 30,
+      "public_postmortem": 30,
+      "public_pain_writeup": 30,
+      "buying_intent_hiring": 60,
+      "function_hiring": 90,
+      "internal_tool_maintenance": 90,
+      "tech_adoption": 90,
+      "competitor_adoption": 120,
+      "conference_talk": 120
+    },
+    "tierRules": {
+      "tier1": {
+        "public": true,
+        "revenue": 500000000,
+        "employees": 2000,
+        "valuation": 5000000000
+      },
+      "tier2": {
+        "revenue": 25000000,
+        "employees": 150,
+        "fundingStages": [
+          "Series A",
+          "Series B",
+          "Series C",
+          "Series D",
+          "growth",
+          "PE"
+        ]
+      },
+      "tier3": {
+        "maxEmployees": 149,
+        "minRaised": 2000000
+      },
+      "unclassified": "parked"
+    },
+    "defaultsReviewRequired": true
+  },
+  "receiptReport": {
+    "schemaVersion": 1,
+    "attemptedClaims": 10,
+    "acceptedClaims": 10,
+    "receiptedClaims": 10,
+    "receiptCoverage": 1,
+    "warnings": [],
+    "droppedCustomers": [],
+    "droppedCompetitors": []
+  }
+}

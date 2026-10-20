@@ -11,6 +11,12 @@ const MAX_SYNTHESIS_SOURCES = 20;
 const MAX_EVIDENCE_PACKET_BYTES = 24000;
 const MAX_SOURCE_EXCERPT_BYTES = 6000;
 const MAX_RECEIPT_TEXT = 200;
+const MIN_RECEIPT_TEXT = 24;
+const PARTNER_PATH_PATTERN=/(?:^|\/)(?:partners?|marketplace|templates?|solution-partners?)(?:\/|$)/i;
+const MEASURABLE_SIZE_PATTERN=/\b(?:employees?|employee count|headcount|engineering headcount|engineers?|engineering team size|team size|workforce|annual revenue|revenue|arr|annual recurring revenue)\b/i;
+const NAVIGATION_PHRASES=['skip to content','copy wordmark','copy logo','download brand assets','brand guidelines','get a demo','log in','sign up','partner finder','all rights reserved','privacy policy','cookie settings','terms of service'];
+const NAVIGATION_TERMS=new Set(['back','contact','cookie','copy','dashboard','doc','download','learn','logo','marketplace','menu','partner','passport','privacy','product','resource','security','signup','solution','term','wordmark']);
+const STOP_TERMS=new Set(['a','an','and','are','as','at','be','by','for','from','in','into','is','it','its','of','on','or','our','that','the','their','this','to','with','you','your']);
 const CUSTOMER_SOURCE_KINDS = new Set([
   'customer_case_study',
   'customer_press_release',
@@ -142,6 +148,96 @@ function normalizeDomain(value) {
 }
 function hostMatches(host,domain) { return Boolean(domain && (host===domain||host.endsWith(`.${domain}`))); }
 function normalizeWhitespace(value) { return String(value??'').replace(/\s+/g,' ').trim(); }
+function normalizedTerm(value) {
+  let term=String(value||'').toLowerCase();
+  if(term.length>5&&term.endsWith('ies'))term=`${term.slice(0,-3)}y`;
+  else if(term.length>5&&term.endsWith('ing'))term=term.slice(0,-3);
+  else if(term.length>4&&term.endsWith('ed'))term=term.slice(0,-2);
+  else if(term.length>4&&term.endsWith('s')&&!term.endsWith('ss'))term=term.slice(0,-1);
+  return term;
+}
+function meaningfulTerms(value) {
+  return [...new Set(normalizeWhitespace(value).normalize('NFKC').toLowerCase().match(/[\p{L}\p{N}]+/gu)||[])]
+    .map(normalizedTerm).filter(term=>term.length>=2&&!STOP_TERMS.has(term));
+}
+function isNavigationHeavy(value) {
+  const text=normalizeWhitespace(value).toLowerCase();
+  if(NAVIGATION_PHRASES.some(phrase=>text.includes(phrase)))return true;
+  const terms=meaningfulTerms(text),navigation=terms.filter(term=>NAVIGATION_TERMS.has(term)).length;
+  return navigation>=4&&navigation/Math.max(terms.length,1)>=0.25;
+}
+function sellerFactSourceAllowed(value) {
+  try{return !PARTNER_PATH_PATTERN.test(new URL(value).pathname.toLowerCase());}catch{return false;}
+}
+function receiptQuality(claim,quote,sourceUrl='') {
+  const text=normalizeWhitespace(quote);
+  if(sourceUrl&&!sellerFactSourceAllowed(sourceUrl))return {ok:false,code:'PARTNER_SOURCE',reason:'Partner, marketplace and template pages cannot support facts about the seller.'};
+  if(text.length<MIN_RECEIPT_TEXT)return {ok:false,code:'QUOTE_TOO_SHORT',reason:`The receipt quote must contain at least ${MIN_RECEIPT_TEXT} characters of supporting context.`};
+  if(isNavigationHeavy(text))return {ok:false,code:'NAVIGATION_BOILERPLATE',reason:'The receipt is mostly navigation, header or footer text rather than supporting evidence.'};
+  const claimTerms=meaningfulTerms(claim),quoteTerms=new Set(meaningfulTerms(text)),matched=claimTerms.filter(term=>quoteTerms.has(term));
+  const needed=claimTerms.length>=4?2:1;
+  if(claimTerms.length&&matched.length<needed)return {ok:false,code:'NO_CLAIM_OVERLAP',reason:'The receipt does not share enough meaningful terms with the claim it is meant to support.'};
+  return {ok:true,code:'QUALITY_OK',reason:'The receipt has contextual text and meaningful claim overlap.'};
+}
+function receiptSnippetAllowed(quote) {
+  const text=normalizeWhitespace(quote);
+  return text.length>=MIN_RECEIPT_TEXT&&!isNavigationHeavy(text)&&meaningfulTerms(text).length>=3;
+}
+function sloganLike(value) {
+  const text=normalizeWhitespace(value),lower=text.toLowerCase(),words=meaningfulTerms(text);
+  if(!text||words.length>18)return false;
+  if(/^(?:build|create|discover|grow|imagine|make|power|reimagine|ship|supercharge|transform|unlock)\b/i.test(text))return true;
+  if(/\b(?:your dreams?|world'?s best|all[- ]in[- ]one|game[- ]chang|revolutionary|effortless|seamless|flexible|modern teams?)\b/i.test(lower))return true;
+  return /\b(?:you|your)\b/i.test(text)&&words.length<=12;
+}
+function vendorSeekingQuery(value) {
+  const text=normalizeWhitespace(value).toLowerCase();
+  const vendor=/\b(?:best|affordable|alternatives?|platforms?|providers?|services?|software|solutions?|systems?|tools?|vendors?)\b/.test(text);
+  const prospectSignal=/\b(?:adopting|careers?|companies hiring|expanding|funding|headcount|hiring|job openings?|migrating|outages?|raised|recruiting|teams hiring|using|with)\b/.test(text);
+  return vendor&&!prospectSignal;
+}
+function killLooksLikePain(value) {
+  return /\b(?:downtime|high costs?|inefficient|legacy|manual processes?|outdated|slow|complaints?|avoiding automation|resistance to change)\b/i.test(normalizeWhitespace(value));
+}
+function termOverlap(left,right) {
+  const a=meaningfulTerms(left),b=new Set(meaningfulTerms(right)),matched=a.filter(term=>b.has(term));
+  return matched.length>=2&&matched.length/Math.max(a.length,1)>=0.5;
+}
+function finding(code,path,field,message,severity='blocking') {return {schemaVersion:1,id:stableId(`${code}:${path}`),code,path,field,severity,message};}
+function evidenceField(key) {return FACT_KEYS.includes(key)?key:key.includes('.')?`${key}.value`:key;}
+function evidenceSeverity(key,qualityCode) {
+  if(qualityCode==='PARTNER_SOURCE')return 'blocking';
+  return /^(?:valueProps|proofPoints|credentials|targetIndustries)\./.test(key)?'advisory':'blocking';
+}
+function workspaceQualityFindings(value) {
+  const profile=value?.sellerProfile||{},config=value?.icpConfig||{},findings=[];
+  for(const [key,item] of Object.entries(profile.evidence||{})) {
+    if(!item?.value||!item.sourceUrl&&!item.evidenceQuote)continue;
+    const quality=receiptQuality(item.value,item.evidenceQuote,item.sourceUrl);
+    if(!quality.ok)findings.push(finding(`RECEIPT_${quality.code}`,`sellerProfile.evidence.${key}`,evidenceField(key),quality.reason,evidenceSeverity(key,quality.code)));
+  }
+  if(!(profile.customers||[]).length)findings.push(finding('EMPTY_CUSTOMERS','sellerProfile.customers','customers','No verified customers are present. Add supported customers or explain why approval should proceed without them.'));
+  if(!(profile.competitors||[]).length)findings.push(finding('EMPTY_COMPETITORS','sellerProfile.competitors','competitors','No verified competitors are present. Add supported competitors or explain why approval should proceed without them.'));
+  const size=config.killPatterns?.sizeMetric||{},sizeLabel=normalizeWhitespace(size.label),targetSize=normalizeWhitespace(profile.targetCompanySize);
+  if(!MEASURABLE_SIZE_PATTERN.test(sizeLabel))findings.push(finding('SIZE_METRIC_UNMEASURABLE','icpConfig.killPatterns.sizeMetric.label','sizeLabel','The minimum-size label must name a measurable unit such as employees, engineering headcount or revenue.'));
+  const labelLower=sizeLabel.toLowerCase(),floor=Number(size.floor);
+  if(/\benterprise\b/i.test(targetSize)&&!/\b(?:small|startup|all sizes?|any size)\b/i.test(targetSize)) {
+    const minimum=/revenue|\barr\b/.test(labelLower)?50_000_000:/engineer/.test(labelLower)?50:250;
+    if(Number.isFinite(floor)&&floor<minimum)findings.push(finding('SIZE_FLOOR_CONTRADICTS_TARGET','icpConfig.killPatterns.sizeMetric.floor','sizeFloor',`The proposed floor of ${floor} conflicts with an enterprise target for this measurement.`));
+  }
+  if(!(config.personas?.buyerTitles||[]).length)findings.push(finding('MISSING_BUYER_PERSONAS','icpConfig.personas.buyerTitles','buyerTitles','At least one buyer title is required before approval.'));
+  if(!(config.personas?.championTitles||[]).length)findings.push(finding('MISSING_CHAMPION_PERSONAS','icpConfig.personas.championTitles','championTitles','At least one champion title is required before approval.'));
+  for(const key of ['category','productOneLiner','pricingModel'])if(profile[key]&&sloganLike(profile[key]))findings.push(finding('SLOGAN_LIKE_FACT',`sellerProfile.${key}`,key,'This reads like a headline or marketing slogan rather than a precise seller fact.','advisory'));
+  for(const [segmentIndex,segment] of (config.segments||[]).entries())for(const [queryIndex,query] of (segment.queryTemplates||[]).entries())if(vendorSeekingQuery(query))findings.push(finding('VENDOR_SEEKING_QUERY',`icpConfig.segments.${segmentIndex}.queryTemplates.${queryIndex}`,`segments.${segmentIndex}.queryTemplates`,'This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers.'));
+  const triggers=[...(config.triggerMapping?.pain_event||[]),...(config.triggerMapping?.buying_intent||[])];
+  for(const group of ['solvingInHouse','buildCulture'])for(const [index,item] of (config.killPatterns?.[group]||[]).entries()) {
+    const path=`icpConfig.killPatterns.${group}.${index}`,field=group;
+    if(killLooksLikePain(item))findings.push(finding('KILL_LOOKS_LIKE_BUYING_PAIN',path,field,'This kill pattern describes pain or modernization need and may be a buying signal rather than a reason the company will not buy.'));
+    if(triggers.some(trigger=>termOverlap(item,trigger)))findings.push(finding('KILL_DUPLICATES_TRIGGER',path,field,'This kill pattern substantially overlaps a pain or buying-intent trigger.'));
+  }
+  return findings.sort((a,b)=>a.path.localeCompare(b.path)||a.code.localeCompare(b.code));
+}
+function blockingQualityFindings(value) {return workspaceQualityFindings(value).filter(item=>item.severity==='blocking');}
 function truncateUtf8(value,maxBytes) {
   const bytes=Buffer.from(value);
   if(bytes.length<=maxBytes)return value;
@@ -192,7 +288,7 @@ function receiptQuotes(value,max=MAX_RECEIPT_TEXT) {
       remaining=remaining.slice(end).trim();
     }
   }
-  return [...new Set(result.filter(Boolean))];
+  return [...new Set(result.filter(receiptSnippetAllowed))];
 }
 function buildReceiptEvidence(state,workspace) {
   const rows=buildResearchEvidence(state,workspace);
@@ -232,10 +328,11 @@ function selectedCandidate(workspace) {
 
 function evidenceFor(state,workspace,raw,value,context) {
   const receiptId=clean(raw?.receiptId,40),ref=context.get(receiptId),sourceId=ref?.sourceId||null,quote=ref?.evidenceQuote||'';
-  const grounded=Boolean(ref&&quote&&quoteIsGrounded(state,sourceId,quote)&&normalizeWhitespace(ref.excerpt).includes(normalizeWhitespace(quote)));
+  const quality=ref?receiptQuality(value,quote,ref.source.url):{ok:false,code:'RECEIPT_NOT_FOUND',reason:receiptId?'The selected receipt was not included in this research run.':'No supporting receipt was selected.'};
+  const grounded=Boolean(ref&&quote&&quality.ok&&quoteIsGrounded(state,sourceId,quote)&&normalizeWhitespace(ref.excerpt).includes(normalizeWhitespace(quote)));
   return {schemaVersion:1,value,sourceUrl:ref?.source.url||null,sourceId,evidenceQuote:quote,inferred:!grounded,
-    verification:grounded?'matched_saved_quote':receiptId?'receipt_not_in_research':'no_source',
-    reason:grounded?'Quote matched saved source text.':receiptId?'The selected receipt was not included in this research run.':'No supporting receipt was selected.'};
+    verification:grounded?'matched_saved_quote':ref?quality.code.toLowerCase():receiptId?'receipt_not_in_research':'no_source',
+    reason:grounded?'Quote matched saved source text and passed contextual quality checks.':quality.reason};
 }
 function customerSourceAllowed(item,ref,sellerDomain) {
   if(!ref)return false;
@@ -318,7 +415,8 @@ function materializeGeneratedDraft(state,workspace,output,{now=()=>new Date().to
     painSources:{...rawConfig.painSources},pitch:{receiptOpenerStyle:clean(rawConfig.pitch.receiptOpenerStyle,500),oneSentenceProduct:profile.productOneLiner,credentialLine:clean(rawConfig.pitch.credentialLine,500),ctaStyle:clean(rawConfig.pitch.ctaStyle,500)},
     objectionTemplates:dedupeStrings(rawConfig.objectionTemplates,3,500),weights:{...WEIGHTS},slaDays:{...SLAS},tierRules:structuredClone(DEFAULT_TIER_RULES),defaultsReviewRequired:true};
   if(config.objectionTemplates.length!==3)throw new SynthesisValidationError('INVALID_OUTPUT','Three different objection templates are required.');
-  const report={schemaVersion:1,attemptedClaims,acceptedClaims,receiptedClaims,receiptCoverage:attemptedClaims?receiptedClaims/attemptedClaims:0,warnings,droppedCustomers,droppedCompetitors};
+  const report={schemaVersion:1,attemptedClaims,acceptedClaims,receiptedClaims,receiptCoverage:attemptedClaims?receiptedClaims/attemptedClaims:0,warnings,droppedCustomers,droppedCompetitors,
+    qualityFindings:workspaceQualityFindings({sellerProfile:profile,icpConfig:config})};
   return {profile,config,report};
 }
 
@@ -341,4 +439,6 @@ function saveGeneratedProfile(state,id,{output,expectedResearchRevision,expected
   return next;
 }
 
-module.exports={FACT_KEYS,LIST_FACT_KEYS,SIGNAL_KEYS,DEFAULT_TIER_RULES,MAX_SYNTHESIS_SOURCES,MAX_EVIDENCE_PACKET_BYTES,MAX_SOURCE_EXCERPT_BYTES,MAX_RECEIPT_TEXT,SynthesisValidationError,assertSynthesisOutput,validateSynthesisOutput,researchSourceContext,buildResearchEvidence,buildReceiptEvidence,receiptIdFor,sourceSetHash,materializeGeneratedDraft,saveGeneratedProfile};
+module.exports={FACT_KEYS,LIST_FACT_KEYS,SIGNAL_KEYS,DEFAULT_TIER_RULES,MAX_SYNTHESIS_SOURCES,MAX_EVIDENCE_PACKET_BYTES,MAX_SOURCE_EXCERPT_BYTES,MAX_RECEIPT_TEXT,MIN_RECEIPT_TEXT,
+  SynthesisValidationError,assertSynthesisOutput,validateSynthesisOutput,researchSourceContext,buildResearchEvidence,buildReceiptEvidence,receiptIdFor,sourceSetHash,
+  meaningfulTerms,isNavigationHeavy,sellerFactSourceAllowed,receiptQuality,receiptQuotes,sloganLike,vendorSeekingQuery,killLooksLikePain,workspaceQualityFindings,blockingQualityFindings,materializeGeneratedDraft,saveGeneratedProfile};

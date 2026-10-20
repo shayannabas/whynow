@@ -41,10 +41,11 @@ function evidence(state, value, sourceUrl, quote, sellerDomain, customer=false) 
   const source=Object.values(state.sources).find(s=>s.url===url && evidenceQuote && quoteIsGrounded(state,s.id,evidenceQuote));
   let firstParty=false;
   if (url) {const host=new URL(url).hostname.replace(/^www\./,'');firstParty=host===sellerDomain || host.endsWith(`.${sellerDomain}`);}
-  const verified=Boolean(source && (!customer || firstParty));
+  const quality=source?require('./validate.cjs').receiptQuality(value,evidenceQuote,url):null;
+  const verified=Boolean(source && quality?.ok && (!customer || firstParty));
   return {schemaVersion:1,value,sourceUrl:url||null,sourceId:source?.id||null,evidenceQuote,inferred:!verified,
     verification:verified?'matched_saved_quote':url?'linked_unverified':'no_source',
-    reason:verified?'Quote matched saved source text.':customer && url && !firstParty?'Customer claim needs the seller’s own public source.':url?'Link supplied; claim has not been verified against saved source text.':'No supporting source supplied.'};
+    reason:verified?'Quote matched saved source text and passed contextual quality checks.':customer && url && !firstParty?'Customer claim needs the seller’s own public source.':quality&&!quality.ok?quality.reason:url?'Link supplied; claim has not been verified against saved source text.':'No supporting source supplied.'};
 }
 function field(form,name,fallback='') {
   return form.has(name)?form.get(name):fallback;
@@ -175,6 +176,12 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
 function profileWarnings(profile) {
   return Object.entries(profile.evidence||{}).filter(([,item])=>item.value&&item.inferred).map(([key,item])=>({key,value:item.value,reason:item.reason}));
 }
+function qualityFindings(workspace) {
+  return require('./validate.cjs').workspaceQualityFindings(workspace);
+}
+function blockingQualityFindings(workspace) {
+  return qualityFindings(workspace).filter(item=>item.severity==='blocking');
+}
 function approvalProblems(workspace) {
   const p=workspace.sellerProfile,c=workspace.icpConfig,errors=[];
   if(!workspace.onboarding?.selectedCandidate)errors.push('Choose the seller company.');
@@ -196,17 +203,23 @@ function saveManualProfile(state,id,form,{now=()=>new Date().toISOString()}={}) 
   const {profile,config}=draftFromForm(state,workspace,form,now);
   return updateWorkspace(state,id,w=>{
     w.sellerProfile=profile;w.icpConfig=config;w.status='needs_review';w.profileRevision=(w.profileRevision||0)+1;w.deliveryMode='demo';
+    delete w.reviewAcknowledgments;
     if(w.research&&['review_required','approved'].includes(w.research.status)){
       w.research.status='review_required';w.research.revision=(w.research.revision||0)+1;
       w.research.steps=(w.research.steps||[]).map(step=>step.key==='review'?{...step,status:'pending'}:step);
     }
   });
 }
-function approveManualProfile(state,id,{revision,acknowledged=false,now=()=>new Date().toISOString()}={}) {
+function approveManualProfile(state,id,{revision,acknowledged=false,qualityReasons={},now=()=>new Date().toISOString()}={}) {
   const workspace=getWorkspace(state,id);checkRevision(workspace,revision);
   if(workspace.status!=='needs_review')throw new Error('Save a draft before approving it.');
   const errors=approvalProblems(workspace);if(errors.length)throw new Error(errors.join(' '));
   if(!acknowledged)throw new Error('Confirm that you reviewed the profile, defaults and unverified claims.');
+  const qualityAcknowledgments=blockingQualityFindings(workspace).map(item=>{
+    const reason=text(qualityReasons?.[item.id]||'',500);
+    if(reason.length<10)throw new Error(`Explain why you are accepting this warning before approval: ${item.message}`);
+    return {schemaVersion:1,id:item.id,code:item.code,path:item.path,reason};
+  });
   const next=updateWorkspace(state,id,w=>{
     w.status='active';w.sellerProfile.approvedAt=now();w.sellerProfile.deliveryAllowed=false;
     w.icpConfig.defaultsReviewRequired=false;w.deliveryMode='demo';w.profileRevision+=1;
@@ -215,7 +228,7 @@ function approveManualProfile(state,id,{revision,acknowledged=false,now=()=>new 
       w.research.steps=(w.research.steps||[]).map(step=>step.key==='review'?{...step,status:'complete'}:step);
     }
   });
-  next.auditLog.push({schemaVersion:1,id:stableId(`${id}:${next.workspaces[id].profileRevision}`),workspaceId:id,type:'seller_profile_approved',occurredAt:now(),profileRevision:next.workspaces[id].profileRevision,actor:'local-admin',unverifiedClaims:profileWarnings(workspace.sellerProfile).length});
+  next.auditLog.push({schemaVersion:1,id:stableId(`${id}:${next.workspaces[id].profileRevision}`),workspaceId:id,type:'seller_profile_approved',occurredAt:now(),profileRevision:next.workspaces[id].profileRevision,actor:'local-admin',unverifiedClaims:profileWarnings(workspace.sellerProfile).length,qualityAcknowledgments});
   return next;
 }
-module.exports={FACT_FIELDS,COLLECTIONS,WEIGHTS,LABELS,SLAS,TIER_RULES,profileWarnings,approvalProblems,saveManualProfile,approveManualProfile,draftFromForm};
+module.exports={FACT_FIELDS,COLLECTIONS,WEIGHTS,LABELS,SLAS,TIER_RULES,profileWarnings,qualityFindings,blockingQualityFindings,approvalProblems,saveManualProfile,approveManualProfile,draftFromForm};

@@ -1,0 +1,470 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-14T01:55:30.462Z",
+  "model": "gpt-4o-mini",
+  "promptVersion": "seller-profile-approvable-receipts-v4",
+  "commitHash": "14a7e577c4e022ddba6aaefa902f6d9763cec09b",
+  "source": "Owner-authorized Stage 2 recovery run using saved public-page research responses.",
+  "seller": {
+    "name": "Resolve AI",
+    "domain": "resolve.ai"
+  },
+  "sellerProfile": {
+    "schemaVersion": 1,
+    "sellerName": "Resolve AI",
+    "domain": "resolve.ai",
+    "deliveryAllowed": false,
+    "generatedAt": "2026-10-14T01:55:30.429Z",
+    "approvedAt": null,
+    "updatedAt": "2026-10-14T01:55:30.429Z",
+    "sources": [
+      "281d77e4f6dcd23a7822b04c",
+      "7a3d69d552e3ee607ff42350",
+      "330ba8acb517219ebba76a01",
+      "96f8b602f0597ad4a04576f9"
+    ],
+    "category": "AI SRE platform",
+    "productOneLiner": "AI for production systems that helps reduce downtime and protect revenue.",
+    "pricingModel": "",
+    "targetCompanySize": "",
+    "valueProps": [
+      "Enterprise-grade security by default.",
+      "Custom agents tailored to your workflows."
+    ],
+    "credentials": [],
+    "targetIndustries": [
+      "Technology"
+    ],
+    "proofPoints": [
+      {
+        "claim": "Learn how to evaluate frontier AI on real incidents.",
+        "schemaVersion": 1,
+        "value": "Learn how to evaluate frontier AI on real incidents.",
+        "sourceUrl": "https://resolve.ai/glossary/aiops-platform",
+        "sourceId": "96f8b602f0597ad4a04576f9",
+        "evidenceQuote": "Learn how to evaluate frontier AI on real incidents.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      }
+    ],
+    "customers": [],
+    "competitors": [],
+    "evidence": {
+      "category": {
+        "schemaVersion": 1,
+        "value": "AI SRE platform",
+        "sourceUrl": "https://resolve.ai/",
+        "sourceId": "281d77e4f6dcd23a7822b04c",
+        "evidenceQuote": "ResolveAI | AI SRE platform Learn how to evaluate frontier AI on real incidents.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "productOneLiner": {
+        "schemaVersion": 1,
+        "value": "AI for production systems that helps reduce downtime and protect revenue.",
+        "sourceUrl": "https://resolve.ai/",
+        "sourceId": "281d77e4f6dcd23a7822b04c",
+        "evidenceQuote": "workflows See what ResolveAI can do Get in touch to learn how our AI SRE platform can help reduce your downtime and protect revenue Talk to Us Browse All resources Every guide, webinar and report Blog",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "pricingModel": {
+        "schemaVersion": 1,
+        "value": "",
+        "sourceUrl": null,
+        "sourceId": null,
+        "evidenceQuote": "",
+        "inferred": true,
+        "verification": "no_source",
+        "reason": "No supporting receipt was selected."
+      },
+      "targetCompanySize": {
+        "schemaVersion": 1,
+        "value": "",
+        "sourceUrl": null,
+        "sourceId": null,
+        "evidenceQuote": "",
+        "inferred": true,
+        "verification": "no_source",
+        "reason": "No supporting receipt was selected."
+      },
+      "valueProps.0": {
+        "schemaVersion": 1,
+        "value": "Enterprise-grade security by default.",
+        "sourceUrl": "https://resolve.ai/",
+        "sourceId": "281d77e4f6dcd23a7822b04c",
+        "evidenceQuote": "Agent teams investigate Operational tasks Proactively run tasks Platform Integrations Meet your stack where it is Security Enterprise-grade by default Build custom agents Custom agents Agents for your",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "valueProps.1": {
+        "schemaVersion": 1,
+        "value": "Custom agents tailored to your workflows.",
+        "sourceUrl": "https://resolve.ai/glossary/what-is-ai-for-production-systems",
+        "sourceId": "7a3d69d552e3ee607ff42350",
+        "evidenceQuote": "Learn how to evaluate frontier AI on real incidents.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "targetIndustries.0": {
+        "schemaVersion": 1,
+        "value": "Technology",
+        "sourceUrl": "https://resolve.ai/glossary/ai-incident-management-platform",
+        "sourceId": "330ba8acb517219ebba76a01",
+        "evidenceQuote": "What is an AI incident management platform?",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      },
+      "proofPoints.0": {
+        "schemaVersion": 1,
+        "value": "Learn how to evaluate frontier AI on real incidents.",
+        "sourceUrl": "https://resolve.ai/glossary/aiops-platform",
+        "sourceId": "96f8b602f0597ad4a04576f9",
+        "evidenceQuote": "Learn how to evaluate frontier AI on real incidents.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text."
+      }
+    }
+  },
+  "icpConfig": {
+    "schemaVersion": 1,
+    "segments": [
+      {
+        "key": "897064de44cbef467643b74e",
+        "label": "Technology Companies",
+        "enabled": true,
+        "subIndustries": [
+          "Software Development",
+          "Cloud Services"
+        ],
+        "queryTemplates": [
+          "AI incident management",
+          "AI for production systems",
+          "AI SRE platform",
+          "AI for operational tasks"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "b5f3227337446f504cd86941",
+        "label": "E-commerce",
+        "enabled": true,
+        "subIndustries": [
+          "Food Delivery",
+          "Online Retail"
+        ],
+        "queryTemplates": [
+          "AI for reducing downtime",
+          "AI for customer service",
+          "AI for operational efficiency",
+          "AI for incident response"
+        ],
+        "revenueSensitivityBase": 4,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "13425bd9e339600c081538e8",
+        "label": "Financial Services",
+        "enabled": true,
+        "subIndustries": [
+          "Cryptocurrency",
+          "Banking"
+        ],
+        "queryTemplates": [
+          "AI for financial operations",
+          "AI for incident management",
+          "AI for risk management",
+          "AI for compliance"
+        ],
+        "revenueSensitivityBase": 5,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      }
+    ],
+    "personas": {
+      "buyerTitles": [
+        "CTO",
+        "Head of Operations",
+        "IT Manager"
+      ],
+      "championTitles": [
+        "DevOps Engineer",
+        "Site Reliability Engineer"
+      ],
+      "wrongOrgTitles": [
+        "Marketing Manager",
+        "Sales Associate"
+      ]
+    },
+    "signalDefinitions": {
+      "techStack": {
+        "label": "Technology Stack",
+        "description": "Focus on companies using cloud services and AI technologies.",
+        "evidenceKeywords": [
+          "AI",
+          "cloud",
+          "SRE",
+          "incident management"
+        ],
+        "negativeKeywords": [
+          "legacy systems",
+          "on-premise"
+        ],
+        "preferredSources": [
+          "customer testimonials",
+          "case studies",
+          "industry reports"
+        ],
+        "rubric": {
+          "1": "Not relevant",
+          "3": "Some relevance",
+          "5": "Highly relevant"
+        }
+      },
+      "activePain": {
+        "label": "Operational Downtime",
+        "description": "Companies experiencing frequent downtime or incidents.",
+        "evidenceKeywords": [
+          "downtime",
+          "incident",
+          "failure",
+          "outage"
+        ],
+        "negativeKeywords": [
+          "stable",
+          "reliable"
+        ],
+        "preferredSources": [
+          "news articles",
+          "customer feedback",
+          "industry reports"
+        ],
+        "rubric": {
+          "1": "Not a pain point",
+          "3": "Moderate pain",
+          "5": "Severe pain"
+        }
+      },
+      "revenueSensitivity": {
+        "label": "Revenue Impact",
+        "description": "Focus on companies where downtime significantly impacts revenue.",
+        "evidenceKeywords": [
+          "revenue loss",
+          "financial impact",
+          "cost of downtime"
+        ],
+        "negativeKeywords": [
+          "low revenue impact",
+          "non-revenue generating"
+        ],
+        "preferredSources": [
+          "financial reports",
+          "case studies",
+          "customer testimonials"
+        ],
+        "rubric": {
+          "1": "Low impact",
+          "3": "Moderate impact",
+          "5": "High impact"
+        }
+      },
+      "observabilityScale": {
+        "label": "Observability Maturity",
+        "description": "Target companies with advanced observability practices.",
+        "evidenceKeywords": [
+          "monitoring",
+          "observability",
+          "analytics"
+        ],
+        "negativeKeywords": [
+          "basic monitoring",
+          "no observability"
+        ],
+        "preferredSources": [
+          "industry reports",
+          "case studies",
+          "customer feedback"
+        ],
+        "rubric": {
+          "1": "Low maturity",
+          "3": "Moderate maturity",
+          "5": "High maturity"
+        }
+      },
+      "aiCompatibility": {
+        "label": "AI Adoption",
+        "description": "Focus on companies actively adopting AI technologies.",
+        "evidenceKeywords": [
+          "AI",
+          "machine learning",
+          "automation"
+        ],
+        "negativeKeywords": [
+          "no AI",
+          "manual processes"
+        ],
+        "preferredSources": [
+          "customer testimonials",
+          "case studies",
+          "industry reports"
+        ],
+        "rubric": {
+          "1": "Not adopting AI",
+          "3": "Some adoption",
+          "5": "High adoption"
+        }
+      },
+      "competitiveWedge": {
+        "label": "Competitive Advantage",
+        "description": "Highlight how AI can provide a competitive edge.",
+        "evidenceKeywords": [
+          "competitive advantage",
+          "differentiation",
+          "innovation"
+        ],
+        "negativeKeywords": [
+          "no differentiation",
+          "stagnation"
+        ],
+        "preferredSources": [
+          "market analysis",
+          "case studies",
+          "customer testimonials"
+        ],
+        "rubric": {
+          "1": "No advantage",
+          "3": "Some advantage",
+          "5": "Significant advantage"
+        }
+      }
+    },
+    "triggerMapping": {
+      "pain_event": [
+        "frequent downtime",
+        "high incident response time",
+        "customer complaints about service reliability"
+      ],
+      "buying_intent": [
+        "looking for AI solutions",
+        "interested in incident management tools",
+        "evaluating SRE platforms"
+      ],
+      "function_roles": [
+        "IT Operations",
+        "DevOps",
+        "Site Reliability Engineering"
+      ],
+      "tech_adoption": [
+        "adopting AI technologies",
+        "implementing cloud solutions"
+      ],
+      "competitor_names": []
+    },
+    "killPatterns": {
+      "solvingInHouse": [
+        "believing internal teams can handle incidents",
+        "relying on existing tools"
+      ],
+      "buildCulture": [
+        "not prioritizing AI adoption",
+        "focusing on manual processes"
+      ],
+      "sizeMetric": {
+        "label": "Company Size",
+        "floor": 50
+      }
+    },
+    "painSources": {
+      "statuspage": true,
+      "hn": false,
+      "news": true,
+      "filings": false
+    },
+    "pitch": {
+      "receiptOpenerStyle": "Learn how our AI SRE platform can help reduce your downtime and protect revenue.",
+      "oneSentenceProduct": "AI for production systems that helps reduce downtime and protect revenue.",
+      "credentialLine": "Trusted by leading companies in technology and finance.",
+      "ctaStyle": "Get in touch to learn more."
+    },
+    "objectionTemplates": [
+      "We already have a solution in place.",
+      "We're not ready to adopt AI yet.",
+      "Our team prefers manual processes."
+    ],
+    "weights": {
+      "techStack": 1.3,
+      "activePain": 1.2,
+      "revenueSensitivity": 1.1,
+      "observabilityScale": 1,
+      "aiCompatibility": 0.9,
+      "competitiveWedge": 0.8
+    },
+    "slaDays": {
+      "form_d_filing": 14,
+      "funding": 30,
+      "exec_change": 30,
+      "executive_departure": 30,
+      "new_account_with_warm_champion": 30,
+      "old_account_inherited_pain": 30,
+      "hiring_surge": 45,
+      "first_function_hire": 45,
+      "headcount_surge": 45,
+      "risk_factor_added": 120,
+      "pain_event": 30,
+      "public_postmortem": 30,
+      "public_pain_writeup": 30,
+      "buying_intent_hiring": 60,
+      "function_hiring": 90,
+      "internal_tool_maintenance": 90,
+      "tech_adoption": 90,
+      "competitor_adoption": 120,
+      "conference_talk": 120
+    },
+    "tierRules": {
+      "tier1": {
+        "public": true,
+        "revenue": 500000000,
+        "employees": 2000,
+        "valuation": 5000000000
+      },
+      "tier2": {
+        "revenue": 25000000,
+        "employees": 150,
+        "fundingStages": [
+          "Series A",
+          "Series B",
+          "Series C",
+          "Series D",
+          "growth",
+          "PE"
+        ]
+      },
+      "tier3": {
+        "maxEmployees": 149,
+        "minRaised": 2000000
+      },
+      "unclassified": "parked"
+    },
+    "defaultsReviewRequired": true
+  },
+  "receiptReport": {
+    "schemaVersion": 1,
+    "attemptedClaims": 6,
+    "acceptedClaims": 6,
+    "receiptedClaims": 6,
+    "receiptCoverage": 1,
+    "warnings": [],
+    "droppedCustomers": [],
+    "droppedCompetitors": []
+  }
+}

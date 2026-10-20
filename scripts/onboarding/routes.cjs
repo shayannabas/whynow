@@ -88,7 +88,8 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
     try{
       await mutate(current=>{
         if(current.activeWorkspaceId!==id)throw new Error('Workspace changed. Refresh and try again.');
-        return pathname.endsWith('/save')?saveManualProfile(current,id,form):approveManualProfile(current,id,{revision:form.get('revision'),acknowledged:form.has('acknowledged')});
+        const qualityReasons=Object.fromEntries([...form].filter(([key])=>key.startsWith('qualityReason.')).map(([key,value])=>[key.slice('qualityReason.'.length),value]));
+        return pathname.endsWith('/save')?saveManualProfile(current,id,form):approveManualProfile(current,id,{revision:form.get('revision'),acknowledged:form.has('acknowledged'),qualityReasons});
       });
       redirect('/onboarding/profile');
     }catch(error){html(400,profilePage(state,{error:error.message,submitted:pathname.endsWith('/save')?form:null}));}

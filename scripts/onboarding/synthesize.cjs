@@ -1,7 +1,7 @@
 const { getWorkspace } = require('../server/state.cjs');
 const { SIGNAL_KEYS, assertSynthesisOutput, buildReceiptEvidence, sourceSetHash, SynthesisValidationError } = require('./validate.cjs');
 
-const PROMPT_VERSION = 'seller-profile-approvable-receipts-v4';
+const PROMPT_VERSION = 'seller-profile-quality-guards-v5';
 
 const text = (maxLength, minLength=0) => ({type:'string',minLength,maxLength});
 const list = (items,minItems,maxItems) => ({type:'array',items,minItems,maxItems});
@@ -64,8 +64,13 @@ function buildSynthesisRequest(state,workspaceId) {
     'An approvable draft must include a receipt-backed product category, product one-liner, and at least one target industry. Choose conservative wording that the selected receipt directly supports.',
     'Receipt quality gate: at least 90% of every non-empty seller fact you attempt must have an exact supporting quote. Prefer fewer supported facts; leave unsupported values empty instead of making a weak attempt.',
     'Customers and competitors count as attempted facts even when rejected. Keep those arrays empty unless one receipt explicitly names the organization and states its relationship to this seller.',
+    'Never use a partner, marketplace, template or solution-partner page as evidence for the seller’s own facts, credentials or target industries.',
     'Do not return URLs, source IDs, or quote text. The server resolves receiptId and independently checks every receipt against the saved page.',
     'Customer and competitor entries require direct evidence. Targeting rules are proposals for human review, not factual claims.',
+    'Use a measurable sizeMetric label such as employees, engineering headcount or annual revenue, and choose a floor consistent with targetCompanySize.',
+    'Buyer titles must be roles likely to approve this purchase; champion titles must be roles likely to own, use or advocate for the product. Avoid generic product or design titles unless the evidence and product motion make them credible.',
+    'Segment search phrases must find prospective buyer companies. Do not write product-category, vendor-comparison or tool-shopping searches that would primarily return the seller or its competitors.',
+    'Kill patterns must describe companies that will not buy, such as a binding internal-build mandate. They must not restate pain, modernization needs, buying intent or positive trigger signals.',
     'Return exactly the requested JSON schema, with 3–10 distinct segments and 4–8 distinct search phrases per segment.'
   ].join('\n');
   const input=JSON.stringify({company,evidence:JSON.parse(evidence.serialized)});

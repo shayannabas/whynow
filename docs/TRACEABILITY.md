@@ -1,6 +1,24 @@
 # WhyNow traceability
 
-## Stage 2 local completion — 2026-10-13
+## Stage 2 warning levels and one-rerun preparation — 2026-10-19
+
+Stage 2 remains reopened for quality. The 9/23/27 offline findings are now classified rather than all treated as blocking: Resolve AI has 7 blocking and 2 advisory findings, Shopify 18 and 5, and Vercel revision 1 has 23 and 4. Blocking findings require a fix or a typed audit reason. Advisories stay beside the affected field and do not appear in the approval-reason form. New tests cover missing personas, severity assignment, advisory UI and advisory-only approval behavior. Verification passed with 107 active tests across 21 files, one intentional Stage 3 skip and zero production dependency vulnerabilities.
+
+Step 5 is planned but not executed. Saved sources will be reused, and a fixed allowlist adds 4 Resolve AI, 5 Shopify and 8 Vercel first-party pages. No Serper query is needed. Exactly three GPT-4o mini drafts are planned, with an expected cost around $0.01 under the existing temporary $0.05 cap. The per-seller pass bar is three first-party customers, two sourced competitors, consistent measurable size, buyer/champion titles and zero blocking warnings. No profile was approved and Stage 3 has not started.
+
+## Stage 2 quality audit — 2026-10-13
+
+Vercel revision 1 demonstrated that 100% exact-substring receipt coverage did not mean a generated profile was useful. Navigation text, page titles, taglines, unrelated quotes and partner-page descriptions could all pass the old check. The original acceptance runner also did not persist its profiles. A bounded recovery run later saved public-data snapshots for Resolve AI, Shopify and Vercel plus separate `needs_review` acceptance state; it did not auto-approve them.
+
+Steps 1–4 of the quality correction are now implemented offline. Research prioritizes customers, case studies, enterprise, pricing, comparison/alternatives and about pages within the existing 20-page ceiling. Partner/marketplace/template pages rank last and cannot support the seller's own facts. Receipt candidates remove common page chrome and require minimum context plus meaningful claim overlap. ICP review now blocks empty organizations, unmeasurable or contradictory size, slogan-like facts, vendor-seeking prospect searches, pain-like kill rules and kill/trigger overlap.
+
+Warnings do not rewrite model output. The review page explains each warning next to its field. Approval requires a distinct typed reason for every remaining warning; the audit log stores the finding and reason, and any edit invalidates the approval context so reasons must be entered again. Tests pair synthetic passing cases with real negative snapshots. The immutable recovered drafts now report 9 warnings for Resolve AI, 23 for Shopify and 27 for Vercel revision 1. Possible correct-but-weak-evidence flags are documented rather than silently loosened in `docs/STAGE-2-QUALITY-AUDIT.md`.
+
+Verification: all 21 test files passed, with 104 active tests and one intentional Stage 3 scaffold skip. No page was fetched and no Serper or OpenAI call was made for this audit. Normal OpenAI settings remain disabled/zero. Step 5 requires separate owner approval; the three recovered profiles remain `needs_review`, and Stage 3 has not started.
+
+## Superseded Stage 2 completion claim — 2026-10-13
+
+The historical record below describes the earlier acceptance result. Its conclusion that Stage 2 was complete is superseded by the quality audit above. In particular, the original acceptance did not persist its profiles, and exact substring receipts did not establish evidence quality.
 
 Completed the owner-authorized real-key acceptance for Resolve AI, Shopify and Vercel. The first live attempt exposed a too-short twenty-second AI timeout, and later runs exposed nondeterministic quote copying plus an approval-contract mismatch. The production fix keeps a bounded ninety-second timeout and converts each saved source excerpt into server-created receipt snippets. OpenAI can only select valid receipt IDs from the request schema; it cannot rewrite their text. The server resolves each ID back to the saved source, rechecks the exact quote, and requires receipt-backed category, product and target-industry fields before a generated draft can reach approval.
 

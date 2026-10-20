@@ -9,7 +9,7 @@ const {PROMPT_VERSION,SYNTHESIS_SCHEMA,buildEvidencePacket,buildSynthesisRequest
 const {SIGNAL_KEYS,MAX_EVIDENCE_PACKET_BYTES,assertSynthesisOutput,materializeGeneratedDraft,receiptIdFor,saveGeneratedProfile}=require('../scripts/onboarding/validate.cjs');
 
 const NOW='2026-09-17T12:00:00.000Z';
-const SELLER_TEXT='Fixture Seller is workflow automation software for enterprise teams. It automates workflows for software companies. Customer Alpha uses Fixture Seller. Rival Corp is listed as an alternative. Certified secure.';
+const SELLER_TEXT='Fixture Seller is workflow automation software for enterprise teams. It automates workflows for software companies. Customer Alpha uses Fixture Seller. Rival Corp is listed as an alternative. Fixture Seller maintains certified enterprise security controls.';
 function segment(label) {
   return {label,subIndustries:[`${label} software`],queryTemplates:[`${label} companies`,`${label} directory`,`${label} funding`,`${label} hiring`],revenueSensitivityBase:3,wedgeCustomers:['Customer Alpha'],exampleTargets:[]};
 }
@@ -22,7 +22,7 @@ function output(sourceId) {
     targetCompanySize:fact('Enterprise teams','Fixture Seller is workflow automation software for enterprise teams.'),
     valueProps:[fact('Workflow automation','It automates workflows for software companies.')],
     proofPoints:[{claim:'Customer Alpha uses the product',receiptId:receiptIdFor(sourceId,'Customer Alpha uses Fixture Seller.')}],
-    credentials:[fact('Certified secure','Certified secure.')],
+    credentials:[fact('Certified enterprise security controls','Fixture Seller maintains certified enterprise security controls.')],
     targetIndustries:[fact('Software companies','It automates workflows for software companies.')],
     customers:[{name:'Customer Alpha',domain:'customer-alpha.com',receiptId:receiptIdFor(sourceId,'Customer Alpha uses Fixture Seller.')}],
     competitors:[{name:'Rival Corp',domain:'rival.example.com',receiptId:receiptIdFor(sourceId,'Rival Corp is listed as an alternative.')}]
@@ -146,6 +146,9 @@ it('uses an injected LLM interface and performs no network access in synthesis t
   expect(calls).toBe(1);expect(seen.validate(raw)).toBe(true);expect(seen.messages[0].content).toContain('only the EVIDENCE');
   expect(seen.messages[0].content).toContain('at least 90%');
   expect(seen.messages[0].content).toContain('Keep those arrays empty unless');
+  expect(seen.messages[0].content).toContain('partner, marketplace, template or solution-partner');
+  expect(seen.messages[0].content).toContain('prospective buyer companies');
+  expect(seen.messages[0].content).toContain('Kill patterns must describe companies that will not buy');
   expect(result).toMatchObject({output:raw,cached:false,model:'fixture-model',promptVersion:PROMPT_VERSION,guard:{expectedResearchRevision:4}});
 });
 
