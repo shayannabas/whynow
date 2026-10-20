@@ -11,6 +11,7 @@ const minute=60000,hour=60*minute,day=24*hour;
 const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
   ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000],['lever',20,500,6*hour,12000],['ashby',20,500,6*hour,12000],
   ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
+  ['wikidata',60,250,7*day,12000],
   ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
   ['engineering_web',20,1500,12*hour,12000],
   ['seller_site',25,1000,day,12000],['seller_customers',2,2000,30*day,12000],['robots',30,500,day,8000]
