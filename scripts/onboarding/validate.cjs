@@ -8,8 +8,10 @@ const FACT_KEYS = ['category', 'productOneLiner', 'pricingModel', 'targetCompany
 const LIST_FACT_KEYS = ['valueProps', 'credentials', 'targetIndustries'];
 const SIGNAL_KEYS = Object.keys(WEIGHTS);
 const MAX_SYNTHESIS_SOURCES = 20;
-const MAX_EVIDENCE_PACKET_BYTES = 24000;
-const MAX_SOURCE_EXCERPT_BYTES = 6000;
+const MAX_EVIDENCE_PACKET_BYTES = 120000;
+const MAX_SOURCE_EXCERPT_BYTES = 20000;
+const MIN_SOURCE_EXCERPT_BYTES = 1500;
+const EVIDENCE_PACKET_RESERVED_BYTES = 1024;
 const MAX_RECEIPT_TEXT = 200;
 const MIN_RECEIPT_TEXT = 24;
 const PARTNER_PATH_PATTERN=/(?:^|\/)(?:partners?|marketplace|templates?|solution-partners?)(?:\/|$)/i;
@@ -238,11 +240,6 @@ function workspaceQualityFindings(value) {
   return findings.sort((a,b)=>a.path.localeCompare(b.path)||a.code.localeCompare(b.code));
 }
 function blockingQualityFindings(value) {return workspaceQualityFindings(value).filter(item=>item.severity==='blocking');}
-function truncateUtf8(value,maxBytes) {
-  const bytes=Buffer.from(value);
-  if(bytes.length<=maxBytes)return value;
-  return bytes.subarray(0,maxBytes).toString('utf8').replace(/\uFFFD$/,'').trimEnd();
-}
 
 function researchSourceContext(state,workspace) {
   const refs=Array.isArray(workspace.research?.sources)?workspace.research.sources:[];
@@ -262,21 +259,21 @@ function sourceSetHash(state,workspace) {
   const rows=[...researchSourceContext(state,workspace).values()].sort((a,b)=>a.sourceId.localeCompare(b.sourceId));
   return createHash('sha256').update(rows.map(row=>`${row.sourceId}:${row.source.contentHash}`).join('\n')).digest('hex');
 }
-function buildResearchEvidence(state,workspace) {
-  const refs=[...researchSourceContext(state,workspace).values()].sort((a,b)=>a.sourceId.localeCompare(b.sourceId));
-  if(!refs.length)throw new SynthesisValidationError('NO_SOURCES','Collect at least one public source before generating a profile.');
-  if(refs.length>MAX_SYNTHESIS_SOURCES)throw new SynthesisValidationError('TOO_MANY_SOURCES',`Use no more than ${MAX_SYNTHESIS_SOURCES} sources for one synthesis request.`);
-  const metadata=refs.map(ref=>({sourceId:ref.sourceId,url:clean(ref.source.url,1000),title:clean(ref.source.title,300),kind:clean(ref.kind,100),ownerDomain:ref.ownerDomain||'',text:''}));
-  const baseBytes=Buffer.byteLength(JSON.stringify({sources:metadata}));
-  if(baseBytes>=MAX_EVIDENCE_PACKET_BYTES)throw new SynthesisValidationError('INPUT_TOO_LARGE','Source metadata exceeds the synthesis input limit.');
-  const perSource=Math.min(MAX_SOURCE_EXCERPT_BYTES,Math.floor((MAX_EVIDENCE_PACKET_BYTES-baseBytes-256)/refs.length));
-  if(perSource<200)throw new SynthesisValidationError('INPUT_TOO_LARGE','There is not enough room for bounded source excerpts.');
-  return refs.map((ref,index)=>({...ref,excerpt:truncateUtf8(normalizeWhitespace(ref.source.text),perSource),packet:metadata[index]}));
+function sourceEvidenceWeight(ref) {
+  let pathname='';try{pathname=new URL(ref.source.url).pathname.toLowerCase();}catch{}
+  if(ref.kind==='seller_customer_page'||/\/(?:customers?|case-stud(?:y|ies)|customer-stories|stories)(?:\/|$)/.test(pathname))return 6;
+  if(/\/(?:compare|comparisons|alternatives?)(?:\/|$)|(?:^|[-/])vs(?:[-/]|$)/.test(pathname))return 6;
+  if(/\/(?:pricing|plans?)(?:\/|$)/.test(pathname))return 4;
+  if(/\/(?:about(?:-us)?|enterprise)(?:\/|$)/.test(pathname))return 3;
+  return 1;
 }
-function receiptIdFor(sourceId,quote) {
-  return `r_${stableId(`${sourceId}\n${normalizeWhitespace(quote)}`)}`;
+function allocateSourceExcerptBudgets(refs,availableBytes) {
+  const minimum=Math.min(MIN_SOURCE_EXCERPT_BYTES,Math.floor(availableBytes/refs.length));
+  const remaining=Math.max(0,availableBytes-(minimum*refs.length));
+  const totalWeight=refs.reduce((sum,ref)=>sum+sourceEvidenceWeight(ref),0);
+  return refs.map(ref=>Math.min(MAX_SOURCE_EXCERPT_BYTES,minimum+Math.floor(remaining*sourceEvidenceWeight(ref)/totalWeight)));
 }
-function receiptQuotes(value,max=MAX_RECEIPT_TEXT) {
+function receiptQuoteCandidates(value,max=MAX_RECEIPT_TEXT) {
   const text=normalizeWhitespace(value), sentences=text?text.split(/(?<=[.!?])\s+/):[], result=[];
   for(const sentence of sentences) {
     let remaining=sentence.trim();
@@ -290,13 +287,58 @@ function receiptQuotes(value,max=MAX_RECEIPT_TEXT) {
   }
   return [...new Set(result.filter(receiptSnippetAllowed))];
 }
+function evidenceQuoteScore(quote,ref) {
+  const text=normalizeWhitespace(quote),lower=text.toLowerCase();
+  let score=0;
+  if(/\b(?:customer|customers|customer story|case study|trusted by|used by|brands?|companies)\b/.test(lower))score+=14;
+  if(/\b(?:vs\.?|versus|alternative|alternatives|compare|comparison|competitor|competitors)\b/.test(lower))score+=14;
+  if(/\b(?:price|prices|pricing|plan|plans|per month|per year|annual|contract|subscription|free|revenue|arr)\b/.test(lower))score+=9;
+  if(/\b(?:employee|employees|headcount|engineer|engineers|engineering team|team of|workforce|enterprise|mid-market|small business|smb)\b/.test(lower))score+=9;
+  if(/\b(?:saved|reduced|increased|improved|grew|growth|faster|hours?|minutes?|percent|%)\b/.test(lower))score+=4;
+  if(/\b(?:[A-Z][A-Za-z0-9&.'’-]{2,}(?:\s+(?:[A-Z][A-Za-z0-9&.'’-]{2,}|of|the)){0,4}|[A-Z][A-Z0-9]{2,})\b/.test(text))score+=3;
+  let urlTerms=[];try{urlTerms=decodeURIComponent(new URL(ref.source.url).pathname).toLowerCase().split(/[^a-z0-9]+/).filter(term=>term.length>=4&&!['about','blog','case','customers','customer','studies','study','compare','comparison','pricing','enterprise','vercel','shopify','resolve'].includes(term));}catch{}
+  if(urlTerms.some(term=>lower.includes(term)))score+=12;
+  return score;
+}
+function selectRelevantReceiptQuotes(ref,budgetBytes) {
+  const candidates=receiptQuoteCandidates(ref.source.text).map((quote,index)=>({quote,index,score:evidenceQuoteScore(quote,ref)}));
+  candidates.sort((left,right)=>right.score-left.score||left.index-right.index);
+  const selected=[];let bytes=0;
+  for(const candidate of candidates) {
+    const addition=Buffer.byteLength(candidate.quote)+(selected.length?1:0);
+    if(bytes+addition>budgetBytes)continue;
+    selected.push(candidate.quote);bytes+=addition;
+  }
+  return selected;
+}
+function buildResearchEvidence(state,workspace) {
+  const refs=[...researchSourceContext(state,workspace).values()].sort((a,b)=>sourceEvidenceWeight(b)-sourceEvidenceWeight(a)||a.sourceId.localeCompare(b.sourceId));
+  if(!refs.length)throw new SynthesisValidationError('NO_SOURCES','Collect at least one public source before generating a profile.');
+  if(refs.length>MAX_SYNTHESIS_SOURCES)throw new SynthesisValidationError('TOO_MANY_SOURCES',`Use no more than ${MAX_SYNTHESIS_SOURCES} sources for one synthesis request.`);
+  const metadata=refs.map(ref=>({sourceId:ref.sourceId,url:clean(ref.source.url,1000),title:clean(ref.source.title,300),kind:clean(ref.kind,100),ownerDomain:ref.ownerDomain||'',text:''}));
+  const baseBytes=Buffer.byteLength(JSON.stringify({sources:metadata}));
+  if(baseBytes>=MAX_EVIDENCE_PACKET_BYTES)throw new SynthesisValidationError('INPUT_TOO_LARGE','Source metadata exceeds the synthesis input limit.');
+  const available=MAX_EVIDENCE_PACKET_BYTES-baseBytes-EVIDENCE_PACKET_RESERVED_BYTES;
+  const budgets=allocateSourceExcerptBudgets(refs,available);
+  if(budgets.some(budget=>budget<200))throw new SynthesisValidationError('INPUT_TOO_LARGE','There is not enough room for bounded source excerpts.');
+  return refs.map((ref,index)=>{
+    const receiptCandidates=selectRelevantReceiptQuotes(ref,budgets[index]);
+    return {...ref,excerpt:receiptCandidates.join('\n'),receiptCandidates,excerptBudgetBytes:budgets[index],packet:metadata[index]};
+  });
+}
+function receiptIdFor(sourceId,quote) {
+  return `r_${stableId(`${sourceId}\n${normalizeWhitespace(quote)}`)}`;
+}
+function receiptQuotes(value,max=MAX_RECEIPT_TEXT) {
+  return receiptQuoteCandidates(value,max);
+}
 function buildReceiptEvidence(state,workspace) {
   const rows=buildResearchEvidence(state,workspace);
   const sources=rows.map(row=>{
     const {text:ignored,...metadata}=row.packet;
     return {...metadata,receipts:[]};
   });
-  const queues=rows.map(row=>receiptQuotes(row.excerpt)),receiptMap=new Map();
+  const queues=rows.map(row=>[...row.receiptCandidates]),receiptMap=new Map();
   let more=true;
   while(more) {
     more=false;

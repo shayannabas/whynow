@@ -1,10 +1,22 @@
 # WhyNow traceability
 
+## Stage 2 evidence-packet root-cause audit — 2026-10-19
+
+The final-run pages were present, but the old drafting input capped the complete receipt menu at 24,000 bytes, split excerpt space across every selected source and sampled from each page's beginning. Resolve AI and Shopify nearly filled that ceiling with only 101 and 122 receipts; Vercel produced 74. This favored headers, navigation and hero copy over customer names and comparison evidence farther down the saved pages.
+
+The offline fix raises the hard ceiling to 120,000 bytes, assigns larger page budgets to customer/case-study and comparison sources followed by pricing and about/enterprise sources, and ranks non-navigation sentences containing organization, customer, comparison, pricing and company-size language. It does not change receipt grounding, partner-page exclusion, claim-overlap checks or any other quality rule.
+
+Rebuilding the unchanged saved sources produced 119,824 bytes/548 receipts for Resolve AI, 119,852/605 for Shopify and 93,160/489 for Vercel. All checked organization names on the individual customer and comparison pages now occur in their source's receipt menu. Names not actually present in an index page's saved text are reported as `not present in saved source`, not as packet failures. The source-by-source counts and before/after name matrix are in `docs/STAGE-2-FINAL-RERUN.md`.
+
+Three new tests cover saved-page customer/competitor excerpts, priority-weighted budgets, navigation exclusion and a 20-source limit stress case. Full verification passed: 22 files, 112 tests passed and one intentionally skipped Stage 3 scaffold test (113 total). The first sandboxed run could not bind local HTTP test ports; the unchanged suite passed when rerun with localhost permission. No page fetch, Serper query, OpenAI call, profile edit or approval occurred. `AGENTS.md` was not changed and Stage 3 was not started.
+
+The earlier instruction to proceed directly to manual correction is superseded by this checkpoint. Manual fixes are paused. A saved-pages-only GPT-4o mini drafting run requires a new explicit owner authorization and is not part of this commit.
+
 ## Final Stage 2 rerun — 2026-10-19
 
 The owner authorized the last automated Stage 2 iteration. `scripts/stage2-final-rerun.cjs` uses a one-time marker, an explicit first-party allowlist, no Serper search and a process-only OpenAI cap. The run fetched 29/29 pages with zero errors, used exactly three GPT-4o mini calls with no retry and recorded $0.007646 in token-priced cost under the $0.05 cap. Normal local OpenAI settings stayed disabled/zero, no profile was approved and Stage 3 did not start.
 
-The new persisted drafts honestly failed the complete pass bar. Resolve AI has 2 first-party customers, no competitors, a consistent Employees/1,000 rule, buyer/champion titles and 8 blocking/4 advisory warnings. Shopify has 0/0 organizations, a compatible Employee Count/50 rule, personas and 25/1 warnings. Vercel has 0/0 organizations, a compatible employees/100 rule, personas and 16/5 warnings. The owner will fix these profiles manually; another automated rerun must not be proposed. Full details are in `docs/STAGE-2-FINAL-RERUN.md`.
+The new persisted drafts honestly failed the complete pass bar. Resolve AI has 2 first-party customers, no competitors, a consistent Employees/1,000 rule, buyer/champion titles and 8 blocking/4 advisory warnings. Shopify has 0/0 organizations, a compatible Employee Count/50 rule, personas and 25/1 warnings. Vercel has 0/0 organizations, a compatible employees/100 rule, personas and 16/5 warnings. Manual correction was subsequently paused when the evidence-packet root cause above was confirmed. Full details are in `docs/STAGE-2-FINAL-RERUN.md`.
 
 ## Stage 2 warning levels and one-rerun preparation — 2026-10-19
 
