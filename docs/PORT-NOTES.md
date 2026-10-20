@@ -32,7 +32,7 @@ Updated October 20, 2026. SignalScout by Isa Iqbal is the read-only behavioral r
 
 **How it decides:** It multiplies the tier weight by fit, a freshness factor and the available stack factor, then divides by the configured ceiling. Any kill makes priority exactly zero. It retains the first kill as primary and every remaining reason as `alsoKilledBy`.
 
-**What changed from SignalScout:** Core output remains parity-compatible. Trigger collectors and advanced stacking are not ported in Phase A; their interface remains present with no-trigger behavior matching SignalScout. Decision weights and the normalization ceiling now come from workspace configuration.
+**What changed from SignalScout:** Core output remains parity-compatible. Decision weights and the normalization ceiling come from workspace configuration. In the live adapter, external incident/news/executive triggers count only when their source reports a date and the event remains inside its configured window; stale rows remain audit history rather than current “why now” evidence.
 
 ## `scripts/signal-rubric.cjs`
 
@@ -112,6 +112,12 @@ The captured Binance-like account has strong public signals and scores **90/100*
 
 **What it does:** Provides the only live network path for collectors. **How it decides:** It requires the crawler contact email, public HTTPS/DNS, allowed redirects, robots permission, per-source pacing, size/type limits and cached budgets. **What changed from SignalScout:** SignalScout's relevant source budgets and cache times are preserved, while WhyNow keeps its stricter DNS pinning, robots checks, atomic cache writes and saved health counters. Skipped sources have no runtime budget.
 
+ATS JSON has a source-specific 16 MB ceiling because large public boards such as Databricks can exceed the normal page limit; every other source keeps its tighter ceiling. Greenhouse, Lever and Ashby slugs are derived from configured domain/name aliases and their standard public board URL shapes. A failed or forbidden source is recorded independently and never blocks unrelated collectors.
+
+### `scripts/firmographics.cjs` and `scripts/collectors/firmographics.cjs`
+
+**What they do:** Build a free, receipted company-size profile from bounded public search and Wikidata evidence. **How they decide:** Employee, revenue, funding, valuation and listing claims must belong to the target company; the tier engine may use lower-confidence proof but marks the tier provisional. Generic `IPO`/`public company` text, truncated one-dollar revenue and metrics stated for a neighboring company are rejected. **What changed from SignalScout:** No Apollo or PDL path exists. WhyNow keeps exact source fields and confidence, prunes legacy misattributed free fields offline, and accepts structured Wikidata exchange claims without treating them like untrusted search boilerplate.
+
 ### `scripts/collector-triggers.cjs`, `scripts/pain-themes.cjs` and `scripts/incident-attribution.cjs`
 
 **What they do:** Add expiry dates to time-sensitive events, classify incident pain themes and distinguish first-party incidents from upstream/unknown reports. **How they decide:** Workspace SLA days, configured theme terms and receipt ownership determine decay, labels and whether an incident is safe to cite. **What changed from SignalScout:** They are small collector dependencies only; no scheduler, outreach or later-chunk logic came with them.
@@ -122,7 +128,7 @@ The captured Binance-like account has strong public signals and scores **90/100*
 
 ### `scripts/collectors/active-pain.cjs`
 
-**What it does:** Collects recent operational incidents from public Statuspage APIs, Hacker News and Google News RSS, plus already-capped search evidence. **How it decides:** A result must name the target or use its domain, describe operational impact and have a public URL; attribution controls confidence and citation status. **What changed from SignalScout:** StatusGator's API collector was not ported. Individual source failures remain visible and cannot suppress receipts from the other free sources.
+**What it does:** Collects recent operational incidents from public Statuspage APIs, Hacker News and dated Serper News/search evidence. **How it decides:** A result must name the target or use its domain, describe operational impact, provide a public URL and include a date inside the configured window. A healthy/no-current-problems page scores zero, and an incident about another company does not transfer to the target merely because it appears on the target's content domain. **What changed from SignalScout:** StatusGator's API collector was not ported. Google News RSS was robots-blocked and was replaced with bounded Serper News while continuing to respect robots. This stricter healthy-page/date/near-entity rule is a deliberate correctness deviation from SignalScout.
 
 ### `scripts/collectors/search-evidence.cjs`
 
@@ -134,7 +140,7 @@ The captured Binance-like account has strong public signals and scores **90/100*
 
 ### `scripts/collectors/edgar-form-d.cjs`
 
-**What it does:** Checks SEC daily indexes and one workspace segment query for matching Form D fundraising. **How it decides:** Company/alias matching is exact after legal-suffix normalization, and details are included only when disclosed in the filing. **What changed from SignalScout:** Resolve segment queries moved into workspace configuration. Risk-factor collection and discovery promotion are not run; account refresh keeps only events for the named account.
+**What it does:** Checks SEC daily indexes and one workspace segment query for matching Form D fundraising. **How it decides:** Company/alias matching is exact after legal-suffix normalization, and details are included only when disclosed in the filing. **What changed from SignalScout:** Resolve segment queries moved into workspace configuration. Risk-factor collection and discovery promotion are not run; account refresh keeps only events for the named account. The live SEC endpoint still returned 403 with the required name-plus-contact identity; that error is retained without blocking other sources, and Phase B does not spend more time retrying it.
 
 ### `scripts/collectors/tech-culture.cjs`
 
@@ -159,3 +165,5 @@ The captured Binance-like account has strong public signals and scores **90/100*
 ## Phase B parity and worked example
 
 `tests/fixtures/parity/signalscout-phase-b.json` freezes 18 pure collector outputs from the same SignalScout commit. WhyNow reproduces them exactly without importing SignalScout at test time. For example, the Binance fixture turns its public Greenhouse reliability/AI-RCA roles into stack and hiring triggers, then the Phase A engine recalculates fit and priority; the job URLs remain the explanation for every point earned. Live adapters add network safety and persistence around that unchanged classification contract.
+
+The live Binance account is not automatically `KILL_UNSELLABLE_ORG`. The parity fixture supplies an explicit unavailable prospecting surface and receipt; the saved live evidence does not. WhyNow never infers a kill from size or fit alone.

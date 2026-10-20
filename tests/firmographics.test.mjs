@@ -21,6 +21,25 @@ describe('free firmographics',()=>{
     expect(profile.employeeCount).toBeNull();expect(profile.isPublic).toBeNull();
   });
 
+  it('requires target-local context and explicit listing language for high-impact fields',()=>{
+    const profile=firmographics.parseSearchResults(company,[
+      {title:'Acme and peers',url:'https://example.org/peers',snippet:'Acme competes with OtherCo. OtherCo raised $535 million and has 8,000 employees.'},
+      {title:'Acme listing',url:'https://acme.example/investors',snippet:'Acme is publicly traded on NASDAQ: ACME and has 2,500 employees.'},
+      {title:'Acme report',url:'https://acme.example/results',snippet:'Acme revenue of $1 was shown in a truncated preview.'},
+    ],'2026-10-20T00:00:00.000Z');
+    expect(profile).toMatchObject({isPublic:true,employeeCount:2500,totalRaised:null,revenueEstimate:null});expect(profile.fields.isPublic.evidenceText).toMatch(/publicly traded|NASDAQ/);
+  });
+
+  it('removes legacy boilerplate public/IPO claims during offline re-sanitization',()=>{
+    const profile=firmographics.emptyProfile(company,'2026-10-20T00:00:00.000Z');profile.fields.isPublic=firmographics.sourceField(true,.82,'https://profiles.example/acme',profile.asOf,'Public-company marker');profile.fields.fundingStage=firmographics.sourceField('Ipo',.78,'https://profiles.example/acme',profile.asOf,'ipo');profile.fields.revenueEstimate=firmographics.sourceField(1,.68,'https://profiles.example/acme',profile.asOf,'revenue of $1');profile.fields.revenueBand=firmographics.sourceField('$1',.68,'https://profiles.example/acme',profile.asOf,'revenue of $1');
+    expect(firmographics.finalizeProfile(profile)).toMatchObject({isPublic:null,fundingStage:'',revenueEstimate:null,revenueBand:''});
+  });
+
+  it('drops saved free fields whose receipt names another company',()=>{
+    const profile=firmographics.emptyProfile(company,'2026-10-20T00:00:00.000Z');profile.fields.employeeCount=firmographics.sourceField(2500,.72,'https://profiles.example/acme',profile.asOf,'2,500 employees');profile.fields.totalRaised=firmographics.sourceField(535_000_000,.8,'https://news.example/doordash-raises',profile.asOf,'raised $535M');firmographics.finalizeProfile(profile);
+    expect(firmographics.pruneUnattributedFields(profile,company)).toMatchObject({employeeCount:2500,totalRaised:null});
+  });
+
   it('merges the strongest free and Wikidata fields while retaining receipts',()=>{
     const free=firmographics.parseSearchResults(company,[{title:'Acme funding',url:'https://news.example/acme',snippet:'Acme raised $40 million in a Series B.'}],'2026-10-20T00:00:00.000Z');
     const wikidata=firmographics.emptyProfile(company,'2026-10-20T00:00:00.000Z');wikidata.source='wikidata';wikidata.sources=['https://www.wikidata.org/entity/Q1'];wikidata.fields.employeeCount=firmographics.sourceField(2500,.7,wikidata.sources[0],wikidata.asOf,'Wikidata P1128 employee count','wikidata');firmographics.finalizeProfile(wikidata);

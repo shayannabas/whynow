@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 20, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phases A and B are complete; no profile was approved and no later port chunk has started.
+Updated: October 20, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phases A and B plus the Phase B demo-quality fixes are complete. Chunk 2 (discovery and the Today surface) is authorized and starts only after this green checkpoint is published. No profile was approved.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -43,6 +43,11 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 - [x] Pass the Phase B full offline suite: 36 files, 177 active tests passed and one existing scaffold remains intentionally skipped.
 - [x] Live Resolve reference check: five accounts, 20 Serper queries exactly, 0 OpenAI calls; results/errors are recorded in `docs/PHASE-B-LIVE-VERIFICATION.md`.
 - [x] Browser verification after a fresh server start: the account detail showed scores, honest zeros, clickable receipts, query count and errors; the Kill Log retained Databricks's receipted build-culture kill.
+- [x] Add free, receipted search/Wikidata firmographics and provisional-tier behavior; no Apollo or PDL.
+- [x] Re-score the five saved live accounts after rejecting public-company/IPO boilerplate, misattributed metrics, healthy status pages, stale/undated evidence and duplicate triggers. The offline pass made zero provider calls.
+- [x] Keep the remaining SEC 403 visible and isolated; other sources continue and no further Phase B effort is spent on EDGAR.
+- [x] Owner authorized Chunk 2: discover 20–30 Resolve-segment prospects with at most 60 additional Serper queries, exclude customers/competitors, then add Today, account detail and new/working/skipped status.
+- [ ] Complete Chunk 2 and stop before the next port phase.
 - [ ] Later port chunks remain blocked until the owner approves each one separately.
 - [ ] Railway deployment is Phase G only and requires the owner's explicit OK.
 
@@ -67,7 +72,7 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 
 ## Current decision
 
-Phase B is the current completed boundary. Phase A parity remains green. The Phase B fixture covers 18 pure collector cases across ATS, incident/news, Serper planning, executive changes, Form D, culture, AI, wedge and revenue. The live check retained successful receipts and exposed provider limitations honestly; no exact-parity exception remains. Chunk 2 is not authorized.
+Phase B and its demo-quality correction pass are the current published boundary. Phase A parity remains green. The Phase B fixture covers 18 pure collector cases across ATS, incident/news, Serper planning, executive changes, Form D, culture, AI, wedge and revenue. From already-saved evidence, Databricks/Uber Eats/Binance/Replicate/DraftKings now tier as 1/1 provisional/1/3/1 provisional; dated pain is zero for all five, Binance has nine active deduplicated ATS triggers, and only Databricks retains a receipted build-culture kill. Chunk 2 is authorized next.
 
 Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup. The bounded recovery run persisted three snapshots and three `needs_review` workspaces. It made four attempts because Shopify used the existing transient retry. Shopify and Vercel reported an estimated combined $0.005177; Resolve AI's usage record was lost when the first process stopped, so the exact total is unknown. The conservative reservation reached $0.038686 under the temporary $0.05 cap. The ignored local `.env` was then verified without displaying secrets: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. Local operation avoids hosting charges, but provider calls still consume credits.
 
@@ -167,6 +172,7 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 
 - **2026-10-20:** Owner superseded Stage 2.5 and the trimmed remaining-stage plan with port mode using SignalScout by Isa Iqbal as a read-only reference. Stage 2.5 is paused and its extractor retained for future use. No module was ported, no profile approved and no provider called; Phase A awaits explicit owner approval.
 - **2026-10-20:** Completed port-mode Phase A. Captured ten immutable offline SignalScout parity cases at commit `130789f`, moved Resolve constants into reference profile v2 with line-level provenance, added workspace-configured scoring/kills/tiering/decisioning, manual accounts, Scorecard, retained Kill Log and a non-approved Resolve demo loader. Real browser restart persistence passed. Full suite: 144 active tests passed, one intentional skip. No provider call, approval or deployment occurred; Phase B remains blocked.
+- **2026-10-20:** Tightened Phase B live quality. Free firmographics now reject adjacent-company/IPO/public boilerplate, current triggers require dated in-window evidence, healthy status pages score zero, and repeated receipts are deduplicated. The five-account correction reused saved evidence and made no provider calls. SEC EDGAR's remaining 403 is recorded and isolated. The owner authorized Chunk 2 with a separate maximum of 60 Serper queries.
 - **2026-10-20:** Reached the Stage 2.5 offline checkpoint. Deterministic saved-page extraction found 7/51/14 customer candidates with 2/3/2 proven domains and 2/2/3 competitors for Resolve AI/Shopify/Vercel. Independent unconfirmed keys produce provisional recall of 7/7 + 2/2, 3/3 + 2/2 and 3/3 + 3/3; confirmed-only scoring remains empty pending owner review. Raw HTML was available, no page/provider call ran, and no profile was approved. A read-only account model listing confirmed the proposed pinned GPT-5.4 mini ID is available; it remains disabled and the conservative focused-call estimate exceeds the old cap. Full verification passed with 125 active tests and one intentional skip across 27 files.
 - **2026-10-19:** Recorded the authorized saved-pages-only redraft preflight ($0.032103 maximum estimate) and stopped attempt: one Resolve AI provider attempt ended `REQUEST_FAILED`; Shopify/Vercel were not called; no profile changed; settings remained disabled/zero; 113 tests pass with one intentional skip.
 - **2026-10-19:** Confirmed offline that duplicated receipt enums put Resolve AI at 1,097 and Shopify at 1,211 enum values. Replaced them with one short-ID enum (548/605/489 values), added stable-ID restoration, a 900-receipt priority cap, documented-limit schema tests and safe HTTP-status diagnostics. Full verification passed with 116 tests and one intentional Stage 3 skip. No provider call or approval occurred.

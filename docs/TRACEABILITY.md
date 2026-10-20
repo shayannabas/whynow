@@ -143,8 +143,12 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Signals feed Phase A | `mergeCollectorResult`; `scoreAccount` | Background-runner test proves receipts update fit and a kill hint reaches Kill Log precedence |
 | Background Refresh account UI | `server/phase-a-pages.cjs`; `server/router.cjs` | Local-only/same-origin HTTP test; button, receipt links and errors render |
 | Exclusions | No GitHub/StatusGator/OTel graph/risk-factor/conference module or route | Runtime budgets and parity fixture omit excluded sources |
-| Full regression | All tests | 36 files passed; 177 active tests passed, 1 intentional skip |
-| Live verification | `.whynow/phase-b-live-report.json`; `docs/PHASE-B-LIVE-VERIFICATION.md` | Five Resolve-segment accounts; exactly 20 Serper queries; 0 OpenAI calls; signals, zeros and errors reported |
+| Free firmographics and tiers | `firmographics.cjs`; `collectors/firmographics.cjs`; `wikidata-universe.cjs` | Search metrics require target-local context; structured Wikidata receipts remain valid; five saved live accounts produce evidence-backed or explicitly provisional tiers without Apollo/PDL |
+| Current why-now only | `active-pain.cjs`; `decisioning.cjs`; `phase-b-runner.cjs` | Synthetic positives and real negatives prove healthy pages, other-company incidents, stale/undated evidence and duplicate URLs do not become current triggers |
+| ATS large-board handling | `collectors/runtime.cjs`; `collectors/hiring.cjs` | ATS JSON alone has a 16 MB ceiling; name/domain aliases drive bounded Greenhouse/Lever/Ashby slug attempts |
+| Failure isolation | `phase-b-runner.cjs`; `docs/PHASE-B-LIVE-VERIFICATION.md` | SEC EDGAR's remaining HTTP 403 is recorded; other collector evidence is retained and scored |
+| Full regression | All tests | 39 files passed; 194 active tests passed, 1 intentional skip |
+| Live verification | `.whynow/phase-b-live-report.json`; `docs/PHASE-B-LIVE-VERIFICATION.md` | Five Resolve-segment accounts; 20-query initial run plus 25-query quality re-check; final correction from saved evidence used 0 queries; 0 OpenAI calls throughout |
 
 | Requirement | Implementation | Verification |
 | --- | --- | --- |

@@ -121,6 +121,9 @@ function operationalPainEvidence(target, result = {}) {
   if (!stronglyAttributedToTarget(target, result)) return false;
   const evidenceUrl = String(result.url || result.link || result.evidenceUrl || "");
   const text = stripHtml(`${result.title || ""} ${result.snippet || result.text || result.evidenceText || ""}`).toLowerCase();
+  const targetName=normalizeEntityText(target.discoveryQuality?.targetAccountName||target.name||''),normalizedText=normalizeEntityText(text),statusLike=/\/status(?:\/|$)|\/incidents?(?:\/|$)/i.test(evidenceUrl)||/^status\./i.test((()=>{try{return new URL(evidenceUrl).hostname;}catch{return '';}})());
+  if(targetName&&!` ${normalizedText} `.includes(` ${targetName} `)&&!statusLike)return false;
+  if(targetName&&!statusLike){const nameIndex=normalizedText.indexOf(targetName),painIndexes=[...normalizedText.matchAll(/\b(outage|downtime|degraded|service disruption|unavailable|incident|down)\b/g)].map(match=>match.index);if(nameIndex<0||!painIndexes.some(index=>Math.abs(index-nameIndex)<=70))return false;}
   if (/\b(no current (?:problems?|issues?|outages?)|all systems operational|currently (?:healthy|operational)|no incidents? reported|service is operating normally)\b/.test(text)) return false;
   const strongIncident = /\b(outage|downtime|degraded|service disruption|unavailable)\b/.test(text);
   const genericIncident = /\b(incident|down)\b/.test(text);

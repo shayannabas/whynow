@@ -44,7 +44,8 @@ async function main(){
       signals:Object.fromEntries(SIGNAL_KEYS.map(key=>{const row=saved.signals?.[key]||{};return [key,{score:Number(row.score||1),evidenceUrl:String(row.evidenceUrl||''),evidenceText:String(row.evidenceText||''),inferred:Boolean(row.inferred)}];})),
       triggers:(saved.triggers||[]).map(row=>({type:row.type||row.triggerType,title:row.title||'',evidenceUrl:row.evidenceUrl||'',occurredAt:row.occurredAt||row.detectedAt||''})),
       kills:(saved.kills||[]).map(row=>({code:row.code,reason:row.reason,evidenceUrl:row.evidenceUrl})),
-      fitScore:saved.fitScore,tier:saved.tier,priority:saved.priority,
+      fitScore:saved.fitScore,tier:saved.tier,tierReason:saved.tierReason,tierProvisional:Boolean(saved.tierProvisional),priority:saved.priority,
+      firmographics:{employeeCount:saved.firmographics?.employeeCount??null,revenueEstimate:saved.firmographics?.revenueEstimate??null,revenueBand:saved.firmographics?.revenueBand||'',fundingStage:saved.firmographics?.fundingStage||'',totalRaised:saved.firmographics?.totalRaised??null,valuation:saved.firmographics?.valuation??null,isPublic:saved.firmographics?.isPublic??null,confidence:saved.firmographics?.confidence??0,confidenceLabel:saved.firmographics?.confidenceLabel||'',fields:saved.firmographics?.fields||{}},
       collectorCounts:Object.fromEntries((run.collectors||[]).map(row=>[row.collectorId,{status:row.status,signals:row.signals,events:row.events,killHints:row.killHints,itemsFound:row.itemsFound}])),
       errors:run.errors||[],
     });

@@ -8,7 +8,7 @@ function ageDays(value,now=new Date()){const timestamp=Date.parse(value||'');ret
 function activeTriggers(account={},now=new Date()){
   return (account.triggers||[]).filter(trigger=>{
     if(!trigger.evidenceUrl||trigger.weakEvidenceFlag===true||trigger.reviewState==='needs_more_research')return false;
-    if(['serper','public_search','google_news_rss'].includes(trigger.sourceId)&&trigger.metadata?.eventDateReported===false)return false;
+    if(['serper','public_search','google_news_rss'].includes(trigger.sourceId)&&/incident|outage|news|exec|executive/.test(String(trigger.type||trigger.triggerType||''))&&trigger.metadata?.eventDateReported!==true)return false;
     const end=Date.parse(trigger.decaysAt||''),start=Date.parse(trigger.occurredAt||trigger.detectedAt||'');
     if(Number.isFinite(end))return now.getTime()<end;
     return Number.isFinite(start)&&ageDays(trigger.occurredAt||trigger.detectedAt,now)>=0&&ageDays(trigger.occurredAt||trigger.detectedAt,now)<90;

@@ -23,6 +23,12 @@ describe('Phase B demo-quality gates',()=>{
     expect(output.events.map(row=>row.evidenceUrl)).toEqual(['https://acme.example/incidents/current']);
   });
 
+  it('does not attribute a third-party incident to a seller-hosted content page',()=>{
+    expect(pain.operationalPainEvidence({name:'Binance',domain:'binance.com'},{title:'MetaMask security incident affected its infrastructure',snippet:'MetaMask users saw a service disruption.',url:'https://www.binance.com/en/square/post/123'})).toBe(false);
+    expect(pain.operationalPainEvidence({name:'Binance',domain:'binance.com'},{title:'Binance API outage affected customers',snippet:'The Binance production platform was unavailable.',url:'https://www.binance.com/en/support/incident/123'})).toBe(true);
+    expect(pain.operationalPainEvidence({name:'Binance',domain:'binance.com'},{title:'Binance founder supports Bitget',snippet:'Binance co-founder offered help after the Bitget platform incident.',url:'https://news.example/bitget'})).toBe(false);
+  });
+
   it('does not turn an undated executive article into a fresh trigger',()=>{
     const base={title:'Acme appoints Jane Doe as CTO',snippet:'Acme appoints Jane Doe as chief technology officer.',url:'https://news.example/acme-cto',sourceId:'serper'};
     expect(executive.executiveNewsEvents(target,[base],NOW,{exec_change:30})).toEqual([]);

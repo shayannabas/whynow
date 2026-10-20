@@ -1,29 +1,36 @@
 # Phase B live verification
 
-Captured October 20, 2026 against the frozen Resolve reference demo. This was the one owner-authorized live check after the full offline suite passed. It used **20 Serper queries exactly** (4 per company), free public collectors and **0 OpenAI calls**. No profile was approved and no later port chunk started.
+Captured October 20, 2026 against the frozen Resolve reference demo. The initial check used 20 Serper queries. The owner-authorized quality re-check used 25 more queries, exactly five per company. Across both checks OpenAI calls remained **zero**. The table below is the final offline re-score of the five accounts from the already-saved evidence after the firmographic and freshness fixes; this re-score made **zero new provider calls**.
 
-All five jobs reached `complete_with_errors`: successful sources were retained and rescored while blocked/missing sources stayed visible as errors. `Parked` means free collectors did not produce receipted firmographics; WhyNow did not guess company size.
+## Final saved-evidence result
 
-| Account | Segment | Fit | Tier | Non-zero signal scores | Triggers | Kill |
-| --- | --- | ---: | --- | --- | ---: | --- |
-| Databricks | Data / AI infrastructure | 53 | Parked | tech 5, revenue 4 inferred, observability 5, pain 4, AI 4 | 4 | `KILL_BUILD_CULTURE` |
-| Uber Eats | Delivery / real-time marketplaces | 48 | Parked | tech 4, revenue 5 inferred, pain 4, AI 5, wedge 5 | 4 | none |
-| Binance | Crypto / fintech | 54 | Parked | tech 4, revenue 5 inferred, observability 5, pain 4, AI 3, wedge 5 | 15 | none |
-| Replicate | Data / AI infrastructure | 49 | Parked | tech 4, revenue 4 inferred, observability 5, pain 4, AI 3 | 7 | none |
-| DraftKings | Sports betting / iGaming | 46 | Parked | tech 3, revenue 5 inferred, observability 3, pain 4, AI 4, wedge 4 inferred | 3 | none |
+| Account | Tier and receipted size basis | Fit | Dated active pain | Active deduplicated triggers | Kills |
+| --- | --- | ---: | --- | ---: | --- |
+| Databricks | Tier 1 — 11,000 employees; [receipt](https://www.trueup.io/co/databricks) | 35 | none | 0 | `KILL_BUILD_CULTURE`; [receipt](https://docs.databricks.com/aws/en/lakehouse-architecture/deployment-guide/observability) |
+| Uber Eats | Tier 1, provisional — $5.8B revenue; [receipt](https://www.theguardian.com/technology/2022/feb/09/uber-eats-earnings-report-stocks) | 31 | none | 0 | none |
+| Binance | Tier 1 — 5,000 employees; [receipt](https://www.binance.com/en/square/post/20642089256402) | 49 | none | 9 | none |
+| Replicate | Tier 3 — 37 employees plus meaningful seed funding; [receipt](https://mlq.ai/startups/replicate/) | 22 | none | 0 | none |
+| DraftKings | Tier 1, provisional — $6.5B valuation; [receipt](https://productmint.com/draftkings-business-model-how-does-draftkings-make-money/) | 24 | none | 0 | none |
 
-## Receipts and honest zeros
+The nine active Binance triggers are dated job-board signals inside their configured windows: AI/dev-tools, system-performance, data-science/LLM, identity/security, language operations and technical-support hiring. Duplicate URLs and stale or undated search evidence are absent. All five active-pain counts are honestly zero because no saved page both attributed a dated incident to the target and placed it inside the trigger window.
 
-- **Databricks:** [technology receipt](https://www.cloudthat.com/resources/blog/unified-monitoring-for-databricks-and-kubernetes-using-grafana/), [observability receipt](https://www.youtube.com/watch?v=zsUcAKyv-Cw), [active-pain receipt](https://www.outagely.com/status/databricks/), [AI receipt](https://www.databricks.com/learn/certification/genai-engineer-associate), and [build-culture kill receipt](https://docs.databricks.com/aws/en/lakehouse-architecture/deployment-guide/observability). Competitive wedge remained 0/1 with no receipt.
-- **Uber Eats:** [technology receipt](https://dev.to/signadot/everything-you-need-to-know-about-kubernetes-microservices-4j0f), [active-pain receipt](https://downdetector.com/status/uber-eats/), [AI receipt](https://www.uber.com/us/en/blog/open-source-and-in-house-how-uber-optimizes-llm-training/), and [Resolve customer-wedge receipt](https://resolve.ai/customers). Observability remained 0/1 with no receipt.
-- **Binance:** [technology/observability receipt](https://startup.jobs/associate-site-reliability-engineer-binance-us-10448662), [active-pain receipt](https://downdetector.com/status/binance/), [AI receipt](https://sg.linkedin.com/jobs/view/llm-data-scientist-algorithm-engineer-top-talent-program-at-binance-4304878015), and [Resolve customer-wedge receipt](https://resolve.ai/customers).
-- **Replicate:** [technology receipt](https://www.linkedin.com/posts/prayag-sangode-41737318_kubernetes-replicaset-k8s-activity-7459134750910353408-zKW3), [observability receipt](https://www.manageengine.com/it-operations-management/blog/best-kubernetes-monitoring-tools.html), [first-party active-pain receipt](https://replicate.com/blog/new-status-page), and [AI receipt](https://www.youtube.com/watch?v=huQPkrwVWwc). Competitive wedge remained 0/1 with no receipt.
-- **DraftKings:** [technology receipt](https://medium.com/draftkings-engineering/draftkings-workshop-demystifying-kubernetes-4ce86c187408), [observability receipt](https://careers.draftkings.com/jobs/jr14624/senior-lead-site-reliability-engineer-database/), [active-pain receipt](https://statusgator.com/services/draftkings), [AI receipt](https://www.facebook.com/draftkingslife/posts/ai-is-changing-more-than-how-engineers-code-its-changing-what-they-get-to-buildi/1714260440699341/), and [Resolve category-wedge receipt](https://resolve.ai/customers).
+## Quality fixes proven offline
 
-## Collector errors and limitations
+- Free-search firmographics now require the metric and target company to occur in the same sentence. Generic `IPO`, `public company` and one-dollar truncated snippets no longer create high-impact fields. Structured Wikidata stock-exchange facts remain valid because they are not free-text guesses.
+- Saved free fields whose URL and quote do not identify the target are removed before re-scoring. The five accounts can therefore keep a tier only when the saved receipt supports that company.
+- Active-pain pages that say a service is healthy score zero. Third-party incidents mentioned on seller-hosted content pages do not become the seller's incident.
+- Search/news/incident/executive triggers require a reported date, must be inside their configured window and are deduplicated by trigger type plus canonical evidence URL. Historical rows remain in `triggerHistory` for audit but do not leak into the current score or report.
+- ATS JSON has a source-specific 16 MB ceiling; the normal public-page ceiling remains unchanged. Slugs are tried from the configured domain/name aliases and common vendor URL shapes.
 
-- SEC daily indexes returned unsupported content types/403 responses on the first account; the shared four-request EDGAR index budget was then exhausted. Form D was therefore 0 for every account.
-- Google News RSS was disallowed by its current `robots.txt` path. Hacker News and Serper continued.
-- ATS discovery returned honest 404/401/no-match results for most companies. Binance's public Greenhouse board succeeded; Databricks's response exceeded the strict 2 MB ceiling.
-- Several inferred or search-derived “active pain” candidates are monitoring pages that say a service is currently healthy. This is retained as a visible SignalScout-parity limitation, not silently rewritten. A later quality phase should add negation/current-status handling without changing the frozen pure-output fixture.
-- StatusGator was **not** used as an API collector. Some ordinary Serper results happened to link to StatusGator pages; these remain transparent search receipts.
+## Binance unsellable-kill explanation
+
+The frozen SignalScout parity case is killed because its input explicitly says the prospecting surface is unavailable and includes a public evidence URL. The live Binance record has no `prospectingSurface`, no receipted `prospectingSurfaceEvidenceUrl`, and no equivalent kill hint. Large size and a high fit score cannot substitute for the missing evidence, so `KILL_UNSELLABLE_ORG` correctly does not fire.
+
+## Remaining source errors
+
+- **SEC EDGAR still returned HTTP 403** even after the request identity was changed to the SEC-required name-plus-contact format and supported content types were accepted. The collector remains implemented, but this source error is isolated: the other collectors continue, their successful evidence is retained and the job reports `complete_with_errors`. No more time is being spent on EDGAR in this phase.
+- Google News RSS was blocked by its `robots.txt`; WhyNow continues to respect that. News collection now uses dated Serper News results inside the authorized query budget.
+- The Wikidata API path was disallowed by its current robots policy during the check. Free-search firmographics still produced the receipted tiers above; no access control was bypassed.
+- Databricks's Greenhouse board exceeded the earlier 8 MB ATS-only ceiling. The offline fix raises only ATS JSON to 16 MB. No new fetch was made for this checkpoint.
+
+This is a correctness-first checkpoint: successful evidence stays visible, zeros stay zero, failures cannot block unrelated sources, and no historical trigger is presented as “why now.”

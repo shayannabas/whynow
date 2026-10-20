@@ -96,6 +96,8 @@ it('normalizes evidence without inventing a receipt',()=>{
   expect(stripHtml('<script>secret()</script><p>A &amp; B</p>')).toBe('A & B');
   expect(evidenceBelongsToTarget({name:'Example',domain:'example.org'},'https://example.org/blog')).toBe(true);
   expect(evidenceBelongsToTarget({name:'Example',domain:'example.org'},'https://news.org','Examples are many')).toBe(false);
+  expect(evidenceBelongsToTarget({name:'Replicate',domain:'replicate.com'},{url:'https://news.org/company',title:'Replicate launches a new API'})).toBe(true);
+  expect(evidenceBelongsToTarget({name:'Replicate',domain:'replicate.com'},{url:'https://news.org/kubernetes',title:'How to replicate a Kubernetes workload'})).toBe(false);
 });
 it('exposes recorded-response helpers without bypassing the guarded runtime',async()=>{
   const h=harness();

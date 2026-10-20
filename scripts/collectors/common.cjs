@@ -31,11 +31,14 @@ function evidenceBelongsToTarget(target={},evidenceOrUrl={},fallbackText='') {
   const evidence=typeof evidenceOrUrl==='string'?{url:evidenceOrUrl,text:fallbackText}:evidenceOrUrl||{};
   const targetDomain=domainForTarget(target),evidenceUrl=String(evidence.url||evidence.link||evidence.evidenceUrl||'');
   if(targetDomain&&evidenceUrl){try{const host=new URL(evidenceUrl).hostname.replace(/^www\./,'').toLowerCase();if(host===targetDomain||host.endsWith(`.${targetDomain}`))return true;}catch{}}
-  const targetName=normalizeEntityText(target.discoveryQuality?.targetAccountName||target.name||'');
+  const targetNameRaw=String(target.discoveryQuality?.targetAccountName||target.name||'').trim(),targetName=normalizeEntityText(targetNameRaw);
   if(targetName.length<4)return false;
-  const text=normalizeEntityText(`${evidence.title||''} ${evidence.snippet||evidence.text||evidence.evidenceText||''}`);
+  const rawText=stripHtml(`${evidence.title||''} ${evidence.snippet||evidence.text||evidence.evidenceText||''}`),text=normalizeEntityText(rawText);
   if(!text)return false;
-  if(!targetName.includes(' '))return new RegExp(`(?:^|\\s)${targetName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:$|\\s)`).test(text);
+  if(!targetName.includes(' ')){
+    const escapedRaw=targetNameRaw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),urlText=normalizeEntityText(evidenceUrl);
+    return new RegExp(`(?:^|\\s)${targetName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:$|\\s)`).test(urlText)||new RegExp(`(?:^|[^A-Za-z0-9])${escapedRaw}(?:$|[^A-Za-z0-9])`).test(rawText);
+  }
   if(` ${text} `.includes(` ${targetName} `))return true;
   const compactTarget=targetName.replace(/\s+/g,''),compactText=text.replace(/\s+/g,'');
   return compactTarget.length>=7&&compactText.includes(compactTarget);

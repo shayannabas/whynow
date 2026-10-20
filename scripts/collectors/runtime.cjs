@@ -9,7 +9,7 @@ const {atomicWrite} = require('../server/state.cjs');
 
 const minute=60000,hour=60*minute,day=24*hour;
 const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
-  ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000,8*1024*1024],['lever',20,500,6*hour,12000,8*1024*1024],['ashby',20,500,6*hour,12000,8*1024*1024],
+  ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000,16*1024*1024],['lever',20,500,6*hour,12000,16*1024*1024],['ashby',20,500,6*hour,12000,16*1024*1024],
   ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
   ['wikidata',60,250,7*day,12000],
   ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
