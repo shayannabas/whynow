@@ -80,7 +80,7 @@ This reproduces the owner review: revision 1 is not usable despite its historica
 
 `npm test` passed with 21 test files and 107 active tests. One Stage 3 golden-set test remains intentionally skipped. All tests are offline and use synthetic data, recorded snapshots or local servers. The production dependency audit found zero vulnerabilities.
 
-## Step 5 preparation — not executed
+## Historical Step 5 preparation
 
 The one-rerun allowlist reuses all saved sources and adds only these public pages:
 
@@ -94,4 +94,4 @@ That is 4 + 5 + 8 = 17 new page requests and zero Serper queries. The saved site
 
 Pass bar per seller: at least three customers with first-party receipts, at least two competitors with receipts, measurable size consistent with target size, buyer and champion titles, and zero blocking warnings. Any remaining failure after the single rerun will be edited manually.
 
-Step 5 is not authorized. No listed page was fetched by WhyNow, no Serper query ran, no OpenAI request ran, and all three recovered profiles remain `needs_review`.
+This 17-page plan was superseded before execution because it did not add enough explicit Resolve AI or Shopify customer coverage. The final authorized plan expanded to 29 first-party pages and is documented in `docs/STAGE-2-FINAL-RERUN.md`. The preserved 9/23/27 findings above remain the pre-rerun audit of the original recovery snapshots; the final snapshots now report 12/26/21 total warnings with blocking/advisory splits of 8/4, 25/1 and 16/5.

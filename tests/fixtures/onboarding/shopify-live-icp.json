@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "capturedOn": "2026-10-14T02:03:57.608Z",
+  "capturedOn": "2026-10-20T00:45:14.738Z",
   "model": "gpt-4o-mini",
-  "promptVersion": "seller-profile-approvable-receipts-v4",
-  "commitHash": "42e7e2bc8fdfd0679575e118970a9035f903efd0",
-  "source": "Owner-authorized Stage 2 recovery run using saved public-page research responses.",
+  "promptVersion": "seller-profile-quality-guards-v5",
+  "commitHash": "9634b6bcbcaa808840d74478ff87680845fc8c8f",
+  "source": "Owner-authorized final Stage 2 rerun using only the documented first-party live-page allowlist and zero Serper queries.",
   "seller": {
     "name": "Shopify: The All-in-One Commerce Platform for Businesses ...",
     "domain": "shopify.com"
@@ -14,43 +14,41 @@
     "sellerName": "Shopify: The All-in-One Commerce Platform for Businesses ...",
     "domain": "shopify.com",
     "deliveryAllowed": false,
-    "generatedAt": "2026-10-14T02:03:57.569Z",
+    "generatedAt": "2026-10-20T00:45:14.701Z",
     "approvedAt": null,
-    "updatedAt": "2026-10-14T02:03:57.569Z",
+    "updatedAt": "2026-10-20T00:45:14.701Z",
     "sources": [
+      "438548a45ba5dddc3b085123",
+      "029a882b5fd741850e826218",
       "2028830bb5ef084561370018",
-      "db1e8aca59d14716aed2cbb7",
       "26ff31a7f8640a4175f06dc2",
-      "24982eddb36fd667efa9b6b9",
-      "54b1432aad91c05d77a1b95d"
+      "24982eddb36fd667efa9b6b9"
     ],
-    "category": "E-commerce Platform",
-    "productOneLiner": "Shopify: The All-in-One Commerce Platform for Businesses",
+    "category": "E-commerce platform",
+    "productOneLiner": "Shopify is a complete commerce platform to sell online or in person.",
     "pricingModel": "Subscription-based",
-    "targetCompanySize": "Small to Enterprise",
+    "targetCompanySize": "Small to large enterprises",
     "valueProps": [
-      "Get started fast; you could be selling by tomorrow.",
-      "Trusted by enterprise brands, no matter your size, complexity, or ambition.",
-      "Built into every store: World's best checkout, proven to convert better."
+      "World's best checkout proven to convert better.",
+      "AI assistant to enhance commerce experience.",
+      "Largest commerce ecosystem with extensive app support."
     ],
-    "credentials": [
-      "Trusted by enterprise brands"
-    ],
+    "credentials": [],
     "targetIndustries": [
       "Retail",
       "E-commerce"
     ],
     "proofPoints": [
       {
-        "claim": "Shopify powered over 875M unique shoppers in 2024.",
+        "claim": "Trusted by enterprise brands across various industries.",
         "schemaVersion": 1,
-        "value": "Shopify powered over 875M unique shoppers in 2024.",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-enterprise-vs-custom-platform",
-        "sourceId": "54b1432aad91c05d77a1b95d",
-        "evidenceQuote": "2 Shopify advantages Shopify powered over 875M unique shoppers in 2024.",
+        "value": "Trusted by enterprise brands across various industries.",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       }
     ],
     "customers": [],
@@ -58,113 +56,103 @@
     "evidence": {
       "category": {
         "schemaVersion": 1,
-        "value": "E-commerce Platform",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
-        "inferred": false,
-        "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "value": "E-commerce platform",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
+        "sourceId": "029a882b5fd741850e826218",
+        "evidenceQuote": "Switch to Shopify Get more customers.",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "productOneLiner": {
         "schemaVersion": 1,
-        "value": "Shopify: The All-in-One Commerce Platform for Businesses",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "value": "Shopify is a complete commerce platform to sell online or in person.",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "Shopify is a complete commerce platform to sell online or in person—whether you're running a side hustle, retail shop, or global brand.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "pricingModel": {
         "schemaVersion": 1,
         "value": "Subscription-based",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-custom-platform",
-        "sourceId": "db1e8aca59d14716aed2cbb7",
-        "evidenceQuote": "Custom Platform: Commerce just works on Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
-        "inferred": false,
-        "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "sourceUrl": "https://www.shopify.com/pricing",
+        "sourceId": "d68028a34eab2aeb8cf7c958",
+        "evidenceQuote": "Try 3 days free, then $1/month for 3 months.",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "targetCompanySize": {
         "schemaVersion": 1,
-        "value": "Small to Enterprise",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
+        "value": "Small to large enterprises",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
+        "sourceId": "029a882b5fd741850e826218",
         "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.0": {
         "schemaVersion": 1,
-        "value": "Get started fast; you could be selling by tomorrow.",
+        "value": "World's best checkout proven to convert better.",
         "sourceUrl": "https://www.shopify.com/",
         "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
+        "evidenceQuote": "Built into every store World's best checkout Proven to convert better.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.1": {
         "schemaVersion": 1,
-        "value": "Trusted by enterprise brands, no matter your size, complexity, or ambition.",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "value": "AI assistant to enhance commerce experience.",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
+        "sourceId": "029a882b5fd741850e826218",
+        "evidenceQuote": "Sidekick Your commerce-obsessed AI assistant.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.2": {
         "schemaVersion": 1,
-        "value": "Built into every store: World's best checkout, proven to convert better.",
+        "value": "Largest commerce ecosystem with extensive app support.",
         "sourceUrl": "https://www.shopify.com/customer-accounts",
         "sourceId": "26ff31a7f8640a4175f06dc2",
-        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "evidenceQuote": "Checkout Payments Taxes Customize & extend Shopify Commerce for Agents Build with our agent tools Shopify App Store Largest commerce ecosystem Shopify.dev Dev docs, CLI, and more Non-stop innovation",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
-      },
-      "credentials.0": {
-        "schemaVersion": 1,
-        "value": "Trusted by enterprise brands",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
-        "inferred": false,
-        "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetIndustries.0": {
         "schemaVersion": 1,
         "value": "Retail",
         "sourceUrl": "https://www.shopify.com/pos/retail-customer-experience",
         "sourceId": "24982eddb36fd667efa9b6b9",
-        "evidenceQuote": "Retail Customer Experience | Shopify POS - Shopify Skip to Content Get in touch Start for free Get in touch Retail customer experiences Create the best retail experiences at scale?",
+        "evidenceQuote": "Thankfully, when you switch to Shopify POS, you can simplify retail operations and give teams the power to deliver the best shopping experiences without complexity Start for free Get in touch 01",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetIndustries.1": {
         "schemaVersion": 1,
         "value": "E-commerce",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify Skip to Content Why Shopify Back Get started fast You could be selling by tomorrow.",
-        "inferred": false,
-        "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
+        "sourceId": "029a882b5fd741850e826218",
+        "evidenceQuote": "Built into every store World's best checkout Proven to convert better.",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "proofPoints.0": {
         "schemaVersion": 1,
-        "value": "Shopify powered over 875M unique shoppers in 2024.",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-enterprise-vs-custom-platform",
-        "sourceId": "54b1432aad91c05d77a1b95d",
-        "evidenceQuote": "2 Shopify advantages Shopify powered over 875M unique shoppers in 2024.",
+        "value": "Trusted by enterprise brands across various industries.",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       }
     }
   },
@@ -180,12 +168,12 @@
           "Brick-and-Mortar Retail"
         ],
         "queryTemplates": [
-          "E-commerce solutions for retail",
-          "Best platforms for online stores",
-          "Shopify alternatives for retail",
-          "E-commerce platforms for small businesses"
+          "e-commerce platforms for retail",
+          "best online store builders",
+          "retail management software",
+          "solutions for small businesses"
         ],
-        "revenueSensitivityBase": 3,
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       },
@@ -195,15 +183,15 @@
         "enabled": true,
         "subIndustries": [
           "Large Scale E-commerce",
-          "Enterprise Retail"
+          "B2B Commerce"
         ],
         "queryTemplates": [
-          "Enterprise e-commerce solutions",
-          "Best platforms for large businesses",
-          "Shopify for enterprise",
-          "E-commerce platforms for large scale"
+          "enterprise e-commerce solutions",
+          "B2B online platforms",
+          "scalable e-commerce systems",
+          "solutions for large retailers"
         ],
-        "revenueSensitivityBase": 5,
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       },
@@ -213,225 +201,305 @@
         "enabled": true,
         "subIndustries": [
           "Startups",
-          "Small Retailers"
+          "Local Businesses"
         ],
         "queryTemplates": [
-          "E-commerce for small businesses",
-          "Best platforms for startups",
-          "Shopify for small retailers",
-          "Affordable e-commerce solutions"
+          "e-commerce for small businesses",
+          "best platforms for startups",
+          "affordable online store solutions",
+          "local business e-commerce"
         ],
-        "revenueSensitivityBase": 2,
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "2746e5455f2a40859c6ffde9",
+        "label": "Fashion and Apparel",
+        "enabled": true,
+        "subIndustries": [
+          "Clothing Retail",
+          "Fashion Brands"
+        ],
+        "queryTemplates": [
+          "e-commerce for fashion brands",
+          "best platforms for clothing retailers",
+          "online store solutions for apparel",
+          "fashion e-commerce platforms"
+        ],
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "a6f3bfe3c03b66f9809686e3",
+        "label": "Food and Beverage",
+        "enabled": true,
+        "subIndustries": [
+          "Grocery Delivery",
+          "Food Retail"
+        ],
+        "queryTemplates": [
+          "e-commerce for food delivery",
+          "best platforms for grocery stores",
+          "online solutions for food retailers",
+          "food and beverage e-commerce"
+        ],
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "acacc0c3e7bd1515a27e7500",
+        "label": "Health and Beauty",
+        "enabled": true,
+        "subIndustries": [
+          "Cosmetics",
+          "Health Products"
+        ],
+        "queryTemplates": [
+          "e-commerce for beauty brands",
+          "best platforms for health products",
+          "online store solutions for cosmetics",
+          "health and beauty e-commerce"
+        ],
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "ac17f05736ffbd1442a65363",
+        "label": "Home Goods",
+        "enabled": true,
+        "subIndustries": [
+          "Furniture",
+          "Home Decor"
+        ],
+        "queryTemplates": [
+          "e-commerce for home goods",
+          "best platforms for furniture retailers",
+          "online store solutions for home decor",
+          "home goods e-commerce"
+        ],
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "ed24279f0c18a33eb267511c",
+        "label": "Technology and Electronics",
+        "enabled": true,
+        "subIndustries": [
+          "Consumer Electronics",
+          "Tech Retail"
+        ],
+        "queryTemplates": [
+          "e-commerce for electronics",
+          "best platforms for tech retailers",
+          "online store solutions for gadgets",
+          "technology e-commerce"
+        ],
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       }
     ],
     "personas": {
       "buyerTitles": [
+        "Chief Marketing Officer",
         "E-commerce Manager",
-        "Retail Director",
-        "Small Business Owner"
+        "Retail Operations Director"
       ],
       "championTitles": [
-        "Marketing Manager",
-        "Product Manager",
-        "Operations Manager"
+        "Store Manager",
+        "Digital Marketing Specialist",
+        "Product Manager"
       ],
       "wrongOrgTitles": [
-        "IT Manager",
-        "HR Director",
-        "Finance Officer"
+        "IT Support",
+        "Administrative Assistant"
       ]
     },
     "signalDefinitions": {
       "techStack": {
         "label": "E-commerce Technology",
-        "description": "Technologies used by businesses to facilitate online sales and retail operations.",
+        "description": "Technologies used in e-commerce operations.",
         "evidenceKeywords": [
-          "E-commerce platform",
-          "Online store",
-          "Payment processing",
-          "Inventory management"
+          "e-commerce platform",
+          "online store",
+          "checkout solutions"
         ],
         "negativeKeywords": [
-          "Custom-built solutions",
-          "Legacy systems"
+          "legacy systems",
+          "on-premise solutions"
         ],
         "preferredSources": [
-          "Shopify",
-          "E-commerce blogs",
-          "Retail technology news"
+          "customer case studies",
+          "industry reports"
         ],
         "rubric": {
-          "1": "Not using any e-commerce technology",
-          "3": "Using basic e-commerce tools",
-          "5": "Fully integrated e-commerce solutions"
+          "1": "No technology adoption",
+          "3": "Limited technology use",
+          "5": "Advanced technology integration"
         }
       },
       "activePain": {
-        "label": "Complexity in E-commerce Management",
-        "description": "Challenges faced by businesses in managing online sales and retail operations.",
+        "label": "Operational Complexity",
+        "description": "Challenges in managing multiple sales channels and inventory.",
         "evidenceKeywords": [
-          "Inventory issues",
-          "Customer service challenges",
-          "Sales conversion problems"
+          "complex retail operations",
+          "inventory management issues"
         ],
         "negativeKeywords": [
-          "Smooth operations",
-          "High customer satisfaction"
+          "simple operations",
+          "single channel sales"
         ],
         "preferredSources": [
-          "Retail case studies",
-          "E-commerce success stories"
+          "customer testimonials",
+          "industry surveys"
         ],
         "rubric": {
-          "1": "No pain points identified",
-          "3": "Some challenges in operations",
-          "5": "Significant operational difficulties"
+          "1": "No operational challenges",
+          "3": "Some operational issues",
+          "5": "Significant operational complexity"
         }
       },
       "revenueSensitivity": {
-        "label": "Revenue Impact of E-commerce Solutions",
-        "description": "The effect of e-commerce solutions on business revenue.",
+        "label": "Revenue Growth Potential",
+        "description": "Potential for revenue growth through e-commerce.",
         "evidenceKeywords": [
-          "Sales growth",
-          "Revenue increase",
-          "Customer acquisition"
+          "increased sales",
+          "revenue growth",
+          "conversion rates"
         ],
         "negativeKeywords": [
-          "Stagnant sales",
-          "Declining revenue"
+          "declining sales",
+          "stagnant revenue"
         ],
         "preferredSources": [
-          "E-commerce analytics",
-          "Business growth reports"
+          "financial reports",
+          "market analysis"
         ],
         "rubric": {
-          "1": "No revenue growth",
-          "3": "Moderate revenue increase",
-          "5": "Significant revenue growth"
+          "1": "No growth potential",
+          "3": "Moderate growth potential",
+          "5": "High growth potential"
         }
       },
       "observabilityScale": {
-        "label": "Visibility in Retail Operations",
-        "description": "The level of insight businesses have into their retail operations.",
+        "label": "Business Visibility",
+        "description": "Visibility into sales and inventory across channels.",
         "evidenceKeywords": [
-          "Inventory visibility",
-          "Sales tracking",
-          "Customer insights"
+          "real-time inventory",
+          "sales analytics"
         ],
         "negativeKeywords": [
-          "Lack of visibility",
-          "Poor data access"
+          "lack of visibility",
+          "manual tracking"
         ],
         "preferredSources": [
-          "Retail management tools",
-          "E-commerce analytics"
+          "analytics reports",
+          "business intelligence tools"
         ],
         "rubric": {
-          "1": "No visibility into operations",
-          "3": "Some insights available",
-          "5": "Full visibility and insights"
+          "1": "No visibility",
+          "3": "Some visibility",
+          "5": "Full visibility"
         }
       },
       "aiCompatibility": {
-        "label": "Integration of AI in E-commerce",
-        "description": "The use of AI technologies in e-commerce operations.",
+        "label": "AI Integration",
+        "description": "Integration of AI tools for enhanced customer experience.",
         "evidenceKeywords": [
-          "AI chatbots",
-          "Personalization",
-          "Predictive analytics"
+          "AI assistant",
+          "automated customer service"
         ],
         "negativeKeywords": [
-          "No AI usage",
-          "Manual processes"
+          "no AI tools",
+          "manual processes"
         ],
         "preferredSources": [
-          "AI in retail articles",
-          "E-commerce technology news"
+          "technology reviews",
+          "case studies"
         ],
         "rubric": {
           "1": "No AI integration",
-          "3": "Basic AI tools",
-          "5": "Advanced AI technologies"
+          "3": "Limited AI use",
+          "5": "Extensive AI integration"
         }
       },
       "competitiveWedge": {
-        "label": "Competitive Advantage in E-commerce",
-        "description": "Unique selling propositions that differentiate a business in the e-commerce space.",
+        "label": "Market Differentiation",
+        "description": "Unique features that set the platform apart from competitors.",
         "evidenceKeywords": [
-          "Unique features",
-          "Customer loyalty",
-          "Brand reputation"
+          "unique selling proposition",
+          "competitive advantages"
         ],
         "negativeKeywords": [
-          "No differentiation",
-          "Weak brand presence"
+          "similar offerings",
+          "no differentiation"
         ],
         "preferredSources": [
-          "Market analysis reports",
-          "E-commerce strategy articles"
+          "competitive analysis",
+          "market research"
         ],
         "rubric": {
-          "1": "No competitive advantage",
+          "1": "No differentiation",
           "3": "Some differentiation",
-          "5": "Strong competitive edge"
+          "5": "Strong differentiation"
         }
       }
     },
     "triggerMapping": {
       "pain_event": [
-        "Inventory shortages",
-        "Customer service complaints",
-        "High cart abandonment rates"
+        "operational inefficiencies",
+        "customer dissatisfaction"
       ],
       "buying_intent": [
-        "Looking for e-commerce solutions",
-        "Researching online retail platforms",
-        "Seeking to improve sales"
+        "looking for e-commerce solutions",
+        "expanding online presence"
       ],
       "function_roles": [
-        "E-commerce Manager",
-        "Retail Operations Director",
-        "Marketing Specialist"
+        "marketing",
+        "operations",
+        "IT"
       ],
       "tech_adoption": [
-        "Adopting new e-commerce technologies",
-        "Integrating AI into retail operations",
-        "Upgrading payment processing systems"
+        "adopting new e-commerce platforms",
+        "integrating AI tools"
       ],
       "competitor_names": []
     },
     "killPatterns": {
       "solvingInHouse": [
-        "Building custom e-commerce solutions",
-        "Using outdated systems"
+        "internal development teams",
+        "custom-built solutions"
       ],
       "buildCulture": [
-        "Resistance to change",
-        "Preference for traditional retail methods"
+        "preference for in-house solutions",
+        "strong internal IT capabilities"
       ],
       "sizeMetric": {
-        "label": "Business Size",
-        "floor": 1
+        "label": "Employee Count",
+        "floor": 50
       }
     },
     "painSources": {
-      "statuspage": true,
+      "statuspage": false,
       "hn": false,
-      "news": true,
+      "news": false,
       "filings": false
     },
     "pitch": {
       "receiptOpenerStyle": "Engaging and informative",
-      "oneSentenceProduct": "Shopify: The All-in-One Commerce Platform for Businesses",
-      "credentialLine": "Trusted by enterprise brands",
-      "ctaStyle": "Direct and action-oriented"
+      "oneSentenceProduct": "Shopify is a complete commerce platform to sell online or in person.",
+      "credentialLine": "Trusted by enterprise brands across various industries.",
+      "ctaStyle": "Direct and actionable"
     },
     "objectionTemplates": [
-      "Too expensive",
-      "Not suitable for my business size",
-      "I prefer custom solutions"
+      "Not ready to switch platforms",
+      "Concerns about migration complexity",
+      "Satisfaction with current solution"
     ],
     "weights": {
       "techStack": 1.3,
@@ -491,12 +559,261 @@
   },
   "receiptReport": {
     "schemaVersion": 1,
-    "attemptedClaims": 11,
-    "acceptedClaims": 11,
-    "receiptedClaims": 11,
-    "receiptCoverage": 1,
-    "warnings": [],
+    "attemptedClaims": 10,
+    "acceptedClaims": 10,
+    "receiptedClaims": 7,
+    "receiptCoverage": 0.7,
+    "warnings": [
+      {
+        "value": "E-commerce platform",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "Subscription-based",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "E-commerce",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      }
+    ],
     "droppedCustomers": [],
-    "droppedCompetitors": []
+    "droppedCompetitors": [],
+    "qualityFindings": [
+      {
+        "schemaVersion": 1,
+        "id": "c5d4d0d90b23f09e2dc63077",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.0",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "00b05a9be4ab36df62677ba2",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.1",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "baf9fe9f341a4663dc72d9bf",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.2",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "dc5b949a10028b41faa31351",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.3",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "e6b94698a9adfe976a2aa953",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.0",
+        "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "98ad591dc414e2c9abf68963",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.1",
+        "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "ad0621e034010d2662e2b69b",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.2",
+        "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "bf160b34caaff43957f81fa9",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.3",
+        "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "f021c5d3127efbebb2a301f1",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.2.queryTemplates.1",
+        "field": "segments.2.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "9a1fc921ee3dce5e5bc6d23d",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.2.queryTemplates.2",
+        "field": "segments.2.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "a516fc8aaf4201cbe8509aad",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.3.queryTemplates.1",
+        "field": "segments.3.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "e038ac30317c6c893a203cd9",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.3.queryTemplates.2",
+        "field": "segments.3.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "14a3c62822c6346ef12a4d68",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.3.queryTemplates.3",
+        "field": "segments.3.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "33fd88ae51b23f0b1897e5b4",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.4.queryTemplates.1",
+        "field": "segments.4.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "784f66390ef6e5fcc452e22f",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.4.queryTemplates.2",
+        "field": "segments.4.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "e34016c3f1db3461cf3d3954",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.5.queryTemplates.1",
+        "field": "segments.5.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "2099da8bf7d68c86b661a676",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.5.queryTemplates.2",
+        "field": "segments.5.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "be14cd16a8294605e6f39609",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.6.queryTemplates.1",
+        "field": "segments.6.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "f09ec8f5bf9fcd2251e99b71",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.6.queryTemplates.2",
+        "field": "segments.6.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "9bb9ae624108203637d69608",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.7.queryTemplates.1",
+        "field": "segments.7.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "8f6235922d565dfbca5c1711",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.7.queryTemplates.2",
+        "field": "segments.7.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "eaed98cac1d9a2b2c30c4955",
+        "code": "EMPTY_COMPETITORS",
+        "path": "sellerProfile.competitors",
+        "field": "competitors",
+        "severity": "blocking",
+        "message": "No verified competitors are present. Add supported competitors or explain why approval should proceed without them."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "dffc88f8a49e7f74e2a23d85",
+        "code": "EMPTY_CUSTOMERS",
+        "path": "sellerProfile.customers",
+        "field": "customers",
+        "severity": "blocking",
+        "message": "No verified customers are present. Add supported customers or explain why approval should proceed without them."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "7cb388f6fe8f4268ea8bdc5b",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.category",
+        "field": "category",
+        "severity": "blocking",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "d41b6737e5c37d0af7a0823e",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.pricingModel",
+        "field": "pricingModel",
+        "severity": "blocking",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "8adf58d0f352f2c2b4cb7f9b",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.targetIndustries.1",
+        "field": "targetIndustries.1.value",
+        "severity": "advisory",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      }
+    ]
   }
 }

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "capturedOn": "2026-10-14T01:55:30.462Z",
+  "capturedOn": "2026-10-20T00:45:02.093Z",
   "model": "gpt-4o-mini",
-  "promptVersion": "seller-profile-approvable-receipts-v4",
-  "commitHash": "14a7e577c4e022ddba6aaefa902f6d9763cec09b",
-  "source": "Owner-authorized Stage 2 recovery run using saved public-page research responses.",
+  "promptVersion": "seller-profile-quality-guards-v5",
+  "commitHash": "9634b6bcbcaa808840d74478ff87680845fc8c8f",
+  "source": "Owner-authorized final Stage 2 rerun using only the documented first-party live-page allowlist and zero Serper queries.",
   "seller": {
     "name": "Resolve AI",
     "domain": "resolve.ai"
@@ -14,41 +14,81 @@
     "sellerName": "Resolve AI",
     "domain": "resolve.ai",
     "deliveryAllowed": false,
-    "generatedAt": "2026-10-14T01:55:30.429Z",
+    "generatedAt": "2026-10-20T00:45:02.059Z",
     "approvedAt": null,
-    "updatedAt": "2026-10-14T01:55:30.429Z",
+    "updatedAt": "2026-10-20T00:45:02.059Z",
     "sources": [
       "281d77e4f6dcd23a7822b04c",
-      "7a3d69d552e3ee607ff42350",
-      "330ba8acb517219ebba76a01",
-      "96f8b602f0597ad4a04576f9"
+      "09e44124a9e07a6a1405e216",
+      "c7f3452aafdcf74f2534a22e",
+      "5cb86b057983ed1c930de78b",
+      "5e70b2e8a303e12d11f9b86a"
     ],
     "category": "AI SRE platform",
     "productOneLiner": "AI for production systems that helps reduce downtime and protect revenue.",
-    "pricingModel": "",
-    "targetCompanySize": "",
+    "pricingModel": "Custom pricing available upon request.",
+    "targetCompanySize": "1000+ employees",
     "valueProps": [
-      "Enterprise-grade security by default.",
-      "Custom agents tailored to your workflows."
+      "Proactively run operational tasks to reduce downtime.",
+      "Custom agents tailored to specific workflows.",
+      "Enterprise-grade security by default."
     ],
     "credentials": [],
     "targetIndustries": [
-      "Technology"
+      "Financial Services",
+      "Technology",
+      "Real Estate"
     ],
     "proofPoints": [
       {
-        "claim": "Learn how to evaluate frontier AI on real incidents.",
+        "claim": "Resolve AI helps companies like Coinbase reduce investigation time by 72%.",
         "schemaVersion": 1,
-        "value": "Learn how to evaluate frontier AI on real incidents.",
-        "sourceUrl": "https://resolve.ai/glossary/aiops-platform",
-        "sourceId": "96f8b602f0597ad4a04576f9",
-        "evidenceQuote": "Learn how to evaluate frontier AI on real incidents.",
+        "value": "Resolve AI helps companies like Coinbase reduce investigation time by 72%.",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "• Join the tech talk Back 5 min read Making the Global Crypto Backbone More Resilient Coding with production context 250+ sessions per week Investigation time 72% faster Time to root cause <10 minutes",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      {
+        "claim": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
+        "schemaVersion": 1,
+        "value": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
+        "sourceUrl": "https://resolve.ai/customers/zscaler",
+        "sourceId": "d231aae81997e40c8a4b50bc",
+        "evidenceQuote": "Good things are waiting...",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       }
     ],
-    "customers": [],
+    "customers": [
+      {
+        "name": "Coinbase",
+        "domain": "coinbase.com",
+        "schemaVersion": 1,
+        "value": "Coinbase",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "Industry Financial Services Company Coinbase Industry Financial Services Company Coinbase About Coinbase The Challenge: Growing complexity in high-stakes production systems The solution: AI for prod",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      {
+        "name": "DoorDash",
+        "domain": "doordash.com",
+        "schemaVersion": 1,
+        "value": "DoorDash",
+        "sourceUrl": "https://resolve.ai/customers/doordash",
+        "sourceId": "5e70b2e8a303e12d11f9b86a",
+        "evidenceQuote": "• Join the tech talk Back 6 min read Powering Uninterrupted Ads for DoorDash Advertisers Time to root cause Up to 87% faster Investigation time 40 min → 1 min Revenue at stake $1B+ ads platform",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      }
+    ],
     "competitors": [],
     "evidence": {
       "category": {
@@ -59,77 +99,137 @@
         "evidenceQuote": "ResolveAI | AI SRE platform Learn how to evaluate frontier AI on real incidents.",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "productOneLiner": {
         "schemaVersion": 1,
         "value": "AI for production systems that helps reduce downtime and protect revenue.",
-        "sourceUrl": "https://resolve.ai/",
-        "sourceId": "281d77e4f6dcd23a7822b04c",
+        "sourceUrl": "https://resolve.ai/about-us",
+        "sourceId": "09e44124a9e07a6a1405e216",
         "evidenceQuote": "workflows See what ResolveAI can do Get in touch to learn how our AI SRE platform can help reduce your downtime and protect revenue Talk to Us Browse All resources Every guide, webinar and report Blog",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "pricingModel": {
         "schemaVersion": 1,
-        "value": "",
-        "sourceUrl": null,
-        "sourceId": null,
-        "evidenceQuote": "",
+        "value": "Custom pricing available upon request.",
+        "sourceUrl": "https://resolve.ai/customers",
+        "sourceId": "5cc8ed8371c883837963722c",
+        "evidenceQuote": "Customer | ResolveAI Good things are waiting...",
         "inferred": true,
-        "verification": "no_source",
-        "reason": "No supporting receipt was selected."
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "targetCompanySize": {
         "schemaVersion": 1,
-        "value": "",
-        "sourceUrl": null,
-        "sourceId": null,
-        "evidenceQuote": "",
+        "value": "1000+ employees",
+        "sourceUrl": "https://resolve.ai/customers/salesforce",
+        "sourceId": "3f799bef0dfe6077dde31009",
+        "evidenceQuote": "Good things are waiting...",
         "inferred": true,
-        "verification": "no_source",
-        "reason": "No supporting receipt was selected."
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "valueProps.0": {
         "schemaVersion": 1,
-        "value": "Enterprise-grade security by default.",
+        "value": "Proactively run operational tasks to reduce downtime.",
         "sourceUrl": "https://resolve.ai/",
         "sourceId": "281d77e4f6dcd23a7822b04c",
         "evidenceQuote": "Agent teams investigate Operational tasks Proactively run tasks Platform Integrations Meet your stack where it is Security Enterprise-grade by default Build custom agents Custom agents Agents for your",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.1": {
         "schemaVersion": 1,
-        "value": "Custom agents tailored to your workflows.",
-        "sourceUrl": "https://resolve.ai/glossary/what-is-ai-for-production-systems",
-        "sourceId": "7a3d69d552e3ee607ff42350",
-        "evidenceQuote": "Learn how to evaluate frontier AI on real incidents.",
+        "value": "Custom agents tailored to specific workflows.",
+        "sourceUrl": "https://resolve.ai/blog/product-deep-dive",
+        "sourceId": "c7f3452aafdcf74f2534a22e",
+        "evidenceQuote": "Agent teams investigate Operational tasks Proactively run tasks Platform Integrations Meet your stack where it is Security Enterprise-grade by default Build custom agents Custom agents Agents for your",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "valueProps.2": {
+        "schemaVersion": 1,
+        "value": "Enterprise-grade security by default.",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "Good things are waiting...",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "targetIndustries.0": {
         "schemaVersion": 1,
-        "value": "Technology",
-        "sourceUrl": "https://resolve.ai/glossary/ai-incident-management-platform",
-        "sourceId": "330ba8acb517219ebba76a01",
-        "evidenceQuote": "What is an AI incident management platform?",
+        "value": "Financial Services",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "Industry Financial Services Company Coinbase Industry Financial Services Company Coinbase About Coinbase The Challenge: Growing complexity in high-stakes production systems The solution: AI for prod",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "targetIndustries.1": {
+        "schemaVersion": 1,
+        "value": "Technology",
+        "sourceUrl": "https://resolve.ai/customers/doordash",
+        "sourceId": "5e70b2e8a303e12d11f9b86a",
+        "evidenceQuote": "• Join the tech talk Back 6 min read Powering Uninterrupted Ads for DoorDash Advertisers Time to root cause Up to 87% faster Investigation time 40 min → 1 min Revenue at stake $1B+ ads platform",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      "targetIndustries.2": {
+        "schemaVersion": 1,
+        "value": "Real Estate",
+        "sourceUrl": "https://resolve.ai/customers/blueground",
+        "sourceId": "4c4791d300036645ada8d9b8",
+        "evidenceQuote": "Good things are waiting...",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "proofPoints.0": {
         "schemaVersion": 1,
-        "value": "Learn how to evaluate frontier AI on real incidents.",
-        "sourceUrl": "https://resolve.ai/glossary/aiops-platform",
-        "sourceId": "96f8b602f0597ad4a04576f9",
-        "evidenceQuote": "Learn how to evaluate frontier AI on real incidents.",
+        "value": "Resolve AI helps companies like Coinbase reduce investigation time by 72%.",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "• Join the tech talk Back 5 min read Making the Global Crypto Backbone More Resilient Coding with production context 250+ sessions per week Investigation time 72% faster Time to root cause <10 minutes",
         "inferred": false,
         "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text."
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "proofPoints.1": {
+        "schemaVersion": 1,
+        "value": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
+        "sourceUrl": "https://resolve.ai/customers/zscaler",
+        "sourceId": "d231aae81997e40c8a4b50bc",
+        "evidenceQuote": "Good things are waiting...",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      "customers.0": {
+        "schemaVersion": 1,
+        "value": "Coinbase",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "Industry Financial Services Company Coinbase Industry Financial Services Company Coinbase About Coinbase The Challenge: Growing complexity in high-stakes production systems The solution: AI for prod",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "customers.1": {
+        "schemaVersion": 1,
+        "value": "DoorDash",
+        "sourceUrl": "https://resolve.ai/customers/doordash",
+        "sourceId": "5e70b2e8a303e12d11f9b86a",
+        "evidenceQuote": "• Join the tech talk Back 6 min read Powering Uninterrupted Ads for DoorDash Advertisers Time to root cause Up to 87% faster Investigation time 40 min → 1 min Revenue at stake $1B+ ads platform",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       }
     }
   },
@@ -137,56 +237,62 @@
     "schemaVersion": 1,
     "segments": [
       {
-        "key": "897064de44cbef467643b74e",
-        "label": "Technology Companies",
+        "key": "bbc60cfd0ebda6b42e76cc07",
+        "label": "Large Enterprises",
         "enabled": true,
         "subIndustries": [
-          "Software Development",
-          "Cloud Services"
+          "Financial Services",
+          "Technology",
+          "Real Estate"
         ],
         "queryTemplates": [
-          "AI incident management",
-          "AI for production systems",
-          "AI SRE platform",
-          "AI for operational tasks"
+          "AI incident management for large enterprises",
+          "AI SRE solutions for financial services",
+          "Operational efficiency tools for tech companies",
+          "Custom AI agents for real estate"
         ],
-        "revenueSensitivityBase": 5,
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [
+          "Coinbase",
+          "DoorDash"
+        ],
+        "exampleTargets": []
+      },
+      {
+        "key": "fd954d197fca066d8d8a1185",
+        "label": "Mid-Sized Companies",
+        "enabled": true,
+        "subIndustries": [
+          "E-commerce",
+          "Healthcare",
+          "Telecommunications"
+        ],
+        "queryTemplates": [
+          "AI solutions for mid-sized e-commerce businesses",
+          "Incident management for healthcare providers",
+          "AI SRE for telecommunications companies",
+          "Operational task automation for mid-sized firms"
+        ],
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       },
       {
-        "key": "b5f3227337446f504cd86941",
-        "label": "E-commerce",
+        "key": "eef5aa92dccba29383b9e70e",
+        "label": "Startups",
         "enabled": true,
         "subIndustries": [
-          "Food Delivery",
-          "Online Retail"
+          "Fintech",
+          "Healthtech",
+          "Proptech"
         ],
         "queryTemplates": [
-          "AI for reducing downtime",
-          "AI for customer service",
-          "AI for operational efficiency",
-          "AI for incident response"
+          "AI for incident management in fintech",
+          "Operational efficiency for healthtech startups",
+          "Custom AI solutions for proptech companies",
+          "AI SRE for early-stage companies"
         ],
-        "revenueSensitivityBase": 4,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "13425bd9e339600c081538e8",
-        "label": "Financial Services",
-        "enabled": true,
-        "subIndustries": [
-          "Cryptocurrency",
-          "Banking"
-        ],
-        "queryTemplates": [
-          "AI for financial operations",
-          "AI for incident management",
-          "AI for risk management",
-          "AI for compliance"
-        ],
-        "revenueSensitivityBase": 5,
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       }
@@ -194,96 +300,95 @@
     "personas": {
       "buyerTitles": [
         "CTO",
-        "Head of Operations",
-        "IT Manager"
+        "Head of Engineering",
+        "IT Operations Manager"
       ],
       "championTitles": [
+        "Site Reliability Engineer",
         "DevOps Engineer",
-        "Site Reliability Engineer"
+        "Product Manager"
       ],
       "wrongOrgTitles": [
-        "Marketing Manager",
+        "Intern",
+        "Junior Developer",
         "Sales Associate"
       ]
     },
     "signalDefinitions": {
       "techStack": {
-        "label": "Technology Stack",
-        "description": "Focus on companies using cloud services and AI technologies.",
+        "label": "Cloud Infrastructure",
+        "description": "Companies using cloud infrastructure for their operations.",
         "evidenceKeywords": [
-          "AI",
-          "cloud",
-          "SRE",
-          "incident management"
+          "AWS",
+          "Azure",
+          "Google Cloud"
         ],
         "negativeKeywords": [
-          "legacy systems",
-          "on-premise"
+          "On-premise",
+          "Legacy systems"
         ],
         "preferredSources": [
-          "customer testimonials",
-          "case studies",
-          "industry reports"
+          "TechCrunch",
+          "Gartner",
+          "Forrester"
         ],
         "rubric": {
-          "1": "Not relevant",
-          "3": "Some relevance",
-          "5": "Highly relevant"
+          "1": "No cloud infrastructure",
+          "3": "Partially using cloud services",
+          "5": "Fully cloud-based infrastructure"
         }
       },
       "activePain": {
-        "label": "Operational Downtime",
-        "description": "Companies experiencing frequent downtime or incidents.",
+        "label": "High Incident Response Times",
+        "description": "Companies struggling with long incident response times.",
         "evidenceKeywords": [
+          "incident response",
           "downtime",
-          "incident",
-          "failure",
-          "outage"
+          "root cause analysis"
         ],
         "negativeKeywords": [
-          "stable",
-          "reliable"
+          "automated incident response",
+          "low downtime"
         ],
         "preferredSources": [
-          "news articles",
-          "customer feedback",
-          "industry reports"
+          "Gartner",
+          "Forrester",
+          "Industry Reports"
         ],
         "rubric": {
-          "1": "Not a pain point",
-          "3": "Moderate pain",
-          "5": "Severe pain"
+          "1": "Very high response times",
+          "3": "Moderate response times",
+          "5": "Low response times"
         }
       },
       "revenueSensitivity": {
-        "label": "Revenue Impact",
-        "description": "Focus on companies where downtime significantly impacts revenue.",
+        "label": "High Revenue Impact",
+        "description": "Companies where downtime significantly impacts revenue.",
         "evidenceKeywords": [
           "revenue loss",
-          "financial impact",
-          "cost of downtime"
+          "downtime costs",
+          "financial impact"
         ],
         "negativeKeywords": [
           "low revenue impact",
           "non-revenue generating"
         ],
         "preferredSources": [
-          "financial reports",
-          "case studies",
-          "customer testimonials"
+          "Industry Reports",
+          "Market Analysis"
         ],
         "rubric": {
-          "1": "Low impact",
-          "3": "Moderate impact",
-          "5": "High impact"
+          "1": "Minimal revenue impact",
+          "3": "Moderate revenue impact",
+          "5": "High revenue impact"
         }
       },
       "observabilityScale": {
-        "label": "Observability Maturity",
-        "description": "Target companies with advanced observability practices.",
+        "label": "Advanced Observability Needs",
+        "description": "Companies requiring advanced observability solutions.",
         "evidenceKeywords": [
-          "monitoring",
           "observability",
+          "monitoring",
           "analytics"
         ],
         "negativeKeywords": [
@@ -291,115 +396,115 @@
           "no observability"
         ],
         "preferredSources": [
-          "industry reports",
-          "case studies",
-          "customer feedback"
+          "TechCrunch",
+          "Gartner"
         ],
         "rubric": {
-          "1": "Low maturity",
-          "3": "Moderate maturity",
-          "5": "High maturity"
+          "1": "No observability",
+          "3": "Basic observability",
+          "5": "Advanced observability"
         }
       },
       "aiCompatibility": {
-        "label": "AI Adoption",
-        "description": "Focus on companies actively adopting AI technologies.",
+        "label": "High AI Adoption",
+        "description": "Companies actively adopting AI technologies.",
         "evidenceKeywords": [
-          "AI",
+          "AI adoption",
           "machine learning",
-          "automation"
+          "AI tools"
         ],
         "negativeKeywords": [
           "no AI",
           "manual processes"
         ],
         "preferredSources": [
-          "customer testimonials",
-          "case studies",
-          "industry reports"
+          "TechCrunch",
+          "Forrester"
         ],
         "rubric": {
-          "1": "Not adopting AI",
-          "3": "Some adoption",
-          "5": "High adoption"
+          "1": "No AI adoption",
+          "3": "Some AI adoption",
+          "5": "High AI adoption"
         }
       },
       "competitiveWedge": {
-        "label": "Competitive Advantage",
-        "description": "Highlight how AI can provide a competitive edge.",
+        "label": "Strong Competitive Advantage",
+        "description": "Companies looking for a competitive edge through AI.",
         "evidenceKeywords": [
           "competitive advantage",
-          "differentiation",
+          "market leadership",
           "innovation"
         ],
         "negativeKeywords": [
-          "no differentiation",
-          "stagnation"
+          "no competition",
+          "market saturation"
         ],
         "preferredSources": [
-          "market analysis",
-          "case studies",
-          "customer testimonials"
+          "Industry Reports",
+          "Market Analysis"
         ],
         "rubric": {
-          "1": "No advantage",
-          "3": "Some advantage",
-          "5": "Significant advantage"
+          "1": "No competitive advantage",
+          "3": "Moderate advantage",
+          "5": "Strong competitive advantage"
         }
       }
     },
     "triggerMapping": {
       "pain_event": [
-        "frequent downtime",
-        "high incident response time",
-        "customer complaints about service reliability"
+        "High incident response times",
+        "Frequent system outages",
+        "Increased operational costs"
       ],
       "buying_intent": [
-        "looking for AI solutions",
-        "interested in incident management tools",
-        "evaluating SRE platforms"
+        "Looking for AI solutions",
+        "Evaluating incident management tools",
+        "Seeking to reduce downtime"
       ],
       "function_roles": [
         "IT Operations",
-        "DevOps",
-        "Site Reliability Engineering"
+        "Engineering",
+        "Product Management"
       ],
       "tech_adoption": [
-        "adopting AI technologies",
-        "implementing cloud solutions"
+        "Cloud migration",
+        "AI adoption",
+        "DevOps practices"
       ],
       "competitor_names": []
     },
     "killPatterns": {
       "solvingInHouse": [
-        "believing internal teams can handle incidents",
-        "relying on existing tools"
+        "Strong internal development team",
+        "Existing in-house solutions",
+        "No budget for external tools"
       ],
       "buildCulture": [
-        "not prioritizing AI adoption",
-        "focusing on manual processes"
+        "Preference for building over buying",
+        "Strong engineering culture",
+        "Focus on internal tools"
       ],
       "sizeMetric": {
-        "label": "Company Size",
-        "floor": 50
+        "label": "Employees",
+        "floor": 1000
       }
     },
     "painSources": {
       "statuspage": true,
-      "hn": false,
+      "hn": true,
       "news": true,
-      "filings": false
+      "filings": true
     },
     "pitch": {
-      "receiptOpenerStyle": "Learn how our AI SRE platform can help reduce your downtime and protect revenue.",
+      "receiptOpenerStyle": "Engaging and informative",
       "oneSentenceProduct": "AI for production systems that helps reduce downtime and protect revenue.",
-      "credentialLine": "Trusted by leading companies in technology and finance.",
-      "ctaStyle": "Get in touch to learn more."
+      "credentialLine": "Trusted by leading companies like Coinbase and DoorDash.",
+      "ctaStyle": "Direct and action-oriented"
     },
     "objectionTemplates": [
-      "We already have a solution in place.",
-      "We're not ready to adopt AI yet.",
-      "Our team prefers manual processes."
+      "We already have an in-house solution.",
+      "We're not looking to change our current processes.",
+      "Budget constraints prevent us from exploring new tools."
     ],
     "weights": {
       "techStack": 1.3,
@@ -459,12 +564,147 @@
   },
   "receiptReport": {
     "schemaVersion": 1,
-    "attemptedClaims": 6,
-    "acceptedClaims": 6,
-    "receiptedClaims": 6,
-    "receiptCoverage": 1,
-    "warnings": [],
+    "attemptedClaims": 14,
+    "acceptedClaims": 14,
+    "receiptedClaims": 8,
+    "receiptCoverage": 0.5714285714285714,
+    "warnings": [
+      {
+        "value": "Custom pricing available upon request.",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "1000+ employees",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "Enterprise-grade security by default.",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "Technology",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "Real Estate",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "value": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      }
+    ],
     "droppedCustomers": [],
-    "droppedCompetitors": []
+    "droppedCompetitors": [],
+    "qualityFindings": [
+      {
+        "schemaVersion": 1,
+        "id": "00b05a9be4ab36df62677ba2",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.1",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "baf9fe9f341a4663dc72d9bf",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.2",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "e6b94698a9adfe976a2aa953",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.0",
+        "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "98ad591dc414e2c9abf68963",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.1",
+        "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "9a1fc921ee3dce5e5bc6d23d",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.2.queryTemplates.2",
+        "field": "segments.2.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "eaed98cac1d9a2b2c30c4955",
+        "code": "EMPTY_COMPETITORS",
+        "path": "sellerProfile.competitors",
+        "field": "competitors",
+        "severity": "blocking",
+        "message": "No verified competitors are present. Add supported competitors or explain why approval should proceed without them."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "d41b6737e5c37d0af7a0823e",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.pricingModel",
+        "field": "pricingModel",
+        "severity": "blocking",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "8db35e9cacc006efed9769f4",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.proofPoints.1",
+        "field": "proofPoints.1.value",
+        "severity": "advisory",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "1ab4a007bbb41ffb74c4f04a",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.targetCompanySize",
+        "field": "targetCompanySize",
+        "severity": "blocking",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "8adf58d0f352f2c2b4cb7f9b",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.targetIndustries.1",
+        "field": "targetIndustries.1.value",
+        "severity": "advisory",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "1525814b5f4499c1d96fbf34",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.targetIndustries.2",
+        "field": "targetIndustries.2.value",
+        "severity": "advisory",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "e6d393da8e9eaf9215a5d694",
+        "code": "RECEIPT_NO_CLAIM_OVERLAP",
+        "path": "sellerProfile.evidence.valueProps.2",
+        "field": "valueProps.2.value",
+        "severity": "advisory",
+        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      }
+    ]
   }
 }

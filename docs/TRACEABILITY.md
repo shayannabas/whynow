@@ -1,10 +1,16 @@
 # WhyNow traceability
 
+## Final Stage 2 rerun — 2026-10-19
+
+The owner authorized the last automated Stage 2 iteration. `scripts/stage2-final-rerun.cjs` uses a one-time marker, an explicit first-party allowlist, no Serper search and a process-only OpenAI cap. The run fetched 29/29 pages with zero errors, used exactly three GPT-4o mini calls with no retry and recorded $0.007646 in token-priced cost under the $0.05 cap. Normal local OpenAI settings stayed disabled/zero, no profile was approved and Stage 3 did not start.
+
+The new persisted drafts honestly failed the complete pass bar. Resolve AI has 2 first-party customers, no competitors, a consistent Employees/1,000 rule, buyer/champion titles and 8 blocking/4 advisory warnings. Shopify has 0/0 organizations, a compatible Employee Count/50 rule, personas and 25/1 warnings. Vercel has 0/0 organizations, a compatible employees/100 rule, personas and 16/5 warnings. The owner will fix these profiles manually; another automated rerun must not be proposed. Full details are in `docs/STAGE-2-FINAL-RERUN.md`.
+
 ## Stage 2 warning levels and one-rerun preparation — 2026-10-19
 
 Stage 2 remains reopened for quality. The 9/23/27 offline findings are now classified rather than all treated as blocking: Resolve AI has 7 blocking and 2 advisory findings, Shopify 18 and 5, and Vercel revision 1 has 23 and 4. Blocking findings require a fix or a typed audit reason. Advisories stay beside the affected field and do not appear in the approval-reason form. New tests cover missing personas, severity assignment, advisory UI and advisory-only approval behavior. Verification passed with 107 active tests across 21 files, one intentional Stage 3 skip and zero production dependency vulnerabilities.
 
-Step 5 is planned but not executed. Saved sources will be reused, and a fixed allowlist adds 4 Resolve AI, 5 Shopify and 8 Vercel first-party pages. No Serper query is needed. Exactly three GPT-4o mini drafts are planned, with an expected cost around $0.01 under the existing temporary $0.05 cap. The per-seller pass bar is three first-party customers, two sourced competitors, consistent measurable size, buyer/champion titles and zero blocking warnings. No profile was approved and Stage 3 has not started.
+This preparation was superseded before execution: the owner noticed that the 17-page plan lacked sufficient explicit Resolve AI and Shopify customer coverage. It is retained as history. The expanded 29-page final plan and its real results are recorded above.
 
 ## Stage 2 quality audit — 2026-10-13
 

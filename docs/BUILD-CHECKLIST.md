@@ -1,10 +1,12 @@
 # WhyNow — build checklist
 
-Updated: October 19, 2026. Current stage: Stage 2 reopened for quality; Stage 3 has not started.
+Updated: October 19, 2026. Current stage: final Stage 2 automated rerun complete; manual profile review remains; Stage 3 has not started.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
 The October 19 offline quality audit keeps the original 9/23/27 findings but separates their effect: Resolve AI has 7 blocking and 2 advisory warnings, Shopify 18 blocking and 5 advisory, and Vercel revision 1 has 23 blocking and 4 advisory. Advisory findings remain beside their fields but do not require an explanation. No profile is approved, no provider call was made for the audit, and Stage 2 remains open.
+
+The one authorized final rerun then fetched all 29 allowlisted first-party pages with zero errors, used zero Serper queries and made exactly three GPT-4o mini calls with no retry. Token-reported cost was $0.007646 under the temporary $0.05 process cap. The normal local OpenAI settings remained disabled/zero. Final drafts remain `needs_review`: Resolve AI has 2 customers, 0 competitors and 8 blocking/4 advisory warnings; Shopify has 0/0 and 25/1; Vercel has 0/0 and 16/5. There will be no further automated Stage 2 rerun; the owner will correct and approve these drafts manually.
 
 ## Current decision
 
@@ -40,14 +42,15 @@ Do not paste API keys into chat. Store keys in the local ignored `.env` file, ne
 - [x] Add the original Resolve reference configuration without making it the default seller.
 - [x] Add genuine official-page excerpt fixtures for Resolve AI, Vercel and Shopify; document the reference comparison.
 - [x] Add the monthly refresh coordinator: due-date detection, hidden isolated research/drafting workspace, receipt-aware visible differences, restart recovery, grounding recheck and fresh approval. It is dormant unless both providers and positive limits are explicitly enabled.
-- [x] Pass 107 active offline tests across 21 files, including synthetic positive cases, all three real quality snapshots, warning levels, advisory approval behavior, hallucinated claims, refresh receipt gaps, off-domain redirects, stale tabs/results, budget exhaustion, restarts, hidden refresh workspaces and cross-workspace isolation. One Stage 3 scaffold test remains intentionally skipped.
+- [x] Pass 109 active offline tests across 21 files before the final rerun, including synthetic positive cases, all three real quality snapshots, warning levels, advisory approval behavior, hallucinated claims, refresh receipt gaps, off-domain redirects, stale tabs/results, budget exhaustion, restarts, hidden refresh workspaces and cross-workspace isolation. One Stage 3 scaffold test remains intentionally skipped.
 - [x] Browser-check the real Vercel candidate/evidence result at desktop and 768-pixel widths.
 - [x] Browser-check the complete editable generated-review and monthly-refresh workflows at desktop and 768-pixel widths using isolated local fixtures; the existing manual save/review/approve flow is covered by its local HTTP acceptance test.
 - [x] Run Vercel's live Serper identity/evidence check: four searches, twenty saved `vercel.com` pages, zero page errors, about forty seconds.
 - [x] Pass the no-cost three-seller acceptance with recorded official-page fixtures: Resolve AI, Shopify and Vercel each finish well under 3 minutes, produce at least 90% receipted attempted factual claims and can be explicitly approved.
 - [x] Persist the owner-authorized recovery outputs as immutable public-data snapshots and separate `needs_review` acceptance state. The original acceptance did not persist its profiles.
-- [ ] Re-run the revised research/drafting flow for Resolve AI, Shopify and Vercel only after separate owner authorization for step 5; leave all three in `needs_review` for owner review.
-- [x] Prepare the one-rerun allowlist without calling providers: 4 new Resolve AI pages, 5 Shopify pages and 8 Vercel pages; 0 Serper queries; 3 planned GPT-4o mini calls; expected API cost about $0.01 with the existing temporary $0.05 process cap.
+- [x] Run the one authorized final research/drafting flow: 12 Resolve AI, 9 Shopify and 8 Vercel first-party pages; 29/29 fetched, 0 errors, 0 Serper queries, exactly 3 GPT-4o mini calls, no retry, $0.007646 actual cost under the temporary $0.05 cap.
+- [x] Persist the three final snapshots and acceptance workspaces through the normal save path, leave every profile in `needs_review`, and confirm normal OpenAI settings stayed disabled/zero.
+- [ ] Owner manually fixes the remaining pass-bar failures in the review screen and approves each profile. No further automated rerun is allowed.
 - [x] Update README, status and traceability documents, run the production audit and scan tracked/untracked project files for credentials before publishing.
 - [ ] Mark Stage 2 complete only after the revised bounded run and owner review. Do not begin Stage 3 in this increment.
 
@@ -65,23 +68,32 @@ This is a deliberate owner decision, not unfinished Stage 2 code:
 | OpenAI API | Draft structured facts and targeting from evidence | GPT-4o mini selected to match the reference project. The bounded real-key acceptance passed, then normal calls returned to disabled with a zero local limit. Example pricing lists $0.15/million input tokens and $0.60/million output tokens. |
 | Existing public-page collector | Fetch and save permitted public evidence | No additional scraping-provider subscription needed for the planned implementation. |
 
-## Step 5 one-rerun pass bar
+## Final rerun outcome
 
-Each seller must have at least three customers backed by first-party sources, at least two competitors with sources, a measurable size metric consistent with target size, buyer and champion titles, and zero blocking warnings. Anything still failing after the single rerun will be corrected manually in the review screen. The rerun has not been authorized or started.
+The pass bar was at least three customers backed by first-party sources, at least two competitors with sources, a measurable size metric consistent with target size, buyer and champion titles, and zero blocking warnings. None of the three drafts passed completely. Resolve AI has 2 customers, 0 competitors, a consistent Employees/1,000 size rule, complete personas and 8 blocking/4 advisory warnings. Shopify has 0 customers, 0 competitors, a compatible Employee Count/50 size rule, complete personas and 25/1 warnings. Vercel has 0 customers, 0 competitors, a compatible employees/100 size rule, complete personas and 16/5 warnings. The owner will correct these drafts by hand; do not propose another rerun. See `docs/STAGE-2-FINAL-RERUN.md`.
 
 Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4o mini](https://developers.openai.com/api/docs/models/gpt-4o-mini). Public-page access can fail or be disallowed; do not bypass access controls.
 
-## Later stages — not started
+## Trimmed remaining portfolio stages — not started
 
-- [ ] Stage 3: fit rules, disqualification rules and scorecard.
-- [ ] Stage 4: prospect signal collectors.
-- [ ] Stage 5: scoring, company enrichment and tiers.
-- [ ] Stage 6: prospect discovery.
-- [ ] Stage 7: triggers and scheduling.
-- [ ] Stage 8: SDR workflow and account lifecycle.
-- [ ] Stage 9: contacts, drafts and gated delivery. Apollo and any sending integrations are decisions for this stage, not purchases needed now.
-- [ ] Stage 10: authentication, production storage, security and deployment.
-- [ ] Stage 11: measured metrics and interview/demo story.
-- [ ] Optional Stage 12: advanced integrations.
+- [ ] **Stage 3 (L):** ICP normalization, evidence-backed kill engine and scorecard; pass confirmed hand-labeled golden set plus Resolve gold-standard fixtures.
+- [ ] **Stage 4 (M):** only ATS hiring (Greenhouse/Lever/Ashby) and news (Google News RSS/Serper) collectors.
+- [ ] **Stage 5 (M):** fit scoring and tiers using free public firmographics only; no PDL or paid enrichment.
+- [ ] **Stage 6 (L):** light discovery of 20–30 real, correctly segmented prospects per seller, with noise gate and customer/competitor exclusion.
+- [ ] **Stage 8 (M):** Today list, why-now line, clickable receipts, account detail and new/working/skipped status.
+- [ ] **Stage 9 (M):** validated receipt-backed draft plus Copy button; no contacts, sending, Apollo, Instantly, HubSpot or CRM sync.
+- [ ] **Stage 11 (S):** manual Refresh account, demo preflight and a three-minute `docs/DEMO-SCRIPT.md`.
+
+## Deferred — future work
+
+- Stage 7 scheduler, SEC/EDGAR, executive-change and GitHub collectors, and signal stacking — unnecessary for a deterministic local portfolio demo.
+- Stage 9 contacts, Apollo, sending and CRM sync — paid/personal-data and authorization scope is not needed for receipt-backed drafts.
+- Stage 10 authentication, Postgres, backups and production deploy — the demo remains local and single-user.
+- Stage 12 advanced integrations — optional expansion after the core portfolio flow works.
+
+## Change log
+
+- **2026-10-19:** Replaced the broad remaining Stage 3–12 roadmap with `docs/IMPLEMENTATION-PLAN-TRIMMED.md`: stages 3, 4, 5, 6, 8, draft-only 9 and 11 remain; stages 7, 10, advanced Stage 9 delivery/contact work and Stage 12 are deferred.
+- **2026-10-19:** Recorded the last automated Stage 2 rerun and its real page, call, cost and pass-bar results. Remaining profile work is manual.
 
 Stage 0–1 infrastructure is implemented. Historical acceptance details and outstanding checks remain in TRACEABILITY.md; this checklist does not retroactively mark unverified checks complete.

@@ -8,6 +8,25 @@ const require=createRequire(import.meta.url);
 const {receiptQuality,receiptQuotes,sloganLike,vendorSeekingQuery,killLooksLikePain,workspaceQualityFindings}=require('../scripts/onboarding/validate.cjs');
 const fixtureDir=path.join(path.dirname(fileURLToPath(import.meta.url)),'fixtures','onboarding');
 const load=slug=>JSON.parse(fs.readFileSync(path.join(fixtureDir,`${slug}-live-icp.json`),'utf8'));
+// Preserved verbatim from the owner-reviewed Vercel revision 1 snapshot. The
+// live snapshot file now holds the final rerun, so this focused fixture keeps
+// the real navigation, partner, size and targeting failures in regression tests.
+const vercelRevision1={
+  sellerProfile:{category:'Multi-tenant SaaS',productOneLiner:'Build the platform of your dreams.',pricingModel:'Flexible Pro plan for modern teams.',targetCompanySize:'Enterprise',
+    valueProps:['Supercharge developer velocity.'],credentials:['Recognized by industry leaders for high-quality solutions.'],targetIndustries:['Ecommerce'],customers:[],competitors:[],evidence:{
+      category:{value:'Multi-tenant SaaS',sourceUrl:'https://vercel.com/solutions/multi-tenant-saas',evidenceQuote:'Multi-tenant SaaS Skip to content Copy Wordmark Copy Logo Download Brand Assets Brand Guidelines Products Agent Stack AI SDK AI Gateway Sandbox Passport Connect eve Core Platform Security Content'},
+      productOneLiner:{value:'Build the platform of your dreams.',sourceUrl:'https://vercel.com/solutions/multi-tenant-saas',evidenceQuote:'Infinite domains.'},
+      pricingModel:{value:'Flexible Pro plan for modern teams.',sourceUrl:'https://vercel.com/blog/new-pro-pricing-plan',evidenceQuote:'Enterprise Pricing Get a Demo Log In Sign Up A more flexible Pro plan for modern teams Tom Occhino Chief Product Officer Blog Company News 9 Sep 2025 3 min read Copy We’re updating Vercel’s Pro plan'},
+      targetCompanySize:{value:'Enterprise',sourceUrl:'https://vercel.com/solutions/turborepo',evidenceQuote:'Enterprise scale.'},
+      'valueProps.0':{value:'Supercharge developer velocity.',sourceUrl:'https://vercel.com/solutions/platform-engineering',evidenceQuote:'Sandbox Passport Connect eve Core Platform Security Content Delivery Fluid Compute Observability Workflows CI/CD Tools Next.js Vercel Agent Vercel Plugin Open Source Domains ↗ v0 ↗ Resources Learn'},
+      'credentials.0':{value:'Recognized by industry leaders for high-quality solutions.',sourceUrl:'https://vercel.com/partners/solution-partners/unlikely',evidenceQuote:'Using modern technologies, its experienced team delivers high-quality solutions across industries, from fashion ecommerce to startup websites.'},
+      'targetIndustries.0':{value:'Ecommerce',sourceUrl:'https://vercel.com/partners/solution-partners/unlikely',evidenceQuote:'Using modern technologies, its experienced team delivers high-quality solutions across industries, from fashion ecommerce to startup websites.'}
+    }},
+  icpConfig:{segments:[{label:'Development Tools',queryTemplates:['developer velocity tools','CI/CD platforms','automated deployment solutions','observability tools']}],
+    personas:{buyerTitles:['Product Manager'],championTitles:['UX Designer'],wrongOrgTitles:[]},
+    triggerMapping:{pain_event:['slow deployment times'],buying_intent:['seeking to improve developer productivity']},
+    killPatterns:{solvingInHouse:['building custom solutions','relying on legacy systems'],buildCulture:['favoring manual processes','avoiding automation'],sizeMetric:{label:'Small to Medium Enterprises',floor:10}}}
+};
 
 function goodWorkspace() {
   return {
@@ -44,7 +63,7 @@ describe('receipt quality guards',()=>{
   });
 
   it('rejects the real Vercel navigation, short, irrelevant and partner-page receipts',()=>{
-    const vercel=load('vercel'),evidence=vercel.sellerProfile.evidence;
+    const evidence=vercelRevision1.sellerProfile.evidence;
     expect(receiptQuality(evidence.category.value,evidence.category.evidenceQuote,evidence.category.sourceUrl)).toMatchObject({ok:false,code:'NAVIGATION_BOILERPLATE'});
     expect(receiptQuality(evidence.productOneLiner.value,evidence.productOneLiner.evidenceQuote,evidence.productOneLiner.sourceUrl)).toMatchObject({ok:false,code:'QUOTE_TOO_SHORT'});
     expect(receiptQuality(evidence['valueProps.0'].value,evidence['valueProps.0'].evidenceQuote,evidence['valueProps.0'].sourceUrl)).toMatchObject({ok:false,code:'NO_CLAIM_OVERLAP'});
@@ -62,14 +81,14 @@ describe('ICP quality guards',()=>{
   });
 
   it('flags the real Vercel revision 1 failures without rewriting the fixture',()=>{
-    const vercel=load('vercel'),before=JSON.stringify(vercel),findings=workspaceQualityFindings(vercel),codes=new Set(findings.map(item=>item.code));
+    const vercel=vercelRevision1,before=JSON.stringify(vercel),findings=workspaceQualityFindings(vercel),codes=new Set(findings.map(item=>item.code));
     for(const code of ['EMPTY_CUSTOMERS','EMPTY_COMPETITORS','RECEIPT_NAVIGATION_BOILERPLATE','RECEIPT_QUOTE_TOO_SHORT','RECEIPT_NO_CLAIM_OVERLAP','RECEIPT_PARTNER_SOURCE','SIZE_METRIC_UNMEASURABLE','SIZE_FLOOR_CONTRADICTS_TARGET','SLOGAN_LIKE_FACT','VENDOR_SEEKING_QUERY','KILL_LOOKS_LIKE_BUYING_PAIN'])expect(codes.has(code),code).toBe(true);
     expect(Object.values(vercel.sellerProfile.evidence).some(item=>item.sourceUrl?.includes('/customers'))).toBe(false);
     expect(JSON.stringify(vercel)).toBe(before);
   });
 
   it('keeps field-level evidence and slogan concerns advisory while core and partner failures block',()=>{
-    const vercel=workspaceQualityFindings(load('vercel'));
+    const vercel=workspaceQualityFindings(vercelRevision1);
     expect(vercel.find(item=>item.path==='sellerProfile.evidence.valueProps.0')).toMatchObject({severity:'advisory',code:'RECEIPT_NO_CLAIM_OVERLAP'});
     expect(vercel.find(item=>item.path==='sellerProfile.productOneLiner')).toMatchObject({severity:'advisory',code:'SLOGAN_LIKE_FACT'});
     expect(vercel.find(item=>item.path==='sellerProfile.evidence.credentials.0')).toMatchObject({severity:'blocking',code:'RECEIPT_PARTNER_SOURCE'});
@@ -90,13 +109,13 @@ describe('ICP quality guards',()=>{
     expect(report['resolve-ai'].length).toBeGreaterThan(0);
     expect(report.shopify.length).toBeGreaterThan(0);
     expect(report.vercel.length).toBeGreaterThan(report['resolve-ai'].length);
-    expect(report.shopify.some(item=>item.code==='RECEIPT_NAVIGATION_BOILERPLATE')).toBe(true);
+    expect(report.shopify.some(item=>item.code==='EMPTY_CUSTOMERS')).toBe(true);
     expect(report['resolve-ai'].some(item=>item.code==='RECEIPT_NO_CLAIM_OVERLAP')).toBe(true);
-    expect(report['resolve-ai'].filter(item=>item.severity==='blocking')).toHaveLength(7);
-    expect(report['resolve-ai'].filter(item=>item.severity==='advisory')).toHaveLength(2);
-    expect(report.shopify.filter(item=>item.severity==='blocking')).toHaveLength(18);
-    expect(report.shopify.filter(item=>item.severity==='advisory')).toHaveLength(5);
-    expect(report.vercel.filter(item=>item.severity==='blocking')).toHaveLength(23);
-    expect(report.vercel.filter(item=>item.severity==='advisory')).toHaveLength(4);
+    expect(report['resolve-ai'].filter(item=>item.severity==='blocking')).toHaveLength(8);
+    expect(report['resolve-ai'].filter(item=>item.severity==='advisory')).toHaveLength(4);
+    expect(report.shopify.filter(item=>item.severity==='blocking')).toHaveLength(25);
+    expect(report.shopify.filter(item=>item.severity==='advisory')).toHaveLength(1);
+    expect(report.vercel.filter(item=>item.severity==='blocking')).toHaveLength(16);
+    expect(report.vercel.filter(item=>item.severity==='advisory')).toHaveLength(5);
   });
 });
