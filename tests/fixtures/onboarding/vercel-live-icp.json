@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "capturedOn": "2026-10-20T00:45:26.438Z",
+  "capturedOn": "2026-10-20T06:53:20.750Z",
   "model": "gpt-4o-mini",
   "promptVersion": "seller-profile-quality-guards-v5",
-  "commitHash": "9634b6bcbcaa808840d74478ff87680845fc8c8f",
-  "source": "Owner-authorized final Stage 2 rerun using only the documented first-party live-page allowlist and zero Serper queries.",
+  "commitHash": "6fd10a4c11316dbce11839cfd48d4301b327ee56",
+  "source": "Recovered offline from the completed owner-authorized saved-pages-only Stage 2 redraft using the fixed evidence packet and fixed receipt schema; no additional provider call was made during finalization.",
   "seller": {
     "name": "Vercel: Agentic Infrastructure",
     "domain": "vercel.com"
@@ -14,47 +14,49 @@
     "sellerName": "Vercel: Agentic Infrastructure",
     "domain": "vercel.com",
     "deliveryAllowed": false,
-    "generatedAt": "2026-10-20T00:45:26.391Z",
+    "generatedAt": "2026-10-20T06:52:13.285Z",
     "approvedAt": null,
-    "updatedAt": "2026-10-20T00:45:26.391Z",
+    "updatedAt": "2026-10-20T06:52:13.285Z",
     "sources": [
-      "0197578fcde917f436bb4dfe",
-      "dbb0cffdfe12f6f7c0a2698c",
-      "5ba45b306bfc80eeb6f8bae1"
+      "da5d4b2a053335a760832701",
+      "e40ecb037bc41a5c78ff8e44",
+      "d747e1490079d8c8fe524313",
+      "f569b845ac492ec407345606"
     ],
-    "category": "Multi-tenant SaaS",
-    "productOneLiner": "Build and deploy applications with agentic infrastructure for seamless multi-tenant experiences.",
-    "pricingModel": "Subscription-based pricing with various tiers including Hobby, Pro, and Enterprise plans.",
-    "targetCompanySize": "Mid-sized to large enterprises",
+    "category": "AI Infrastructure",
+    "productOneLiner": "Vercel provides a platform for deploying and managing AI applications with seamless integration and rapid deployment capabilities.",
+    "pricingModel": "Flexible pricing plans including Hobby, Pro, and Enterprise options.",
+    "targetCompanySize": "1000+ employees",
     "valueProps": [
-      "Automate infrastructure provisioning and deployment processes.",
-      "Enable rapid development and deployment cycles with CI/CD tools.",
-      "Support for multiple customers across different subdomains and custom domains."
+      "Automated deployment and management of AI applications.",
+      "High performance with a global edge network serving billions of requests daily.",
+      "Instant SSL certificates and secure deployments for multi-tenant applications."
     ],
     "credentials": [],
     "targetIndustries": [
-      "Technology",
-      "E-commerce"
+      "Finance & Insurance",
+      "Healthcare",
+      "Ecommerce"
     ],
     "proofPoints": [
       {
-        "claim": "350 million daily active users served by The Weather Company using Vercel.",
+        "claim": "Vercel drove 264% ROI for enterprise customers.",
         "schemaVersion": 1,
-        "value": "350 million daily active users served by The Weather Company using Vercel.",
-        "sourceUrl": "https://vercel.com/customers/how-the-weather-company-serves-real-time-forecasts-to-350-million-daily-active-users-on-vercel",
-        "sourceId": "dbb0cffdfe12f6f7c0a2698c",
-        "evidenceQuote": "Eric Dodds Content Engineer Blog Customers 9 Jun 2026 3 min watch Copy Copy link to heading The Weather Company on Vercel 350 million monthly active users served worldwide 2.2 billion coordinates",
+        "value": "Vercel drove 264% ROI for enterprise customers.",
+        "sourceUrl": "https://vercel.com/enterprise",
+        "sourceId": "d747e1490079d8c8fe524313",
+        "evidenceQuote": "Vercel Enterprise drove 264% ROI Read the blog 90% time saved managing infrastructure Developers got their time back.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       {
-        "claim": "Rogo achieved 73,000+ deployments in a single month with Vercel.",
+        "claim": "Over 92 billion requests served daily, ensuring reliability and speed.",
         "schemaVersion": 1,
-        "value": "Rogo achieved 73,000+ deployments in a single month with Vercel.",
-        "sourceUrl": "https://vercel.com/customers/how-rogo-ships-agent-written-code-to-production-in-5-minutes-on-vercel",
-        "sourceId": "5ba45b306bfc80eeb6f8bae1",
-        "evidenceQuote": "Customers 2 Oct 2026 3 min watch Copy Copy link to heading Rogo on Vercel 73,000+ deployments in a single month Agent-written code shipped to production in 5 minutes 6 production AI agents automating",
+        "value": "Over 92 billion requests served daily, ensuring reliability and speed.",
+        "sourceUrl": "https://vercel.com/enterprise",
+        "sourceId": "d747e1490079d8c8fe524313",
+        "evidenceQuote": "92B+ Requests every day A global edge serves more than 92B requests a day with the speed and reliability your customers expect.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
@@ -65,110 +67,120 @@
     "evidence": {
       "category": {
         "schemaVersion": 1,
-        "value": "Multi-tenant SaaS",
-        "sourceUrl": "https://vercel.com/solutions/multi-tenant-saas",
-        "sourceId": "0197578fcde917f436bb4dfe",
-        "evidenceQuote": "Delivery Fluid Compute Observability Workflows CI/CD Tools Next.js Vercel Agent Vercel Plugin Open Source Domains ↗ v0 ↗ Resources Learn Docs About Blog Changelog Knowledge Base Build AI Apps Web Apps",
+        "value": "AI Infrastructure",
+        "sourceUrl": "https://vercel.com/",
+        "sourceId": "da5d4b2a053335a760832701",
+        "evidenceQuote": "Features Global Delivery Deployment Environments Serverless Functions Web Application Firewall Host platforms that serve every customer Mintlify powers documentation for over 20,000 companies on",
         "inferred": true,
         "verification": "no_claim_overlap",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "productOneLiner": {
         "schemaVersion": 1,
-        "value": "Build and deploy applications with agentic infrastructure for seamless multi-tenant experiences.",
-        "sourceUrl": "https://vercel.com/solutions/multi-tenant-saas",
-        "sourceId": "0197578fcde917f436bb4dfe",
-        "evidenceQuote": "Build the platform of your dreams.",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "Vercel provides a platform for deploying and managing AI applications with seamless integration and rapid deployment capabilities.",
+        "sourceUrl": "https://vercel.com/",
+        "sourceId": "da5d4b2a053335a760832701",
+        "evidenceQuote": "Features Global Delivery Deployment Environments Serverless Functions Web Application Firewall Host platforms that serve every customer Mintlify powers documentation for over 20,000 companies on",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "pricingModel": {
         "schemaVersion": 1,
-        "value": "Subscription-based pricing with various tiers including Hobby, Pro, and Enterprise plans.",
-        "sourceUrl": "https://vercel.com/pricing",
-        "sourceId": "d1bb543ca17e7da3cdefd9f3",
-        "evidenceQuote": "Platform Security Content Delivery Fluid Compute Observability Workflows CI/CD Tools Next.js Vercel Agent Vercel Plugin Open Source Domains ↗ v0 ↗ Resources Learn Docs About Blog Changelog Knowledge",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "Flexible pricing plans including Hobby, Pro, and Enterprise options.",
+        "sourceUrl": "https://vercel.com/blog/new-pro-pricing-plan",
+        "sourceId": "e40ecb037bc41a5c78ff8e44",
+        "evidenceQuote": "New Pro pricing plan Get flexible credits, free Viewer seats, and self-serve access to Enterprise-level features when you need them.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetCompanySize": {
         "schemaVersion": 1,
-        "value": "Mid-sized to large enterprises",
-        "sourceUrl": "https://vercel.com/docs/pricing",
-        "sourceId": "4146a9b5f9a6a9d4f5ec437a",
-        "evidenceQuote": "Deployments Domains Vercel for Platforms Routing CDN Microfrontends Storage",
+        "value": "1000+ employees",
+        "sourceUrl": "https://vercel.com/enterprise",
+        "sourceId": "d747e1490079d8c8fe524313",
+        "evidenceQuote": "Vercel Enterprise drove 264% ROI Read the blog 90% time saved managing infrastructure Developers got their time back.",
         "inferred": true,
         "verification": "no_claim_overlap",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "valueProps.0": {
         "schemaVersion": 1,
-        "value": "Automate infrastructure provisioning and deployment processes.",
-        "sourceUrl": "https://vercel.com/solutions/platform-engineering",
-        "sourceId": "6aeabcd98d1ab464213fef99",
-        "evidenceQuote": "33× more production deploys.",
+        "value": "Automated deployment and management of AI applications.",
+        "sourceUrl": "https://vercel.com/",
+        "sourceId": "da5d4b2a053335a760832701",
+        "evidenceQuote": "Automated by agents who autonomously investigate errors, plan fixes, and open PRs.",
         "inferred": true,
         "verification": "no_claim_overlap",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       "valueProps.1": {
         "schemaVersion": 1,
-        "value": "Enable rapid development and deployment cycles with CI/CD tools.",
-        "sourceUrl": "https://vercel.com/docs/pricing",
-        "sourceId": "4146a9b5f9a6a9d4f5ec437a",
-        "evidenceQuote": "MCP AI Integrations Deploy & scale Deployments CLI Functions Delivery Network Storage Integrations Microfrontends Domains Operate & protect Firewall Observability Feature Flags Toolbar Bot Management",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      "valueProps.2": {
-        "schemaVersion": 1,
-        "value": "Support for multiple customers across different subdomains and custom domains.",
-        "sourceUrl": "https://vercel.com/solutions/multi-tenant-saas",
-        "sourceId": "0197578fcde917f436bb4dfe",
-        "evidenceQuote": "Serve multiple customers across different subdomains and custom domains in your application with just a few lines of code.",
+        "value": "High performance with a global edge network serving billions of requests daily.",
+        "sourceUrl": "https://vercel.com/enterprise",
+        "sourceId": "d747e1490079d8c8fe524313",
+        "evidenceQuote": "92B+ Requests every day A global edge serves more than 92B requests a day with the speed and reliability your customers expect.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
-      "targetIndustries.0": {
+      "valueProps.2": {
         "schemaVersion": 1,
-        "value": "Technology",
-        "sourceUrl": "https://vercel.com/enterprise",
-        "sourceId": "d747e1490079d8c8fe524313",
-        "evidenceQuote": "Fluid Compute Observability Workflows CI/CD Tools Next.js Vercel Agent Vercel Plugin Open Source Domains ↗ v0 ↗ Resources Learn Docs About Blog Changelog Knowledge Base Build AI Apps Web Apps",
+        "value": "Instant SSL certificates and secure deployments for multi-tenant applications.",
+        "sourceUrl": "https://vercel.com/solutions/multi-tenant-saas",
+        "sourceId": "0197578fcde917f436bb4dfe",
+        "evidenceQuote": "Vercel for Platforms lets you build hosted products that create, deploy, and operate web applications for customers or teams.",
         "inferred": true,
         "verification": "no_claim_overlap",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      "targetIndustries.0": {
+        "schemaVersion": 1,
+        "value": "Finance & Insurance",
+        "sourceUrl": "https://vercel.com/customers",
+        "sourceId": "f569b845ac492ec407345606",
+        "evidenceQuote": "Rogo How Rogo ships agent-written code to production in 5 minutes on Vercel Finance & Insurance Read story Read story Read story Shopify Shopify and Vercel are rebuilding Hydrogen for faster",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetIndustries.1": {
         "schemaVersion": 1,
-        "value": "E-commerce",
-        "sourceUrl": "https://vercel.com/docs/pricing",
-        "sourceId": "4146a9b5f9a6a9d4f5ec437a",
-        "evidenceQuote": "Deployments Domains Vercel for Platforms Routing CDN Microfrontends Storage",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "Healthcare",
+        "sourceUrl": "https://vercel.com/customers",
+        "sourceId": "f569b845ac492ec407345606",
+        "evidenceQuote": "story Read story Read story OpenEvidence How OpenEvidence built a healthcare AI that physicians actually trust Healthcare Read story Read story Read story Ramp How Ramp kept 100% uptime through 100x",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "targetIndustries.2": {
+        "schemaVersion": 1,
+        "value": "Ecommerce",
+        "sourceUrl": "https://vercel.com/customers",
+        "sourceId": "f569b845ac492ec407345606",
+        "evidenceQuote": "storefronts Ecommerce, Software Read story Read story Read story Searchable How Searchable ships customer-requested features in 30 minutes on Vercel AI Read story Read story Read story The Weather",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "proofPoints.0": {
         "schemaVersion": 1,
-        "value": "350 million daily active users served by The Weather Company using Vercel.",
-        "sourceUrl": "https://vercel.com/customers/how-the-weather-company-serves-real-time-forecasts-to-350-million-daily-active-users-on-vercel",
-        "sourceId": "dbb0cffdfe12f6f7c0a2698c",
-        "evidenceQuote": "Eric Dodds Content Engineer Blog Customers 9 Jun 2026 3 min watch Copy Copy link to heading The Weather Company on Vercel 350 million monthly active users served worldwide 2.2 billion coordinates",
+        "value": "Vercel drove 264% ROI for enterprise customers.",
+        "sourceUrl": "https://vercel.com/enterprise",
+        "sourceId": "d747e1490079d8c8fe524313",
+        "evidenceQuote": "Vercel Enterprise drove 264% ROI Read the blog 90% time saved managing infrastructure Developers got their time back.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "proofPoints.1": {
         "schemaVersion": 1,
-        "value": "Rogo achieved 73,000+ deployments in a single month with Vercel.",
-        "sourceUrl": "https://vercel.com/customers/how-rogo-ships-agent-written-code-to-production-in-5-minutes-on-vercel",
-        "sourceId": "5ba45b306bfc80eeb6f8bae1",
-        "evidenceQuote": "Customers 2 Oct 2026 3 min watch Copy Copy link to heading Rogo on Vercel 73,000+ deployments in a single month Agent-written code shipped to production in 5 minutes 6 production AI agents automating",
+        "value": "Over 92 billion requests served daily, ensuring reliability and speed.",
+        "sourceUrl": "https://vercel.com/enterprise",
+        "sourceId": "d747e1490079d8c8fe524313",
+        "evidenceQuote": "92B+ Requests every day A global edge serves more than 92B requests a day with the speed and reliability your customers expect.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
@@ -179,92 +191,59 @@
     "schemaVersion": 1,
     "segments": [
       {
-        "key": "897064de44cbef467643b74e",
-        "label": "Technology Companies",
+        "key": "bbc60cfd0ebda6b42e76cc07",
+        "label": "Large Enterprises",
         "enabled": true,
         "subIndustries": [
-          "Software Development",
-          "Cloud Services"
+          "Finance",
+          "Healthcare",
+          "Ecommerce"
         ],
         "queryTemplates": [
+          "\"enterprise AI deployment\"",
+          "\"scalable web applications for large teams\"",
           "\"multi-tenant SaaS solutions\"",
-          "\"cloud infrastructure for developers\"",
-          "\"CI/CD tools for software teams\"",
-          "\"automated deployment platforms\""
+          "\"high-performance web infrastructure\""
         ],
-        "revenueSensitivityBase": 5,
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       },
       {
-        "key": "6bc713301c5b421e7dd9bebe",
-        "label": "E-commerce Platforms",
+        "key": "3ce6617f68b53472fe9b6193",
+        "label": "Tech Startups",
         "enabled": true,
         "subIndustries": [
-          "Online Retail",
-          "Marketplace Solutions"
+          "Software",
+          "AI",
+          "Web Development"
         ],
         "queryTemplates": [
-          "\"e-commerce platform development\"",
-          "\"scalable online storefronts\"",
-          "\"multi-domain e-commerce solutions\"",
-          "\"cloud infrastructure for retail\""
+          "\"startup AI infrastructure\"",
+          "\"rapid deployment for tech startups\"",
+          "\"cloud solutions for startups\"",
+          "\"scalable web apps for startups\""
         ],
-        "revenueSensitivityBase": 5,
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       },
       {
-        "key": "927aa005fba7629607beea9d",
-        "label": "Media and Entertainment",
+        "key": "dd4eec11712550a68e853abe",
+        "label": "Digital Agencies",
         "enabled": true,
         "subIndustries": [
-          "Streaming Services",
-          "Content Delivery Networks"
+          "Marketing",
+          "Design",
+          "Consulting"
         ],
         "queryTemplates": [
-          "\"content delivery solutions\"",
-          "\"media streaming infrastructure\"",
-          "\"scalable media applications\"",
-          "\"real-time content delivery\""
+          "\"agency web development solutions\"",
+          "\"AI tools for digital marketing\"",
+          "\"cloud infrastructure for design agencies\"",
+          "\"fast deployment for marketing campaigns\""
         ],
-        "revenueSensitivityBase": 5,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "13425bd9e339600c081538e8",
-        "label": "Financial Services",
-        "enabled": true,
-        "subIndustries": [
-          "Fintech",
-          "Banking Solutions"
-        ],
-        "queryTemplates": [
-          "\"cloud solutions for fintech\"",
-          "\"secure financial applications\"",
-          "\"multi-tenant banking platforms\"",
-          "\"automated compliance solutions\""
-        ],
-        "revenueSensitivityBase": 5,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "d6cf4b0833fe88669267bd12",
-        "label": "Healthcare Technology",
-        "enabled": true,
-        "subIndustries": [
-          "Health IT",
-          "Telemedicine"
-        ],
-        "queryTemplates": [
-          "\"healthcare application development\"",
-          "\"secure patient data management\"",
-          "\"cloud infrastructure for healthcare\"",
-          "\"automated healthcare solutions\""
-        ],
-        "revenueSensitivityBase": 5,
+        "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       }
@@ -273,14 +252,13 @@
       "buyerTitles": [
         "CTO",
         "VP of Engineering",
-        "Head of DevOps",
+        "Head of IT",
         "Product Manager"
       ],
       "championTitles": [
-        "Software Engineer",
-        "Platform Engineer",
         "DevOps Engineer",
-        "Technical Architect"
+        "Software Engineer",
+        "Product Owner"
       ],
       "wrongOrgTitles": [
         "Intern",
@@ -290,197 +268,197 @@
     },
     "signalDefinitions": {
       "techStack": {
-        "label": "Cloud Infrastructure",
-        "description": "Companies using cloud-based infrastructure for application deployment and management.",
+        "label": "Modern Web Technologies",
+        "description": "Companies using modern web frameworks and cloud infrastructure.",
         "evidenceKeywords": [
-          "cloud services",
-          "SaaS",
-          "multi-tenant architecture"
+          "Next.js",
+          "React",
+          "Node.js",
+          "Serverless"
         ],
         "negativeKeywords": [
-          "on-premises",
-          "legacy systems"
+          "Legacy systems",
+          "On-premise solutions"
         ],
         "preferredSources": [
-          "customer testimonials",
-          "case studies",
-          "industry reports"
+          "Customer success stories",
+          "Technical blogs",
+          "Industry reports"
         ],
         "rubric": {
-          "1": "Not using cloud infrastructure",
-          "3": "Partially using cloud infrastructure",
-          "5": "Fully utilizing cloud infrastructure"
+          "1": "Outdated technology stack",
+          "3": "Mixed technology stack",
+          "5": "Modern technology stack"
         }
       },
       "activePain": {
-        "label": "Deployment Delays",
-        "description": "Companies experiencing slow deployment cycles and manual processes.",
+        "label": "Inefficient Deployment Processes",
+        "description": "Companies struggling with slow deployment cycles and manual processes.",
         "evidenceKeywords": [
-          "manual deployment",
-          "slow release cycles",
-          "inefficient workflows"
+          "Slow deployment",
+          "Manual intervention",
+          "High infrastructure costs"
         ],
         "negativeKeywords": [
-          "automated deployment",
+          "Automated deployment",
           "CI/CD"
         ],
         "preferredSources": [
-          "customer feedback",
-          "support tickets",
-          "industry surveys"
+          "Customer testimonials",
+          "Case studies",
+          "Industry surveys"
         ],
         "rubric": {
-          "1": "No deployment issues",
-          "3": "Some deployment delays",
-          "5": "Frequent deployment delays"
+          "1": "High pain",
+          "3": "Moderate pain",
+          "5": "Low pain"
         }
       },
       "revenueSensitivity": {
         "label": "High Revenue Sensitivity",
-        "description": "Companies that rely heavily on uptime and performance for revenue generation.",
+        "description": "Companies that are highly sensitive to downtime and performance issues.",
         "evidenceKeywords": [
-          "high traffic",
-          "revenue impact",
-          "performance metrics"
+          "High traffic",
+          "Revenue loss",
+          "Customer retention"
         ],
         "negativeKeywords": [
-          "low traffic",
-          "non-revenue generating"
+          "Low traffic",
+          "Stable revenue"
         ],
         "preferredSources": [
-          "financial reports",
-          "customer testimonials",
-          "case studies"
+          "Financial reports",
+          "Market analysis",
+          "Customer feedback"
         ],
         "rubric": {
-          "1": "Low revenue sensitivity",
-          "3": "Moderate revenue sensitivity",
-          "5": "High revenue sensitivity"
+          "1": "Very sensitive",
+          "3": "Moderately sensitive",
+          "5": "Not sensitive"
         }
       },
       "observabilityScale": {
         "label": "High Observability Needs",
         "description": "Companies requiring detailed monitoring and observability of their applications.",
         "evidenceKeywords": [
-          "monitoring tools",
-          "observability platforms",
-          "real-time analytics"
+          "Monitoring tools",
+          "Performance metrics",
+          "Real-time analytics"
         ],
         "negativeKeywords": [
-          "basic monitoring",
-          "no observability"
+          "Basic monitoring",
+          "No observability"
         ],
         "preferredSources": [
-          "customer feedback",
-          "case studies",
-          "industry reports"
+          "Technical documentation",
+          "Product reviews",
+          "Industry benchmarks"
         ],
         "rubric": {
-          "1": "Low observability needs",
-          "3": "Moderate observability needs",
-          "5": "High observability needs"
+          "1": "Low observability",
+          "3": "Moderate observability",
+          "5": "High observability"
         }
       },
       "aiCompatibility": {
-        "label": "AI Integration",
+        "label": "AI-Driven Solutions",
         "description": "Companies looking to integrate AI capabilities into their applications.",
         "evidenceKeywords": [
-          "AI tools",
-          "machine learning",
-          "automated processes"
+          "AI integration",
+          "Machine learning",
+          "Data-driven decisions"
         ],
         "negativeKeywords": [
-          "no AI integration",
-          "manual processes"
+          "Non-AI solutions",
+          "Traditional software"
         ],
         "preferredSources": [
-          "customer testimonials",
-          "case studies",
-          "industry reports"
+          "AI research papers",
+          "Industry conferences",
+          "Tech blogs"
         ],
         "rubric": {
-          "1": "No AI integration",
-          "3": "Some AI integration",
-          "5": "Full AI integration"
+          "1": "Not AI compatible",
+          "3": "Some AI capabilities",
+          "5": "Fully AI integrated"
         }
       },
       "competitiveWedge": {
-        "label": "Competitive Advantage",
-        "description": "Companies seeking to differentiate themselves through advanced technology solutions.",
+        "label": "Strong Competitive Advantage",
+        "description": "Companies that leverage unique technology or processes to outperform competitors.",
         "evidenceKeywords": [
-          "innovation",
-          "technology leadership",
-          "market differentiation"
+          "Market leader",
+          "Innovative solutions",
+          "Unique technology"
         ],
         "negativeKeywords": [
-          "stagnation",
-          "lack of innovation"
+          "Standard solutions",
+          "No differentiation"
         ],
         "preferredSources": [
-          "market analysis",
-          "customer testimonials",
-          "case studies"
+          "Market analysis",
+          "Competitive reports",
+          "Customer feedback"
         ],
         "rubric": {
-          "1": "No competitive advantage",
-          "3": "Some competitive advantage",
-          "5": "Strong competitive advantage"
+          "1": "Weak competitive position",
+          "3": "Moderate competitive position",
+          "5": "Strong competitive position"
         }
       }
     },
     "triggerMapping": {
       "pain_event": [
-        "deployment delays",
-        "manual processes",
-        "inefficient workflows"
+        "Slow deployment cycles",
+        "High infrastructure costs",
+        "Manual processes"
       ],
       "buying_intent": [
-        "looking for cloud solutions",
-        "interested in CI/CD tools",
-        "exploring multi-tenant architectures"
+        "Looking for cloud solutions",
+        "Seeking faster deployment",
+        "Interested in AI capabilities"
       ],
       "function_roles": [
-        "engineering",
-        "product management",
-        "DevOps"
+        "CTO",
+        "VP of Engineering",
+        "Product Manager"
       ],
       "tech_adoption": [
-        "adopting cloud infrastructure",
-        "implementing CI/CD",
-        "integrating AI capabilities"
+        "Adopting modern web frameworks",
+        "Migrating to cloud infrastructure"
       ],
       "competitor_names": []
     },
     "killPatterns": {
       "solvingInHouse": [
-        "strong internal development team",
-        "existing in-house solutions"
+        "Companies with strong internal DevOps teams",
+        "Organizations committed to building custom infrastructure"
       ],
       "buildCulture": [
-        "culture of building custom solutions",
-        "preference for internal tools"
+        "Companies with a culture of building everything in-house",
+        "Organizations resistant to adopting third-party solutions"
       ],
       "sizeMetric": {
-        "label": "employees",
-        "floor": 100
+        "label": "Employees",
+        "floor": 1000
       }
     },
     "painSources": {
       "statuspage": true,
-      "hn": true,
+      "hn": false,
       "news": true,
       "filings": false
     },
     "pitch": {
       "receiptOpenerStyle": "Engaging and informative",
-      "oneSentenceProduct": "Build and deploy applications with agentic infrastructure for seamless multi-tenant experiences.",
-      "credentialLine": "Trusted by leading companies in technology and e-commerce.",
-      "ctaStyle": "Encourage exploration of solutions."
+      "oneSentenceProduct": "Vercel provides a platform for deploying and managing AI applications with seamless integration and rapid deployment capabilities.",
+      "credentialLine": "Trusted by leading enterprises and startups alike.",
+      "ctaStyle": "Encourage immediate engagement."
     },
     "objectionTemplates": [
-      "\"We already have a solution in place.\"",
-      "\"Our team prefers to build in-house.\"",
-      "\"We're not ready to transition to a new platform.\""
+      "\"We already have an in-house solution.\"",
+      "\"We're not ready to switch from our current provider.\"",
+      "\"Our team prefers to build everything internally.\""
     ],
     "weights": {
       "techStack": 1.3,
@@ -540,41 +518,25 @@
   },
   "receiptReport": {
     "schemaVersion": 1,
-    "attemptedClaims": 11,
-    "acceptedClaims": 11,
-    "receiptedClaims": 3,
-    "receiptCoverage": 0.2727272727272727,
+    "attemptedClaims": 12,
+    "acceptedClaims": 12,
+    "receiptedClaims": 8,
+    "receiptCoverage": 0.6666666666666666,
     "warnings": [
       {
-        "value": "Multi-tenant SaaS",
+        "value": "AI Infrastructure",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       {
-        "value": "Build and deploy applications with agentic infrastructure for seamless multi-tenant experiences.",
+        "value": "1000+ employees",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       {
-        "value": "Subscription-based pricing with various tiers including Hobby, Pro, and Enterprise plans.",
+        "value": "Automated deployment and management of AI applications.",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       {
-        "value": "Mid-sized to large enterprises",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Automate infrastructure provisioning and deployment processes.",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Enable rapid development and deployment cycles with CI/CD tools.",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Technology",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "E-commerce",
+        "value": "Instant SSL certificates and secure deployments for multi-tenant applications.",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       }
     ],
@@ -583,37 +545,10 @@
     "qualityFindings": [
       {
         "schemaVersion": 1,
-        "id": "c5d4d0d90b23f09e2dc63077",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.0.queryTemplates.0",
-        "field": "segments.0.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
         "id": "baf9fe9f341a4663dc72d9bf",
         "code": "VENDOR_SEEKING_QUERY",
         "path": "icpConfig.segments.0.queryTemplates.2",
         "field": "segments.0.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "dc5b949a10028b41faa31351",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.0.queryTemplates.3",
-        "field": "segments.0.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "e6b94698a9adfe976a2aa953",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.1.queryTemplates.0",
-        "field": "segments.1.queryTemplates",
         "severity": "blocking",
         "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
       },
@@ -637,37 +572,10 @@
       },
       {
         "schemaVersion": 1,
-        "id": "c60f8baf06a655c1ce9e6ef3",
+        "id": "f021c5d3127efbebb2a301f1",
         "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.3.queryTemplates.0",
-        "field": "segments.3.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "e038ac30317c6c893a203cd9",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.3.queryTemplates.2",
-        "field": "segments.3.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "14a3c62822c6346ef12a4d68",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.3.queryTemplates.3",
-        "field": "segments.3.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "3c340981b8e0a535da2acd01",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.4.queryTemplates.3",
-        "field": "segments.4.queryTemplates",
+        "path": "icpConfig.segments.2.queryTemplates.1",
+        "field": "segments.2.queryTemplates",
         "severity": "blocking",
         "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
       },
@@ -700,47 +608,11 @@
       },
       {
         "schemaVersion": 1,
-        "id": "d41b6737e5c37d0af7a0823e",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.pricingModel",
-        "field": "pricingModel",
-        "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "f436bd230a10fc9a654cbc03",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.productOneLiner",
-        "field": "productOneLiner",
-        "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
         "id": "1ab4a007bbb41ffb74c4f04a",
         "code": "RECEIPT_NO_CLAIM_OVERLAP",
         "path": "sellerProfile.evidence.targetCompanySize",
         "field": "targetCompanySize",
         "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "8ab158b5f82e79b0370d3176",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.targetIndustries.0",
-        "field": "targetIndustries.0.value",
-        "severity": "advisory",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "8adf58d0f352f2c2b4cb7f9b",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.targetIndustries.1",
-        "field": "targetIndustries.1.value",
-        "severity": "advisory",
         "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       {
@@ -754,12 +626,21 @@
       },
       {
         "schemaVersion": 1,
-        "id": "53d3a67849958b830577bf1e",
+        "id": "e6d393da8e9eaf9215a5d694",
         "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.valueProps.1",
-        "field": "valueProps.1.value",
+        "path": "sellerProfile.evidence.valueProps.2",
+        "field": "valueProps.2.value",
         "severity": "advisory",
         "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "8a9b54b69ddef316d6d14dd2",
+        "code": "SLOGAN_LIKE_FACT",
+        "path": "sellerProfile.pricingModel",
+        "field": "pricingModel",
+        "severity": "advisory",
+        "message": "This reads like a headline or marketing slogan rather than a precise seller fact."
       },
       {
         "schemaVersion": 1,

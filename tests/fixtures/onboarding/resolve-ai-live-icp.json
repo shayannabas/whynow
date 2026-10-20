@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "capturedOn": "2026-10-20T00:45:02.093Z",
+  "capturedOn": "2026-10-20T06:53:20.733Z",
   "model": "gpt-4o-mini",
   "promptVersion": "seller-profile-quality-guards-v5",
-  "commitHash": "9634b6bcbcaa808840d74478ff87680845fc8c8f",
-  "source": "Owner-authorized final Stage 2 rerun using only the documented first-party live-page allowlist and zero Serper queries.",
+  "commitHash": "6fd10a4c11316dbce11839cfd48d4301b327ee56",
+  "source": "Recovered offline from the completed owner-authorized saved-pages-only Stage 2 redraft using the fixed evidence packet and fixed receipt schema; no additional provider call was made during finalization.",
   "seller": {
     "name": "Resolve AI",
     "domain": "resolve.ai"
@@ -14,154 +14,165 @@
     "sellerName": "Resolve AI",
     "domain": "resolve.ai",
     "deliveryAllowed": false,
-    "generatedAt": "2026-10-20T00:45:02.059Z",
+    "generatedAt": "2026-10-20T06:51:48.991Z",
     "approvedAt": null,
-    "updatedAt": "2026-10-20T00:45:02.059Z",
+    "updatedAt": "2026-10-20T06:51:48.991Z",
     "sources": [
-      "281d77e4f6dcd23a7822b04c",
-      "09e44124a9e07a6a1405e216",
+      "2d6a914cdde5a2af7b84efdf",
       "c7f3452aafdcf74f2534a22e",
+      "3cde6a74e435a0f9820aa59f",
       "5cb86b057983ed1c930de78b",
-      "5e70b2e8a303e12d11f9b86a"
+      "09e44124a9e07a6a1405e216",
+      "4c4791d300036645ada8d9b8",
+      "3f799bef0dfe6077dde31009",
+      "d231aae81997e40c8a4b50bc"
     ],
-    "category": "AI SRE platform",
-    "productOneLiner": "AI for production systems that helps reduce downtime and protect revenue.",
-    "pricingModel": "Custom pricing available upon request.",
-    "targetCompanySize": "1000+ employees",
+    "category": "AI for production systems",
+    "productOneLiner": "Resolve AI provides autonomous incident investigation and operational support for production systems.",
+    "pricingModel": "Credit-based pricing for AI agents based on defined types of work.",
+    "targetCompanySize": "500+ employees",
     "valueProps": [
-      "Proactively run operational tasks to reduce downtime.",
-      "Custom agents tailored to specific workflows.",
-      "Enterprise-grade security by default."
+      "Achieves up to 72% reduction in investigation time for incidents.",
+      "Enables faster incident resolution, reducing mean time to resolution (MTTR) significantly.",
+      "Supports engineers by automating root cause analysis and operational tasks."
     ],
-    "credentials": [],
+    "credentials": [
+      "Trusted by leading companies like Salesforce, Coinbase, and Zscaler."
+    ],
     "targetIndustries": [
-      "Financial Services",
       "Technology",
-      "Real Estate"
+      "Financial Services",
+      "PropTech"
     ],
     "proofPoints": [
       {
-        "claim": "Resolve AI helps companies like Coinbase reduce investigation time by 72%.",
+        "claim": "Salesforce achieved a ~60% reduction in MTTR after deploying Resolve AI.",
         "schemaVersion": 1,
-        "value": "Resolve AI helps companies like Coinbase reduce investigation time by 72%.",
-        "sourceUrl": "https://resolve.ai/customers/coinbase",
-        "sourceId": "5cb86b057983ed1c930de78b",
-        "evidenceQuote": "• Join the tech talk Back 5 min read Making the Global Crypto Backbone More Resilient Coding with production context 250+ sessions per week Investigation time 72% faster Time to root cause <10 minutes",
+        "value": "Salesforce achieved a ~60% reduction in MTTR after deploying Resolve AI.",
+        "sourceUrl": "https://resolve.ai/customers/salesforce",
+        "sourceId": "3f799bef0dfe6077dde31009",
+        "evidenceQuote": "The Results After deploying Resolve AI, Salesforce achieved significant improvements across every stage of incident response: ~60% reduction in mean time to resolve ( MTTR ): Investigations that",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       {
-        "claim": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
+        "claim": "Coinbase reported a 72% reduction in investigation time with Resolve AI.",
         "schemaVersion": 1,
-        "value": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
+        "value": "Coinbase reported a 72% reduction in investigation time with Resolve AI.",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "Coinbase benefits with Resolve AI: 72% reduction in investigation time : incidents that previously required long manual triage now move from alert to informed action in minutes, not half an hour or",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      {
+        "claim": "Zscaler experienced a 75% reduction in incident investigation time.",
+        "schemaVersion": 1,
+        "value": "Zscaler experienced a 75% reduction in incident investigation time.",
         "sourceUrl": "https://resolve.ai/customers/zscaler",
         "sourceId": "d231aae81997e40c8a4b50bc",
-        "evidenceQuote": "Good things are waiting...",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      }
-    ],
-    "customers": [
-      {
-        "name": "Coinbase",
-        "domain": "coinbase.com",
-        "schemaVersion": 1,
-        "value": "Coinbase",
-        "sourceUrl": "https://resolve.ai/customers/coinbase",
-        "sourceId": "5cb86b057983ed1c930de78b",
-        "evidenceQuote": "Industry Financial Services Company Coinbase Industry Financial Services Company Coinbase About Coinbase The Challenge: Growing complexity in high-stakes production systems The solution: AI for prod",
-        "inferred": false,
-        "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text and passed contextual quality checks."
-      },
-      {
-        "name": "DoorDash",
-        "domain": "doordash.com",
-        "schemaVersion": 1,
-        "value": "DoorDash",
-        "sourceUrl": "https://resolve.ai/customers/doordash",
-        "sourceId": "5e70b2e8a303e12d11f9b86a",
-        "evidenceQuote": "• Join the tech talk Back 6 min read Powering Uninterrupted Ads for DoorDash Advertisers Time to root cause Up to 87% faster Investigation time 40 min → 1 min Revenue at stake $1B+ ads platform",
+        "evidenceQuote": "Zscaler benefits with Resolve AI: 75 percent reduction in incident investigation time , shortening the duration of degraded access More than 30 percent fewer engineers involved per incident , reducing",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       }
     ],
+    "customers": [],
     "competitors": [],
     "evidence": {
       "category": {
         "schemaVersion": 1,
-        "value": "AI SRE platform",
-        "sourceUrl": "https://resolve.ai/",
-        "sourceId": "281d77e4f6dcd23a7822b04c",
-        "evidenceQuote": "ResolveAI | AI SRE platform Learn how to evaluate frontier AI on real incidents.",
+        "value": "AI for production systems",
+        "sourceUrl": "https://resolve.ai/glossary/pagerduty-sre-agent-vs-resolve-ai",
+        "sourceId": "2d6a914cdde5a2af7b84efdf",
+        "evidenceQuote": "• Join the tech talk Product Customers Resources Company Blog Labs Get Pricing Try now Try now Overview Product AI for production systems Resolve AI Agents On-call Your on-call engineers Incidents",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "productOneLiner": {
         "schemaVersion": 1,
-        "value": "AI for production systems that helps reduce downtime and protect revenue.",
-        "sourceUrl": "https://resolve.ai/about-us",
-        "sourceId": "09e44124a9e07a6a1405e216",
-        "evidenceQuote": "workflows See what ResolveAI can do Get in touch to learn how our AI SRE platform can help reduce your downtime and protect revenue Talk to Us Browse All resources Every guide, webinar and report Blog",
+        "value": "Resolve AI provides autonomous incident investigation and operational support for production systems.",
+        "sourceUrl": "https://resolve.ai/blog/product-deep-dive",
+        "sourceId": "c7f3452aafdcf74f2534a22e",
+        "evidenceQuote": "That’s why we’re thrilled to introduce our first product, AI Production Engineer – a tireless, autonomous teammate designed to handle alerts, perform root cause analysis , resolve incidents, and make",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "pricingModel": {
         "schemaVersion": 1,
-        "value": "Custom pricing available upon request.",
-        "sourceUrl": "https://resolve.ai/customers",
-        "sourceId": "5cc8ed8371c883837963722c",
-        "evidenceQuote": "Customer | ResolveAI Good things are waiting...",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "Credit-based pricing for AI agents based on defined types of work.",
+        "sourceUrl": "https://resolve.ai/pricing",
+        "sourceId": "3cde6a74e435a0f9820aa59f",
+        "evidenceQuote": "production Pricing designed around the work agents do: Credit-based: Credits are used as ResolveAI agents perform defined types of work across your production environment.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetCompanySize": {
         "schemaVersion": 1,
-        "value": "1000+ employees",
-        "sourceUrl": "https://resolve.ai/customers/salesforce",
-        "sourceId": "3f799bef0dfe6077dde31009",
-        "evidenceQuote": "Good things are waiting...",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "500+ employees",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "As of late 2025, Coinbase manages over $500 billion in assets on the platform and processes close to $300 billion in quarterly trading volume, supported by more than 4,700 employees globally.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.0": {
         "schemaVersion": 1,
-        "value": "Proactively run operational tasks to reduce downtime.",
-        "sourceUrl": "https://resolve.ai/",
-        "sourceId": "281d77e4f6dcd23a7822b04c",
-        "evidenceQuote": "Agent teams investigate Operational tasks Proactively run tasks Platform Integrations Meet your stack where it is Security Enterprise-grade by default Build custom agents Custom agents Agents for your",
+        "value": "Achieves up to 72% reduction in investigation time for incidents.",
+        "sourceUrl": "https://resolve.ai/customers/coinbase",
+        "sourceId": "5cb86b057983ed1c930de78b",
+        "evidenceQuote": "Coinbase benefits with Resolve AI: 72% reduction in investigation time : incidents that previously required long manual triage now move from alert to informed action in minutes, not half an hour or",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.1": {
         "schemaVersion": 1,
-        "value": "Custom agents tailored to specific workflows.",
-        "sourceUrl": "https://resolve.ai/blog/product-deep-dive",
-        "sourceId": "c7f3452aafdcf74f2534a22e",
-        "evidenceQuote": "Agent teams investigate Operational tasks Proactively run tasks Platform Integrations Meet your stack where it is Security Enterprise-grade by default Build custom agents Custom agents Agents for your",
-        "inferred": false,
-        "verification": "matched_saved_quote",
-        "reason": "Quote matched saved source text and passed contextual quality checks."
-      },
-      "valueProps.2": {
-        "schemaVersion": 1,
-        "value": "Enterprise-grade security by default.",
-        "sourceUrl": "https://resolve.ai/customers/coinbase",
-        "sourceId": "5cb86b057983ed1c930de78b",
-        "evidenceQuote": "Good things are waiting...",
+        "value": "Enables faster incident resolution, reducing mean time to resolution (MTTR) significantly.",
+        "sourceUrl": "https://resolve.ai/customers/zscaler",
+        "sourceId": "d231aae81997e40c8a4b50bc",
+        "evidenceQuote": "• Join the tech talk Product Customers Resources Company Blog Labs Get Pricing Try now Try now Overview Product AI for production systems Resolve AI Agents On-call Your on-call engineers Incidents",
         "inferred": true,
         "verification": "no_claim_overlap",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
+      "valueProps.2": {
+        "schemaVersion": 1,
+        "value": "Supports engineers by automating root cause analysis and operational tasks.",
+        "sourceUrl": "https://resolve.ai/blog/product-deep-dive",
+        "sourceId": "c7f3452aafdcf74f2534a22e",
+        "evidenceQuote": "That’s why we’re thrilled to introduce our first product, AI Production Engineer – a tireless, autonomous teammate designed to handle alerts, perform root cause analysis , resolve incidents, and make",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "credentials.0": {
+        "schemaVersion": 1,
+        "value": "Trusted by leading companies like Salesforce, Coinbase, and Zscaler.",
+        "sourceUrl": "https://resolve.ai/about-us",
+        "sourceId": "09e44124a9e07a6a1405e216",
+        "evidenceQuote": "Domain experts in production systems Engineering teams like Coinbase, DoorDash, Zscaler, Snowflake, and Robinhood run Resolve in production across diverse and regulated environments.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
       "targetIndustries.0": {
+        "schemaVersion": 1,
+        "value": "Technology",
+        "sourceUrl": "https://resolve.ai/customers/salesforce",
+        "sourceId": "3f799bef0dfe6077dde31009",
+        "evidenceQuote": "World's Leading CRM Back 2 min read From Hours to Minutes for the World's Leading CRM MTTR reduction ~60% Alert triage ~70% faster Investigation time ~30% reduction Industry Tech Company Salesforce",
+        "inferred": true,
+        "verification": "no_claim_overlap",
+        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+      },
+      "targetIndustries.1": {
         "schemaVersion": 1,
         "value": "Financial Services",
         "sourceUrl": "https://resolve.ai/customers/coinbase",
@@ -171,62 +182,42 @@
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
-      "targetIndustries.1": {
-        "schemaVersion": 1,
-        "value": "Technology",
-        "sourceUrl": "https://resolve.ai/customers/doordash",
-        "sourceId": "5e70b2e8a303e12d11f9b86a",
-        "evidenceQuote": "• Join the tech talk Back 6 min read Powering Uninterrupted Ads for DoorDash Advertisers Time to root cause Up to 87% faster Investigation time 40 min → 1 min Revenue at stake $1B+ ads platform",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
       "targetIndustries.2": {
         "schemaVersion": 1,
-        "value": "Real Estate",
+        "value": "PropTech",
         "sourceUrl": "https://resolve.ai/customers/blueground",
         "sourceId": "4c4791d300036645ada8d9b8",
-        "evidenceQuote": "Good things are waiting...",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "evidenceQuote": "feature development Autonomous RCA 100% of alerts investigated Company Blueground Industry PropTech Challenge Managing complex production operations at scale.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "proofPoints.0": {
         "schemaVersion": 1,
-        "value": "Resolve AI helps companies like Coinbase reduce investigation time by 72%.",
-        "sourceUrl": "https://resolve.ai/customers/coinbase",
-        "sourceId": "5cb86b057983ed1c930de78b",
-        "evidenceQuote": "• Join the tech talk Back 5 min read Making the Global Crypto Backbone More Resilient Coding with production context 250+ sessions per week Investigation time 72% faster Time to root cause <10 minutes",
+        "value": "Salesforce achieved a ~60% reduction in MTTR after deploying Resolve AI.",
+        "sourceUrl": "https://resolve.ai/customers/salesforce",
+        "sourceId": "3f799bef0dfe6077dde31009",
+        "evidenceQuote": "The Results After deploying Resolve AI, Salesforce achieved significant improvements across every stage of incident response: ~60% reduction in mean time to resolve ( MTTR ): Investigations that",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "proofPoints.1": {
         "schemaVersion": 1,
-        "value": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
-        "sourceUrl": "https://resolve.ai/customers/zscaler",
-        "sourceId": "d231aae81997e40c8a4b50bc",
-        "evidenceQuote": "Good things are waiting...",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      "customers.0": {
-        "schemaVersion": 1,
-        "value": "Coinbase",
+        "value": "Coinbase reported a 72% reduction in investigation time with Resolve AI.",
         "sourceUrl": "https://resolve.ai/customers/coinbase",
         "sourceId": "5cb86b057983ed1c930de78b",
-        "evidenceQuote": "Industry Financial Services Company Coinbase Industry Financial Services Company Coinbase About Coinbase The Challenge: Growing complexity in high-stakes production systems The solution: AI for prod",
+        "evidenceQuote": "Coinbase benefits with Resolve AI: 72% reduction in investigation time : incidents that previously required long manual triage now move from alert to informed action in minutes, not half an hour or",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
-      "customers.1": {
+      "proofPoints.2": {
         "schemaVersion": 1,
-        "value": "DoorDash",
-        "sourceUrl": "https://resolve.ai/customers/doordash",
-        "sourceId": "5e70b2e8a303e12d11f9b86a",
-        "evidenceQuote": "• Join the tech talk Back 6 min read Powering Uninterrupted Ads for DoorDash Advertisers Time to root cause Up to 87% faster Investigation time 40 min → 1 min Revenue at stake $1B+ ads platform",
+        "value": "Zscaler experienced a 75% reduction in incident investigation time.",
+        "sourceUrl": "https://resolve.ai/customers/zscaler",
+        "sourceId": "d231aae81997e40c8a4b50bc",
+        "evidenceQuote": "Zscaler benefits with Resolve AI: 75 percent reduction in incident investigation time , shortening the duration of degraded access More than 30 percent fewer engineers involved per incident , reducing",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
@@ -237,60 +228,56 @@
     "schemaVersion": 1,
     "segments": [
       {
-        "key": "bbc60cfd0ebda6b42e76cc07",
-        "label": "Large Enterprises",
+        "key": "4981f05fe2899f953688fb4a",
+        "label": "Large Technology Companies",
         "enabled": true,
         "subIndustries": [
-          "Financial Services",
-          "Technology",
-          "Real Estate"
+          "Software Development",
+          "Cloud Services",
+          "Cybersecurity"
         ],
         "queryTemplates": [
-          "AI incident management for large enterprises",
-          "AI SRE solutions for financial services",
-          "Operational efficiency tools for tech companies",
-          "Custom AI agents for real estate"
-        ],
-        "revenueSensitivityBase": 1,
-        "wedgeCustomers": [
-          "Coinbase",
-          "DoorDash"
-        ],
-        "exampleTargets": []
-      },
-      {
-        "key": "fd954d197fca066d8d8a1185",
-        "label": "Mid-Sized Companies",
-        "enabled": true,
-        "subIndustries": [
-          "E-commerce",
-          "Healthcare",
-          "Telecommunications"
-        ],
-        "queryTemplates": [
-          "AI solutions for mid-sized e-commerce businesses",
-          "Incident management for healthcare providers",
-          "AI SRE for telecommunications companies",
-          "Operational task automation for mid-sized firms"
+          "\"AI incident management software\"",
+          "\"automated incident response solutions\"",
+          "\"AI for production systems\"",
+          "\"SRE tools for large enterprises\""
         ],
         "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
         "exampleTargets": []
       },
       {
-        "key": "eef5aa92dccba29383b9e70e",
-        "label": "Startups",
+        "key": "4acf06933ecea63d8703aea6",
+        "label": "Financial Services Firms",
         "enabled": true,
         "subIndustries": [
           "Fintech",
-          "Healthtech",
-          "Proptech"
+          "Cryptocurrency",
+          "Banking"
         ],
         "queryTemplates": [
-          "AI for incident management in fintech",
-          "Operational efficiency for healthtech startups",
-          "Custom AI solutions for proptech companies",
-          "AI SRE for early-stage companies"
+          "\"AI for financial incident management\"",
+          "\"automated incident response in finance\"",
+          "\"SRE tools for fintech\"",
+          "\"AI solutions for trading platforms\""
+        ],
+        "revenueSensitivityBase": 1,
+        "wedgeCustomers": [],
+        "exampleTargets": []
+      },
+      {
+        "key": "30143200afce2e6dfec8f52e",
+        "label": "Real Estate Technology",
+        "enabled": true,
+        "subIndustries": [
+          "Property Management",
+          "Real Estate Services"
+        ],
+        "queryTemplates": [
+          "\"AI for property management systems\"",
+          "\"automated incident response for real estate\"",
+          "\"SRE tools for property tech\"",
+          "\"AI solutions for real estate operations\""
         ],
         "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
@@ -299,212 +286,216 @@
     ],
     "personas": {
       "buyerTitles": [
-        "CTO",
+        "Chief Technology Officer",
         "Head of Engineering",
+        "Site Reliability Engineer",
         "IT Operations Manager"
       ],
       "championTitles": [
-        "Site Reliability Engineer",
         "DevOps Engineer",
-        "Product Manager"
+        "SRE Team Lead",
+        "Incident Response Manager"
       ],
       "wrongOrgTitles": [
-        "Intern",
-        "Junior Developer",
-        "Sales Associate"
+        "Product Manager",
+        "UX Designer",
+        "Marketing Director"
       ]
     },
     "signalDefinitions": {
       "techStack": {
-        "label": "Cloud Infrastructure",
-        "description": "Companies using cloud infrastructure for their operations.",
+        "label": "Cloud Infrastructure and DevOps Tools",
+        "description": "Companies using cloud services and DevOps practices are likely to benefit from AI incident management solutions.",
         "evidenceKeywords": [
-          "AWS",
-          "Azure",
-          "Google Cloud"
+          "cloud services",
+          "DevOps",
+          "SRE tools",
+          "incident management"
         ],
         "negativeKeywords": [
-          "On-premise",
-          "Legacy systems"
+          "on-premise solutions",
+          "legacy systems"
         ],
         "preferredSources": [
-          "TechCrunch",
-          "Gartner",
-          "Forrester"
+          "customer stories",
+          "case studies",
+          "industry reports"
         ],
         "rubric": {
           "1": "No cloud infrastructure",
-          "3": "Partially using cloud services",
-          "5": "Fully cloud-based infrastructure"
+          "3": "Limited use of cloud services",
+          "5": "Extensive use of cloud and DevOps practices"
         }
       },
       "activePain": {
-        "label": "High Incident Response Times",
-        "description": "Companies struggling with long incident response times.",
+        "label": "Incident Response Challenges",
+        "description": "Companies struggling with slow incident response times and high operational costs are prime candidates for AI solutions.",
         "evidenceKeywords": [
           "incident response",
-          "downtime",
-          "root cause analysis"
+          "high MTTR",
+          "operational inefficiencies"
         ],
         "negativeKeywords": [
-          "automated incident response",
-          "low downtime"
+          "no incident response issues",
+          "fully automated systems"
         ],
         "preferredSources": [
-          "Gartner",
-          "Forrester",
-          "Industry Reports"
+          "customer testimonials",
+          "case studies",
+          "industry reports"
         ],
         "rubric": {
-          "1": "Very high response times",
-          "3": "Moderate response times",
-          "5": "Low response times"
+          "1": "No incident response challenges",
+          "3": "Some challenges but manageable",
+          "5": "Significant challenges in incident response"
         }
       },
       "revenueSensitivity": {
-        "label": "High Revenue Impact",
-        "description": "Companies where downtime significantly impacts revenue.",
+        "label": "High Revenue Impact from Downtime",
+        "description": "Companies that experience significant revenue loss due to downtime are more likely to invest in AI incident management solutions.",
         "evidenceKeywords": [
           "revenue loss",
-          "downtime costs",
-          "financial impact"
+          "downtime impact",
+          "critical systems"
         ],
         "negativeKeywords": [
           "low revenue impact",
-          "non-revenue generating"
+          "stable operations"
         ],
         "preferredSources": [
-          "Industry Reports",
-          "Market Analysis"
+          "financial reports",
+          "case studies",
+          "industry benchmarks"
         ],
         "rubric": {
-          "1": "Minimal revenue impact",
+          "1": "Minimal revenue impact from downtime",
           "3": "Moderate revenue impact",
-          "5": "High revenue impact"
+          "5": "High revenue impact from downtime"
         }
       },
       "observabilityScale": {
-        "label": "Advanced Observability Needs",
-        "description": "Companies requiring advanced observability solutions.",
+        "label": "Complex Distributed Systems",
+        "description": "Companies with complex, distributed systems are more likely to benefit from AI-driven observability and incident management.",
         "evidenceKeywords": [
-          "observability",
-          "monitoring",
-          "analytics"
+          "distributed systems",
+          "microservices",
+          "complex architectures"
         ],
         "negativeKeywords": [
-          "basic monitoring",
-          "no observability"
+          "simple architectures",
+          "single service applications"
         ],
         "preferredSources": [
-          "TechCrunch",
-          "Gartner"
+          "technical blogs",
+          "case studies",
+          "industry reports"
         ],
         "rubric": {
-          "1": "No observability",
-          "3": "Basic observability",
-          "5": "Advanced observability"
+          "1": "Simple architecture",
+          "3": "Moderately complex architecture",
+          "5": "Highly complex distributed architecture"
         }
       },
       "aiCompatibility": {
-        "label": "High AI Adoption",
-        "description": "Companies actively adopting AI technologies.",
+        "label": "Readiness for AI Solutions",
+        "description": "Companies that are already leveraging AI in other areas are more likely to adopt AI incident management solutions.",
         "evidenceKeywords": [
           "AI adoption",
           "machine learning",
-          "AI tools"
+          "automation"
         ],
         "negativeKeywords": [
-          "no AI",
-          "manual processes"
+          "no AI initiatives",
+          "resistance to AI"
         ],
         "preferredSources": [
-          "TechCrunch",
-          "Forrester"
+          "customer stories",
+          "case studies",
+          "industry reports"
         ],
         "rubric": {
-          "1": "No AI adoption",
-          "3": "Some AI adoption",
-          "5": "High AI adoption"
+          "1": "No AI initiatives",
+          "3": "Some AI initiatives",
+          "5": "Extensive AI initiatives"
         }
       },
       "competitiveWedge": {
-        "label": "Strong Competitive Advantage",
-        "description": "Companies looking for a competitive edge through AI.",
+        "label": "Unique AI Capabilities",
+        "description": "Companies looking for advanced AI capabilities in incident management are more likely to choose Resolve AI over competitors.",
         "evidenceKeywords": [
-          "competitive advantage",
-          "market leadership",
-          "innovation"
+          "AI-driven incident management",
+          "autonomous investigations",
+          "root cause analysis"
         ],
         "negativeKeywords": [
-          "no competition",
-          "market saturation"
+          "basic incident management",
+          "manual processes"
         ],
         "preferredSources": [
-          "Industry Reports",
-          "Market Analysis"
+          "product comparisons",
+          "customer testimonials",
+          "industry reports"
         ],
         "rubric": {
-          "1": "No competitive advantage",
-          "3": "Moderate advantage",
-          "5": "Strong competitive advantage"
+          "1": "Basic incident management",
+          "3": "Standard incident management",
+          "5": "Advanced AI-driven incident management"
         }
       }
     },
     "triggerMapping": {
       "pain_event": [
-        "High incident response times",
-        "Frequent system outages",
-        "Increased operational costs"
+        "High MTTR incidents",
+        "Frequent escalations",
+        "Operational inefficiencies"
       ],
       "buying_intent": [
-        "Looking for AI solutions",
-        "Evaluating incident management tools",
-        "Seeking to reduce downtime"
+        "Evaluating incident management solutions",
+        "Seeking to reduce downtime",
+        "Looking for AI-driven operational tools"
       ],
       "function_roles": [
-        "IT Operations",
-        "Engineering",
-        "Product Management"
+        "Site Reliability Engineers",
+        "DevOps Managers",
+        "IT Operations Directors"
       ],
       "tech_adoption": [
-        "Cloud migration",
-        "AI adoption",
-        "DevOps practices"
+        "Using cloud services",
+        "Implementing DevOps practices",
+        "Adopting AI technologies"
       ],
       "competitor_names": []
     },
     "killPatterns": {
       "solvingInHouse": [
-        "Strong internal development team",
-        "Existing in-house solutions",
-        "No budget for external tools"
+        "Strong internal incident management capabilities",
+        "Existing automated incident response solutions"
       ],
       "buildCulture": [
-        "Preference for building over buying",
-        "Strong engineering culture",
-        "Focus on internal tools"
+        "Preference for building custom solutions",
+        "Strong internal development teams"
       ],
       "sizeMetric": {
         "label": "Employees",
-        "floor": 1000
+        "floor": 500
       }
     },
     "painSources": {
       "statuspage": true,
-      "hn": true,
+      "hn": false,
       "news": true,
-      "filings": true
+      "filings": false
     },
     "pitch": {
-      "receiptOpenerStyle": "Engaging and informative",
-      "oneSentenceProduct": "AI for production systems that helps reduce downtime and protect revenue.",
-      "credentialLine": "Trusted by leading companies like Coinbase and DoorDash.",
-      "ctaStyle": "Direct and action-oriented"
+      "receiptOpenerStyle": "AI for production systems",
+      "oneSentenceProduct": "Resolve AI provides autonomous incident investigation and operational support for production systems.",
+      "credentialLine": "Trusted by leading companies like Salesforce, Coinbase, and Zscaler.",
+      "ctaStyle": "Get Pricing"
     },
     "objectionTemplates": [
-      "We already have an in-house solution.",
-      "We're not looking to change our current processes.",
-      "Budget constraints prevent us from exploring new tools."
+      "We already have an incident management solution.",
+      "Our team prefers to build custom tools.",
+      "We don't have the budget for new tools right now."
     ],
     "weights": {
       "techStack": 1.3,
@@ -566,37 +557,30 @@
     "schemaVersion": 1,
     "attemptedClaims": 14,
     "acceptedClaims": 14,
-    "receiptedClaims": 8,
-    "receiptCoverage": 0.5714285714285714,
+    "receiptedClaims": 12,
+    "receiptCoverage": 0.8571428571428571,
     "warnings": [
       {
-        "value": "Custom pricing available upon request.",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "1000+ employees",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Enterprise-grade security by default.",
+        "value": "Enables faster incident resolution, reducing mean time to resolution (MTTR) significantly.",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       {
         "value": "Technology",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Real Estate",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Zscaler achieves root cause analysis in minutes using Resolve AI.",
         "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       }
     ],
     "droppedCustomers": [],
     "droppedCompetitors": [],
     "qualityFindings": [
+      {
+        "schemaVersion": 1,
+        "id": "c5d4d0d90b23f09e2dc63077",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.0.queryTemplates.0",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
       {
         "schemaVersion": 1,
         "id": "00b05a9be4ab36df62677ba2",
@@ -617,19 +601,37 @@
       },
       {
         "schemaVersion": 1,
-        "id": "e6b94698a9adfe976a2aa953",
+        "id": "dc5b949a10028b41faa31351",
         "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.1.queryTemplates.0",
+        "path": "icpConfig.segments.0.queryTemplates.3",
+        "field": "segments.0.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "ad0621e034010d2662e2b69b",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.1.queryTemplates.2",
         "field": "segments.1.queryTemplates",
         "severity": "blocking",
         "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
       },
       {
         "schemaVersion": 1,
-        "id": "98ad591dc414e2c9abf68963",
+        "id": "bf160b34caaff43957f81fa9",
         "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.1.queryTemplates.1",
+        "path": "icpConfig.segments.1.queryTemplates.3",
         "field": "segments.1.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "8004d168a24b6b018430a3d9",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.2.queryTemplates.0",
+        "field": "segments.2.queryTemplates",
         "severity": "blocking",
         "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
       },
@@ -638,6 +640,15 @@
         "id": "9a1fc921ee3dce5e5bc6d23d",
         "code": "VENDOR_SEEKING_QUERY",
         "path": "icpConfig.segments.2.queryTemplates.2",
+        "field": "segments.2.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
+        "id": "e7cde1341461df227cbce64c",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.2.queryTemplates.3",
         "field": "segments.2.queryTemplates",
         "severity": "blocking",
         "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
@@ -653,55 +664,28 @@
       },
       {
         "schemaVersion": 1,
-        "id": "d41b6737e5c37d0af7a0823e",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.pricingModel",
-        "field": "pricingModel",
+        "id": "dffc88f8a49e7f74e2a23d85",
+        "code": "EMPTY_CUSTOMERS",
+        "path": "sellerProfile.customers",
+        "field": "customers",
         "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "message": "No verified customers are present. Add supported customers or explain why approval should proceed without them."
       },
       {
         "schemaVersion": 1,
-        "id": "8db35e9cacc006efed9769f4",
+        "id": "8ab158b5f82e79b0370d3176",
         "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.proofPoints.1",
-        "field": "proofPoints.1.value",
+        "path": "sellerProfile.evidence.targetIndustries.0",
+        "field": "targetIndustries.0.value",
         "severity": "advisory",
         "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       },
       {
         "schemaVersion": 1,
-        "id": "1ab4a007bbb41ffb74c4f04a",
+        "id": "53d3a67849958b830577bf1e",
         "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.targetCompanySize",
-        "field": "targetCompanySize",
-        "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "8adf58d0f352f2c2b4cb7f9b",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.targetIndustries.1",
-        "field": "targetIndustries.1.value",
-        "severity": "advisory",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "1525814b5f4499c1d96fbf34",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.targetIndustries.2",
-        "field": "targetIndustries.2.value",
-        "severity": "advisory",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "e6d393da8e9eaf9215a5d694",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.valueProps.2",
-        "field": "valueProps.2.value",
+        "path": "sellerProfile.evidence.valueProps.1",
+        "field": "valueProps.1.value",
         "severity": "advisory",
         "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       }

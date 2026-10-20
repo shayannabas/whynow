@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 19, 2026. Current stage: the stopped saved-pages-only Stage 2 redraft was traced offline to a Structured Outputs enum-limit violation and fixed; no retry is authorized; Stage 3 has not started.
+Updated: October 19, 2026. Current stage: the authorized fixed-schema saved-pages draft completed with three new `needs_review` profiles; automated Stage 2 drafting is finished, manual correction remains, and Stage 3 has not started.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -13,6 +13,8 @@ The subsequent offline root-cause audit found that the 24 KB evidence menu divid
 The owner then authorized one saved-pages-only GPT-4o mini draft per seller. Preflight estimated $0.024729 input cost and $0.032103 maximum total, below the $0.04 stop line. The run stopped on Resolve AI after one provider attempt with safe status `REQUEST_FAILED`; Shopify and Vercel made zero attempts. The isolated working state prevented partial output from replacing the prior profiles. No page fetch, Serper query, new profile or approval occurred. Normal OpenAI settings are confirmed disabled/zero, and no retry is authorized.
 
 The request was then reconstructed offline. The old schema duplicated 548/605/489 stable receipt IDs across optional and required enums, yielding 1,097/1,211/979 enum values. Resolve AI and Shopify exceeded OpenAI's 1,000-value limit; Shopify also exceeded the 15,000-character large-enum limit. The fix sends one enum of short run-local IDs, maps them back to stable IDs server-side, and caps a future packet at 900 receipts in source-priority order. Post-fix schemas contain 548/605/489 enum values and 2,192/2,420/1,956 enum characters. The original failure did not retain an HTTP status; future safe failures store and show only the numeric status, never the response body.
+
+The owner authorized one fixed-schema saved-pages draft per seller. Preflight passed all schema limits and estimated $0.026104 maximum cost, below the $0.04 stop line. Resolve AI, Shopify and Vercel each completed in one provider attempt with no retry. A local snapshot-path bug then interrupted finalization after all calls; the intact isolated outputs were finalized offline without another call. The exact provider token usage was lost with the interrupted in-memory usage array, so actual cost is unavailable; the persisted conservative reservation is $0.026104. All three remain `needs_review`: Resolve AI has 0 customers/0 competitors and 11 blocking/2 advisory warnings; Shopify has 0 customers/2 sourced competitors and 13/0; Vercel has 0/0 and 8/4. OpenAI is disabled/zero and no further automated draft is authorized.
 
 ## Current decision
 
@@ -64,6 +66,8 @@ Do not paste API keys into chat. Store keys in the local ignored `.env` file, ne
 - [x] Rebuild the stopped request offline and confirm its Structured Outputs schema violated the documented enum limits for Resolve AI and Shopify.
 - [x] Replace duplicated stable-ID enums with one short run-local receipt enum, restore stable IDs server-side, add a 900-receipt priority cap and retain only safe HTTP status codes on future request failures.
 - [x] Build and test the exact schema shape for all three captured packets against documented enum, enum-string, property, nesting and schema-string limits.
+- [x] Run the owner-authorized fixed-schema saved-pages draft: one successful provider attempt per seller, no retry, no fetches, no Serper and no approvals.
+- [x] Recover the three completed drafts offline after the local snapshot-path finalization error; persist all three as `needs_review` and record that exact token-priced cost was not retained.
 - [x] Confirm after the stopped attempt that there were zero page fetches, zero Serper queries, no approvals, and normal OpenAI settings are disabled with a zero local limit.
 - [ ] Owner decides the next action. No further provider attempt is authorized.
 - [ ] After the owner-reviewed draft-only result, manually fix any remaining pass-bar failures in the review screen and approve each profile.
@@ -111,6 +115,7 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 
 - **2026-10-19:** Recorded the authorized saved-pages-only redraft preflight ($0.032103 maximum estimate) and stopped attempt: one Resolve AI provider attempt ended `REQUEST_FAILED`; Shopify/Vercel were not called; no profile changed; settings remained disabled/zero; 113 tests pass with one intentional skip.
 - **2026-10-19:** Confirmed offline that duplicated receipt enums put Resolve AI at 1,097 and Shopify at 1,211 enum values. Replaced them with one short-ID enum (548/605/489 values), added stable-ID restoration, a 900-receipt priority cap, documented-limit schema tests and safe HTTP-status diagnostics. Full verification passed with 116 tests and one intentional Stage 3 skip. No provider call or approval occurred.
+- **2026-10-19:** Completed the fixed-schema saved-pages draft with one successful call per seller and no retry. Recovered finalization offline after a local snapshot-path error. New `needs_review` results are Resolve AI 0/0 organizations and 11/2 warnings, Shopify 0/2 and 13/0, Vercel 0/0 and 8/4. Exact token-priced cost was not retained; conservative reservation was $0.026104. No profile was approved and OpenAI returned to disabled/zero.
 - **2026-10-19:** Confirmed the 24 KB start-of-page evidence menu was hiding deeper saved customer/comparison evidence. Added a priority-weighted, relevance-ranked 120 KB packet and offline coverage/cap tests.
 - **2026-10-19:** Replaced the broad remaining Stage 3–12 roadmap with `docs/IMPLEMENTATION-PLAN-TRIMMED.md`: stages 3, 4, 5, 6, 8, draft-only 9 and 11 remain; stages 7, 10, advanced Stage 9 delivery/contact work and Stage 12 are deferred.
 - **2026-10-19:** Recorded the last automated Stage 2 rerun and its real page, call, cost and pass-bar results. Remaining profile work is manual.

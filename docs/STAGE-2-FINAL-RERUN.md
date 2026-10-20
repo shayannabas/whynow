@@ -141,6 +141,24 @@ The fix uses deterministic, request-local IDs (`R001`, `R002`, and so on) in the
 
 The receipt count did not change. Short IDs reduced the serialized packet sizes to 107,768 bytes for Resolve AI, 106,542 for Shopify and 82,402 for Vercel without removing any receipt from these three packets. A committed public-data manifest records the packet hashes, source-set hashes, counts and exact post-fix schema metrics. Offline tests build the production schema for every captured packet and assert the current documented ceilings: 1,000 total enum values, 15,000 characters for a string enum over 250 values, 5,000 object properties, 10 nesting levels and 120,000 total schema-string characters. A separate test proves the 900-receipt priority cap and synthesis tests prove the short-to-stable server mapping. Full verification passed: 23 test files, 116 tests passed and one intentionally skipped Stage 3 scaffold test (117 total).
 
+## Authorized fixed-schema saved-pages draft
+
+On October 19 the owner authorized one additional bounded GPT-4o mini draft per seller from commit `6fd10a4`: saved final-run pages only, the fixed evidence packet and fixed short receipt schema, no page fetches, no Serper, one existing transient retry if needed, a temporary process-only $0.05 cap, immediate stop on a failed seller call, no automatic approval and an immediate return to disabled/zero normal settings.
+
+Offline preflight passed the documented schema limits for all three sellers. It estimated 124,860 input tokens, $0.018729 input cost and $0.026104 maximum input-plus-output cost, below the $0.04 stop line. The run made exactly one successful provider attempt per seller and used no retry. There was no HTTP failure to record.
+
+After the third successful call, the local runner failed while joining an undefined snapshot-directory path. This was a post-processing bug, not a provider failure. All three completed drafts were intact in the isolated state. They were finalized offline through `saveState()` without any repeat provider call. The three public snapshots and acceptance state now contain the recovered outputs.
+
+The exact provider-reported token usage and cost were held only in the interrupted process's in-memory array and were not persisted before the path error. Therefore actual cost is honestly reported as **unavailable**, not estimated as actual. The conservative persisted reservation was **$0.026104 total**: Resolve AI $0.009143, Shopify $0.009127 and Vercel $0.007834. The runner now persists a factual recovery report explaining this gap.
+
+| Seller | First-party customers | Sourced competitors | Size metric and target match | Buyer titles | Champion titles | Blocking / advisory | Top blocking reasons | Actual cost |
+| --- | --- | --- | --- | --- | --- | ---: | --- | --- |
+| Resolve AI | 0 | 0 | Employees, floor 500; matches “500+ employees” | Chief Technology Officer; Head of Engineering; Site Reliability Engineer; IT Operations Manager | DevOps Engineer; SRE Team Lead; Incident Response Manager | 11 / 2 | vendor-seeking queries (9); empty customers (1); empty competitors (1) | Unavailable; $0.009143 reserved |
+| Shopify | 0 | BigCommerce; WooCommerce, both sourced from first-party Shopify comparison pages | Annual Revenue, floor $100,000; compatible with “Small to Enterprise” | Ecommerce Manager; Marketing Director; Chief Operating Officer | Retail Manager; Product Manager; Brand Strategist | 13 / 0 | vendor-seeking queries (12); empty customers (1) | Unavailable; $0.009127 reserved |
+| Vercel | 0 | 0 | Employees, floor 1,000; matches “1000+ employees” | CTO; VP of Engineering; Head of IT; Product Manager | DevOps Engineer; Software Engineer; Product Owner | 8 / 4 | vendor-seeking queries (4); weak claim/receipt overlap (2); empty customers (1); empty competitors (1) | Unavailable; $0.007834 reserved |
+
+All three profiles remain `needs_review`. None was approved. Normal settings were verified at `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. This is the final automated Stage 2 output; remaining pass-bar failures require owner review and manual correction rather than another automated rerun.
+
 ### Current pass-bar state after the stopped attempt
 
 | Seller | Customers with first-party sources | Competitors with sources | Size metric and target match | Buyer titles | Champion titles | Blocking / advisory | Top blocking reasons |
@@ -153,4 +171,4 @@ Final offline verification after recording the stopped attempt: 22 test files, 1
 
 ## Owner action
 
-Do not begin manual fixes yet. The authorized saved-pages drafting attempt stopped before producing a new profile. Its schema-limit cause is fixed and verified offline, but no retry is authorized. The owner must decide the next action; no profile may be auto-approved, and normal OpenAI settings remain disabled/zero.
+The fixed-schema run produced three new `needs_review` profiles, but none meets the pass bar. Do not run another automated draft. The owner may now review and manually correct these profiles in the app; no profile may be auto-approved, and normal OpenAI settings remain disabled/zero.

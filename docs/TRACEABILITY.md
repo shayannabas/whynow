@@ -1,5 +1,13 @@
 # WhyNow traceability
 
+## Fixed-schema saved-pages draft — 2026-10-19
+
+The owner authorized one additional GPT-4o mini draft for Resolve AI, Shopify and Vercel using only the saved final-run pages, fixed evidence packet and fixed receipt schema from commit `6fd10a4`. Preflight passed every documented schema limit and estimated $0.026104 maximum cost, below the $0.04 stop line. The process made exactly three provider attempts—one successful attempt per seller—with no retry, no page fetch, no Serper query and no automatic approval.
+
+After the third success, a local snapshot-path import bug stopped post-processing. The generated drafts were intact in isolated persistent state and were finalized offline without another provider call. Because the runner's successful API usage array existed only in the interrupted process memory, provider-reported token usage and exact cost were not retained. The persisted conservative reservations total $0.026104; documentation does not mislabel that estimate as actual cost.
+
+The new snapshots and acceptance state remain `needs_review`. Resolve AI has 0 customers, 0 competitors, Employees/500 matching “500+ employees,” buyer/champion titles and 11 blocking/2 advisory findings. Shopify has 0 customers, two sourced competitors (BigCommerce and WooCommerce), Annual Revenue/$100,000 matching “Small to Enterprise,” personas and 13/0 findings. Vercel has 0 customers, 0 competitors, Employees/1,000 matching “1000+ employees,” personas and 8/4 findings. Normal OpenAI settings are disabled/zero. No profile was approved and Stage 3 did not start.
+
 ## Saved-pages packet redraft attempt — 2026-10-19
 
 The owner authorized one GPT-4o mini drafting call for each of Resolve AI, Shopify and Vercel using only the saved final-run pages and fixed packet from commit `68774af`. `AGENTS.md` records the exact limits: no page fetches, no Serper, existing single transient retry only, temporary process-only $0.05 cap, no automatic approval and immediate confirmation that normal settings are disabled/zero.

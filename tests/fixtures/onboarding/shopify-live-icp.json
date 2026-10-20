@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "capturedOn": "2026-10-20T00:45:14.738Z",
+  "capturedOn": "2026-10-20T06:53:20.744Z",
   "model": "gpt-4o-mini",
   "promptVersion": "seller-profile-quality-guards-v5",
-  "commitHash": "9634b6bcbcaa808840d74478ff87680845fc8c8f",
-  "source": "Owner-authorized final Stage 2 rerun using only the documented first-party live-page allowlist and zero Serper queries.",
+  "commitHash": "6fd10a4c11316dbce11839cfd48d4301b327ee56",
+  "source": "Recovered offline from the completed owner-authorized saved-pages-only Stage 2 redraft using the fixed evidence packet and fixed receipt schema; no additional provider call was made during finalization.",
   "seller": {
     "name": "Shopify: The All-in-One Commerce Platform for Businesses ...",
     "domain": "shopify.com"
@@ -14,59 +14,101 @@
     "sellerName": "Shopify: The All-in-One Commerce Platform for Businesses ...",
     "domain": "shopify.com",
     "deliveryAllowed": false,
-    "generatedAt": "2026-10-20T00:45:14.701Z",
+    "generatedAt": "2026-10-20T06:52:02.709Z",
     "approvedAt": null,
-    "updatedAt": "2026-10-20T00:45:14.701Z",
+    "updatedAt": "2026-10-20T06:52:02.709Z",
     "sources": [
       "438548a45ba5dddc3b085123",
-      "029a882b5fd741850e826218",
+      "d68028a34eab2aeb8cf7c958",
+      "4f86f3d1e0e2fa70fa5c9da8",
+      "b4afd7cd7fcea99568285c5f",
       "2028830bb5ef084561370018",
-      "26ff31a7f8640a4175f06dc2",
-      "24982eddb36fd667efa9b6b9"
+      "029a882b5fd741850e826218",
+      "edf193a62106e5f2220ff59d"
     ],
-    "category": "E-commerce platform",
-    "productOneLiner": "Shopify is a complete commerce platform to sell online or in person.",
-    "pricingModel": "Subscription-based",
-    "targetCompanySize": "Small to large enterprises",
+    "category": "Ecommerce Platform",
+    "productOneLiner": "Shopify is a complete commerce platform to sell online or in person, empowering businesses of all sizes to grow.",
+    "pricingModel": "Starts at $29/month",
+    "targetCompanySize": "Small to Enterprise",
     "valueProps": [
-      "World's best checkout proven to convert better.",
-      "AI assistant to enhance commerce experience.",
-      "Largest commerce ecosystem with extensive app support."
+      "Shopify's checkout converts up to 15% better than competitor platforms.",
+      "Trusted by enterprise brands, Shopify supports businesses of all sizes and complexities.",
+      "Shopify's total cost of ownership is 33% better on average compared to competitors."
     ],
-    "credentials": [],
+    "credentials": [
+      "Leader in the 2024 Gartner Magic Quadrant for Digital Commerce.",
+      "Trusted by enterprise brands across various industries."
+    ],
     "targetIndustries": [
-      "Retail",
-      "E-commerce"
+      "Fashion & Apparel",
+      "Food & Beverage",
+      "Health & Beauty"
     ],
     "proofPoints": [
       {
-        "claim": "Trusted by enterprise brands across various industries.",
+        "claim": "Shopify has processed over $1 trillion in sales.",
         "schemaVersion": 1,
-        "value": "Trusted by enterprise brands across various industries.",
+        "value": "Shopify has processed over $1 trillion in sales.",
         "sourceUrl": "https://www.shopify.com/about",
         "sourceId": "438548a45ba5dddc3b085123",
-        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "evidenceQuote": "$1 trillion+ Sales made by businesses on Shopify—and counting 675+ million Unique shoppers bought from Shopify stores in 2023 10% Of U.S.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      {
+        "claim": "Shopify's checkout converts up to 50% higher than guest checkout.",
+        "schemaVersion": 1,
+        "value": "Shopify's checkout converts up to 50% higher than guest checkout.",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "conversions 15 % High-intent shoppers 250M + Shopify Checkout with Shop Pay converts up to 50% higher than guest checkout and exposes your brand to hundreds of millions of buyers.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       }
     ],
     "customers": [],
-    "competitors": [],
+    "competitors": [
+      {
+        "name": "BigCommerce",
+        "domain": "bigcommerce.com",
+        "schemaVersion": 1,
+        "value": "BigCommerce",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
+        "sourceId": "029a882b5fd741850e826218",
+        "evidenceQuote": "We have more global partners than any competitor—many of them specialize in helping BigCommerce customers make the switch to Shopify.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      {
+        "name": "WooCommerce",
+        "domain": "woocommerce.com",
+        "schemaVersion": 1,
+        "value": "WooCommerce",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-woocommerce",
+        "sourceId": "edf193a62106e5f2220ff59d",
+        "evidenceQuote": "race Get in touch Start free trial Thousands of brands have outgrown WooCommerce Brands are switching to Shopify—the most dependable global commerce platform to expand your business.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      }
+    ],
     "evidence": {
       "category": {
         "schemaVersion": 1,
-        "value": "E-commerce platform",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
-        "sourceId": "029a882b5fd741850e826218",
-        "evidenceQuote": "Switch to Shopify Get more customers.",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "Ecommerce Platform",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "Shopify is a complete commerce platform to sell online or in person—whether you're running a side hustle, retail shop, or global brand.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "productOneLiner": {
         "schemaVersion": 1,
-        "value": "Shopify is a complete commerce platform to sell online or in person.",
+        "value": "Shopify is a complete commerce platform to sell online or in person, empowering businesses of all sizes to grow.",
         "sourceUrl": "https://www.shopify.com/about",
         "sourceId": "438548a45ba5dddc3b085123",
         "evidenceQuote": "Shopify is a complete commerce platform to sell online or in person—whether you're running a side hustle, retail shop, or global brand.",
@@ -76,19 +118,19 @@
       },
       "pricingModel": {
         "schemaVersion": 1,
-        "value": "Subscription-based",
+        "value": "Starts at $29/month",
         "sourceUrl": "https://www.shopify.com/pricing",
         "sourceId": "d68028a34eab2aeb8cf7c958",
-        "evidenceQuote": "Try 3 days free, then $1/month for 3 months.",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "evidenceQuote": "Pay yearly Compare all features Basic $29 /mo For solo entrepreneurs Start for free Sell online, in person, and in AI chats Card rates from 2.9% + 30¢ USD Built-in AI assistant Millions of tokens Earn",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetCompanySize": {
         "schemaVersion": 1,
-        "value": "Small to large enterprises",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
-        "sourceId": "029a882b5fd741850e826218",
+        "value": "Small to Enterprise",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
         "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
         "inferred": false,
         "verification": "matched_saved_quote",
@@ -96,60 +138,120 @@
       },
       "valueProps.0": {
         "schemaVersion": 1,
-        "value": "World's best checkout proven to convert better.",
-        "sourceUrl": "https://www.shopify.com/",
-        "sourceId": "2028830bb5ef084561370018",
-        "evidenceQuote": "Built into every store World's best checkout Proven to convert better.",
+        "value": "Shopify's checkout converts up to 15% better than competitor platforms.",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "ecommerce sales are processed through Shopify Commerce tools that go the extra mile Checkout Shopify’s fast, customizable checkout converts up to 15% better than competitor platforms.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.1": {
         "schemaVersion": 1,
-        "value": "AI assistant to enhance commerce experience.",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
-        "sourceId": "029a882b5fd741850e826218",
-        "evidenceQuote": "Sidekick Your commerce-obsessed AI assistant.",
+        "value": "Trusted by enterprise brands, Shopify supports businesses of all sizes and complexities.",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "valueProps.2": {
         "schemaVersion": 1,
-        "value": "Largest commerce ecosystem with extensive app support.",
-        "sourceUrl": "https://www.shopify.com/customer-accounts",
-        "sourceId": "26ff31a7f8640a4175f06dc2",
-        "evidenceQuote": "Checkout Payments Taxes Customize & extend Shopify Commerce for Agents Build with our agent tools Shopify App Store Largest commerce ecosystem Shopify.dev Dev docs, CLI, and more Non-stop innovation",
+        "value": "Shopify's total cost of ownership is 33% better on average compared to competitors.",
+        "sourceUrl": "https://www.shopify.com/enterprise",
+        "sourceId": "4f86f3d1e0e2fa70fa5c9da8",
+        "evidenceQuote": "Cut costs, not ambitions Shopify's total cost of ownership is 33% better on average, so you can re-invest savings into growth.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "credentials.0": {
+        "schemaVersion": 1,
+        "value": "Leader in the 2024 Gartner Magic Quadrant for Digital Commerce.",
+        "sourceUrl": "https://www.shopify.com/enterprise",
+        "sourceId": "4f86f3d1e0e2fa70fa5c9da8",
+        "evidenceQuote": "Shopify named a Leader in the 2025 Gartner® Magic Quadrant™, positioned highest for Ability to Execute Read the report Shopify named Leader in IDC B2C Commerce Platforms, 2024 Read the report Shopify",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "credentials.1": {
+        "schemaVersion": 1,
+        "value": "Trusted by enterprise brands across various industries.",
+        "sourceUrl": "https://www.shopify.com/about",
+        "sourceId": "438548a45ba5dddc3b085123",
+        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetIndustries.0": {
         "schemaVersion": 1,
-        "value": "Retail",
-        "sourceUrl": "https://www.shopify.com/pos/retail-customer-experience",
-        "sourceId": "24982eddb36fd667efa9b6b9",
-        "evidenceQuote": "Thankfully, when you switch to Shopify POS, you can simplify retail operations and give teams the power to deliver the best shopping experiences without complexity Start for free Get in touch 01",
+        "value": "Fashion & Apparel",
+        "sourceUrl": "https://www.shopify.com/case-studies",
+        "sourceId": "b4afd7cd7fcea99568285c5f",
+        "evidenceQuote": "Fashion & Apparel Apparel & accessories Scalpers Digital revenue at Scalpers grew from €4 million to €40 million after the Spanish fashion brand moved to Shopify.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "targetIndustries.1": {
         "schemaVersion": 1,
-        "value": "E-commerce",
-        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
-        "sourceId": "029a882b5fd741850e826218",
-        "evidenceQuote": "Built into every store World's best checkout Proven to convert better.",
-        "inferred": true,
-        "verification": "no_claim_overlap",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
+        "value": "Food & Beverage",
+        "sourceUrl": "https://www.shopify.com/case-studies",
+        "sourceId": "b4afd7cd7fcea99568285c5f",
+        "evidenceQuote": "Food & beverage FOOTDISTRICT FOOTDISTRICT grew revenue by 14%, returning customers by 28%, and average order value by 5% after moving from Magento 2 to Shopify.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "targetIndustries.2": {
+        "schemaVersion": 1,
+        "value": "Health & Beauty",
+        "sourceUrl": "https://www.shopify.com/case-studies",
+        "sourceId": "b4afd7cd7fcea99568285c5f",
+        "evidenceQuote": "Health & beauty Claire's The 64-year-old brand is relaunching online on Shopify with a creator-led drop model built for Gen Alpha.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
       },
       "proofPoints.0": {
         "schemaVersion": 1,
-        "value": "Trusted by enterprise brands across various industries.",
+        "value": "Shopify has processed over $1 trillion in sales.",
         "sourceUrl": "https://www.shopify.com/about",
         "sourceId": "438548a45ba5dddc3b085123",
-        "evidenceQuote": "Trusted by enterprise brands No matter your size, complexity, or ambition.",
+        "evidenceQuote": "$1 trillion+ Sales made by businesses on Shopify—and counting 675+ million Unique shoppers bought from Shopify stores in 2023 10% Of U.S.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "proofPoints.1": {
+        "schemaVersion": 1,
+        "value": "Shopify's checkout converts up to 50% higher than guest checkout.",
+        "sourceUrl": "https://www.shopify.com/",
+        "sourceId": "2028830bb5ef084561370018",
+        "evidenceQuote": "conversions 15 % High-intent shoppers 250M + Shopify Checkout with Shop Pay converts up to 50% higher than guest checkout and exposes your brand to hundreds of millions of buyers.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "competitors.0": {
+        "schemaVersion": 1,
+        "value": "BigCommerce",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-bigcommerce",
+        "sourceId": "029a882b5fd741850e826218",
+        "evidenceQuote": "We have more global partners than any competitor—many of them specialize in helping BigCommerce customers make the switch to Shopify.",
+        "inferred": false,
+        "verification": "matched_saved_quote",
+        "reason": "Quote matched saved source text and passed contextual quality checks."
+      },
+      "competitors.1": {
+        "schemaVersion": 1,
+        "value": "WooCommerce",
+        "sourceUrl": "https://www.shopify.com/compare/shopify-vs-woocommerce",
+        "sourceId": "edf193a62106e5f2220ff59d",
+        "evidenceQuote": "race Get in touch Start free trial Thousands of brands have outgrown WooCommerce Brands are switching to Shopify—the most dependable global commerce platform to expand your business.",
         "inferred": false,
         "verification": "matched_saved_quote",
         "reason": "Quote matched saved source text and passed contextual quality checks."
@@ -160,328 +262,289 @@
     "schemaVersion": 1,
     "segments": [
       {
-        "key": "30c5b4a050480b7631334db6",
-        "label": "Retail and E-commerce",
+        "key": "e714ea8b455aa8aef308699f",
+        "label": "Fashion & Apparel",
         "enabled": true,
         "subIndustries": [
-          "Online Retail",
-          "Brick-and-Mortar Retail"
+          "Clothing",
+          "Accessories",
+          "Footwear"
         ],
         "queryTemplates": [
-          "e-commerce platforms for retail",
-          "best online store builders",
-          "retail management software",
-          "solutions for small businesses"
+          "fashion ecommerce platform",
+          "best ecommerce platform for clothing",
+          "online store solutions for apparel brands",
+          "ecommerce solutions for fashion retailers"
         ],
         "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
-        "exampleTargets": []
+        "exampleTargets": [
+          {
+            "name": "Diane Von Furstenberg",
+            "domain": "dvf.com",
+            "sourceUrl": "https://www.shopify.com/case-studies/diane-von-furstenberg",
+            "sourceId": "85a45b7702e0114bb6041d51",
+            "evidenceQuote": "access to data, and improved staff efficiency By running the entire business on Shopify, Diane von Furstenberg is able to deliver the clienteling experience their discerning customers expect."
+          }
+        ]
       },
       {
-        "key": "041428d9b1d265b7b8a1d6c3",
-        "label": "Enterprise Solutions",
+        "key": "39a12683b74117ccd983f262",
+        "label": "Food & Beverage",
         "enabled": true,
         "subIndustries": [
-          "Large Scale E-commerce",
-          "B2B Commerce"
+          "Restaurants",
+          "Food Retail",
+          "Beverage Production"
         ],
         "queryTemplates": [
-          "enterprise e-commerce solutions",
-          "B2B online platforms",
-          "scalable e-commerce systems",
-          "solutions for large retailers"
+          "ecommerce platform for food businesses",
+          "best online store for restaurants",
+          "food delivery ecommerce solutions",
+          "beverage ecommerce platform"
         ],
         "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
-        "exampleTargets": []
+        "exampleTargets": [
+          {
+            "name": "Rōti Modern Mediterranean",
+            "domain": "roti.com",
+            "sourceUrl": "https://www.shopify.com/case-studies",
+            "sourceId": "b4afd7cd7fcea99568285c5f",
+            "evidenceQuote": "Sporting Goods Sports & recreation Rōti Modern Mediterranean Rōti uses Shopify as the customer-facing brand and discovery layer around specialized restaurant systems."
+          },
+          {
+            "name": "Óptica Bassol",
+            "domain": "opticabassol.com",
+            "sourceUrl": "https://www.shopify.com/case-studies",
+            "sourceId": "b4afd7cd7fcea99568285c5f",
+            "evidenceQuote": "Food & beverage Óptica Bassol After consolidating 25 separate stores into a single Shopify setup, Óptica Bassol cut what used to be full days of lost sales down to just a few hours a year."
+          }
+        ]
       },
       {
-        "key": "3d8a0a8bea28657a8988bfad",
-        "label": "Small Business",
-        "enabled": true,
-        "subIndustries": [
-          "Startups",
-          "Local Businesses"
-        ],
-        "queryTemplates": [
-          "e-commerce for small businesses",
-          "best platforms for startups",
-          "affordable online store solutions",
-          "local business e-commerce"
-        ],
-        "revenueSensitivityBase": 1,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "2746e5455f2a40859c6ffde9",
-        "label": "Fashion and Apparel",
-        "enabled": true,
-        "subIndustries": [
-          "Clothing Retail",
-          "Fashion Brands"
-        ],
-        "queryTemplates": [
-          "e-commerce for fashion brands",
-          "best platforms for clothing retailers",
-          "online store solutions for apparel",
-          "fashion e-commerce platforms"
-        ],
-        "revenueSensitivityBase": 1,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "a6f3bfe3c03b66f9809686e3",
-        "label": "Food and Beverage",
-        "enabled": true,
-        "subIndustries": [
-          "Grocery Delivery",
-          "Food Retail"
-        ],
-        "queryTemplates": [
-          "e-commerce for food delivery",
-          "best platforms for grocery stores",
-          "online solutions for food retailers",
-          "food and beverage e-commerce"
-        ],
-        "revenueSensitivityBase": 1,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "acacc0c3e7bd1515a27e7500",
-        "label": "Health and Beauty",
+        "key": "c9a773e424d690b45da98ace",
+        "label": "Health & Beauty",
         "enabled": true,
         "subIndustries": [
           "Cosmetics",
-          "Health Products"
+          "Skincare",
+          "Wellness Products"
         ],
         "queryTemplates": [
-          "e-commerce for beauty brands",
-          "best platforms for health products",
-          "online store solutions for cosmetics",
-          "health and beauty e-commerce"
+          "ecommerce platform for beauty brands",
+          "best online store for skincare",
+          "health and wellness ecommerce solutions",
+          "cosmetics ecommerce platform"
         ],
         "revenueSensitivityBase": 1,
         "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "ac17f05736ffbd1442a65363",
-        "label": "Home Goods",
-        "enabled": true,
-        "subIndustries": [
-          "Furniture",
-          "Home Decor"
-        ],
-        "queryTemplates": [
-          "e-commerce for home goods",
-          "best platforms for furniture retailers",
-          "online store solutions for home decor",
-          "home goods e-commerce"
-        ],
-        "revenueSensitivityBase": 1,
-        "wedgeCustomers": [],
-        "exampleTargets": []
-      },
-      {
-        "key": "ed24279f0c18a33eb267511c",
-        "label": "Technology and Electronics",
-        "enabled": true,
-        "subIndustries": [
-          "Consumer Electronics",
-          "Tech Retail"
-        ],
-        "queryTemplates": [
-          "e-commerce for electronics",
-          "best platforms for tech retailers",
-          "online store solutions for gadgets",
-          "technology e-commerce"
-        ],
-        "revenueSensitivityBase": 1,
-        "wedgeCustomers": [],
-        "exampleTargets": []
+        "exampleTargets": [
+          {
+            "name": "Teddy Group",
+            "domain": "teddygroup.com",
+            "sourceUrl": "https://www.shopify.com/case-studies",
+            "sourceId": "b4afd7cd7fcea99568285c5f",
+            "evidenceQuote": "Health & beauty Teddy Group Teddy Group moved three fashion brands, Rinascimento, Terranova, and Calliope, to Shopify in just five months while keeping development fully in-house."
+          }
+        ]
       }
     ],
     "personas": {
       "buyerTitles": [
-        "Chief Marketing Officer",
-        "E-commerce Manager",
-        "Retail Operations Director"
+        "Ecommerce Manager",
+        "Marketing Director",
+        "Chief Operating Officer"
       ],
       "championTitles": [
-        "Store Manager",
-        "Digital Marketing Specialist",
-        "Product Manager"
+        "Retail Manager",
+        "Product Manager",
+        "Brand Strategist"
       ],
       "wrongOrgTitles": [
-        "IT Support",
-        "Administrative Assistant"
+        "IT Manager",
+        "Software Developer",
+        "Data Analyst"
       ]
     },
     "signalDefinitions": {
       "techStack": {
-        "label": "E-commerce Technology",
-        "description": "Technologies used in e-commerce operations.",
+        "label": "Ecommerce Platforms",
+        "description": "Companies using outdated or custom-built ecommerce solutions may be looking to modernize their platforms.",
         "evidenceKeywords": [
-          "e-commerce platform",
-          "online store",
-          "checkout solutions"
+          "custom ecommerce platform",
+          "legacy ecommerce system",
+          "outdated technology"
         ],
         "negativeKeywords": [
-          "legacy systems",
-          "on-premise solutions"
+          "recently migrated",
+          "no plans to change"
         ],
         "preferredSources": [
-          "customer case studies",
-          "industry reports"
+          "case studies",
+          "industry reports",
+          "customer testimonials"
         ],
         "rubric": {
-          "1": "No technology adoption",
-          "3": "Limited technology use",
-          "5": "Advanced technology integration"
+          "1": "No urgency to change",
+          "3": "Considering options",
+          "5": "Ready to switch"
         }
       },
       "activePain": {
-        "label": "Operational Complexity",
-        "description": "Challenges in managing multiple sales channels and inventory.",
+        "label": "Operational Inefficiencies",
+        "description": "Businesses struggling with high operational costs or slow implementation times may benefit from Shopify's streamlined solutions.",
         "evidenceKeywords": [
-          "complex retail operations",
-          "inventory management issues"
+          "high implementation costs",
+          "slow platform migration",
+          "inefficient order management"
         ],
         "negativeKeywords": [
-          "simple operations",
-          "single channel sales"
+          "satisfied with current solution",
+          "no issues reported"
         ],
         "preferredSources": [
-          "customer testimonials",
-          "industry surveys"
+          "case studies",
+          "customer feedback",
+          "industry analysis"
         ],
         "rubric": {
-          "1": "No operational challenges",
-          "3": "Some operational issues",
-          "5": "Significant operational complexity"
+          "1": "No pain points",
+          "3": "Some challenges",
+          "5": "Significant issues"
         }
       },
       "revenueSensitivity": {
-        "label": "Revenue Growth Potential",
-        "description": "Potential for revenue growth through e-commerce.",
+        "label": "High Growth Potential",
+        "description": "Companies experiencing rapid growth may require scalable ecommerce solutions to support their expansion.",
         "evidenceKeywords": [
-          "increased sales",
-          "revenue growth",
-          "conversion rates"
+          "rapid revenue growth",
+          "expanding product lines",
+          "increased customer demand"
         ],
         "negativeKeywords": [
-          "declining sales",
-          "stagnant revenue"
+          "stable revenue",
+          "no growth plans"
         ],
         "preferredSources": [
           "financial reports",
-          "market analysis"
+          "market analysis",
+          "growth case studies"
         ],
         "rubric": {
-          "1": "No growth potential",
-          "3": "Moderate growth potential",
-          "5": "High growth potential"
+          "1": "Low growth",
+          "3": "Moderate growth",
+          "5": "High growth"
         }
       },
       "observabilityScale": {
-        "label": "Business Visibility",
-        "description": "Visibility into sales and inventory across channels.",
+        "label": "Data-Driven Decision Making",
+        "description": "Businesses leveraging data analytics for decision-making may benefit from Shopify's integrated analytics tools.",
         "evidenceKeywords": [
-          "real-time inventory",
-          "sales analytics"
+          "data analytics",
+          "customer insights",
+          "performance tracking"
         ],
         "negativeKeywords": [
-          "lack of visibility",
-          "manual tracking"
+          "no data usage",
+          "manual reporting"
         ],
         "preferredSources": [
-          "analytics reports",
-          "business intelligence tools"
+          "case studies",
+          "customer testimonials",
+          "industry reports"
         ],
         "rubric": {
-          "1": "No visibility",
-          "3": "Some visibility",
-          "5": "Full visibility"
+          "1": "Minimal data usage",
+          "3": "Some data-driven decisions",
+          "5": "Highly data-driven"
         }
       },
       "aiCompatibility": {
         "label": "AI Integration",
-        "description": "Integration of AI tools for enhanced customer experience.",
+        "description": "Companies looking to enhance customer experiences through AI may find value in Shopify's AI tools.",
         "evidenceKeywords": [
-          "AI assistant",
+          "AI-driven solutions",
+          "personalized recommendations",
           "automated customer service"
         ],
         "negativeKeywords": [
-          "no AI tools",
-          "manual processes"
+          "no interest in AI",
+          "satisfied with current tools"
         ],
         "preferredSources": [
           "technology reviews",
-          "case studies"
+          "case studies",
+          "industry reports"
         ],
         "rubric": {
-          "1": "No AI integration",
-          "3": "Limited AI use",
-          "5": "Extensive AI integration"
+          "1": "No AI usage",
+          "3": "Exploring AI options",
+          "5": "Fully integrated AI solutions"
         }
       },
       "competitiveWedge": {
-        "label": "Market Differentiation",
-        "description": "Unique features that set the platform apart from competitors.",
+        "label": "Cost Efficiency",
+        "description": "Businesses seeking to reduce operational costs may find Shopify's pricing model advantageous compared to competitors.",
         "evidenceKeywords": [
-          "unique selling proposition",
-          "competitive advantages"
+          "high operational costs",
+          "cost-saving solutions",
+          "affordable pricing"
         ],
         "negativeKeywords": [
-          "similar offerings",
-          "no differentiation"
+          "no cost concerns",
+          "satisfied with current pricing"
         ],
         "preferredSources": [
-          "competitive analysis",
-          "market research"
+          "pricing comparisons",
+          "case studies",
+          "customer testimonials"
         ],
         "rubric": {
-          "1": "No differentiation",
-          "3": "Some differentiation",
-          "5": "Strong differentiation"
+          "1": "High costs",
+          "3": "Moderate costs",
+          "5": "Low costs"
         }
       }
     },
     "triggerMapping": {
       "pain_event": [
-        "operational inefficiencies",
-        "customer dissatisfaction"
+        "High operational costs",
+        "Slow implementation times",
+        "Inefficient order management"
       ],
       "buying_intent": [
-        "looking for e-commerce solutions",
-        "expanding online presence"
+        "Looking to switch platforms",
+        "Seeking cost-effective solutions",
+        "Interested in improving customer experience"
       ],
       "function_roles": [
-        "marketing",
-        "operations",
-        "IT"
+        "Ecommerce Manager",
+        "Marketing Director",
+        "Chief Operating Officer"
       ],
       "tech_adoption": [
-        "adopting new e-commerce platforms",
-        "integrating AI tools"
+        "Exploring new ecommerce solutions",
+        "Considering AI integration",
+        "Researching cost-effective platforms"
       ],
-      "competitor_names": []
+      "competitor_names": [
+        "BigCommerce",
+        "WooCommerce"
+      ]
     },
     "killPatterns": {
       "solvingInHouse": [
-        "internal development teams",
-        "custom-built solutions"
+        "Companies with strong internal development teams",
+        "Businesses committed to custom solutions"
       ],
       "buildCulture": [
-        "preference for in-house solutions",
-        "strong internal IT capabilities"
+        "Organizations focused on building proprietary technology",
+        "Companies with a culture of in-house development"
       ],
       "sizeMetric": {
-        "label": "Employee Count",
-        "floor": 50
+        "label": "Annual Revenue",
+        "floor": 100000
       }
     },
     "painSources": {
@@ -491,15 +554,15 @@
       "filings": false
     },
     "pitch": {
-      "receiptOpenerStyle": "Engaging and informative",
-      "oneSentenceProduct": "Shopify is a complete commerce platform to sell online or in person.",
-      "credentialLine": "Trusted by enterprise brands across various industries.",
-      "ctaStyle": "Direct and actionable"
+      "receiptOpenerStyle": "Shopify is the leading ecommerce platform, trusted by thousands of brands worldwide.",
+      "oneSentenceProduct": "Shopify is a complete commerce platform to sell online or in person, empowering businesses of all sizes to grow.",
+      "credentialLine": "Shopify is recognized as a leader in the ecommerce space, with a proven track record of success.",
+      "ctaStyle": "Start your free trial today and see how Shopify can transform your business."
     },
     "objectionTemplates": [
-      "Not ready to switch platforms",
-      "Concerns about migration complexity",
-      "Satisfaction with current solution"
+      "We are satisfied with our current platform.",
+      "We have a custom-built solution that works for us.",
+      "We are not looking to switch providers at this time."
     ],
     "weights": {
       "techStack": 1.3,
@@ -559,24 +622,11 @@
   },
   "receiptReport": {
     "schemaVersion": 1,
-    "attemptedClaims": 10,
-    "acceptedClaims": 10,
-    "receiptedClaims": 7,
-    "receiptCoverage": 0.7,
-    "warnings": [
-      {
-        "value": "E-commerce platform",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "Subscription-based",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "value": "E-commerce",
-        "reason": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      }
-    ],
+    "attemptedClaims": 16,
+    "acceptedClaims": 16,
+    "receiptedClaims": 16,
+    "receiptCoverage": 1,
+    "warnings": [],
     "droppedCustomers": [],
     "droppedCompetitors": [],
     "qualityFindings": [
@@ -654,6 +704,15 @@
       },
       {
         "schemaVersion": 1,
+        "id": "8004d168a24b6b018430a3d9",
+        "code": "VENDOR_SEEKING_QUERY",
+        "path": "icpConfig.segments.2.queryTemplates.0",
+        "field": "segments.2.queryTemplates",
+        "severity": "blocking",
+        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
+      },
+      {
+        "schemaVersion": 1,
         "id": "f021c5d3127efbebb2a301f1",
         "code": "VENDOR_SEEKING_QUERY",
         "path": "icpConfig.segments.2.queryTemplates.1",
@@ -672,111 +731,12 @@
       },
       {
         "schemaVersion": 1,
-        "id": "a516fc8aaf4201cbe8509aad",
+        "id": "e7cde1341461df227cbce64c",
         "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.3.queryTemplates.1",
-        "field": "segments.3.queryTemplates",
+        "path": "icpConfig.segments.2.queryTemplates.3",
+        "field": "segments.2.queryTemplates",
         "severity": "blocking",
         "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "e038ac30317c6c893a203cd9",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.3.queryTemplates.2",
-        "field": "segments.3.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "14a3c62822c6346ef12a4d68",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.3.queryTemplates.3",
-        "field": "segments.3.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "33fd88ae51b23f0b1897e5b4",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.4.queryTemplates.1",
-        "field": "segments.4.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "784f66390ef6e5fcc452e22f",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.4.queryTemplates.2",
-        "field": "segments.4.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "e34016c3f1db3461cf3d3954",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.5.queryTemplates.1",
-        "field": "segments.5.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "2099da8bf7d68c86b661a676",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.5.queryTemplates.2",
-        "field": "segments.5.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "be14cd16a8294605e6f39609",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.6.queryTemplates.1",
-        "field": "segments.6.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "f09ec8f5bf9fcd2251e99b71",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.6.queryTemplates.2",
-        "field": "segments.6.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "9bb9ae624108203637d69608",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.7.queryTemplates.1",
-        "field": "segments.7.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "8f6235922d565dfbca5c1711",
-        "code": "VENDOR_SEEKING_QUERY",
-        "path": "icpConfig.segments.7.queryTemplates.2",
-        "field": "segments.7.queryTemplates",
-        "severity": "blocking",
-        "message": "This search phrase describes a product/vendor category and is likely to return sellers or competitors instead of prospective buyers."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "eaed98cac1d9a2b2c30c4955",
-        "code": "EMPTY_COMPETITORS",
-        "path": "sellerProfile.competitors",
-        "field": "competitors",
-        "severity": "blocking",
-        "message": "No verified competitors are present. Add supported competitors or explain why approval should proceed without them."
       },
       {
         "schemaVersion": 1,
@@ -786,33 +746,6 @@
         "field": "customers",
         "severity": "blocking",
         "message": "No verified customers are present. Add supported customers or explain why approval should proceed without them."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "7cb388f6fe8f4268ea8bdc5b",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.category",
-        "field": "category",
-        "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "d41b6737e5c37d0af7a0823e",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.pricingModel",
-        "field": "pricingModel",
-        "severity": "blocking",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
-      },
-      {
-        "schemaVersion": 1,
-        "id": "8adf58d0f352f2c2b4cb7f9b",
-        "code": "RECEIPT_NO_CLAIM_OVERLAP",
-        "path": "sellerProfile.evidence.targetIndustries.1",
-        "field": "targetIndustries.1.value",
-        "severity": "advisory",
-        "message": "The receipt does not share enough meaningful terms with the claim it is meant to support."
       }
     ]
   }
