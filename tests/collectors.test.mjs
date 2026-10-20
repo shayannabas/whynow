@@ -68,6 +68,13 @@ it('rejects timeouts, oversized bodies, and unsupported content',async()=>{
   const large=harness({fetch:async()=>response('a'.repeat(2*1024*1024+1))});await expect(large.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'TOO_LARGE'});
   const binary=harness({fetch:async()=>response('binary',200,{'content-type':'image/png'})});await expect(binary.runtime.request('robots','https://example.org/robots.txt')).rejects.toMatchObject({code:'CONTENT_TYPE'});
 });
+it('allows SEC plain-text indexes served as octet-stream and keeps safe HTTP status diagnostics',async()=>{
+  const sec=harness({fetch:async url=>url.endsWith('/robots.txt')?response('User-agent: *\nAllow: /'):response('D  Example  1  20261020  edgar/data/1/file.txt',200,{'content-type':'application/octet-stream'})});
+  expect((await sec.runtime.requestText('https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261020.idx','edgar_index')).value).toContain('Example');
+  const failed=harness({fetch:async url=>url.endsWith('/robots.txt')?response('',404):response('blocked',429)});
+  await expect(failed.runtime.request('seller_site','https://example.org/page')).rejects.toMatchObject({status:429});
+  expect(failed.runtime.snapshot().health.seller_site).toMatchObject({code:'HTTP_ERROR',httpStatus:429});
+});
 it('retains source revisions and accepts exact whitespace-normalized quotes only',()=>{
   const a=recordSource(defaultState(),{url:'https://example.org',fetchedAt:'2026-09-16T00:00:00Z',title:'Source',text:'The public\n page has evidence.'});
   expect(quoteIsGrounded(a.state,a.source.id,'public page has evidence.')).toBe(true);

@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 20, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phase A is complete locally and awaiting the next owner gate; no profile was approved and Phase B has not started.
+Updated: October 20, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phases A and B are complete; no profile was approved and no later port chunk has started.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -34,7 +34,16 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 - [x] Make state storage configurable through `STATE_DIR`; continue honoring `PORT`; keep long provider work in existing background coordinators.
 - [x] Browser acceptance: load Resolve reference demo, add Coinbase, see its 8/100 scorecard, see its `KILL_EXISTING_CUSTOMER` receipt, restart and confirm persistence.
 - [x] Full offline suite: 31 files, 144 active tests pass and one existing scaffold test remains intentionally skipped.
-- [ ] Later phases B–F remain blocked until the owner approves each phase separately.
+- [x] Owner authorized the narrowed Phase B scope: ATS hiring, Statuspage/HN/Google News active pain, Serper search/executive change, SEC Form D, tech culture, AI compatibility, competitive wedge and revenue sensitivity.
+- [x] Freeze 18 SignalScout collector outputs at source commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`; WhyNow reproduces them exactly without importing SignalScout at runtime.
+- [x] Preserve WhyNow's stricter network/robots/budget/atomic-state boundary and match SignalScout's in-scope budgets and cache times.
+- [x] Move Resolve transaction rules and EDGAR segment queries into the load-only reference configuration with source-line provenance.
+- [x] Add persistent, background **Refresh account**; collected receipts update the six-signal scorecard, kills and tiers without deleting prior evidence.
+- [x] Keep GitHub, StatusGator API, conference speakers, OTel graph, EDGAR risk factors and Chunk 2 out of scope.
+- [x] Pass the Phase B full offline suite: 36 files, 177 active tests passed and one existing scaffold remains intentionally skipped.
+- [x] Live Resolve reference check: five accounts, 20 Serper queries exactly, 0 OpenAI calls; results/errors are recorded in `docs/PHASE-B-LIVE-VERIFICATION.md`.
+- [x] Browser verification after a fresh server start: the account detail showed scores, honest zeros, clickable receipts, query count and errors; the Kill Log retained Databricks's receipted build-culture kill.
+- [ ] Later port chunks remain blocked until the owner approves each one separately.
 - [ ] Railway deployment is Phase G only and requires the owner's explicit OK.
 
 ## Stage 2.5 — research quality
@@ -58,7 +67,7 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 
 ## Current decision
 
-Phase A is the current completed boundary. The immutable parity fixture covers the Databricks-like, Uber-Eats-like, Binance-like, Replicate-like and DraftKings-like gold-standard cases, clean Tier 1/2/3 prospects, an existing customer and a simultaneous five-rule kill. WhyNow reproduces SignalScout's exact saved scoring, kill, tier and decision outputs for all ten cases under the frozen Resolve configuration. No exact-parity exception remains. Phase B collectors are not authorized.
+Phase B is the current completed boundary. Phase A parity remains green. The Phase B fixture covers 18 pure collector cases across ATS, incident/news, Serper planning, executive changes, Form D, culture, AI, wedge and revenue. The live check retained successful receipts and exposed provider limitations honestly; no exact-parity exception remains. Chunk 2 is not authorized.
 
 Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup. The bounded recovery run persisted three snapshots and three `needs_review` workspaces. It made four attempts because Shopify used the existing transient retry. Shopify and Vercel reported an estimated combined $0.005177; Resolve AI's usage record was lost when the first process stopped, so the exact total is unknown. The conservative reservation reached $0.038686 under the temporary $0.05 cap. The ignored local `.env` was then verified without displaying secrets: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. Local operation avoids hosting charges, but provider calls still consume credits.
 

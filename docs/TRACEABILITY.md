@@ -132,6 +132,20 @@ Current checkpoint: repository published at https://github.com/shayannabas/whyno
 
 Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9gCy1ehLhbSXvlpVtmBvqgXzJ2sQwhg83E8/edit), [PRD v4](https://docs.google.com/document/d/1t9YUZ33bUCPdxgfFshEvdqCw5S9fdhU40QQECeMkl-0/edit).
 
+## Port mode Phase B traceability — October 20, 2026
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| SignalScout pure collector parity | `tests/fixtures/parity/signalscout-phase-b.json`; Phase B collector modules | 18 exact frozen input/output cases from source commit `130789f1...`; reference repo is not imported at test time |
+| Workspace configuration, not Resolve globals | `phase-b-config.cjs`; `resolve-ai.json` collector rules/provenance | Isolation tests plus reference validation; Phase A parity unchanged |
+| Guarded public adapters | `collectors/runtime.cjs`; hiring, active-pain, search, executive, EDGAR, culture, AI, wedge, revenue modules | Recorded-response adapter tests; no test hits a provider |
+| Persistent caps and failure isolation | `phase-b-runner.cjs`; `serper.cjs` | Per-run/monthly cap tests, source errors retained, free collectors continue after Serper failure |
+| Signals feed Phase A | `mergeCollectorResult`; `scoreAccount` | Background-runner test proves receipts update fit and a kill hint reaches Kill Log precedence |
+| Background Refresh account UI | `server/phase-a-pages.cjs`; `server/router.cjs` | Local-only/same-origin HTTP test; button, receipt links and errors render |
+| Exclusions | No GitHub/StatusGator/OTel graph/risk-factor/conference module or route | Runtime budgets and parity fixture omit excluded sources |
+| Full regression | All tests | 36 files passed; 177 active tests passed, 1 intentional skip |
+| Live verification | `.whynow/phase-b-live-report.json`; `docs/PHASE-B-LIVE-VERIFICATION.md` | Five Resolve-segment accounts; exactly 20 Serper queries; 0 OpenAI calls; signals, zeros and errors reported |
+
 | Requirement | Implementation | Verification |
 | --- | --- | --- |
 | Node 22, CommonJS, allowed dependencies | package.json, .nvmrc, CI | Seven tests passed on Node 22.23.2 |

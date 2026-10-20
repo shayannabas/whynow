@@ -1,6 +1,6 @@
 # WhyNow SignalScout port notes
 
-Updated October 20, 2026. SignalScout by Isa Iqbal is the read-only behavioral reference and is used with permission. WhyNow keeps its own isolated workspaces, atomic JSON state, receipts, human approval and send-free Demo mode. Phase A is complete; Phase B is not authorized.
+Updated October 20, 2026. SignalScout by Isa Iqbal is the read-only behavioral reference and is used with permission. WhyNow keeps its own isolated workspaces, atomic JSON state, receipts, human approval and send-free Demo mode. Phases A and B are complete; no later port chunk has started.
 
 ## `scripts/scoring.cjs`
 
@@ -105,3 +105,57 @@ The captured Binance-like account has strong public signals and scores **90/100*
 ## Parity result
 
 `tests/fixtures/parity/signalscout-phase-a.json` was captured once from SignalScout commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. Ten WhyNow cases reproduce its complete saved scoring, kill, tier and decision outputs exactly. Tests use only the fixture and do not import or modify SignalScout at runtime. No exact-parity exception is recorded for Phase A.
+
+## Phase B collector modules
+
+### `scripts/collectors/runtime.cjs`
+
+**What it does:** Provides the only live network path for collectors. **How it decides:** It requires the crawler contact email, public HTTPS/DNS, allowed redirects, robots permission, per-source pacing, size/type limits and cached budgets. **What changed from SignalScout:** SignalScout's relevant source budgets and cache times are preserved, while WhyNow keeps its stricter DNS pinning, robots checks, atomic cache writes and saved health counters. Skipped sources have no runtime budget.
+
+### `scripts/collector-triggers.cjs`, `scripts/pain-themes.cjs` and `scripts/incident-attribution.cjs`
+
+**What they do:** Add expiry dates to time-sensitive events, classify incident pain themes and distinguish first-party incidents from upstream/unknown reports. **How they decide:** Workspace SLA days, configured theme terms and receipt ownership determine decay, labels and whether an incident is safe to cite. **What changed from SignalScout:** They are small collector dependencies only; no scheduler, outreach or later-chunk logic came with them.
+
+### `scripts/collectors/hiring.cjs`
+
+**What it does:** Normalizes Greenhouse, Lever and Ashby jobs into reliability, platform, stack and AI-RCA evidence. **How it decides:** Public job titles/descriptions must match explicit role/tool patterns and keep the posting URL. Three recent new infrastructure roles can create a hiring-surge trigger. **What changed from SignalScout:** The pure classification is parity-compatible; live requests use WhyNow's guarded runtime and workspace SLAs.
+
+### `scripts/collectors/active-pain.cjs`
+
+**What it does:** Collects recent operational incidents from public Statuspage APIs, Hacker News and Google News RSS, plus already-capped search evidence. **How it decides:** A result must name the target or use its domain, describe operational impact and have a public URL; attribution controls confidence and citation status. **What changed from SignalScout:** StatusGator's API collector was not ported. Individual source failures remain visible and cannot suppress receipts from the other free sources.
+
+### `scripts/collectors/search-evidence.cjs`
+
+**What it does:** Runs four bounded searches per account for pain, technology, AI adoption and engineering-leadership changes. **How it decides:** It discards results that neither use the target domain nor explicitly name the target. **What changed from SignalScout:** Search is injected behind WhyNow's persistent per-run/monthly Serper reservation; tracked-person discovery is not used by the Phase B runner.
+
+### `scripts/collectors/executive-change.cjs`
+
+**What it does:** Converts exact public appointment/departure language for CTO and senior engineering roles into expiring triggers. **How it decides:** Target name, action, role and recency must occur in a supported sentence with a URL. **What changed from SignalScout:** PhantomBuster and people-led account discovery were removed; only receipted search results for the refreshed account are used.
+
+### `scripts/collectors/edgar-form-d.cjs`
+
+**What it does:** Checks SEC daily indexes and one workspace segment query for matching Form D fundraising. **How it decides:** Company/alias matching is exact after legal-suffix normalization, and details are included only when disclosed in the filing. **What changed from SignalScout:** Resolve segment queries moved into workspace configuration. Risk-factor collection and discovery promotion are not run; account refresh keeps only events for the named account.
+
+### `scripts/collectors/tech-culture.cjs`
+
+**What it does:** Finds receipted production-stack, observability, OpenTelemetry-adoption and build-in-house evidence. **How it decides:** Explicit technology phrases create signals; explicit built/open-sourced/internal platform phrases create retained kill hints. **What changed from SignalScout:** GitHub and the OTel graph were not ported. The collector uses bounded search results or explicitly configured public engineering sources.
+
+### `scripts/collectors/ai-compatibility.cjs`
+
+**What it does:** Scores public evidence of LLM, generative-AI and AI-assisted engineering adoption. **How it decides:** One or more explicit AI engineering terms plus a URL are required. **What changed from SignalScout:** Classification parity is preserved, but inputs come only from the current account's guarded search/job evidence.
+
+### `scripts/collectors/competitive-wedge.cjs`
+
+**What it does:** Verifies configured seller customers on the saved customer page and maps same-segment customer proof to a prospect. **How it decides:** Customer names and segment wedge lists come from the workspace; unverified names produce no signal. **What changed from SignalScout:** Resolve customer names, URL, source ID and seller label are configuration, not module constants.
+
+### `scripts/collectors/revenue-sensitivity.cjs`
+
+**What it does:** Estimates how directly production failure affects transactions. **How it decides:** Workspace segment rules distinguish lost transactions, returning customers and non-transactional models; a public event can add a receipted boost, otherwise the signal is explicitly inferred. **What changed from SignalScout:** All Resolve segment and keyword rules moved into the reference/workspace configuration.
+
+### `scripts/phase-b-config.cjs`, `scripts/phase-b-runner.cjs` and the account page
+
+**What they do:** Translate an approved/reference workspace into collector inputs, run each collector in a background job, merge evidence without erasing better receipts, and rerun Phase A scoring/kills/tiers. **How they decide:** Normal workspaces require owner approval; the frozen Resolve demo is the only load-only exception. Serper queries are reserved persistently before use, interrupted runs are recorded, and every collector shows complete, disabled or error. **What changed from SignalScout:** WhyNow adds workspace isolation, atomic JSON progress, the manual **Refresh account** button and a receipt/error UI. No scheduler, discovery promotion, OpenAI or send path is active.
+
+## Phase B parity and worked example
+
+`tests/fixtures/parity/signalscout-phase-b.json` freezes 18 pure collector outputs from the same SignalScout commit. WhyNow reproduces them exactly without importing SignalScout at test time. For example, the Binance fixture turns its public Greenhouse reliability/AI-RCA roles into stack and hiring triggers, then the Phase A engine recalculates fit and priority; the job URLs remain the explanation for every point earned. Live adapters add network safety and persistence around that unchanged classification contract.

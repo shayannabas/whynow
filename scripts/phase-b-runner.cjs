@@ -35,7 +35,7 @@ function mergeCollectorResult(account={},result={},runId=''){
   next.updatedAt=new Date().toISOString();
   return next;
 }
-function safeError(error){return {code:String(error?.code||'COLLECTOR_FAILED'),message:String(error?.message||error?.error||'Collector failed').slice(0,300),status:Number.isInteger(error?.status)?error.status:null};}
+function safeError(error){const status=Number.isInteger(error?.status)?error.status:Number.isInteger(error?.httpStatus)?error.httpStatus:null;return {code:String(error?.code||'COLLECTOR_FAILED'),message:String(error?.message||error?.error||'Collector failed').slice(0,300),status};}
 function sourceErrors(runtime){return Object.entries(runtime.snapshot().health||{}).filter(([,row])=>row.status==='error').map(([source,row])=>({collectorId:source,...safeError(row)}));}
 function findRun(workspace,id){return workspace.runs.find(row=>row.id===id&&row.type==='account_collector_refresh');}
 

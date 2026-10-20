@@ -94,7 +94,7 @@ class CollectorRuntime {
         this.health[source]={status:'ok',checkedAt:new Date(this.now()).toISOString(),httpStatus:result.status};return result;
       } catch(error) {
         const safe=error instanceof CollectorHttpError?error:new CollectorHttpError('FETCH_FAILED','The public page request failed');
-        this.health[source]={status:'error',checkedAt:new Date(this.now()).toISOString(),code:safe.code,message:safe.message};throw safe;
+        this.health[source]={status:'error',checkedAt:new Date(this.now()).toISOString(),code:safe.code,message:safe.message,httpStatus:Number.isInteger(safe.status)?safe.status:null};throw safe;
       }
     };
     const work=(this.queues.get(source)||Promise.resolve()).then(execute);
@@ -159,7 +159,8 @@ class CollectorRuntime {
       if(!(response.status>=200 && response.status<300) && !(source==='robots' && response.status===404))throw new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);
       if(Buffer.byteLength(response.text)>2*1024*1024)throw new CollectorHttpError('TOO_LARGE','Page exceeds the 2 MB limit');
       const contentType=response.headers.get('content-type')||'';
-      if(contentType && !/text\/|json|xml/i.test(contentType))throw new CollectorHttpError('CONTENT_TYPE','Only text pages are supported');
+      const secPlainText=(source==='edgar_index'||source==='edgar_filing')&&url.hostname==='www.sec.gov'&&/application\/octet-stream/i.test(contentType);
+      if(contentType && !/text\/|json|xml/i.test(contentType)&&!secPlainText)throw new CollectorHttpError('CONTENT_TYPE','Only text pages are supported');
       const result={schemaVersion:1,url:url.href,status:response.status,text:response.text,contentType,savedAt:this.now(),fetchedAt:new Date(this.now()).toISOString()};
       atomicWrite(cacheFile,JSON.stringify(result));return {...result,fromCache:false};
     } finally {clearTimeout(timer);}
