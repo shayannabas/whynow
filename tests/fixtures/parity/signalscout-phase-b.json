@@ -1,0 +1,1214 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-20",
+  "source": {
+    "product": "SignalScout",
+    "repository": "https://github.com/isaiqba-cell/flowfire",
+    "commit": "130789f1bac1d5e11f5f5154f269155dc17f2d21"
+  },
+  "sourceBudgets": {
+    "statuspage": {
+      "maxRequestsPerRun": 30,
+      "minIntervalMs": 350,
+      "cacheTtlMs": 900000,
+      "timeoutMs": 10000
+    },
+    "greenhouse": {
+      "maxRequestsPerRun": 20,
+      "minIntervalMs": 500,
+      "cacheTtlMs": 21600000,
+      "timeoutMs": 12000
+    },
+    "lever": {
+      "maxRequestsPerRun": 20,
+      "minIntervalMs": 500,
+      "cacheTtlMs": 21600000,
+      "timeoutMs": 12000
+    },
+    "ashby": {
+      "maxRequestsPerRun": 20,
+      "minIntervalMs": 500,
+      "cacheTtlMs": 21600000,
+      "timeoutMs": 12000
+    },
+    "hn": {
+      "maxRequestsPerRun": 40,
+      "minIntervalMs": 400,
+      "cacheTtlMs": 3600000,
+      "timeoutMs": 10000
+    },
+    "google_news_rss": {
+      "maxRequestsPerRun": 20,
+      "minIntervalMs": 750,
+      "cacheTtlMs": 1800000,
+      "timeoutMs": 12000
+    },
+    "serper": {
+      "maxRequestsPerRun": 150,
+      "minIntervalMs": 500,
+      "cacheTtlMs": 21600000,
+      "timeoutMs": 15000
+    },
+    "edgar_index": {
+      "maxRequestsPerRun": 4,
+      "minIntervalMs": 400,
+      "cacheTtlMs": 21600000,
+      "timeoutMs": 15000
+    },
+    "edgar_search": {
+      "maxRequestsPerRun": 12,
+      "minIntervalMs": 400,
+      "cacheTtlMs": 21600000,
+      "timeoutMs": 15000
+    },
+    "edgar_filing": {
+      "maxRequestsPerRun": 8,
+      "minIntervalMs": 400,
+      "cacheTtlMs": 2592000000,
+      "timeoutMs": 15000
+    },
+    "engineering_web": {
+      "maxRequestsPerRun": 20,
+      "minIntervalMs": 1500,
+      "cacheTtlMs": 43200000,
+      "timeoutMs": 12000
+    },
+    "resolve_customers": {
+      "maxRequestsPerRun": 2,
+      "minIntervalMs": 2000,
+      "cacheTtlMs": 2592000000,
+      "timeoutMs": 12000
+    },
+    "robots": {
+      "maxRequestsPerRun": 30,
+      "minIntervalMs": 500,
+      "cacheTtlMs": 86400000,
+      "timeoutMs": 8000
+    }
+  },
+  "cases": [
+    {
+      "id": "greenhouse-normalization",
+      "module": "hiring",
+      "function": "normalizeJobs",
+      "input": {
+        "provider": "greenhouse",
+        "payload": {
+          "jobs": [
+            {
+              "id": 1,
+              "title": "SRE",
+              "content": "<p>Kubernetes</p>",
+              "absolute_url": "https://jobs.example/1",
+              "location": {
+                "name": "Remote"
+              },
+              "updated_at": "2026-07-11T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "output": [
+        {
+          "id": 1,
+          "title": "SRE",
+          "text": "Kubernetes",
+          "url": "https://jobs.example/1",
+          "location": "Remote",
+          "updatedAt": "2026-07-11T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "lever-normalization",
+      "module": "hiring",
+      "function": "normalizeJobs",
+      "input": {
+        "provider": "lever",
+        "payload": [
+          {
+            "id": "2",
+            "text": "Platform Engineer",
+            "descriptionPlain": "Grafana",
+            "hostedUrl": "https://jobs.example/2",
+            "categories": {
+              "location": "New York"
+            },
+            "createdAt": 1783641600000
+          }
+        ]
+      },
+      "output": [
+        {
+          "id": "2",
+          "title": "Platform Engineer",
+          "text": "Grafana",
+          "url": "https://jobs.example/2",
+          "location": "New York",
+          "updatedAt": "2026-07-10T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "ashby-normalization",
+      "module": "hiring",
+      "function": "normalizeJobs",
+      "input": {
+        "provider": "ashby",
+        "payload": {
+          "jobs": [
+            {
+              "id": "3",
+              "title": "Incident Manager",
+              "descriptionPlain": "PagerDuty",
+              "jobUrl": "https://jobs.example/3",
+              "isListed": true,
+              "publishedAt": "2026-07-09T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "output": [
+        {
+          "id": "3",
+          "title": "Incident Manager",
+          "text": "PagerDuty",
+          "url": "https://jobs.example/3",
+          "updatedAt": "2026-07-09T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "hiring-signals",
+      "module": "hiring",
+      "function": "jobSignals",
+      "input": {
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "crypto_fintech",
+          "icpSegment": "crypto_fintech",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Crypto / fintech exchanges & brokers",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase",
+              "MSCI"
+            ]
+          }
+        },
+        "provider": "greenhouse",
+        "jobs": [
+          {
+            "id": "1",
+            "title": "Founding Site Reliability Engineer",
+            "text": "Build on-call systems with Kubernetes and Datadog.",
+            "url": "https://jobs.example/1",
+            "updatedAt": "2026-07-11T00:00:00Z"
+          },
+          {
+            "id": "2",
+            "title": "Platform Engineer",
+            "text": "Own Kubernetes reliability and Grafana.",
+            "url": "https://jobs.example/2",
+            "updatedAt": "2026-07-10T00:00:00Z"
+          },
+          {
+            "id": "3",
+            "title": "Observability Engineer",
+            "text": "Operate OpenTelemetry and PagerDuty.",
+            "url": "https://jobs.example/3",
+            "updatedAt": "2026-07-09T00:00:00Z"
+          }
+        ],
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": {
+        "signals": [
+          {
+            "id": "sig_715f3eb946d1242b",
+            "key": "observabilityScale",
+            "score": 4,
+            "evidenceUrl": "https://jobs.example/1",
+            "evidenceText": "Founding Site Reliability Engineer. Named stack: Datadog, Kubernetes. Build on-call systems with Kubernetes and Datadog.",
+            "observedAt": "2026-07-11T00:00:00Z",
+            "sourceId": "greenhouse",
+            "inferred": false,
+            "metadata": {
+              "jobId": "1",
+              "senior": false,
+              "tools": [
+                "Datadog",
+                "Kubernetes"
+              ]
+            }
+          },
+          {
+            "id": "sig_4f91aaeb7cde4645",
+            "key": "techStack",
+            "score": 4,
+            "evidenceUrl": "https://jobs.example/1",
+            "evidenceText": "Job posting names Datadog, Kubernetes.",
+            "observedAt": "2026-07-11T00:00:00Z",
+            "sourceId": "greenhouse",
+            "inferred": false,
+            "metadata": {
+              "jobId": "1",
+              "tools": [
+                "Datadog",
+                "Kubernetes"
+              ]
+            }
+          },
+          {
+            "id": "sig_ab28ba05495a078d",
+            "key": "observabilityScale",
+            "score": 4,
+            "evidenceUrl": "https://jobs.example/2",
+            "evidenceText": "Platform Engineer. Named stack: Grafana, Kubernetes. Own Kubernetes reliability and Grafana.",
+            "observedAt": "2026-07-10T00:00:00Z",
+            "sourceId": "greenhouse",
+            "inferred": false,
+            "metadata": {
+              "jobId": "2",
+              "senior": false,
+              "tools": [
+                "Grafana",
+                "Kubernetes"
+              ]
+            }
+          },
+          {
+            "id": "sig_f30df6840341d8cf",
+            "key": "techStack",
+            "score": 4,
+            "evidenceUrl": "https://jobs.example/2",
+            "evidenceText": "Job posting names Grafana, Kubernetes.",
+            "observedAt": "2026-07-10T00:00:00Z",
+            "sourceId": "greenhouse",
+            "inferred": false,
+            "metadata": {
+              "jobId": "2",
+              "tools": [
+                "Grafana",
+                "Kubernetes"
+              ]
+            }
+          },
+          {
+            "id": "sig_dd50f278ab197084",
+            "key": "observabilityScale",
+            "score": 4,
+            "evidenceUrl": "https://jobs.example/3",
+            "evidenceText": "Observability Engineer. Named stack: PagerDuty, OpenTelemetry. Operate OpenTelemetry and PagerDuty.",
+            "observedAt": "2026-07-09T00:00:00Z",
+            "sourceId": "greenhouse",
+            "inferred": false,
+            "metadata": {
+              "jobId": "3",
+              "senior": false,
+              "tools": [
+                "PagerDuty",
+                "OpenTelemetry"
+              ]
+            }
+          },
+          {
+            "id": "sig_db9dbef7aae7fdbe",
+            "key": "techStack",
+            "score": 4,
+            "evidenceUrl": "https://jobs.example/3",
+            "evidenceText": "Job posting names PagerDuty, OpenTelemetry.",
+            "observedAt": "2026-07-09T00:00:00Z",
+            "sourceId": "greenhouse",
+            "inferred": false,
+            "metadata": {
+              "jobId": "3",
+              "tools": [
+                "PagerDuty",
+                "OpenTelemetry"
+              ]
+            }
+          }
+        ],
+        "events": [
+          {
+            "id": "evt_a6f0b6e964322c66",
+            "type": "reliability_hiring",
+            "title": "Founding Site Reliability Engineer",
+            "evidenceUrl": "https://jobs.example/1",
+            "evidenceText": "Founding Site Reliability Engineer. Named stack: Datadog, Kubernetes. Build on-call systems with Kubernetes and Datadog.",
+            "occurredAt": "2026-07-11T00:00:00Z",
+            "sourceId": "greenhouse",
+            "painThemes": [],
+            "metadata": {
+              "provider": "greenhouse",
+              "jobId": "1",
+              "jobTitle": "Founding Site Reliability Engineer",
+              "senior": false,
+              "tools": [
+                "Datadog",
+                "Kubernetes"
+              ],
+              "painThemes": [],
+              "painThemeMatches": []
+            }
+          },
+          {
+            "id": "evt_b5f5114eafa2c59e",
+            "type": "reliability_hiring",
+            "title": "Platform Engineer",
+            "evidenceUrl": "https://jobs.example/2",
+            "evidenceText": "Platform Engineer. Named stack: Grafana, Kubernetes. Own Kubernetes reliability and Grafana.",
+            "occurredAt": "2026-07-10T00:00:00Z",
+            "sourceId": "greenhouse",
+            "painThemes": [],
+            "metadata": {
+              "provider": "greenhouse",
+              "jobId": "2",
+              "jobTitle": "Platform Engineer",
+              "senior": false,
+              "tools": [
+                "Grafana",
+                "Kubernetes"
+              ],
+              "painThemes": [],
+              "painThemeMatches": []
+            }
+          },
+          {
+            "id": "evt_56e70bd9a3a07c76",
+            "type": "reliability_hiring",
+            "title": "Observability Engineer",
+            "evidenceUrl": "https://jobs.example/3",
+            "evidenceText": "Observability Engineer. Named stack: PagerDuty, OpenTelemetry. Operate OpenTelemetry and PagerDuty.",
+            "occurredAt": "2026-07-09T00:00:00Z",
+            "sourceId": "greenhouse",
+            "painThemes": [],
+            "metadata": {
+              "provider": "greenhouse",
+              "jobId": "3",
+              "jobTitle": "Observability Engineer",
+              "senior": false,
+              "tools": [
+                "PagerDuty",
+                "OpenTelemetry"
+              ],
+              "painThemes": [],
+              "painThemeMatches": []
+            }
+          }
+        ],
+        "quotebook": []
+      }
+    },
+    {
+      "id": "hiring-velocity",
+      "module": "hiring",
+      "function": "atsVelocityEvents",
+      "input": {
+        "target": {
+          "name": "Hiring Co",
+          "hiringHistory": []
+        },
+        "provider": "greenhouse",
+        "jobs": [
+          {
+            "id": "1",
+            "title": "Founding Site Reliability Engineer",
+            "text": "Build on-call systems with Kubernetes and Datadog.",
+            "url": "https://jobs.example/1",
+            "updatedAt": "2026-07-11T00:00:00Z"
+          },
+          {
+            "id": "2",
+            "title": "Platform Engineer",
+            "text": "Own Kubernetes reliability and Grafana.",
+            "url": "https://jobs.example/2",
+            "updatedAt": "2026-07-10T00:00:00Z"
+          },
+          {
+            "id": "3",
+            "title": "Observability Engineer",
+            "text": "Operate OpenTelemetry and PagerDuty.",
+            "url": "https://jobs.example/3",
+            "updatedAt": "2026-07-09T00:00:00Z"
+          }
+        ],
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": [
+        {
+          "id": "evt_af8764544ff7c4b5",
+          "type": "hiring_surge",
+          "title": "Hiring Co added 3 reliability/platform roles",
+          "evidenceUrl": "https://jobs.example/1",
+          "evidenceText": "Hiring Co has 3 newly observed SRE, platform, reliability, incident, performance, or observability openings inside 30 days.",
+          "occurredAt": "2026-07-11T00:00:00Z",
+          "sourceId": "greenhouse",
+          "painThemes": [],
+          "metadata": {
+            "provider": "greenhouse",
+            "newReqCount": 3,
+            "jobIds": [
+              "1",
+              "2",
+              "3"
+            ],
+            "evidenceUrls": [
+              "https://jobs.example/1",
+              "https://jobs.example/2",
+              "https://jobs.example/3"
+            ]
+          },
+          "triggerType": "hiring_surge",
+          "detectedAt": "2026-07-11T00:00:00Z",
+          "decaysAt": "2026-08-25T00:00:00.000Z",
+          "slaDays": 45,
+          "slaKey": "hiring_surge"
+        },
+        {
+          "id": "evt_cb2868eb69d7a40f",
+          "type": "first_infra_hire",
+          "title": "Hiring Co: Founding Site Reliability Engineer",
+          "evidenceUrl": "https://jobs.example/1",
+          "evidenceText": "Founding Site Reliability Engineer is an explicitly founding/first infrastructure role or a newly observed Head of infrastructure role on greenhouse.",
+          "occurredAt": "2026-07-11T00:00:00Z",
+          "sourceId": "greenhouse",
+          "painThemes": [],
+          "metadata": {
+            "provider": "greenhouse",
+            "jobId": "1",
+            "title": "Founding Site Reliability Engineer"
+          },
+          "triggerType": "first_infra_hire",
+          "detectedAt": "2026-07-11T00:00:00Z",
+          "decaysAt": "2026-08-25T00:00:00.000Z",
+          "slaDays": 45,
+          "slaKey": "first_infra_hire"
+        }
+      ]
+    },
+    {
+      "id": "statuspage-incident",
+      "module": "active-pain",
+      "function": "statuspageItems",
+      "input": {
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "crypto_fintech",
+          "icpSegment": "crypto_fintech",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Crypto / fintech exchanges & brokers",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase",
+              "MSCI"
+            ]
+          }
+        },
+        "incidents": [
+          {
+            "id": "inc_1",
+            "name": "API requests failing",
+            "impact": "major",
+            "status": "resolved",
+            "created_at": "2026-07-10T10:00:00.000Z",
+            "resolved_at": "2026-07-10T12:00:00.000Z",
+            "shortlink": "https://stspg.io/test",
+            "components": [
+              {
+                "name": "Trading API"
+              }
+            ],
+            "incident_updates": [
+              {
+                "body": "We identified elevated errors."
+              }
+            ]
+          }
+        ],
+        "apiUrl": "https://status.coinbase.com/api/v2/incidents.json",
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": {
+        "events": [
+          {
+            "id": "evt_9f07471df59a1469",
+            "type": "production_incident",
+            "title": "API requests failing",
+            "evidenceUrl": "https://stspg.io/test",
+            "evidenceText": "API requests failing Affected: Trading API. We identified elevated errors.",
+            "occurredAt": "2026-07-10T10:00:00.000Z",
+            "sourceId": "statuspage",
+            "painThemes": [],
+            "metadata": {
+              "incidentId": "inc_1",
+              "impact": "major",
+              "durationMinutes": 120,
+              "status": "resolved",
+              "painThemes": [],
+              "painThemeMatches": [],
+              "attribution": "internal",
+              "citable": true,
+              "citationStatus": "citable",
+              "notCitableReason": "",
+              "attributionVersion": "incident-attribution-v1"
+            },
+            "attribution": "internal",
+            "citable": true,
+            "citationStatus": "citable",
+            "notCitableReason": ""
+          }
+        ],
+        "signals": [
+          {
+            "id": "sig_28b72f187290b63e",
+            "key": "activePain",
+            "score": 5,
+            "evidenceUrl": "https://stspg.io/test",
+            "evidenceText": "API requests failing Affected: Trading API. We identified elevated errors.",
+            "observedAt": "2026-07-10T10:00:00.000Z",
+            "sourceId": "statuspage",
+            "inferred": false,
+            "confidence": 0.9,
+            "metadata": {
+              "incidentId": "inc_1",
+              "impact": "major",
+              "durationMinutes": 120,
+              "painThemes": [],
+              "attribution": "internal",
+              "citable": true,
+              "citationStatus": "citable",
+              "notCitableReason": ""
+            }
+          }
+        ],
+        "quotebook": []
+      }
+    },
+    {
+      "id": "google-news-rss",
+      "module": "active-pain",
+      "function": "googleNewsRssItems",
+      "input": {
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "crypto_fintech",
+          "icpSegment": "crypto_fintech",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Crypto / fintech exchanges & brokers",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase",
+              "MSCI"
+            ]
+          }
+        },
+        "xml": "<rss><channel><item><title><![CDATA[Coinbase API outage affected customers]]></title><link>https://news.google.com/rss/articles/coinbase-incident</link><pubDate>Fri, 11 Jul 2026 12:00:00 GMT</pubDate><description><![CDATA[The Coinbase trading platform was unavailable during a production service incident.]]></description></item></channel></rss>",
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": {
+        "events": [
+          {
+            "id": "evt_4cdd624b867ce9bd",
+            "type": "outage_news",
+            "title": "Coinbase API outage affected customers",
+            "evidenceUrl": "https://news.google.com/rss/articles/coinbase-incident",
+            "evidenceText": "Coinbase API outage affected customers The Coinbase trading platform was unavailable during a production service incident.",
+            "occurredAt": "Fri, 11 Jul 2026 12:00:00 GMT",
+            "sourceId": "google_news_rss",
+            "painThemes": [],
+            "metadata": {
+              "painThemes": [],
+              "painThemeMatches": [],
+              "attribution": "unknown",
+              "citable": false,
+              "citationStatus": "not_citable",
+              "notCitableReason": "The public receipt does not yet establish whether the incident was internal.",
+              "attributionVersion": "incident-attribution-v1"
+            },
+            "attribution": "unknown",
+            "citable": false,
+            "citationStatus": "not_citable",
+            "notCitableReason": "The public receipt does not yet establish whether the incident was internal."
+          }
+        ],
+        "signals": [
+          {
+            "id": "sig_35b91d16957e54bf",
+            "key": "activePain",
+            "score": 4,
+            "evidenceUrl": "https://news.google.com/rss/articles/coinbase-incident",
+            "evidenceText": "Coinbase API outage affected customers The Coinbase trading platform was unavailable during a production service incident.",
+            "observedAt": "Fri, 11 Jul 2026 12:00:00 GMT",
+            "sourceId": "google_news_rss",
+            "inferred": false,
+            "confidence": 0.6,
+            "metadata": {
+              "painThemes": [],
+              "attribution": "unknown",
+              "citable": false,
+              "citationStatus": "not_citable",
+              "notCitableReason": "The public receipt does not yet establish whether the incident was internal."
+            }
+          }
+        ],
+        "quotebook": []
+      }
+    },
+    {
+      "id": "serper-query-plan",
+      "module": "search-evidence",
+      "function": "serperQueries",
+      "input": {
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "crypto_fintech",
+          "icpSegment": "crypto_fintech",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Crypto / fintech exchanges & brokers",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase",
+              "MSCI"
+            ]
+          }
+        }
+      },
+      "output": [
+        {
+          "kind": "active_pain",
+          "query": "\"Coinbase\" outage OR incident OR downtime"
+        },
+        {
+          "kind": "tech_culture",
+          "query": "\"Coinbase\" Kubernetes OR microservices OR observability SRE"
+        },
+        {
+          "kind": "ai_compatibility",
+          "query": "\"Coinbase\" LLM OR Copilot OR Cursor engineering"
+        },
+        {
+          "kind": "exec_change",
+          "query": "\"Coinbase\" (appoints OR joins OR hires OR names OR leaves OR departs OR resigns OR \"steps down\") (\"VP Engineering\" OR CTO OR SVP OR \"Head of Platform\" OR \"Head of SRE\")"
+        }
+      ]
+    },
+    {
+      "id": "executive-appointment",
+      "module": "executive-change",
+      "function": "executiveNewsEvents",
+      "input": {
+        "target": {
+          "name": "Acme",
+          "domain": "acme.example"
+        },
+        "results": [
+          {
+            "title": "Acme appoints new CTO",
+            "snippet": "Acme named Jordan Doe chief technology officer.",
+            "url": "https://news.example/acme-cto",
+            "date": "2 days ago",
+            "sourceId": "serper"
+          }
+        ],
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": [
+        {
+          "id": "evt_107a715decdd3746",
+          "type": "exec_change",
+          "title": "Acme appoints new CTO",
+          "evidenceUrl": "https://news.example/acme-cto",
+          "evidenceText": "Acme appoints new CTO. Acme named Jordan Doe chief technology officer.",
+          "occurredAt": "2026-07-10T12:00:00.000Z",
+          "sourceId": "serper",
+          "painThemes": [],
+          "metadata": {
+            "role": "CTO",
+            "route": "news",
+            "eventDateReported": true
+          },
+          "triggerType": "exec_change",
+          "detectedAt": "2026-07-10T12:00:00.000Z",
+          "decaysAt": "2026-08-09T12:00:00.000Z",
+          "slaDays": 30,
+          "slaKey": "exec_change"
+        }
+      ]
+    },
+    {
+      "id": "executive-departure",
+      "module": "executive-change",
+      "function": "executiveDepartureEvents",
+      "input": {
+        "target": {
+          "name": "Acme",
+          "domain": "acme.example"
+        },
+        "results": [
+          {
+            "title": "Acme CTO steps down",
+            "snippet": "Acme's CTO Jordan Doe leaves after scaling the platform team.",
+            "url": "https://news.example/acme-cto-departs",
+            "date": "2 days ago",
+            "sourceId": "serper"
+          }
+        ],
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": [
+        {
+          "id": "evt_6a5ef8548aa22abc",
+          "type": "executive_departure",
+          "title": "Acme CTO steps down",
+          "evidenceUrl": "https://news.example/acme-cto-departs",
+          "evidenceText": "Acme CTO steps down. Acme's CTO Jordan Doe leaves after scaling the platform team.",
+          "occurredAt": "2026-07-10T12:00:00.000Z",
+          "sourceId": "serper",
+          "painThemes": [],
+          "metadata": {
+            "role": "CTO",
+            "route": "news",
+            "action": "departure",
+            "eventDateReported": true,
+            "followUp": "find_successor"
+          },
+          "triggerType": "executive_departure",
+          "detectedAt": "2026-07-10T12:00:00.000Z",
+          "decaysAt": "2026-10-08T12:00:00.000Z",
+          "slaDays": 90,
+          "slaKey": "default"
+        }
+      ]
+    },
+    {
+      "id": "edgar-daily-index",
+      "module": "edgar",
+      "function": "parseDailyIndex",
+      "input": {
+        "text": "D                Acme Systems Inc.                                             1234567     20260711    edgar/data/1234567/0001234567-26-000001.txt"
+      },
+      "output": [
+        {
+          "form": "D",
+          "companyName": "Acme Systems Inc.",
+          "cik": "1234567",
+          "filedAt": "2026-07-11",
+          "evidenceUrl": "https://www.sec.gov/Archives/edgar/data/1234567/0001234567-26-000001.txt",
+          "textUrl": "https://www.sec.gov/Archives/edgar/data/1234567/0001234567-26-000001.txt",
+          "source": "edgar_daily_index"
+        }
+      ]
+    },
+    {
+      "id": "edgar-filing-details",
+      "module": "edgar",
+      "function": "parseFilingDetails",
+      "input": {
+        "text": "<edgarSubmission><entityName>Acme Systems Inc.</entityName><isNew>true</isNew><isEquityType>true</isEquityType><totalOfferingAmount>12000000</totalOfferingAmount><totalAmountSold>8250000</totalAmountSold><dateOfFirstSale><value>2026-07-01</value></dateOfFirstSale><relatedPersonInfo><firstName>Ada</firstName><lastName>Lovelace</lastName></relatedPersonInfo></edgarSubmission>"
+      },
+      "output": {
+        "issuerName": "Acme Systems Inc.",
+        "amountRaised": 8250000,
+        "offeringAmount": 12000000,
+        "roundType": "New Equity",
+        "executiveNames": [
+          "Ada Lovelace"
+        ],
+        "firstSaleAt": "2026-07-01",
+        "securityTypes": [
+          "Equity"
+        ]
+      }
+    },
+    {
+      "id": "edgar-form-d-event",
+      "module": "edgar",
+      "function": "formDEvent",
+      "input": {
+        "filing": {
+          "form": "D",
+          "companyName": "Acme Systems Inc.",
+          "cik": "1234567",
+          "filedAt": "2026-07-11",
+          "evidenceUrl": "https://www.sec.gov/Archives/edgar/data/1234567/0001234567-26-000001.txt",
+          "textUrl": "https://www.sec.gov/Archives/edgar/data/1234567/0001234567-26-000001.txt",
+          "source": "edgar_daily_index"
+        },
+        "details": {
+          "issuerName": "Acme Systems Inc.",
+          "amountRaised": 8250000,
+          "offeringAmount": 12000000,
+          "roundType": "New Equity",
+          "executiveNames": [
+            "Ada Lovelace"
+          ],
+          "firstSaleAt": "2026-07-01",
+          "securityTypes": [
+            "Equity"
+          ]
+        }
+      },
+      "output": {
+        "id": "evt_9b745761dfd91936",
+        "type": "form_d_filing",
+        "triggerType": "form_d_filing",
+        "title": "Acme Systems Inc. Form D filing",
+        "evidenceUrl": "https://www.sec.gov/Archives/edgar/data/1234567/0001234567-26-000001.txt",
+        "evidenceText": "Acme Systems Inc. filed SEC Form D on 2026-07-11. Amount sold: $8,250,000. Offering: New Equity. Related executives: Ada Lovelace.",
+        "occurredAt": "2026-07-11T00:00:00.000Z",
+        "detectedAt": "2026-07-11T00:00:00.000Z",
+        "sourceId": "sec_edgar",
+        "sourceName": "SEC EDGAR",
+        "metadata": {
+          "form": "D",
+          "cik": "1234567",
+          "issuerName": "Acme Systems Inc.",
+          "amountRaised": 8250000,
+          "offeringAmount": 12000000,
+          "roundType": "New Equity",
+          "executiveNames": [
+            "Ada Lovelace"
+          ],
+          "firstSaleAt": "2026-07-01"
+        },
+        "decaysAt": "2026-07-25T00:00:00.000Z",
+        "slaDays": 14,
+        "slaKey": "form_d_filing"
+      }
+    },
+    {
+      "id": "tech-culture",
+      "module": "tech-culture",
+      "function": "analyzeDocuments",
+      "input": {
+        "documents": [
+          {
+            "title": "Evolving Distributed Tracing at Uber Engineering",
+            "text": "Uber built Jaeger, an open source distributed tracing system, for thousands of microservices and its Observability team.",
+            "url": "https://www.uber.com/us/en/blog/distributed-tracing/"
+          },
+          {
+            "title": "Observability's Agentic Moment",
+            "text": "Databricks is reinventing operational observability for the agentic era with Genie Code, delivering instant root-cause analysis for new error patterns.",
+            "url": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code"
+          }
+        ],
+        "now": "2026-07-12T12:00:00.000Z"
+      },
+      "output": {
+        "signals": [
+          {
+            "id": "sig_0f5197e0e930534a",
+            "key": "techStack",
+            "score": 3,
+            "evidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+            "evidenceText": "Evolving Distributed Tracing at Uber Engineering. Production stack evidence: microservices.",
+            "observedAt": "2026-10-20T22:58:15.176Z",
+            "sourceId": "engineering_web",
+            "inferred": false,
+            "metadata": {
+              "terms": [
+                "microservices"
+              ]
+            }
+          },
+          {
+            "id": "sig_a3f7992a1d4f0a7d",
+            "key": "observabilityScale",
+            "score": 5,
+            "evidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+            "evidenceText": "Evolving Distributed Tracing at Uber Engineering. Reliability practice evidence: observability, tracing, Jaeger.",
+            "observedAt": "2026-10-20T22:58:15.176Z",
+            "sourceId": "engineering_web",
+            "inferred": false,
+            "metadata": {
+              "terms": [
+                "observability",
+                "tracing",
+                "Jaeger"
+              ]
+            }
+          },
+          {
+            "id": "sig_2be277de619763c1",
+            "key": "observabilityScale",
+            "score": 3,
+            "evidenceUrl": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code",
+            "evidenceText": "Observability's Agentic Moment. Reliability practice evidence: observability.",
+            "observedAt": "2026-10-20T22:58:15.176Z",
+            "sourceId": "engineering_web",
+            "inferred": false,
+            "metadata": {
+              "terms": [
+                "observability"
+              ]
+            }
+          }
+        ],
+        "events": [],
+        "killHints": [
+          {
+            "code": "KILL_BUILD_CULTURE",
+            "evidenceUrl": "https://www.uber.com/us/en/blog/distributed-tracing/",
+            "evidenceText": "Evolving Distributed Tracing at Uber Engineering. Uber built Jaeger, an open source distributed tracing system, for thousands of microservices and its Observability team.",
+            "sourceId": "engineering_web"
+          },
+          {
+            "code": "KILL_SOLVING_IN_HOUSE",
+            "evidenceUrl": "https://www.databricks.com/dataaisummit/session/observabilitys-agentic-moment-operating-ai-production-genie-code",
+            "evidenceText": "Observability's Agentic Moment. Databricks is reinventing operational observability for the agentic era with Genie Code, delivering instant root-cause analysis for new error patterns.",
+            "sourceId": "engineering_web"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai-compatibility",
+      "module": "ai-compatibility",
+      "function": "analyzeAiEvidence",
+      "input": {
+        "documents": [
+          {
+            "title": "Accelerating Large-Scale Test Migration with LLMs",
+            "text": "Airbnb used LLMs and AI-assisted development for code generation across nearly 3.5K React test files.",
+            "url": "https://airbnb.tech/infrastructure/accelerating-large-scale-test-migration-with-llms/"
+          }
+        ]
+      },
+      "output": [
+        {
+          "id": "sig_1f2811d0b7b84dfa",
+          "key": "aiCompatibility",
+          "score": 5,
+          "evidenceUrl": "https://airbnb.tech/infrastructure/accelerating-large-scale-test-migration-with-llms/",
+          "evidenceText": "Accelerating Large-Scale Test Migration with LLMs. AI engineering signals: LLM, code generation, AI-assisted development.",
+          "observedAt": "2026-10-20T22:58:15.177Z",
+          "sourceId": "public_search",
+          "inferred": false,
+          "metadata": {
+            "terms": [
+              "LLM",
+              "code generation",
+              "AI-assisted development"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "competitive-wedge",
+      "module": "competitive-wedge",
+      "function": "combined",
+      "input": {
+        "html": "<main>Coinbase DoorDash Snowflake Salesforce</main>",
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "crypto_fintech",
+          "icpSegment": "crypto_fintech",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Crypto / fintech exchanges & brokers",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase",
+              "MSCI"
+            ]
+          }
+        },
+        "observedAt": "2026-07-12T12:00:00.000Z"
+      },
+      "output": {
+        "verified": [
+          "Coinbase",
+          "DoorDash",
+          "Salesforce",
+          "Snowflake"
+        ],
+        "diff": {
+          "added": [
+            "DoorDash",
+            "Salesforce",
+            "Snowflake"
+          ],
+          "removed": [
+            "Toast"
+          ]
+        },
+        "signal": {
+          "id": "sig_3e9241df6472604e",
+          "key": "competitiveWedge",
+          "score": 5,
+          "evidenceUrl": "https://resolve.ai/customers",
+          "evidenceText": "Coinbase is verified on Resolve's customer page. Nearest relationship for Coinbase: direct rival or category peer.",
+          "observedAt": "2026-07-12T12:00:00.000Z",
+          "sourceId": "resolve_customers",
+          "inferred": false,
+          "metadata": {
+            "wedgeCustomers": [
+              "Coinbase"
+            ],
+            "relationship": "direct rival or category peer"
+          }
+        }
+      }
+    },
+    {
+      "id": "revenue-sensitivity-inferred",
+      "module": "revenue-sensitivity",
+      "function": "classifyRevenueSensitivity",
+      "input": {
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "Coinbase",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "crypto_fintech",
+          "icpSegment": "crypto_fintech",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Crypto / fintech exchanges & brokers",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase",
+              "MSCI"
+            ]
+          }
+        },
+        "context": {
+          "now": "2026-07-12T12:00:00.000Z"
+        }
+      },
+      "output": {
+        "id": "sig_99dec7e313b28cb3",
+        "key": "revenueSensitivity",
+        "score": 5,
+        "evidenceUrl": "",
+        "evidenceText": "Crypto / fintech exchanges & brokers base score. No unverified seasonal boost applied. Crypto / fintech exchanges & brokers has time-bound transactions that can disappear or move to a competitor when production fails.",
+        "observedAt": "2026-07-12T12:00:00.000Z",
+        "sourceId": "segment_model",
+        "inferred": true,
+        "metadata": {
+          "baseScore": 5,
+          "seasonalBoost": 0,
+          "transactionalUrgency": "transaction_gone",
+          "transactionalUrgencyReason": "Crypto / fintech exchanges & brokers has time-bound transactions that can disappear or move to a competitor when production fails.",
+          "transactionalUrgencySource": "segment_model"
+        }
+      }
+    },
+    {
+      "id": "revenue-sensitivity-receipted",
+      "module": "revenue-sensitivity",
+      "function": "classifyRevenueSensitivity",
+      "input": {
+        "target": {
+          "id": "acct_coinbase",
+          "accountId": "acct_coinbase",
+          "name": "DraftKings",
+          "domain": "coinbase.com",
+          "website": "https://coinbase.com",
+          "segment": "sports_betting",
+          "icpSegment": "sports_betting",
+          "statusPageUrl": "https://status.coinbase.com",
+          "ats": {
+            "provider": "greenhouse",
+            "slug": "coinbase"
+          },
+          "monitoringEnabled": true,
+          "resolveSegmentConfig": {
+            "label": "Sports betting / iGaming",
+            "revenueSensitivityBase": 5,
+            "wedgeCustomers": [
+              "Coinbase"
+            ]
+          }
+        },
+        "context": {
+          "now": "2026-07-12T12:00:00.000Z",
+          "eventCalendar": [
+            {
+              "title": "2026 NFL schedule released",
+              "text": "Public event calendar for the upcoming season.",
+              "date": "2026-07-10T00:00:00Z",
+              "url": "https://www.nfl.com/nfl-schedule-release/"
+            }
+          ]
+        }
+      },
+      "output": {
+        "id": "sig_75bed76b20d46090",
+        "key": "revenueSensitivity",
+        "score": 5,
+        "evidenceUrl": "https://www.nfl.com/nfl-schedule-release/",
+        "evidenceText": "2026 NFL schedule released. Public event calendar for the upcoming season. Sports betting / iGaming has time-bound transactions that can disappear or move to a competitor when production fails.",
+        "observedAt": "2026-07-10T00:00:00Z",
+        "sourceId": "event_calendar",
+        "inferred": false,
+        "metadata": {
+          "baseScore": 5,
+          "eventBoost": 1,
+          "transactionalUrgency": "transaction_gone",
+          "transactionalUrgencyReason": "Sports betting / iGaming has time-bound transactions that can disappear or move to a competitor when production fails.",
+          "transactionalUrgencySource": "segment_model"
+        }
+      }
+    }
+  ]
+}

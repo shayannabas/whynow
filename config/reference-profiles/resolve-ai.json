@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v2-phase-a",
+  "referenceProfileVersion": "resolve-ai-v3-phase-b",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -48,6 +48,9 @@
       {"target":"icpConfig.tierRules","sourceFile":"scripts/tiering.cjs","sourceLines":"3-8","note":"Tier thresholds moved out of runtime code."},
       {"target":"icpConfig.decisionRules","sourceFile":"scripts/decisioning.cjs","sourceLines":"6-11,25-70","note":"Tier weights, normalization ceiling and Theme B multiplier moved out of runtime code."},
       {"target":"icpConfig.entityRules","sourceFile":"scripts/entity-rules.cjs","sourceLines":"5-7","note":"Uber parent/alias identity rule moved out of runtime code."}
+      ,{"target":"icpConfig.collectorRules.transactionalUrgency","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"189-194","note":"Segment transaction-loss rules and public keyword cues moved out of runtime code."}
+      ,{"target":"icpConfig.collectorRules.edgarSegmentQueries","sourceFile":"scripts/collectors/edgar.cjs","sourceLines":"10-21","note":"Resolve Form D segment query expressions moved out of the collector."}
+      ,{"target":"icpConfig.slaDays","sourceFile":"scripts/stage3-signals.cjs","sourceLines":"5-22","note":"Collector trigger decay windows moved out of runtime code."}
     ],
     "whyNowExtensions": [
       {"target":"icpConfig.killRules.whyNowExtension","note":"WhyNow additionally excludes the seller and configured competitors. This does not alter SignalScout's five-code precedence fixture."}
@@ -303,6 +306,28 @@
       "tierWeights": {"1": 3, "2": 2, "3": 1, "parked": 0},
       "maxPriorityRaw": 9.375,
       "themeBBoost": {"enabled": true, "multiplier": 1.08}
+    },
+    "collectorRules": {
+      "customerSourceId": "resolve_customers",
+      "customerSourceUrl": "https://resolve.ai/customers",
+      "transactionalUrgency": {
+        "transactionGoneSegments": ["sports_betting", "ticketing_live_events", "delivery_marketplaces", "travel_hospitality", "crypto_fintech"],
+        "customerReturnsSegments": ["restaurant_commerce_saas"],
+        "transactionGoneKeywords": ["betting", "wager", "ticket", "auction", "delivery", "ride hail", "booking", "travel", "trading", "payment"],
+        "customerReturnsKeywords": ["retail", "resale", "gig", "gaming", "commerce"]
+      },
+      "edgarSegmentQueries": {
+        "crypto_fintech": "(\"Other Banking and Financial Services\" OR \"Commercial Banking\") AND (crypto OR fintech OR exchange OR broker OR custody OR payments OR neobank)",
+        "delivery_marketplaces": "(\"Other Technology\" OR Restaurants) AND (delivery OR grocery OR logistics OR marketplace OR restaurant)",
+        "ticketing_live_events": "\"Other Technology\" AND (ticketing OR tickets OR venue)",
+        "sports_betting": "\"Casinos & Gaming\" AND (sportsbook OR betting OR casino OR gaming)",
+        "data_ai_infrastructure": "\"Other Technology\" AND (database OR platform OR AI OR observability OR developer)",
+        "cybersecurity": "\"Other Technology\" AND (cybersecurity OR cyber OR security OR identity OR endpoint)",
+        "travel_hospitality": "(\"Other Travel\" OR \"Other Technology\") AND (travel OR hotel OR booking OR hospitality OR property)",
+        "restaurant_commerce_saas": "\"Other Technology\" AND (restaurant OR ordering OR merchant OR commerce OR POS)",
+        "insurance_vertical_saas": "\"Other Banking and Financial Services\" AND (insurtech OR claims OR carrier)",
+        "enterprise_platforms": "\"Other Technology\" AND (CRM OR workflow OR collaboration OR marketing OR enterprise)"
+      }
     },
     "exclusions": {
       "sellerLabel": "Resolve",

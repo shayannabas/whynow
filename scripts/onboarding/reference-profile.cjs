@@ -23,7 +23,7 @@ function publicHttps(value) {
   }
 }
 function validateReferenceProfile(value) {
-  if (!plainObject(value) || value.schemaVersion !== 1 || value.referenceProfileVersion !== 'resolve-ai-v2-phase-a' || value.id !== 'resolve-ai' || value.kind !== 'load_only_reference' || value.loadOnly !== true) throw new Error('Invalid Resolve reference profile header.');
+  if (!plainObject(value) || value.schemaVersion !== 1 || value.referenceProfileVersion !== 'resolve-ai-v3-phase-b' || value.id !== 'resolve-ai' || value.kind !== 'load_only_reference' || value.loadOnly !== true) throw new Error('Invalid Resolve reference profile header.');
   if (FORBIDDEN_RUNTIME_KEYS.some(key => Object.hasOwn(value,key))) throw new Error('Reference profiles cannot contain runtime workspace state.');
   if (!plainObject(value.seller) || value.seller.name !== 'Resolve AI' || value.seller.domain !== 'resolve.ai' || value.seller.website !== 'https://resolve.ai') throw new Error('Invalid Resolve reference identity.');
   const provenance=value.provenance;
@@ -41,6 +41,8 @@ function validateReferenceProfile(value) {
   if (!plainObject(config.signalDefinitions) || SIGNAL_KEYS.some(key=>!plainObject(config.signalDefinitions[key]) || typeof config.signalDefinitions[key].label !== 'string')) throw new Error('Invalid Resolve reference signals.');
   if (!plainObject(config.weights) || SIGNAL_KEYS.some(key=>!Number.isFinite(config.weights[key]) || config.weights[key] <= 0)) throw new Error('Invalid Resolve reference weights.');
   if (!plainObject(config.slaDays) || Object.values(config.slaDays).some(days=>!Number.isInteger(days) || days < 1)) throw new Error('Invalid Resolve reference SLAs.');
+  const collectorRules=config.collectorRules;
+  if (!plainObject(collectorRules) || !publicHttps(collectorRules.customerSourceUrl) || typeof collectorRules.customerSourceId!=='string' || !collectorRules.customerSourceId || !plainObject(collectorRules.transactionalUrgency) || !nonEmptyStrings(collectorRules.transactionalUrgency.transactionGoneSegments) || !nonEmptyStrings(collectorRules.transactionalUrgency.customerReturnsSegments) || !nonEmptyStrings(collectorRules.transactionalUrgency.transactionGoneKeywords) || !nonEmptyStrings(collectorRules.transactionalUrgency.customerReturnsKeywords) || !plainObject(collectorRules.edgarSegmentQueries) || !segmentKeys.every(key=>typeof collectorRules.edgarSegmentQueries[key]==='string'&&collectorRules.edgarSegmentQueries[key].trim())) throw new Error('Invalid Resolve reference collector rules.');
   if (!plainObject(config.tierRules) || !plainObject(config.triggerMapping) || !plainObject(config.killPatterns) || !nonEmptyStrings(config.killPatterns.solvingInHousePatterns) || !nonEmptyStrings(config.killPatterns.buildCulturePatterns) || !plainObject(config.scoring) || config.scoring.liveTriggerDays!==90 || !plainObject(config.decisionRules) || !Array.isArray(config.killRules?.precedence) || !Array.isArray(config.entityRules) || !plainObject(config.exclusions) || !nonEmptyStrings(config.exclusions.existingCustomers) || !publicHttps(config.exclusions.customerSourceUrl)) throw new Error('Invalid Resolve reference rules.');
   return true;
 }
