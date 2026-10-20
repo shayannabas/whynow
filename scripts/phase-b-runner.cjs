@@ -54,6 +54,7 @@ function findRun(workspace,id){return workspace.runs.find(row=>row.id===id&&row.
 
 function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),now=()=>new Date(),id=()=>randomUUID(),collectors=defaultCollectors,searchProvider=(query,options)=>options.kind==='active_pain_news'?searchNews(query,options):search(query,options)}={}){
   const pending=new Map();
+  let ignoreSavedRuntimeOnce=env.PHASE_B_RESET_RUNTIME_BUDGETS==='true';
   const updateRun=async(workspaceId,runId,fn)=>mutate(state=>{const workspace=state.workspaces[workspaceId],run=findRun(workspace,runId);if(!run)throw new Error('Collector run disappeared.');fn(run,workspace);return state;});
   const persistRuntime=(workspace,runtime)=>{workspace.budgets.phaseBCollector={day:now().toISOString().slice(0,10),...runtime.snapshot()};};
   const reserveSerper=async(workspaceId,runId,limit)=>updateRun(workspaceId,runId,(run,workspace)=>{
@@ -71,7 +72,7 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
     await updateRun(workspaceId,runId,run=>{run.status='running';});
     const state=read(),workspace=state.workspaces[workspaceId],account=workspace?.accounts.find(row=>row.id===accountId),collectorConfig=collectorConfigForWorkspace(workspace),target=collectorTargetForAccount(account,collectorConfig),runtime=runtimeFactory({env});
     runtime.identity();
-    const day=now().toISOString().slice(0,10),saved=workspace.budgets.phaseBCollector;if(saved?.day===day){runtime.usage={...runtime.usage,...structuredClone(saved.usage||{})};runtime.health=structuredClone(saved.health||{});}
+    const day=now().toISOString().slice(0,10),saved=workspace.budgets.phaseBCollector;if(saved?.day===day&&!ignoreSavedRuntimeOnce){runtime.usage={...runtime.usage,...structuredClone(saved.usage||{})};runtime.health=structuredClone(saved.health||{});}ignoreSavedRuntimeOnce=false;
     let searchResults=[];
     const settings=serperSettings(env);
     if(settings.enabled){

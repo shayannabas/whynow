@@ -25,6 +25,7 @@ async function main(){
   const email=String(process.env.CRAWLER_CONTACT_EMAIL||'');if(!/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(email))throw new Error('Set CRAWLER_CONTACT_EMAIL before live collector verification.');
   assertSerperReady(serperSettings(process.env));
   process.env.PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT='5';
+  process.env.PHASE_B_RESET_RUNTIME_BUDGETS='true';
   process.env.EDGAR_ENABLED='true';
   const stateFile=statePath(process.env),cacheDir=path.join(path.dirname(stateFile),'collector-cache');
   let writes=Promise.resolve(),read=()=>loadState(stateFile),mutate=fn=>{const work=writes.then(()=>{const next=fn(read());saveState(next,stateFile);return next;});writes=work.catch(()=>{});return work;};
