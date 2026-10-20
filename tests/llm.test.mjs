@@ -69,7 +69,10 @@ it('bounds retries, handles refusal/incomplete/invalid output, never logs provid
     await expect(h.run()).rejects.toThrow();expect(h.read().workspaces[h.id].llmCache).toBeUndefined();
   }
   const error=harness({fetchImpl:async()=>new Response(JSON.stringify({error:{message:env.OPENAI_API_KEY}}),{status:401})});
-  await expect(error.run()).rejects.not.toThrow(env.OPENAI_API_KEY);
+  const failure=await error.run().catch(item=>item);
+  expect(failure).toMatchObject({code:'REQUEST_FAILED',httpStatus:401});
+  expect(failure.message).toContain('HTTP 401');
+  expect(failure.message).not.toContain(env.OPENAI_API_KEY);
 });
 it('rejects oversized inputs, invalid schemas/validators and archived workspace requests',async()=>{
   const h=harness({fetchImpl:()=>{throw Error('Must not call');}});

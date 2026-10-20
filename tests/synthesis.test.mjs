@@ -5,7 +5,7 @@ const {defaultState,createWorkspace,updateWorkspace}=require('../scripts/server/
 const {recordSource}=require('../scripts/sources.cjs');
 const {createLlm}=require('../scripts/llm.cjs');
 const {WEIGHTS,SLAS}=require('../scripts/onboarding/manual-profile.cjs');
-const {PROMPT_VERSION,SYNTHESIS_SCHEMA,buildEvidencePacket,buildSynthesisRequest,generateSynthesis}=require('../scripts/onboarding/synthesize.cjs');
+const {PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisRequest,generateSynthesis}=require('../scripts/onboarding/synthesize.cjs');
 const {SIGNAL_KEYS,MAX_EVIDENCE_PACKET_BYTES,assertSynthesisOutput,materializeGeneratedDraft,receiptIdFor,saveGeneratedProfile}=require('../scripts/onboarding/validate.cjs');
 
 const NOW='2026-09-17T12:00:00.000Z';
@@ -37,6 +37,18 @@ function output(sourceId) {
     objectionTemplates:['Ask a clarifying question.','Use a verified proof point.','Offer a small next step.']
   }};
 }
+function useRunLocalReceiptIds(value,receiptIdMap) {
+  const result=structuredClone(value),shortByStable=new Map([...receiptIdMap].map(([shortId,stableId])=>[stableId,shortId]));
+  function visit(node) {
+    if(Array.isArray(node)){node.forEach(visit);return;}
+    if(!node||typeof node!=='object')return;
+    for(const [key,item] of Object.entries(node)) {
+      if(key==='receiptId'&&item)node[key]=shortByStable.get(item)||item;
+      else visit(item);
+    }
+  }
+  visit(result);return result;
+}
 function fixture() {
   let state=createWorkspace(defaultState(),{name:'Fixture Seller'});const id=state.activeWorkspaceId;
   let saved=recordSource(state,{url:'https://example.org/product',title:'Product',text:SELLER_TEXT,fetchedAt:NOW});state=saved.state;const sellerSourceId=saved.source.id;
@@ -57,13 +69,28 @@ it('builds a stable bounded packet from only this workspace research source set'
   const built=buildSynthesisRequest(f.state,f.id),user=JSON.parse(built.request.messages[1].content);
   expect(built.request).toMatchObject({workspaceId:f.id,promptVersion:PROMPT_VERSION,name:'whynow_seller_profile',maxOutputTokens:4096});
   expect(built.request.schema).not.toBe(SYNTHESIS_SCHEMA);
-  expect(built.request.schema.$defs.receiptId.enum).toEqual(['',...packet.receiptIds]);
-  expect(built.request.schema.$defs.requiredReceiptId.enum).toEqual(packet.receiptIds);
+  expect(built.request.schema.$defs.receiptId.enum).toEqual(packet.receiptIds);
+  expect(built.request.schema.$defs.requiredReceiptId).toBeUndefined();
+  expect(packet.receiptIds.every(id=>/^R\d{3}$/.test(id))).toBe(true);
+  expect([...packet.receiptIdMap.values()].every(id=>/^r_[a-f0-9]{24}$/.test(id))).toBe(true);
   expect(user.evidence.sources.every(source=>source.receipts.every(receipt=>receipt.text.length<=200))).toBe(true);
   expect(user.company).toEqual({name:'Fixture Seller',domain:'example.org'});
   expect(built.guard).toMatchObject({expectedResearchRevision:4,expectedRunId:'research-run-1',expectedProfileRevision:0,expectedSourceSetHash:packet.sourceSetHash});
   const reversed=structuredClone(f.state);reversed.workspaces[f.id].research.sources.reverse();
   expect(buildEvidencePacket(reversed,reversed.workspaces[f.id]).serialized).toBe(packet.serialized);
+});
+
+it('caps future oversized receipt menus in source priority order',()=>{
+  const receipt=(index)=>({receiptId:`stable-${index}`,text:`Receipt ${index}`});
+  const evidence={schemaVersion:1,sourceIds:['priority','generic'],receiptIds:[],receiptMap:new Map(),sources:[
+    {sourceId:'priority',receipts:Array.from({length:MAX_SCHEMA_RECEIPTS},(_,index)=>receipt(index))},
+    {sourceId:'generic',receipts:[receipt(MAX_SCHEMA_RECEIPTS)]}
+  ]};
+  const packet=remapReceiptEvidence(evidence);
+  expect(packet.receiptIds).toHaveLength(MAX_SCHEMA_RECEIPTS);
+  expect(packet.sources[0].receipts).toHaveLength(MAX_SCHEMA_RECEIPTS);
+  expect(packet.sources[1].receipts).toEqual([]);
+  expect(packet.receiptIdMap.get('R900')).toBe('stable-899');
 });
 
 it('enforces the strict generated schema and semantic cardinality',()=>{
@@ -141,15 +168,17 @@ it('rejects stale, archived and approved workspaces before generated output can 
 });
 
 it('uses an injected LLM interface and performs no network access in synthesis tests',async()=>{
-  const f=fixture(),raw=output(f.sellerSourceId);let calls=0,seen;
-  const result=await generateSynthesis({state:f.state,workspaceId:f.id,llm:{generate:async request=>{calls++;seen=request;return {value:raw,cached:false,model:'fixture-model'};}}});
-  expect(calls).toBe(1);expect(seen.validate(raw)).toBe(true);expect(seen.messages[0].content).toContain('only the EVIDENCE');
+  const f=fixture(),raw=output(f.sellerSourceId),built=buildSynthesisRequest(f.state,f.id),runLocal=useRunLocalReceiptIds(raw,built.receiptIdMap);let calls=0,seen;
+  const result=await generateSynthesis({state:f.state,workspaceId:f.id,llm:{generate:async request=>{calls++;seen=request;expect(request.validate(runLocal)).toBe(true);return {value:runLocal,cached:false,model:'fixture-model'};}}});
+  expect(calls).toBe(1);expect(seen.messages[0].content).toContain('only the EVIDENCE');
   expect(seen.messages[0].content).toContain('at least 90%');
   expect(seen.messages[0].content).toContain('Keep those arrays empty unless');
   expect(seen.messages[0].content).toContain('partner, marketplace, template or solution-partner');
   expect(seen.messages[0].content).toContain('prospective buyer companies');
   expect(seen.messages[0].content).toContain('Kill patterns must describe companies that will not buy');
   expect(result).toMatchObject({output:raw,cached:false,model:'fixture-model',promptVersion:PROMPT_VERSION,guard:{expectedResearchRevision:4}});
+  const invalid=structuredClone(runLocal);invalid.sellerProfile.category.receiptId='R999';
+  expect(()=>seen.validate(invalid)).toThrow('outside this request');
 });
 
 it('keeps OpenAI disabled when a key exists but the explicit enable switch is off',async()=>{

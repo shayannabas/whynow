@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-19",
+  "source": "Derived offline from the saved final-run pages; the run-local IDs are deterministic from each real receipt count.",
+  "packets": [
+    {
+      "seller": "Resolve AI",
+      "receiptCount": 548,
+      "packetBytes": 107768,
+      "packetSha256": "006f5e2c50977f24b5510c898cb293de9a77fec35886d99bc257beffe0aee51c",
+      "sourceSetHash": "85717f9a8643ac4d15c3bfe09156e905916eb52d96f70e11294f6908c6b229db",
+      "expectedSchemaMetrics": {"enumValues":548,"enumStringLength":2192,"largestEnumValues":548,"largestEnumStringLength":2192,"objectProperties":132,"nestingLevels":7,"schemaStringLength":3443}
+    },
+    {
+      "seller": "Shopify",
+      "receiptCount": 605,
+      "packetBytes": 106542,
+      "packetSha256": "22d0b24801c16164f5d4ac0f0e422cd5487798bc43a36cc21ce7eb3389629aea",
+      "sourceSetHash": "2e4cb8074ec378aec52c3d974ce0f4a5092449a607d560405955f16ea9ce9152",
+      "expectedSchemaMetrics": {"enumValues":605,"enumStringLength":2420,"largestEnumValues":605,"largestEnumStringLength":2420,"objectProperties":132,"nestingLevels":7,"schemaStringLength":3671}
+    },
+    {
+      "seller": "Vercel",
+      "receiptCount": 489,
+      "packetBytes": 82402,
+      "packetSha256": "e28ba68a538bf1e007fdb7eefa40727df213d824b0a530d5318fe6f8072f3061",
+      "sourceSetHash": "d1b6f9e19e3ae555ca50c50700d91aef6e5055735f246747101c640e99d1f4c6",
+      "expectedSchemaMetrics": {"enumValues":489,"enumStringLength":1956,"largestEnumValues":489,"largestEnumStringLength":1956,"objectProperties":132,"nestingLevels":7,"schemaStringLength":3207}
+    }
+  ]
+}

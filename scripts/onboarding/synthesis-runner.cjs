@@ -14,13 +14,14 @@ function safeSynthesisError(error) {
     'RESEARCH_NOT_READY','NO_SOURCES','STALE_RESEARCH','ARCHIVED','ACTIVE_PROFILE','WORKSPACE_CHANGED'
   ]);
   const code=allowed.has(error?.code)?error.code:'SYNTHESIS_FAILED';
+  const httpStatus=code==='REQUEST_FAILED'&&Number.isInteger(error?.httpStatus)?error.httpStatus:null;
   const messages={
     DISABLED:'OpenAI drafting is disabled. No paid request was made.',
     KEY_MISSING:'Add your own OpenAI key privately before enabling drafting.',
     BUDGET_MISSING:'Set approved OpenAI spending and request limits before enabling drafting.',
     BUDGET_EXHAUSTED:'The approved OpenAI limit has been reached. No extra request was made.',
     MODEL_UNSUPPORTED:'The configured OpenAI model is not approved for this workflow.',
-    REQUEST_FAILED:'The OpenAI request failed or timed out. No profile was approved.',
+    REQUEST_FAILED:httpStatus?`The OpenAI request failed (HTTP ${httpStatus}). No profile was approved.`:'The OpenAI request failed or timed out. No profile was approved.',
     REFUSED:'OpenAI declined the request. No profile was generated.',
     INCOMPLETE:'OpenAI returned an incomplete draft. No profile was generated.',
     INVALID_OUTPUT:'The generated draft failed the local schema or evidence checks.',
@@ -33,7 +34,7 @@ function safeSynthesisError(error) {
     WORKSPACE_CHANGED:'Workspace changed. Refresh and try again.',
     SYNTHESIS_FAILED:'The profile draft could not be completed. No profile was approved.'
   };
-  return {code,message:messages[code]};
+  return {code,message:messages[code],...(httpStatus?{httpStatus}: {})};
 }
 
 function setDraftStep(research,status,message='') {

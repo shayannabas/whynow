@@ -6,7 +6,7 @@ const DEFAULT_MODEL='gpt-4o-mini';
 const DEFAULT_TIMEOUT_MS=90000;
 const MAX_REQUEST_BYTES=360000;
 const ESTIMATED_BYTES_PER_INPUT_TOKEN=3;
-class LlmError extends Error {constructor(code,message){super(message);this.code=code;}}
+class LlmError extends Error {constructor(code,message,{httpStatus}={}){super(message);this.code=code;if(Number.isInteger(httpStatus))this.httpStatus=httpStatus;}}
 function settings(env={}) {
   const model=env.OPENAI_MODEL||DEFAULT_MODEL;
   const dollars=Number(env.OPENAI_MONTHLY_LIMIT_USD||0);
@@ -79,7 +79,7 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
           if(!response.ok) {
             await response.body?.cancel();
             if((response.status===429||response.status>=500)&&attempt===0){await sleep(500);continue;}
-            throw new LlmError('REQUEST_FAILED',`OpenAI request failed (HTTP ${response.status}). Check account access, billing and limits.`);
+            throw new LlmError('REQUEST_FAILED',`OpenAI request failed (HTTP ${response.status}). Check account access, billing and limits.`,{httpStatus:response.status});
           }
           const raw=await response.text();
           if(Buffer.byteLength(raw)>128000)throw new LlmError('INVALID_OUTPUT','OpenAI response exceeded the size limit.');

@@ -125,6 +125,22 @@ The run then stopped on the first seller. Resolve AI made one provider attempt a
 
 Post-attempt checks confirmed `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. No page fetch, Serper query, approval or Stage 3 work occurred. The previous three profiles remain unchanged in `needs_review`; another provider attempt requires a new explicit owner authorization.
 
+## Structured Outputs schema-limit diagnosis and offline fix
+
+The stopped request was rebuilt offline from the same saved pages. The diagnosis is confirmed at the request-schema level: the old schema defined the same stable receipt IDs twice, once in `$defs.receiptId` and again in `$defs.requiredReceiptId`. Resolve AI therefore sent 1,097 enum values and Shopify 1,211, above OpenAI's documented 1,000-value total limit. Shopify's larger enum also contained 15,730 characters, above the documented 15,000-character limit for a string enum with more than 250 values. Vercel was never called and its old schema was within those two limits.
+
+The failed attempt did not retain an HTTP status code. Its isolated state contains only the safe code `REQUEST_FAILED` and generic message. Provider bodies were intentionally discarded. Future `REQUEST_FAILED` records now retain and display the numeric HTTP status only, never the response body.
+
+The fix uses deterministic, request-local IDs (`R001`, `R002`, and so on) in the evidence menu and one shared receipt enum. Optional receipt fields use an empty-string `const` or the shared enum; required fields reference the same enum without copying it. After local validation, the server maps selected short IDs back to the original stable IDs before the unchanged receipt grounding, source and quote-quality checks run. A 900-receipt ceiling is a future-safe backstop below the 1,000-enum limit. Because the saved evidence sources are already priority ordered, the cap retains customer/case-study and comparison-page receipts before generic-page receipts.
+
+| Seller | Old enum definitions | Old enum values | Old enum characters | Largest old enum | New enum definitions | New enum values | New enum characters | Properties | Nesting | Total schema strings, before → after |
+| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Resolve AI | 2 | 1,097 | 28,496 | 549 values / 14,248 chars | 1 | 548 | 2,192 | 132 | 7 | 29,764 → 3,443 |
+| Shopify | 2 | 1,211 | 31,460 | 606 values / 15,730 chars | 1 | 605 | 2,420 | 132 | 7 | 32,728 → 3,671 |
+| Vercel | 2 | 979 | 25,428 | 490 values / 12,714 chars | 1 | 489 | 1,956 | 132 | 7 | 26,696 → 3,207 |
+
+The receipt count did not change. Short IDs reduced the serialized packet sizes to 107,768 bytes for Resolve AI, 106,542 for Shopify and 82,402 for Vercel without removing any receipt from these three packets. A committed public-data manifest records the packet hashes, source-set hashes, counts and exact post-fix schema metrics. Offline tests build the production schema for every captured packet and assert the current documented ceilings: 1,000 total enum values, 15,000 characters for a string enum over 250 values, 5,000 object properties, 10 nesting levels and 120,000 total schema-string characters. A separate test proves the 900-receipt priority cap and synthesis tests prove the short-to-stable server mapping. Full verification passed: 23 test files, 116 tests passed and one intentionally skipped Stage 3 scaffold test (117 total).
+
 ### Current pass-bar state after the stopped attempt
 
 | Seller | Customers with first-party sources | Competitors with sources | Size metric and target match | Buyer titles | Champion titles | Blocking / advisory | Top blocking reasons |
@@ -137,4 +153,4 @@ Final offline verification after recording the stopped attempt: 22 test files, 1
 
 ## Owner action
 
-Do not begin manual fixes yet. The authorized saved-pages drafting attempt stopped before producing a new profile. No retry is authorized. The owner must decide the next action; no profile may be auto-approved, and normal OpenAI settings remain disabled/zero.
+Do not begin manual fixes yet. The authorized saved-pages drafting attempt stopped before producing a new profile. Its schema-limit cause is fixed and verified offline, but no retry is authorized. The owner must decide the next action; no profile may be auto-approved, and normal OpenAI settings remain disabled/zero.

@@ -26,6 +26,16 @@ it('records a safe, retryable failure when paid OpenAI drafting is disabled',asy
   expect(workspace.sellerProfile.category).toBeUndefined();
 });
 
+it('records only the HTTP status for provider request failures',async()=>{
+  const f=fixture();let state=f.state,writes=Promise.resolve();
+  const mutate=fn=>{const work=writes.then(()=>{state=fn(state);return structuredClone(state);});writes=work.catch(()=>{});return work;};
+  const coordinator=createSynthesisCoordinator({read:()=>structuredClone(state),mutate,llm:{generate:async()=>{throw Object.assign(new Error('secret response body'),{code:'REQUEST_FAILED',httpStatus:400});}},now:()=> '2026-09-17T12:01:00.000Z',randomId:()=> 'draft-http-1'});
+  await expect(coordinator.start(f.id)).rejects.toMatchObject({code:'REQUEST_FAILED',message:'The OpenAI request failed (HTTP 400). No profile was approved.'});
+  const saved=state.workspaces[f.id].research.synthesisJob.error;
+  expect(saved).toEqual({code:'REQUEST_FAILED',message:'The OpenAI request failed (HTTP 400). No profile was approved.',httpStatus:400});
+  expect(JSON.stringify(state)).not.toContain('secret response body');
+});
+
 it('does not begin drafting from a stale tab after the active workspace changes',async()=>{
   const f=fixture();let state=createWorkspace(f.state,{name:'Another workspace'}),calls=0,writes=Promise.resolve();
   const mutate=fn=>{const work=writes.then(()=>{state=fn(state);return structuredClone(state);});writes=work.catch(()=>{});return work;};

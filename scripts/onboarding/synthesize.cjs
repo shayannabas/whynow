@@ -1,12 +1,14 @@
 const { getWorkspace } = require('../server/state.cjs');
 const { SIGNAL_KEYS, assertSynthesisOutput, buildReceiptEvidence, sourceSetHash, SynthesisValidationError } = require('./validate.cjs');
+const { assertStructuredOutputSchemaWithinLimits } = require('../openai-schema.cjs');
 
 const PROMPT_VERSION = 'seller-profile-quality-guards-v5';
+const MAX_SCHEMA_RECEIPTS = 900;
 
 const text = (maxLength, minLength=0) => ({type:'string',minLength,maxLength});
 const list = (items,minItems,maxItems) => ({type:'array',items,minItems,maxItems});
 function strictObject(properties,required=Object.keys(properties)) { return {type:'object',additionalProperties:false,properties,required}; }
-const receiptIdSchema = required => ({$ref:`#/$defs/${required?'requiredReceiptId':'receiptId'}`});
+const receiptIdSchema = required => required?{$ref:'#/$defs/receiptId'}:{anyOf:[{type:'string',const:''},{$ref:'#/$defs/receiptId'}]};
 function factSchema(valueKey='value',required=false) { return strictObject({[valueKey]:text(2000,required?1:0),receiptId:receiptIdSchema(required)}); }
 function stringListSchema(min=0,max=30,itemMax=200) { return list(text(itemMax,1),min,max); }
 const organizationSchema = strictObject({name:text(200,1),domain:text(253),receiptId:receiptIdSchema(true)});
@@ -36,7 +38,7 @@ const SYNTHESIS_SCHEMA = strictObject({
     objectionTemplates:stringListSchema(3,3,500)
   })
 });
-SYNTHESIS_SCHEMA.$defs={receiptId:text(40),requiredReceiptId:text(40,1)};
+SYNTHESIS_SCHEMA.$defs={receiptId:text(4,4)};
 
 function companyFor(workspace) {
   const candidate=workspace.research?.selectedCandidate||workspace.onboarding?.selectedCandidate;
@@ -45,9 +47,64 @@ function companyFor(workspace) {
   return {name,domain};
 }
 
+function remapReceiptEvidence(evidence,maxReceipts=MAX_SCHEMA_RECEIPTS) {
+  const selected=[];
+  // Sources are already ordered by evidence priority. A source-major cap keeps
+  // customer, case-study and comparison pages ahead of generic pages if a
+  // future 120 KB packet could otherwise exceed the schema's enum ceiling.
+  for(const source of evidence.sources)for(const receipt of source.receipts) {
+    if(selected.length===maxReceipts)break;
+    selected.push(receipt.receiptId);
+  }
+  const stableToShort=new Map(),receiptIdMap=new Map();
+  selected.forEach((stableId,index)=>{
+    const shortId=`R${String(index+1).padStart(3,'0')}`;
+    stableToShort.set(stableId,shortId);receiptIdMap.set(shortId,stableId);
+  });
+  const sources=evidence.sources.map(source=>({...source,receipts:source.receipts.filter(receipt=>stableToShort.has(receipt.receiptId)).map(receipt=>({...receipt,receiptId:stableToShort.get(receipt.receiptId)}))}));
+  const serialized=JSON.stringify({schemaVersion:1,sources});
+  return {...evidence,sources,serialized,receiptIds:[...receiptIdMap.keys()],receiptIdMap};
+}
+
 function buildEvidencePacket(state,workspace) {
-  const evidence=buildReceiptEvidence(state,workspace);
-  return {...evidence,sourceSetHash:sourceSetHash(state,workspace)};
+  return {...remapReceiptEvidence(buildReceiptEvidence(state,workspace)),sourceSetHash:sourceSetHash(state,workspace)};
+}
+
+function buildSynthesisSchema(receiptIds) {
+  const schema=structuredClone(SYNTHESIS_SCHEMA);
+  schema.$defs.receiptId={type:'string',enum:[...receiptIds]};
+  assertStructuredOutputSchemaWithinLimits(schema);
+  return schema;
+}
+
+function validateRunLocalReceiptIds(value,receiptIds) {
+  assertSynthesisOutput(value);
+  const allowed=new Set(receiptIds);
+  function visit(node) {
+    if(Array.isArray(node)){node.forEach(visit);return;}
+    if(!node||typeof node!=='object')return;
+    for(const [key,item] of Object.entries(node)) {
+      if(key==='receiptId'&&item&&!allowed.has(item))throw new SynthesisValidationError('INVALID_OUTPUT','The draft referenced a receipt outside this request.');
+      visit(item);
+    }
+  }
+  visit(value);return true;
+}
+
+function expandRunLocalReceiptIds(value,receiptIdMap) {
+  const result=structuredClone(value);
+  function visit(node) {
+    if(Array.isArray(node)){node.forEach(visit);return;}
+    if(!node||typeof node!=='object')return;
+    for(const [key,item] of Object.entries(node)) {
+      if(key==='receiptId'&&item) {
+        const stableId=receiptIdMap.get(item);
+        if(!stableId)throw new SynthesisValidationError('INVALID_OUTPUT','The draft referenced a receipt outside this request.');
+        node[key]=stableId;
+      } else visit(item);
+    }
+  }
+  visit(result);return result;
 }
 
 function buildSynthesisRequest(state,workspaceId) {
@@ -74,20 +131,19 @@ function buildSynthesisRequest(state,workspaceId) {
     'Return exactly the requested JSON schema, with 3–10 distinct segments and 4–8 distinct search phrases per segment.'
   ].join('\n');
   const input=JSON.stringify({company,evidence:JSON.parse(evidence.serialized)});
-  const schema=structuredClone(SYNTHESIS_SCHEMA);
-  schema.$defs.receiptId={type:'string',enum:['',...evidence.receiptIds]};
-  schema.$defs.requiredReceiptId={type:'string',enum:evidence.receiptIds};
+  const schema=buildSynthesisSchema(evidence.receiptIds);
   return {
-    request:{workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_seller_profile',schema,validate:assertSynthesisOutput,maxOutputTokens:4096,messages:[{role:'system',content:instructions},{role:'user',content:input}]},
+    request:{workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_seller_profile',schema,validate:value=>validateRunLocalReceiptIds(value,evidence.receiptIds),maxOutputTokens:4096,messages:[{role:'system',content:instructions},{role:'user',content:input}]},
     guard:{expectedResearchRevision:workspace.research?.revision??0,expectedRunId:workspace.research?.runId||null,expectedSourceSetHash:evidence.sourceSetHash,expectedProfileRevision:workspace.profileRevision||0},
-    evidence:{sourceIds:evidence.sourceIds,sourceSetHash:evidence.sourceSetHash,bytes:Buffer.byteLength(evidence.serialized)}
+    evidence:{sourceIds:evidence.sourceIds,sourceSetHash:evidence.sourceSetHash,bytes:Buffer.byteLength(evidence.serialized),receiptCount:evidence.receiptIds.length},
+    receiptIdMap:evidence.receiptIdMap
   };
 }
 
 async function generateSynthesis({state,workspaceId,llm}) {
   if(!llm||typeof llm.generate!=='function')throw new SynthesisValidationError('INVALID_INPUT','An injected LLM client is required.');
   const built=buildSynthesisRequest(state,workspaceId),result=await llm.generate(built.request);
-  return {output:result.value,cached:Boolean(result.cached),model:result.model,guard:built.guard,evidence:built.evidence,promptVersion:PROMPT_VERSION};
+  return {output:expandRunLocalReceiptIds(result.value,built.receiptIdMap),cached:Boolean(result.cached),model:result.model,guard:built.guard,evidence:built.evidence,promptVersion:PROMPT_VERSION};
 }
 
-module.exports={PROMPT_VERSION,SYNTHESIS_SCHEMA,buildEvidencePacket,buildSynthesisRequest,generateSynthesis};
+module.exports={PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisSchema,buildSynthesisRequest,validateRunLocalReceiptIds,expandRunLocalReceiptIds,generateSynthesis};
