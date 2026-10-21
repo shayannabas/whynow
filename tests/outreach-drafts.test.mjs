@@ -14,6 +14,7 @@ describe('receipt-backed deterministic outreach',()=>{
     const {account}=fixture(),falsePositive={id:'bad',type:'outage_news',title:'Clarksville reports Mann Circle Water Outage',evidenceText:'Water service on Mann Circle was turned off for repair.',evidenceUrl:'https://clarksville.example/water-outage',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-11-20T00:00:00.000Z',citable:false};
     expect(outreach.triggerRelevantToAccount(account.triggers[0],account)).toBe(true);
     expect(outreach.triggerRelevantToAccount(falsePositive,{...account,name:'Circle',domain:'circle.com'})).toBe(false);
+    expect(outreach.triggerRelevantToAccount({...falsePositive,citable:true,title:'CrowdStrike CTO departs',evidenceText:'CrowdStrike CTO departs after 13 years.',evidenceUrl:'https://news.example/crowdstrike'},{...account,name:'CrowdStrike',domain:'crowdstrike.com'})).toBe(true);
   });
   it('creates a 60–110 word five-block template from frozen claims and public receipts without a model',()=>{
     const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context);

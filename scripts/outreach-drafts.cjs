@@ -23,6 +23,7 @@ function triggerRelevantToAccount(trigger={},account={}){
   const sourceDomain=rootDomain(trigger.evidenceUrl),accountDomain=rootDomain(account.domain||account.website);if(sourceDomain&&accountDomain&&(sourceDomain===accountDomain||sourceDomain.endsWith(`.${accountDomain}`)))return true;
   const text=`${trigger.title||''} ${trigger.evidenceText||''}`,name=String(account.discoveryQuality?.targetAccountName||account.name||'').trim();
   if(name.split(/\s+/).length>1)return includesAccountName(text,account);
+  if(new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i').test(text))return true;
   const provider=String(trigger.sourceId||trigger.metadata?.provider||'');return /greenhouse|lever|ashby/i.test(provider)&&new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i').test(text);
 }
 function receiptedActiveTriggers(account={},now=new Date()){
