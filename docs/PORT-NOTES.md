@@ -132,7 +132,7 @@ ATS JSON has a source-specific 16 MB ceiling because large public boards such as
 
 ### `scripts/collectors/search-evidence.cjs`
 
-**What it does:** Runs four bounded searches per account for pain, technology, AI adoption and engineering-leadership changes. **How it decides:** It discards results that neither use the target domain nor explicitly name the target. **What changed from SignalScout:** Search is injected behind WhyNow's persistent per-run/monthly Serper reservation; tracked-person discovery is not used by the Phase B runner.
+**What it does:** Runs five bounded searches per account for pain, technology/AI, engineering-leadership changes and free firmographics. **How it decides:** It discards results that neither use the target domain nor explicitly name the target. A workspace-configured division rule may supply a parent name/domain for only the two sizing searches while the division remains visible. **What changed from SignalScout:** Search is injected behind WhyNow's persistent per-run/monthly Serper reservation; tracked-person discovery is not used by the Phase B runner.
 
 ### `scripts/collectors/executive-change.cjs`
 
@@ -160,7 +160,7 @@ ATS JSON has a source-specific 16 MB ceiling because large public boards such as
 
 ### `scripts/phase-b-config.cjs`, `scripts/phase-b-runner.cjs` and the account page
 
-**What they do:** Translate an approved/reference workspace into collector inputs, run each collector in a background job, merge evidence without erasing better receipts, and rerun Phase A scoring/kills/tiers. **How they decide:** Normal workspaces require owner approval; the frozen Resolve demo is the only load-only exception. Serper queries are reserved persistently before use, interrupted runs are recorded, and every collector shows complete, disabled or error. **What changed from SignalScout:** WhyNow adds workspace isolation, atomic JSON progress, the manual **Refresh account** button and a receipt/error UI. No scheduler, discovery promotion, OpenAI or send path is active.
+**What they do:** Translate an approved/reference workspace into collector inputs, run each collector in a background job, merge evidence without erasing better receipts, and rerun Phase A scoring/kills/tiers. **How they decide:** Normal workspaces require owner approval; the frozen Resolve demo is the only load-only exception. Serper queries are reserved persistently before use, interrupted runs are recorded, and every collector shows complete, disabled or error. Workspace entity rules let a division inherit its parent's size evidence—for example, Uber Eats remains the visible account while Uber/uber.com is used for firmographics. **What changed from SignalScout:** WhyNow adds workspace isolation, atomic JSON progress, the manual **Refresh account** button and a receipt/error UI. No scheduler, OpenAI or send path is active.
 
 ## Phase B parity and worked example
 
@@ -185,3 +185,9 @@ The live Binance account is not automatically `KILL_UNSELLABLE_ORG`. The parity 
 ### `scripts/account-lifecycle.cjs` and the Today/account pages
 
 **What they do:** Turn saved prospects into a small seller work queue and let the user mark an account `new`, `working` or `skipped`. **How they decide:** Killed and skipped accounts remain saved but leave Today; working accounts rank first, then priority, active receipted triggers and fit. A skip requires a typed reason and every change enters the audit log. The why-now line uses only a currently active trigger and otherwise says that the account still needs a refresh. **What changed from SignalScout:** Contacts, drafts, sends and full CRM stages are deliberately absent. The account page adds the receipted size reason, current triggers and a compact status form while preserving WhyNow's existing Refresh account action.
+
+### `scripts/refresh-all-runner.cjs`
+
+**What it does:** Runs the account collectors sequentially across every discovered account as one persisted background job. **How it decides:** The feature is off by default, requires a positive process-only cap, refuses to start when the account count could exceed the hard 150-query ceiling, and records each child run plus its exact Serper usage. **What changed from SignalScout:** WhyNow exposes one local **Refresh all** action instead of relying on a scheduler. The existing guarded runtime, source-level errors and atomic state remain in charge, so one broken source or account does not erase other results.
+
+Uncollected signals follow SignalScout exactly: the six-signal scorer assigns an explicit score-1, inferred prior at 40% confidence. Six entirely unknown signals therefore produce 8/100, zero receipts and the `mostly-inferred` label—not a claim that the company lacks pain or fit. WhyNow's browser now displays these rows as **Unknown · low confidence** so the numerical prior is not mistaken for negative evidence.

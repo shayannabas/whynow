@@ -15,7 +15,7 @@ it('shows account receipts and starts Refresh account as a local background acti
   let state=loadResolveReferenceDemo(defaultState()),workspaceId=state.activeWorkspaceId;
   state=addManualAccountToState(state,workspaceId,{name:'Acme',domain:'acme.example',segment:'data_ai_infrastructure',sourceUrl:'https://acme.example/about'},{id:()=> 'acct-acme',now:()=> '2026-10-20T12:00:00.000Z'});
   state.workspaces[workspaceId].accounts[0].signals.techStack={key:'techStack',score:5,evidenceUrl:'https://acme.example/engineering',evidenceText:'Acme uses Kubernetes.',observedAt:'2026-10-20T12:00:00.000Z',inferred:false};saveState(state,stateFile);
-  const phaseBRefreshCoordinator={start:async(id,accountId)=>{calls.push({id,accountId});return {id:'run-1',status:'queued'};}};
+  const phaseBRefreshCoordinator={start:async(id,accountId)=>{calls.push({id,accountId});return {id:'run-1',status:'queued'};},wait:async()=>({id:'run-1',status:'complete',serperQueries:0,errors:[]})};
   const start=async env=>{server=http.createServer(createRouter({stateFile,env,phaseBRefreshCoordinator}));await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});return `http://127.0.0.1:${server.address().port}`;},stop=()=>new Promise(resolve=>server.close(resolve));
   try{
     let base=await start({NODE_ENV:'development',OPENAI_ENABLED:'false',SERPER_ENABLED:'false'}),page=await(await fetch(`${base}/accounts/acct-acme`)).text();

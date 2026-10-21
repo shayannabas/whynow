@@ -7,6 +7,7 @@ const {phaseAConfigForWorkspace}=require('../scripts/phase-a-config.cjs');
 const {evaluateKills}=require('../scripts/kills.cjs');
 const {signalRubric}=require('../scripts/signal-rubric.cjs');
 const {sameEntity}=require('../scripts/entity-rules.cjs');
+const {scoreSignals}=require('../scripts/scoring.cjs');
 
 describe('Phase A workspace-driven rules',()=>{
   it('loads the Resolve config without approving a profile',()=>{
@@ -59,5 +60,10 @@ describe('Phase A workspace-driven rules',()=>{
     const rules=[{canonicalName:'Uber',aliases:['uber eats'],domains:['uber.com','ubereats.com']}];
     expect(sameEntity({name:'Uber Technologies',domain:'uber.com'},{name:'Uber Eats',domain:'ubereats.com'},rules)).toBe(true);
     expect(sameEntity({name:'Uber Eats'},{name:'Unrelated'},rules)).toBe(false);
+  });
+  it('treats uncollected signals as unknown low-confidence priors, not negative evidence',()=>{
+    const score=scoreSignals({},{});
+    expect(score.fitScore).toBe(8);expect(score.confidenceBand).toBe('mostly-inferred');expect(score.receiptedSignals).toBe(0);
+    expect(Object.values(score.breakdown).every(row=>row.rawScore===1&&row.confidence===.4&&row.evidenceUrl==='')).toBe(true);
   });
 });
