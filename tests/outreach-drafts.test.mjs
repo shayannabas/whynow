@@ -23,6 +23,20 @@ describe('receipt-backed deterministic outreach',()=>{
     expect(draft.body).toContain(workspace.icpConfig.outreach.claims.product.value);
     expect(draft.evidenceRefs).toEqual(expect.arrayContaining(['https://acme.example/jobs/sre','https://resolve.ai/product/ai-sre']));
   });
+  it('uses the exact Demo merge token and chooses an approved trigger-matched persona without inventing a person',()=>{
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context);
+    expect(context.persona).toMatchObject({firstName:'{{first_name}}',title:'Head of SRE',role:'champion',recipientMode:'merge_field',templateLabel:'Template with merge fields — recipient filled at send time',contactSource:'deferred (Apollo planned)'});
+    expect(context.persona.selectionReason).toContain('reliability');
+    expect(draft.validation.ok).toBe(true);expect(draft.body).toMatch(/^Hi \{\{first_name\}\},\n\n/);
+    const generic={...draft,body:draft.body.replace('Hi {{first_name}},','Hi there,')};expect(outreach.validateOutreachDraft(generic,context).reasons).toEqual(expect.arrayContaining([expect.objectContaining({code:'GENERIC_GREETING'}),expect.objectContaining({code:'MERGE_GREETING'})]));
+    const invented={...draft,body:draft.body.replace('Hi {{first_name}},','Hi Jordan,')};expect(outreach.validateOutreachDraft(invented,context).reasons).toContainEqual(expect.objectContaining({code:'MERGE_GREETING'}));
+    const nonDemo=outreach.buildDraftContext({...workspace,deliveryMode:'live'},account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW));expect(nonDemo.blockers).toContainEqual(expect.objectContaining({code:'MERGE_FIELD_DEMO_ONLY'}));
+  });
+  it('chooses an engineering buyer for executive change while real named recipients still work',()=>{
+    const {workspace,account}=fixture(),executive={...account,triggers:[{...account.triggers[0],type:'executive_change',title:'Acme Cloud CTO departs',evidenceText:'Acme Cloud CTO departs after five years.'}]},merge=outreach.buildDraftContext(workspace,executive,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),named=outreach.buildDraftContext(workspace,account,fields,new Date(NOW));
+    expect(merge.persona).toMatchObject({title:'VP Engineering',role:'buyer',recipientMode:'merge_field'});expect(merge.persona.selectionReason).toContain('budget owner');
+    expect(named.persona).toMatchObject({firstName:'Ava',title:'VP Engineering',recipientMode:'named',contactSource:'manual local entry'});expect(outreach.templateDraft(named).validation.ok).toBe(true);
+  });
   it('blocks killed accounts, stale evidence, mismatched personas and unapproved seller claims',()=>{
     const {workspace,account}=fixture();
     const killed=outreach.buildDraftContext(workspace,{...account,killStatus:'killed',kills:[{code:'KILL_EXISTING_CUSTOMER'}]},fields,new Date(NOW));expect(killed.blockers).toContainEqual(expect.objectContaining({code:'ACCOUNT_KILLED'}));
@@ -49,5 +63,9 @@ describe('receipt-backed deterministic outreach',()=>{
   it('builds but does not execute a Responses structured-output request and prices its upper bound',()=>{
     const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'}),estimate=model.estimateOutreachRequest(request);
     expect(request).toMatchObject({model:'gpt-5.5',store:false,max_output_tokens:600,text:{format:{type:'json_schema',strict:true}}});expect(estimate).toMatchObject({model:'gpt-5.5',maxOutputTokens:600});expect(estimate.maximumTotalCostUsd).toBeGreaterThan(0);expect(()=>model.assertRecordedModel({model:'gpt-5.4'},{OPENAI_OUTREACH_MODEL:'gpt-5.5'})).toThrow('gpt-5.5');
+  });
+  it('pins the model prompt to the exact Demo merge greeting',()=>{
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'});
+    expect(request.instructions).toContain('Hi {{first_name}},');expect(request.instructions).toContain('invented people');expect(request.input).toContain('merge_field');
   });
 });

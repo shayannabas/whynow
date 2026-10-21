@@ -1,13 +1,15 @@
-# Chunk 3 — outreach drafts offline checkpoint
+# Chunk 3 — outreach drafts
 
-Updated October 21, 2026. No paid outreach generation call has been made.
+Updated October 21, 2026. The bounded paid checkpoint is documented below after it runs; drafts remain Demo-only and cannot be sent.
 
 ## What is built
 
 - A deterministic first-touch email template generalized to the active workspace seller.
 - One fresh, public, account-relevant receipt is required. Expired, weak, uncitable or wrong-entity evidence is blocked.
 - Seller language can come only from the frozen Resolve reference config or an owner-approved seller profile with a public receipt.
-- The browser asks for the recipient's real first name/title and the sender's first name. No contact lookup runs.
+- With a manually entered real recipient, the browser uses that first name and an approved title. This private entry stays in local state and is never copied into Git, fixtures or documentation.
+- With no saved recipient, Demo mode uses the literal `{{first_name}}` token and automatically chooses an approved workspace persona that matches the trigger. The draft is labeled **Template with merge fields — recipient filled at send time**.
+- **Contact source: deferred (Apollo planned).** No contact lookup runs.
 - The account page shows a `Demo · copy only · no send path` watermark, supporting receipts and a Copy button.
 - There is no sending endpoint, contact provider or CRM integration.
 
@@ -15,7 +17,7 @@ Updated October 21, 2026. No paid outreach generation call has been made.
 
 The port keeps the useful parts of `resolve-outreach.cjs` and `message-targeting.cjs`: buyer/champion gating, above/below-the-power-line framing, awareness-sensitive calls to action, a receipt-led opener, strict subject/body structure, exact seller-claim wording and validator rejection instead of silent rewriting.
 
-WhyNow deliberately narrows the current surface. Apollo/contact selection, model generation, candidate ranking, objection sheets, call plans and delivery are not active. The template accepts a manually entered recipient so the local demo remains useful without introducing the deferred contact-enrichment scope.
+WhyNow deliberately narrows the current surface. Apollo/contact selection, candidate ranking, objection sheets, call plans and delivery are not active. The Demo merge token is accepted only as the exact greeting `Hi {{first_name}},`; generic greetings and invented names remain blocked.
 
 ## Model preflight
 
