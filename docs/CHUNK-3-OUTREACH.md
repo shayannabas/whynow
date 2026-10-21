@@ -1,6 +1,6 @@
 # Chunk 3 — outreach drafts
 
-Updated October 21, 2026. The bounded paid checkpoint stopped safely on an incomplete first response. Drafts remain Demo-only and cannot be sent.
+Updated October 21, 2026. The first bounded paid checkpoint stopped safely on an incomplete response; the corrected 4,000-token batch then produced three validator-passing Demo drafts. Drafts remain copy-only and cannot be sent.
 
 ## What is built
 
@@ -45,7 +45,7 @@ The estimate uses the corrected request built from the saved Binance account con
 
 Across Binance, Coalition and CrowdStrike, the three-request conservative maximum is $0.371815. Adding one maximum-size transient retry yields $0.495855, inside the authorized temporary $0.50 cap. Actual cost can differ because the API bills real input, visible output and reasoning tokens; the runtime still stops before a reservation would exceed the cap.
 
-## Bounded paid-test outcome
+## First bounded paid-test outcome — historical
 
 The owner authorized one three-target batch for Binance, Coalition and CrowdStrike. The runner started Binance, received provider status `incomplete`, and stopped immediately because this was not a retryable 429 or 5xx response and the requirement that every draft pass validation could no longer be met.
 
@@ -57,3 +57,84 @@ The owner authorized one three-target batch for Binance, Coalition and CrowdStri
 - Normal local configuration after the stop: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`.
 
 No draft, subject, receipt citation or persona result can be reported as model output from this first checkpoint. The owner later supplied the separate corrected-run authorization described above; any request beyond that one corrected batch requires new explicit authorization.
+
+## Corrected 4,000-token paid checkpoint
+
+The corrected batch used commit `21f3451`, GPT-5.5 reasoning effort `medium`, exactly three logical calls and three provider attempts, with no retry. The provider returned model snapshot `gpt-5.5-2026-04-23` for every result. All three drafts passed the local receipt, claim, greeting and structure validator.
+
+| Account | Persona | Why this persona | Input | Output | Reasoning | Cost |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| Binance | Head of SRE | Reliability/performance hiring maps to the leader responsible for SRE and incident work. | 666 | 655 | 516 | $0.022980 |
+| Coalition | Head of SRE | Reliability/performance hiring maps to the leader responsible for SRE and incident work. | 656 | 752 | 596 | $0.025840 |
+| CrowdStrike | VP Engineering | An executive-change trigger is best reviewed by an engineering budget owner. | 644 | 669 | 516 | $0.023290 |
+| **Total** |  |  | **1,966** | **2,076** | **1,628** | **$0.072110** |
+
+OpenAI's `output_tokens` total includes reasoning tokens. The reasoning column above is the subset reported in `output_tokens_details.reasoning_tokens`.
+
+Every result used template version `whynow-outreach-template-v1`, label **Template with merge fields — recipient filled at send time**, literal greeting `Hi {{first_name}},` and sender `Shayan`.
+
+### Binance
+
+**Subject:** AI performance on-call coverage
+
+```text
+Hi {{first_name}},
+
+Saw the AI System Performance Engineer (APAC Remote) opening across Hong Kong, Singapore, and Taiwan—focused on system performance and production reliability.
+
+Resolve AI puts an autonomous AI production engineer on-call: if production slips, it investigates logs and hands your team the root cause in minutes. Built by the creators of OpenTelemetry. Coinbase achieved 73% faster time to root cause.
+
+Worth exploring whether an AI production engineer on-call fits the next SRE operating state you’re building?
+
+Shayan
+```
+
+Receipts:
+
+- <https://job-boards.eu.greenhouse.io/binance/jobs/5002733101>
+- <https://resolve.ai/product/ai-sre>
+
+### Coalition
+
+**Subject:** Protecting deploy cadence as SRE grows
+
+```text
+Hi {{first_name}},
+
+Saw the Senior Site Reliability Engineer opening in Canada calling out Kubernetes and AWS. Since that points to continued investment in reliability and incident work, I figured the next operating state may be less about firefighting and more about deploying on time.
+
+Resolve AI puts an autonomous AI production engineer on-call: if production slips, it investigates logs and hands your team the root cause in minutes. Built by the creators of OpenTelemetry. DoorDash cut investigation times by 87%.
+
+Worth exploring whether this could help your SRE team protect deploy cadence as the team grows?
+
+Shayan
+```
+
+Receipts:
+
+- <https://www.coalitioninc.com/job-posting?gh_jid=4742193005>
+- <https://resolve.ai/product/ai-sre>
+- <https://resolve.ai/product/overview>
+
+### CrowdStrike
+
+**Subject:** Operating model after CTO transition
+
+```text
+Hi {{first_name}},
+
+Saw the report that CrowdStrike Global CTO Elia Zaitsev left after 13 years to launch a $170 Million AI Security Fund. For engineering, that kind of transition can be a moment to revisit the next operating state for production ownership.
+
+Resolve AI puts an autonomous AI production engineer on-call: if production slips, it investigates logs and hands your team the root cause in minutes. Built by the creators of OpenTelemetry. Coinbase achieved 73% faster time to root cause.
+
+Is this direction relevant as you plan post-CTO engineering priorities?
+
+Shayan
+```
+
+Receipts:
+
+- <https://www.thekeyexecutives.com/2026/09/04/crowdstrike-cto-elia-zaitsev-leaves-after-13-years-to-launch-170-million-ai-security-fund/>
+- <https://resolve.ai/product/ai-sre>
+
+The report confirms `savedToApplicationState=false`, `noSend=true`, `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. No draft was marked or saved as sent. This authorization is exhausted.

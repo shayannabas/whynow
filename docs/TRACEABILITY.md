@@ -175,8 +175,9 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Validator gates | `validateOutreachDraft` | Five blocks, 60–110 words, <=8-word subject, exact seller wording, named greeting/signature, no links or enum leakage |
 | Copy-only browser surface | `/accounts/:id/drafts/template` and account page | Local/same-origin POST, watermark, receipts and clipboard button; no send route/action |
 | Free model verification | `openai-model-check.cjs`; `outreach-model.cjs` | `GET /v1/models` returned HTTP 200 and listed `gpt-5.5`; no generation request; official docs confirm Responses/Structured Outputs |
-| Cost estimate | `docs/CHUNK-3-OUTREACH.md` | Real saved Binance context: 814 estimated input tokens, about $0.00857 typical total, $0.02207 conservative maximum |
+| Corrected cost estimate | `docs/CHUNK-3-OUTREACH.md` | Real saved Binance context: 803 estimated input tokens, about $0.008515 at 150 output tokens, $0.124015 at the 4,000-token allowance; three calls plus one maximum transient retry = $0.495855 under the $0.50 cap |
 | Bounded paid checkpoint | `outreach-live.cjs`; `run-chunk3-outreach-paid.cjs`; ignored local safe report | Binance returned `incomplete` after one logical call/one attempt; no retry, no Coalition/CrowdStrike call, no validated/sent draft; exact billed cost unavailable, $0.022015 conservatively reserved; OpenAI disabled/zero afterward |
+| Corrected paid checkpoint | 4,000-token GPT-5.x request; safe incomplete telemetry; ignored v2 report | Binance, Coalition and CrowdStrike completed in three logical calls/three attempts with no retry; all passed local validation; input/output/reasoning totals 1,966/2,076/1,628; actual total $0.072110; no send/state mutation; OpenAI disabled/zero afterward |
 | Deployment direction | `AGENTS.md`; checklist | Local screen-share is the demo path; no snapshot/deploy; Railway backup and Apollo lookup remain deferred and owner-gated |
 
 | Requirement | Implementation | Verification |
