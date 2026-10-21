@@ -1,6 +1,6 @@
 # Chunk 3 — outreach drafts
 
-Updated October 21, 2026. The bounded paid checkpoint is documented below after it runs; drafts remain Demo-only and cannot be sent.
+Updated October 21, 2026. The bounded paid checkpoint stopped safely on an incomplete first response. Drafts remain Demo-only and cannot be sent.
 
 ## What is built
 
@@ -25,7 +25,7 @@ WhyNow deliberately narrows the current surface. Apollo/contact selection, candi
 - Free read-only check: `GET /v1/models` returned HTTP 200 and listed `gpt-5.5` for the configured API key.
 - Official model documentation confirms Responses API and Structured Outputs support: <https://developers.openai.com/api/docs/models/gpt-5.5>.
 - Official price checked October 21, 2026: $5 per million input tokens and $30 per million output tokens.
-- The Structured Outputs request is built and tested offline, but it is not executed.
+- The Structured Outputs request is built and tested offline. One bounded Binance request was executed and returned provider status `incomplete` before a validator-ready draft existed.
 - No recorded model-output fixture exists yet. A guard requires any future recorded response to name the configured outreach model.
 
 ## Per-draft estimate
@@ -43,3 +43,16 @@ The estimate uses the actual request built from the saved Binance account contex
 | Conservative maximum total | $0.022070 |
 
 Actual cost can differ because the API bills real input, visible output and reasoning tokens. The maximum is not authorized spending; it is only a planning estimate. The owner must separately approve any generation call and cap.
+
+## Bounded paid-test outcome
+
+The owner authorized one three-target batch for Binance, Coalition and CrowdStrike. The runner started Binance, received provider status `incomplete`, and stopped immediately because this was not a retryable 429 or 5xx response and the requirement that every draft pass validation could no longer be met.
+
+- Logical calls: 1 of 3; provider attempts: 1.
+- Coalition and CrowdStrike calls: not made.
+- Validator-ready drafts: 0; drafts saved as sent: 0.
+- Temporary cap: $0.25; conservative reservation for the attempted request: $0.022015.
+- Actual billed cost: unavailable because usage metadata from the incomplete response was not retained. The reservation is an upper bound, not a claim that this amount was charged.
+- Normal local configuration after the stop: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`.
+
+No draft, subject, receipt citation or persona result can be reported as model output from this checkpoint. Another paid request requires a new explicit owner authorization.

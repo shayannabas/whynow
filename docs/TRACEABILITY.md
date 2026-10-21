@@ -176,6 +176,7 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Copy-only browser surface | `/accounts/:id/drafts/template` and account page | Local/same-origin POST, watermark, receipts and clipboard button; no send route/action |
 | Free model verification | `openai-model-check.cjs`; `outreach-model.cjs` | `GET /v1/models` returned HTTP 200 and listed `gpt-5.5`; no generation request; official docs confirm Responses/Structured Outputs |
 | Cost estimate | `docs/CHUNK-3-OUTREACH.md` | Real saved Binance context: 814 estimated input tokens, about $0.00857 typical total, $0.02207 conservative maximum |
+| Bounded paid checkpoint | `outreach-live.cjs`; `run-chunk3-outreach-paid.cjs`; ignored local safe report | Binance returned `incomplete` after one logical call/one attempt; no retry, no Coalition/CrowdStrike call, no validated/sent draft; exact billed cost unavailable, $0.022015 conservatively reserved; OpenAI disabled/zero afterward |
 | Deployment direction | `AGENTS.md`; checklist | Local screen-share is the demo path; no snapshot/deploy; Railway backup and Apollo lookup remain deferred and owner-gated |
 
 | Requirement | Implementation | Verification |
