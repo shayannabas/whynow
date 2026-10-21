@@ -4,6 +4,7 @@ const require=createRequire(import.meta.url);
 const {defaultState}=require('../scripts/server/state.cjs');
 const {loadResolveReferenceDemo}=require('../scripts/reference-demo.cjs');
 const outreach=require('../scripts/outreach-drafts.cjs');
+const model=require('../scripts/outreach-model.cjs');
 const NOW='2026-10-21T00:00:00.000Z';
 function fixture(){const state=loadResolveReferenceDemo(defaultState(),{now:()=>NOW}),workspace=state.workspaces[state.activeWorkspaceId],account={schemaVersion:1,id:'acct-acme',name:'Acme Cloud',domain:'acme.example',icpSegment:'data_ai_infrastructure',status:'new',signals:{},kills:[],triggers:[{id:'trigger-1',type:'reliability_hiring',title:'Acme Cloud is hiring a Senior Site Reliability Engineer',evidenceText:'Acme Cloud is hiring a Senior Site Reliability Engineer to improve production incident response and distributed systems reliability.',evidenceUrl:'https://acme.example/jobs/sre',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-12-20T00:00:00.000Z',citable:true}]};workspace.accounts.push(account);return {state,workspace,account};}
 const fields={firstName:'Ava',title:'VP Engineering',senderFirstName:'Shayan'};
@@ -44,5 +45,9 @@ describe('receipt-backed deterministic outreach',()=>{
     expect(outreach.outreachModel({})).toBe('gpt-5.5');
     expect(outreach.outreachModel({OPENAI_MODEL:'gpt-4o-mini'})).toBe('gpt-5.5');
     expect(outreach.outreachModel({OPENAI_OUTREACH_MODEL:'gpt-test'})).toBe('gpt-test');
+  });
+  it('builds but does not execute a Responses structured-output request and prices its upper bound',()=>{
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'}),estimate=model.estimateOutreachRequest(request);
+    expect(request).toMatchObject({model:'gpt-5.5',store:false,max_output_tokens:600,text:{format:{type:'json_schema',strict:true}}});expect(estimate).toMatchObject({model:'gpt-5.5',maxOutputTokens:600});expect(estimate.maximumTotalCostUsd).toBeGreaterThan(0);expect(()=>model.assertRecordedModel({model:'gpt-5.4'},{OPENAI_OUTREACH_MODEL:'gpt-5.5'})).toThrow('gpt-5.5');
   });
 });

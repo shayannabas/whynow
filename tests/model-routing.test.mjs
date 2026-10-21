@@ -15,3 +15,8 @@ it('checks account model listing without making a generation request or exposing
   let seen;const result=await checkModelAvailability({apiKey:'private-test-key',fetchImpl:async(url,options)=>{seen={url,options};return new Response(JSON.stringify({data:[{id:PROPOSED_STRONG_MODEL}]}),{status:200});}});
   expect(result).toMatchObject({checked:true,available:true,httpStatus:200,model:PROPOSED_STRONG_MODEL});expect(seen.url).toBe(MODELS_ENDPOINT);expect(seen.options.method).toBe('GET');expect(JSON.stringify(result)).not.toContain('private-test-key');
 });
+
+it('reports a closest listed fallback without returning the model inventory',async()=>{
+  const result=await checkModelAvailability({apiKey:'private-test-key',model:'gpt-5.5',fetchImpl:async()=>new Response(JSON.stringify({data:[{id:'gpt-5.4-mini'},{id:'unrelated-private-model'}]}),{status:200})});
+  expect(result).toMatchObject({checked:true,available:false,model:'gpt-5.5',closestAvailable:'gpt-5.4-mini'});expect(JSON.stringify(result)).not.toContain('unrelated-private-model');
+});
