@@ -1,6 +1,6 @@
 # WhyNow SignalScout port notes
 
-Updated October 20, 2026. SignalScout by Isa Iqbal is the read-only behavioral reference and is used with permission. WhyNow keeps its own isolated workspaces, atomic JSON state, receipts, human approval and send-free Demo mode. Phases A and B are complete; no later port chunk has started.
+Updated October 21, 2026. SignalScout by Isa Iqbal is the read-only behavioral reference and is used with permission. WhyNow keeps its own isolated workspaces, atomic JSON state, receipts, human approval and send-free Demo mode. Phases A and B, Chunk 2, Refresh-all and Chunk 3's offline deterministic outreach checkpoint are complete. Paid outreach generation is not authorized.
 
 ## `scripts/scoring.cjs`
 
@@ -90,13 +90,13 @@ Updated October 20, 2026. SignalScout by Isa Iqbal is the read-only behavioral r
 
 **What changed from SignalScout:** Pages use WhyNow's existing server-rendered shell and workspace switcher. There is no discovery, authentication bypass, outreach or send path in Phase A.
 
-## Railway-ready foundation changes
+## Portable local-state foundation
 
 **What it does:** Lets the existing atomic state file live on a future mounted volume.
 
 **How it decides:** `STATE_DIR` selects the directory and defaults to `.whynow/`; the existing server already reads `process.env.PORT`. Research/provider work remains in background coordinators.
 
-**What changed from SignalScout:** No Railway runtime, database, backup or deployment workflow was copied. Deployment is Phase G only after the owner's explicit OK.
+**What changed from SignalScout:** No Railway runtime, database, backup or deployment workflow was copied. Interview demos run locally with screen sharing. Railway is a deferred backup only and requires the owner's explicit OK; it is not a planned phase.
 
 ## Worked example — why the Binance-like account is killed
 
@@ -191,3 +191,27 @@ The live Binance account is not automatically `KILL_UNSELLABLE_ORG`. The parity 
 **What it does:** Runs the account collectors sequentially across every discovered account as one persisted background job. **How it decides:** The feature is off by default, requires a positive process-only cap, refuses to start when the account count could exceed the hard 150-query ceiling, and records each child run plus its exact Serper usage. **What changed from SignalScout:** WhyNow exposes one local **Refresh all** action instead of relying on a scheduler. The existing guarded runtime, source-level errors and atomic state remain in charge, so one broken source or account does not erase other results.
 
 Uncollected signals follow SignalScout exactly: the six-signal scorer assigns an explicit score-1, inferred prior at 40% confidence. Six entirely unknown signals therefore produce 8/100, zero receipts and the `mostly-inferred` label—not a claim that the company lacks pain or fit. WhyNow's browser now displays these rows as **Unknown · low confidence** so the numerical prior is not mistaken for negative evidence.
+
+## Step 1 — evidence-filled Today queue
+
+### `scripts/refresh-all-runner.cjs` live checkpoint
+
+**What it does:** Completed one background pass over all 25 discovered accounts. **How it decides:** The persisted parent run holds the account list, a 150-query hard ceiling and every child run; the already-running job was allowed to finish instead of being duplicated. **What changed from SignalScout:** This is a local, explicit Refresh-all action rather than a scheduler. The run used 125 Serper queries, made zero OpenAI calls and left failed optional sources as unknown evidence.
+
+**Worked example:** Binance reached Tier 1 with fit 49 and a current Greenhouse receipt. Its uncollected active-pain signal still displays as `Unknown · low confidence`; WhyNow does not turn that missing source into a claim that Binance has no production pain.
+
+## Chunk 3 — offline outreach templates
+
+### `scripts/message-targeting.cjs`
+
+**What it does:** Classifies a manually entered recipient above or below the engineering power line, estimates awareness, chooses an operating-pressure layer and selects CTA severity. **How it decides:** Workspace buyer/champion titles gate eligibility; recent citable incidents outrank broad AI-forward language; absent history defaults to the least aggressive seed question. **What changed from SignalScout:** Resolve-aware wording became seller-neutral, and Apollo/contact selection is absent. The user supplies the real recipient and sender names.
+
+### `scripts/outreach-drafts.cjs`
+
+**What it does:** Builds and validates a deterministic five-block first-touch email. **How it decides:** A non-killed account needs one dated, in-window, account-relevant public receipt plus frozen-reference or owner-approved receipted seller claims. The validator enforces an eight-word subject, 60–110 body words, exact claim wording, named greeting/signature, no body links and no internal enum leakage. **What changed from SignalScout:** WhyNow creates one transparent template before any AI option. It rejects uncitable/wrong-entity news such as the saved “Mann Circle” water-outage result, and it has no delivery path.
+
+### `scripts/outreach-model.cjs` and the account-page draft surface
+
+**What they do:** Build a future Responses API Structured Outputs request, estimate its cost, enforce recorded-fixture model identity, and expose a Demo-watermarked Copy button. **How they decide:** `OPENAI_OUTREACH_MODEL` is independent from Stage 2; the default is `gpt-5.5`. The live account check used only `GET /v1/models`. **What changed from SignalScout:** No generation call, retry, contact lookup, candidate ranking or send action is active. A saved Binance-sized request is estimated at about $0.00857 for a 150-token response and a conservative $0.02207 at the 600-token allowance.
+
+**Worked example:** With a real VP Engineering name, a current Acme Cloud SRE-job receipt and the frozen Resolve product/credential/proof receipts, the deterministic draft passes. Removing the receipt, aging it out, changing `73%` to `91%`, entering a CFO title or removing the approved seller evidence blocks the draft instead of silently rewriting it.

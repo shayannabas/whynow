@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 20, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phases A and B, the Phase B demo-quality fixes, and Chunk 2 are complete. No profile was approved and no later port chunk has started.
+Updated: October 21, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phases A and B, Chunk 2, the one authorized Refresh-all run and Chunk 3's deterministic offline outreach checkpoint are complete. No profile was approved, no paid outreach call was made and no send path exists.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -53,8 +53,16 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 - [x] Add Today, account detail, clickable why-now/source receipts and explicit `new / working / skipped` state with required typed skip reason and audit event.
 - [x] Browser-check Today, Discovery and account detail; restart and confirm the 25 prospects and completed run persist.
 - [x] Complete Chunk 2 and stop before the next port phase.
+- [x] Complete the single authorized 25-account Refresh-all background run without a duplicate: 25/25 accounts, exactly 125 Serper queries, zero OpenAI calls.
+- [x] Report the Today evidence set: 7/25 refreshed discovery accounts and 8 total Today accounts have at least one dated, in-window receipt; preserve exact top-10 and fit distribution in `docs/STEP-1-REFRESH-ALL.md`.
+- [x] Keep uncollected signals as SignalScout's score-1, 40%-confidence prior and label them `Unknown · low confidence`, never negative evidence.
+- [x] Port workspace-neutral message targeting and validator gates, then build the deterministic receipt-backed template first.
+- [x] Add the Demo watermark, manual recipient/sender fields, receipt links and Copy button. Keep every send code path absent.
+- [x] Configure outreach independently as `OPENAI_OUTREACH_MODEL=gpt-5.5`; free `GET /v1/models` returned HTTP 200 and confirmed account access.
+- [x] Confirm from official documentation that `gpt-5.5` supports Responses/Structured Outputs and costs $5/M input plus $30/M output tokens.
+- [x] Estimate a real Binance-context draft at about $0.00857 for 814 input + 150 output tokens; conservative 600-output-token maximum is $0.02207.
+- [ ] Any model-generated outreach call requires a new explicit owner authorization and cap. No recorded response fixture exists yet.
 - [ ] Later port chunks remain blocked until the owner approves each one separately.
-- [ ] Railway deployment is Phase G only and requires the owner's explicit OK.
 
 ## Stage 2.5 — research quality
 
@@ -77,7 +85,7 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 
 ## Current decision
 
-Chunk 2 is the current completed boundary. Phase A/B parity remains green. The Resolve demo contains 25 new balanced discovery accounts plus the five Phase B verification accounts; Databricks remains killed and therefore stays outside Today. Discovery spent 10 of the authorized extra 60 Serper queries and made zero OpenAI calls. New prospects honestly start Parked with fit 8 until account collectors provide receipted evidence. No later port phase is authorized.
+The current completed boundary is the offline Chunk 3 template checkpoint. Phase A/B parity and Chunk 2 remain green. The original Refresh-all job completed 25/25 discovered accounts with exactly 125 Serper queries and zero OpenAI calls; it was not duplicated. Seven refreshed discovery accounts now have a dated, in-window trigger, while eight accounts across the complete Today queue do. Missing signals remain unknown/low-confidence rather than negative. The deterministic outreach template uses only current account-relevant receipts and frozen-reference or owner-approved seller claims. `gpt-5.5` is available to the account, but no paid draft call is authorized.
 
 Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup. The bounded recovery run persisted three snapshots and three `needs_review` workspaces. It made four attempts because Shopify used the existing transient retry. Shopify and Vercel reported an estimated combined $0.005177; Resolve AI's usage record was lost when the first process stopped, so the exact total is unknown. The conservative reservation reached $0.038686 under the temporary $0.05 cap. The ignored local `.env` was then verified without displaying secrets: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. Local operation avoids hosting charges, but provider calls still consume credits.
 
@@ -155,7 +163,7 @@ The pass bar was at least three customers backed by first-party sources, at leas
 
 Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4o mini](https://developers.openai.com/api/docs/models/gpt-4o-mini). Public-page access can fail or be disallowed; do not bypass access controls.
 
-## Trimmed remaining portfolio stages — not started
+## Superseded trimmed portfolio stages — historical only
 
 - [ ] **Stage 2.5 (M):** owner confirms/corrects independent eval keys and decides whether to authorize a bounded focused-drafting check.
 - [ ] **Stage 3 (L):** ICP normalization, evidence-backed kill engine and scorecard; pass confirmed hand-labeled golden set plus Resolve gold-standard fixtures.
@@ -166,15 +174,19 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 - [ ] **Stage 9 (M):** validated receipt-backed draft plus Copy button; no contacts, sending, Apollo, Instantly, HubSpot or CRM sync.
 - [ ] **Stage 11 (S):** manual Refresh account, demo preflight and a three-minute `docs/DEMO-SCRIPT.md`.
 
-## Deferred — future work
+## Deferred — possible later
 
 - Stage 7 scheduler, SEC/EDGAR, executive-change and GitHub collectors, and signal stacking — unnecessary for a deterministic local portfolio demo.
-- Stage 9 contacts, Apollo, sending and CRM sync — paid/personal-data and authorization scope is not needed for receipt-backed drafts.
-- Stage 10 authentication, Postgres, backups and production deploy — the demo remains local and single-user.
+- Apollo integration — if separately authorized, port only SignalScout's contact lookup behind an off-by-default switch, run it only after fit/kill checks pass, and enforce a strict credit cap. No sending or CRM sync.
+- Railway deploy (backup only, owner OK required) — interview demos run locally with screen sharing; existing `STATE_DIR`/`PORT` support stays, but Railway is not a planned phase and no demo snapshot work is needed.
+- Stage 10 authentication, Postgres and backups — the demo remains local and single-user.
 - Stage 12 advanced integrations — optional expansion after the core portfolio flow works.
 
 ## Change log
 
+- **2026-10-21:** Finished the already-running 25-account Refresh-all job without launching a duplicate. It completed 25/25 accounts with 125/150 authorized Serper queries and zero OpenAI calls. Seven batch accounts (eight across Today) have a dated in-window trigger; fit scores span 11–51 with median 34. Optional-source failures remain unknown evidence.
+- **2026-10-21:** Completed Chunk 3's offline checkpoint. Ported workspace-neutral message targeting and validator gates, added a deterministic receipt-backed five-block template, Demo watermark and Copy button, and kept the application send-free. The real Circle false-positive receipt is rejected for drafting. A free `GET /v1/models` check confirmed `gpt-5.5`; official pricing yields about $0.00857 typical and $0.02207 conservative maximum per saved-context request. No generation call ran.
+- **2026-10-21:** Confirmed local screen-sharing as the interview demo path. Removed Railway as a planned phase; Railway backup and capped, off-by-default Apollo contact lookup are documented only as possible later work requiring separate owner approval. No deployment or snapshot work ran.
 - **2026-10-20:** Owner superseded Stage 2.5 and the trimmed remaining-stage plan with port mode using SignalScout by Isa Iqbal as a read-only reference. Stage 2.5 is paused and its extractor retained for future use. No module was ported, no profile approved and no provider called; Phase A awaits explicit owner approval.
 - **2026-10-20:** Completed port-mode Phase A. Captured ten immutable offline SignalScout parity cases at commit `130789f`, moved Resolve constants into reference profile v2 with line-level provenance, added workspace-configured scoring/kills/tiering/decisioning, manual accounts, Scorecard, retained Kill Log and a non-approved Resolve demo loader. Real browser restart persistence passed. Full suite: 144 active tests passed, one intentional skip. No provider call, approval or deployment occurred; Phase B remains blocked.
 - **2026-10-20:** Tightened Phase B live quality. Free firmographics now reject adjacent-company/IPO/public boilerplate, current triggers require dated in-window evidence, healthy status pages score zero, and repeated receipts are deduplicated. The five-account correction reused saved evidence and made no provider calls. SEC EDGAR's remaining 403 is recorded and isolated. The owner authorized Chunk 2 with a separate maximum of 60 Serper queries.

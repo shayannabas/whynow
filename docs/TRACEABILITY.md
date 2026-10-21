@@ -6,7 +6,7 @@ The owner authorized Phase A after the Stage 2.5 pause. The immutable fixture `t
 
 Resolve reference profile v2 remains load-only and now records line-level provenance for every moved runtime constant: segments/personas, scoring weights and trigger window, customer exclusions, kill floor/patterns/precedence, tier rules, decision rules and the Uber identity alias. Normal workspaces require owner approval before scoring; the explicit `reference_demo` adapter is a non-approved local parity surface with delivery disabled.
 
-Phase A adds `scoring.cjs`, `kills.cjs`, `tiering.cjs`, `decisioning.cjs`, `signal-rubric.cjs`, `entity-rules.cjs`, the workspace config adapter, score orchestrator, manual account persistence and local reference loader. The browser exposes Accounts, Scorecard and Kill Log. A real isolated walkthrough loaded Resolve, added Coinbase, displayed 8/100 inferred fit, retained `KILL_EXISTING_CUSTOMER` with `https://resolve.ai/customers`, restarted and preserved the same record. `STATE_DIR` selects the durable state directory and the existing server continues to honor `PORT`; Railway deployment is explicitly deferred to Phase G after owner approval.
+Phase A adds `scoring.cjs`, `kills.cjs`, `tiering.cjs`, `decisioning.cjs`, `signal-rubric.cjs`, `entity-rules.cjs`, the workspace config adapter, score orchestrator, manual account persistence and local reference loader. The browser exposes Accounts, Scorecard and Kill Log. A real isolated walkthrough loaded Resolve, added Coinbase, displayed 8/100 inferred fit, retained `KILL_EXISTING_CUSTOMER` with `https://resolve.ai/customers`, restarted and preserved the same record. `STATE_DIR` selects the durable state directory and the existing server continues to honor `PORT`; Railway deployment is deferred backup-only work requiring owner approval.
 
 Verification: 31 test files passed, 144 active tests passed and one pre-existing future scaffold remains skipped. No Serper, OpenAI or other provider ran; no seller profile was approved; no deployment occurred. Phase B is not authorized.
 
@@ -163,6 +163,21 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Persistence browser check | Atomic state + `/discovery`, `/today`, `/accounts/:id` | Completed run and 25 prospects visible after server restart |
 | Full regression | All tests | 43 files passed; 205 active tests passed, 1 intentional future scaffold skipped |
 
+## Refresh-all and Chunk 3 offline traceability — October 21, 2026
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| One non-duplicated 25-account refresh | Persisted `account_collector_refresh_all` run; `docs/STEP-1-REFRESH-ALL.md` | Original job finished 25/25 with 125 Serper queries, 0 failed accounts and 0 OpenAI calls |
+| Today evidence | `account-lifecycle.cjs`; saved account receipts | 7/25 refreshed discovery accounts have a dated in-window trigger; 8 accounts across the complete Today queue |
+| Unknown is not negative | `scoring.cjs`; Scorecard/account pages | Missing signals retain SignalScout's score-1, confidence-0.4 prior and render `Unknown · low confidence` with no receipt |
+| Workspace-neutral targeting | `message-targeting.cjs`; `resolve-ai.json` outreach config | Ported title, power-line, awareness, Maslow and CTA tests pass without Resolve runtime constants |
+| Deterministic receipt-backed template | `outreach-drafts.cjs`; account detail route/page | Blocks killed, stale, uncitable, wrong-entity, wrong-persona and unapproved-claim contexts; saves Demo-only drafts and audit events |
+| Validator gates | `validateOutreachDraft` | Five blocks, 60–110 words, <=8-word subject, exact seller wording, named greeting/signature, no links or enum leakage |
+| Copy-only browser surface | `/accounts/:id/drafts/template` and account page | Local/same-origin POST, watermark, receipts and clipboard button; no send route/action |
+| Free model verification | `openai-model-check.cjs`; `outreach-model.cjs` | `GET /v1/models` returned HTTP 200 and listed `gpt-5.5`; no generation request; official docs confirm Responses/Structured Outputs |
+| Cost estimate | `docs/CHUNK-3-OUTREACH.md` | Real saved Binance context: 814 estimated input tokens, about $0.00857 typical total, $0.02207 conservative maximum |
+| Deployment direction | `AGENTS.md`; checklist | Local screen-share is the demo path; no snapshot/deploy; Railway backup and Apollo lookup remain deferred and owner-gated |
+
 | Requirement | Implementation | Verification |
 | --- | --- | --- |
 | Node 22, CommonJS, allowed dependencies | package.json, .nvmrc, CI | Seven tests passed on Node 22.23.2 |
@@ -175,7 +190,7 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Health, 404 and generic errors | router.cjs, server.cjs | HTTP tests |
 | CI installation, tests, audit, secret scan | .github/workflows/ci.yml | Configured; remote run pending repository publication |
 
-No later-stage seller research, collection, scoring, contacts, outreach, auth or deployment is implemented.
+The table above is the historical Stage 0 boundary. Current port-mode implementation and verification are recorded in the dated sections that precede it.
 
 This sentence describes the Stage 0 checkpoint. Stage 1 infrastructure is added below; seller research and prospect collectors are still absent.
 
