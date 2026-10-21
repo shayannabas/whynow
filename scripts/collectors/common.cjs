@@ -29,18 +29,20 @@ function domainForTarget(target={}) {if(target.domain)return String(target.domai
 function normalizeEntityText(value=''){return stripHtml(value).toLowerCase().replace(/\b(inc|incorporated|llc|ltd|limited|corp|corporation|company|technologies|technology)\b/g,' ').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();}
 function evidenceBelongsToTarget(target={},evidenceOrUrl={},fallbackText='') {
   const evidence=typeof evidenceOrUrl==='string'?{url:evidenceOrUrl,text:fallbackText}:evidenceOrUrl||{};
-  const targetDomain=domainForTarget(target),evidenceUrl=String(evidence.url||evidence.link||evidence.evidenceUrl||'');
-  if(targetDomain&&evidenceUrl){try{const host=new URL(evidenceUrl).hostname.replace(/^www\./,'').toLowerCase();if(host===targetDomain||host.endsWith(`.${targetDomain}`))return true;}catch{}}
-  const targetNameRaw=String(target.discoveryQuality?.targetAccountName||target.name||'').trim(),targetName=normalizeEntityText(targetNameRaw);
-  if(targetName.length<4)return false;
+  const evidenceUrl=String(evidence.url||evidence.link||evidence.evidenceUrl||''),targetDomains=Array.from(new Set([domainForTarget(target),domainForTarget(target.firmographicTarget||{})].filter(Boolean)));
+  if(evidenceUrl){try{const host=new URL(evidenceUrl).hostname.replace(/^www\./,'').toLowerCase();if(targetDomains.some(domain=>host===domain||host.endsWith(`.${domain}`)))return true;}catch{}}
+  const targetNames=Array.from(new Set([target.discoveryQuality?.targetAccountName,target.name,target.firmographicTarget?.name,...(target.aliases||[])].map(value=>String(value||'').trim()).filter(Boolean)));
   const rawText=stripHtml(`${evidence.title||''} ${evidence.snippet||evidence.text||evidence.evidenceText||''}`),text=normalizeEntityText(rawText);
   if(!text)return false;
-  if(!targetName.includes(' ')){
+  return targetNames.some(targetNameRaw=>{
+    const targetName=normalizeEntityText(targetNameRaw);if(targetName.length<4)return false;
+    if(!targetName.includes(' ')){
     const escapedRaw=targetNameRaw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),urlText=normalizeEntityText(evidenceUrl);
     return new RegExp(`(?:^|\\s)${targetName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:$|\\s)`).test(urlText)||new RegExp(`(?:^|[^A-Za-z0-9])${escapedRaw}(?:$|[^A-Za-z0-9])`).test(rawText);
-  }
-  if(` ${text} `.includes(` ${targetName} `))return true;
-  const compactTarget=targetName.replace(/\s+/g,''),compactText=text.replace(/\s+/g,'');
-  return compactTarget.length>=7&&compactText.includes(compactTarget);
+    }
+    if(` ${text} `.includes(` ${targetName} `))return true;
+    const compactTarget=targetName.replace(/\s+/g,''),compactText=text.replace(/\s+/g,'');
+    return compactTarget.length>=7&&compactText.includes(compactTarget);
+  });
 }
 module.exports={clampScore,domainForTarget,evidenceBelongsToTarget,event,normalizeEntityText,signal,stableId,stripHtml,unique,withinDays};

@@ -1,7 +1,7 @@
 'use strict';
 
 const {phaseAConfigForWorkspace}=require('./phase-a-config.cjs');
-const {parentRuleForNamesAndDomains}=require('./entity-rules.cjs');
+const {parentRuleForNamesAndDomains,rootDomain}=require('./entity-rules.cjs');
 
 function mapSegments(rows=[]){
   return Object.fromEntries((rows||[]).filter(row=>row?.key).map(row=>[row.key,structuredClone(row)]));
@@ -32,6 +32,11 @@ function collectorConfigForWorkspace(workspace={}){
 function collectorTargetForAccount(account={},collectorConfig={}){
   const segment=String(account.icpSegment||account.segment||'');
   const parent=parentRuleForNamesAndDomains([account.name],[account.domain||account.website],collectorConfig.entityRules||[]);
+  const firmographicTarget=parent?{
+    name:String(parent.canonicalName||account.name),
+    domain:rootDomain(parent.domains?.[0]||account.domain||account.website),
+    parentOf:String(account.name||''),
+  }:{name:String(account.name||''),domain:rootDomain(account.domain||account.website),parentOf:''};
   return {
     ...structuredClone(account),
     segment,
@@ -41,6 +46,7 @@ function collectorTargetForAccount(account={},collectorConfig={}){
     championTitles:structuredClone(collectorConfig.personas?.championTitles||[]),
     competitors:structuredClone(collectorConfig.competitors||[]),
     aliases:Array.from(new Set([...(account.aliases||[]),...(parent?.aliases||[]),parent?.canonicalName].filter(Boolean))),
+    firmographicTarget,
   };
 }
 

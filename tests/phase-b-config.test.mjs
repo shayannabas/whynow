@@ -4,6 +4,8 @@ const require=createRequire(import.meta.url);
 const {loadResolveReferenceDemo}=require('../scripts/reference-demo.cjs');
 const {defaultState}=require('../scripts/server/state.cjs');
 const {collectorConfigForWorkspace,collectorTargetForAccount}=require('../scripts/phase-b-config.cjs');
+const {phaseBQueryPlan}=require('../scripts/collectors/search-evidence.cjs');
+const {collectFirmographics}=require('../scripts/collectors/firmographics.cjs');
 
 describe('workspace-owned Phase B configuration',()=>{
   it('loads Resolve collector rules from the frozen workspace instead of collector constants',()=>{
@@ -23,6 +25,17 @@ describe('workspace-owned Phase B configuration',()=>{
     expect(target.segmentConfig.label).toBe('Cybersecurity platforms');
     expect(target.buyerTitles).toEqual(config.personas.buyerTitles);
     expect(target.competitors).toEqual(config.competitors);
+  });
+
+  it('uses the parent company for division sizing while keeping the division visible',async()=>{
+    const state=loadResolveReferenceDemo(defaultState()),workspace=state.workspaces[state.activeWorkspaceId],config=collectorConfigForWorkspace(workspace);
+    const target=collectorTargetForAccount({id:'uber-eats',name:'Uber Eats',domain:'ubereats.com',icpSegment:'delivery_marketplaces'},config),plan=phaseBQueryPlan(target);
+    expect(target).toMatchObject({name:'Uber Eats',domain:'ubereats.com',firmographicTarget:{name:'Uber',domain:'uber.com',parentOf:'Uber Eats'}});
+    expect(plan.find(row=>row.kind==='active_pain_news').query).toContain('"Uber Eats"');
+    expect(plan.find(row=>row.kind==='firmographics_size').query).toContain('"Uber"');
+    const runtime={requestJson:async()=>({value:{search:[]}})},result=await collectFirmographics(target,{runtime,now:new Date('2026-10-20T00:00:00Z'),searchResults:[{kind:'firmographics_size',title:'Uber company profile',url:'https://example.org/uber',snippet:'Uber has 30,000 employees.'}]});
+    expect(result.targetPatch).toMatchObject({firmographics:{employeeCount:30000},firmographicEntity:{name:'Uber',domain:'uber.com',parentOf:'Uber Eats'}});
+    expect(target).toMatchObject({name:'Uber Eats',domain:'ubereats.com'});
   });
 
   it('keeps two approved workspace configurations isolated',()=>{

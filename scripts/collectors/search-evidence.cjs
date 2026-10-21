@@ -16,13 +16,14 @@ function serperQueries(target) {
 // The frozen SignalScout query plan above remains unchanged for parity tests.
 function phaseBQueryPlan(target){
   const name=String(target.name||'').replace(/["\n\r]/g,' ').trim();
+  const firmographicName=String(target.firmographicTarget?.name||name).replace(/["\n\r]/g,' ').trim();
   if(!name)return [];
   return [
     {kind:'active_pain_news',query:`"${name}" outage OR incident OR downtime OR degraded`},
     {kind:'tech_and_ai',query:`"${name}" Kubernetes OR microservices OR observability OR SRE OR LLM OR Copilot OR Cursor engineering`},
     {kind:'exec_change',query:`"${name}" (appoints OR joins OR hires OR names OR leaves OR departs OR resigns OR "steps down") ("VP Engineering" OR CTO OR SVP OR "Head of Platform" OR "Head of SRE")`},
-    {kind:'firmographics_size',query:`"${name}" employees revenue public company`},
-    {kind:'firmographics_funding',query:`"${name}" raised funding valuation founded headquartered`},
+    {kind:'firmographics_size',query:`"${firmographicName}" employees revenue public company`},
+    {kind:'firmographics_funding',query:`"${firmographicName}" raised funding valuation founded headquartered`},
   ];
 }
 
