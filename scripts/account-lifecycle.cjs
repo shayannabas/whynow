@@ -33,6 +33,7 @@ function todaySections(workspace={},now=new Date(),options={}){
   for(const account of base){
     const reviewReason=needsReviewReason(account,now),hasTrigger=Boolean(latestTrigger(account,now));
     if(reviewReason){needsReview.push({...account,reviewReason});continue;}
+    if(![1,2,3].includes(Number(account.tier))){needsReview.push({...account,reviewReason:'Tier unknown — verify firmographics before placing this account in the seller queue.'});continue;}
     if(hasTrigger){actNow.push(account);continue;}
     if(Number(account.fitScore||0)>=threshold&&account.tier!=='parked')worthResearching.push(account);
   }

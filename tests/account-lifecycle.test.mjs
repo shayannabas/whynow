@@ -5,7 +5,7 @@ const lifecycle=require('../scripts/account-lifecycle.cjs');
 
 describe('simple account lifecycle and Today queue',()=>{
   it('ranks working accounts, keeps only active why-now evidence and excludes killed/skipped rows',()=>{
-    const now=new Date('2026-10-20T12:00:00.000Z'),base={fitScore:40,priority:.2,signals:{},triggers:[],kills:[]};
+    const now=new Date('2026-10-20T12:00:00.000Z'),base={fitScore:40,priority:.2,tier:1,signals:{},triggers:[],kills:[]};
     const accounts=[
       {...base,id:'new',name:'New',status:'new',sourceUrl:'https://new.example'},
       {...base,id:'working',name:'Working',status:'working',priority:.1,triggers:[{type:'reliability_hiring',title:'Hiring SREs now',evidenceUrl:'https://working.example/jobs',occurredAt:'2026-10-19T12:00:00.000Z',decaysAt:'2026-11-19T12:00:00.000Z'}]},
@@ -32,12 +32,14 @@ describe('simple account lifecycle and Today queue',()=>{
       {...base,id:'research',name:'Research',fitScore:48,triggers:[]},
       {...base,id:'thin',name:'Thin',fitScore:20,triggers:[]},
       {...base,id:'circle',name:'Circle',fitScore:55,triggers:[],triggerHistory:[{type:'outage_news',title:'Mann Circle Water Outage',evidenceUrl:'https://news.example/mann-circle',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-11-20T00:00:00.000Z',metadata:{citable:false,notCitableReason:'The receipt describes a different entity.'}}]},
+      {...base,id:'axs',name:'AXS',tier:'parked',fitScore:24,triggers:[{type:'reliability_hiring',title:'Site Reliability Engineer II',evidenceUrl:'https://jobs.example/axs/sre',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-12-20T00:00:00.000Z'}]},
     ]};
     const sections=lifecycle.todaySections(workspace,now);
     expect(sections.actNow.map(row=>row.id)).toEqual(['act']);
     expect(sections.worthResearching.map(row=>row.id)).toEqual(['research']);
-    expect(sections.needsReview.map(row=>row.id)).toEqual(['circle']);
+    expect(sections.needsReview.map(row=>row.id)).toEqual(['circle','axs']);
     expect(sections.needsReview[0].reviewReason).toContain('different entity');
+    expect(sections.needsReview[1].reviewReason).toContain('Tier unknown');
     expect(lifecycle.todayQueue(workspace,now).map(row=>row.id)).toEqual(['act','research']);
   });
 });
