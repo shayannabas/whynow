@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 const require=createRequire(import.meta.url);
-const {CollectorRuntime,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress}=require('../scripts/collectors/runtime.cjs');
+const {CollectorRuntime,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress,officialSecDataEndpoint}=require('../scripts/collectors/runtime.cjs');
 const {recordSource,quoteIsGrounded,getSource}=require('../scripts/sources.cjs');
 const {defaultState}=require('../scripts/server/state.cjs');
 const {signal,stripHtml,evidenceBelongsToTarget}=require('../scripts/collectors/common.cjs');
@@ -72,11 +72,31 @@ it('rejects timeouts, oversized bodies, and unsupported content',async()=>{
 it('allows SEC plain-text indexes served as octet-stream and keeps safe HTTP status diagnostics',async()=>{
   const headers=[];const sec=harness({fetch:async(url,options)=>{headers.push(options.headers);return url.endsWith('/robots.txt')?response('User-agent: *\nAllow: /'):response('D  Example  1  20261020  edgar/data/1/file.txt',200,{'content-type':'application/octet-stream'});}});
   expect((await sec.runtime.requestText('https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261020.idx','edgar_index')).value).toContain('Example');
-  expect(headers[1]['User-Agent']).toBe('WhyNow crawler@example.org');
-  expect(headers[1].Accept).toContain('application/octet-stream');
+  expect(headers).toHaveLength(1);
+  expect(headers[0]['User-Agent']).toBe('WhyNow crawler@example.org');
+  expect(headers[0].Accept).toContain('application/octet-stream');
   const failed=harness({fetch:async url=>url.endsWith('/robots.txt')?response('',404):response('blocked',429)});
   await expect(failed.runtime.request('seller_site','https://example.org/page')).rejects.toMatchObject({status:429});
   expect(failed.runtime.snapshot().health.seller_site).toMatchObject({code:'HTTP_ERROR',httpStatus:429});
+});
+it('skips robots only for documented SEC data endpoints and keeps the public-address guard',async()=>{
+  for(const url of [
+    'https://www.sec.gov/files/company_tickers.json',
+    'https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261020.idx',
+    'https://www.sec.gov/Archives/edgar/data/1/filing.txt',
+    'https://data.sec.gov/submissions/CIK0000320193.json',
+    'https://efts.sec.gov/LATEST/search-index?q=Acme',
+  ])expect(officialSecDataEndpoint(url)).toBe(true);
+  expect(officialSecDataEndpoint('https://www.sec.gov/about')).toBe(false);
+  expect(officialSecDataEndpoint('https://example.org/Archives/edgar/data/1/filing.txt')).toBe(false);
+  const calls=[];const direct=harness({fetch:async(url,options)=>{calls.push({url,options});return response('{}',200,{'content-type':'application/json'});}});
+  await direct.runtime.requestJson('https://efts.sec.gov/LATEST/search-index?q=CrowdStrike&forms=D','edgar_search');
+  expect(calls.map(row=>row.url)).toEqual(['https://efts.sec.gov/LATEST/search-index?q=CrowdStrike&forms=D']);
+  expect(calls[0].options.headers['User-Agent']).toBe('WhyNow crawler@example.org');
+  const guarded=harness({lookup:async()=>[{address:'127.0.0.1',family:4}]});
+  await expect(guarded.runtime.requestJson('https://efts.sec.gov/LATEST/search-index?q=CrowdStrike','edgar_search')).rejects.toMatchObject({code:'UNSAFE_URL'});
+  const ordinary=harness({fetch:async url=>url.endsWith('/robots.txt')?response('User-agent: *\nDisallow: /'):response('{}',200,{'content-type':'application/json'})});
+  await expect(ordinary.runtime.request('edgar_search','https://www.sec.gov/about')).rejects.toMatchObject({code:'ROBOTS_DISALLOWED'});
 });
 it('allows larger ATS JSON while preserving the two-megabyte general ceiling',async()=>{
   const body='a'.repeat(3*1024*1024),ats=harness({fetch:async url=>url.endsWith('/robots.txt')?response(''):response(body,200,{'content-type':'application/json'})});

@@ -26,9 +26,14 @@ The nine active Binance triggers are dated job-board signals inside their config
 
 The frozen SignalScout parity case is killed because its input explicitly says the prospecting surface is unavailable and includes a public evidence URL. The live Binance record has no `prospectingSurface`, no receipted `prospectingSurfaceEvidenceUrl`, and no equivalent kill hint. Large size and a high fit score cannot substitute for the missing evidence, so `KILL_UNSELLABLE_ORG` correctly does not fire.
 
+## SEC EDGAR 403 timebox — resolved October 21
+
+The blocked request was WhyNow's automatic `robots.txt` pre-check on the SEC hosts. A single plain curl to SEC's documented `company_tickers.json` endpoint, using the same name-plus-contact User-Agent, returned HTTP **200**. This proved the machine/IP was not blocked. After limiting the robots bypass to documented SEC data URLs, a one-company EFTS Form D search also returned HTTP **200** with zero matching filings. The contact email was never printed. The check used **2 SEC requests total**, below the five-request ceiling.
+
+WhyNow still performs the public-HTTPS, DNS/private-address, pacing, cache, byte, content-type and per-source budget checks. Ordinary SEC web pages are not exempt from robots. A 403 or other EDGAR failure remains isolated and cannot stop other collectors.
+
 ## Remaining source errors
 
-- **SEC EDGAR still returned HTTP 403** even after the request identity was changed to the SEC-required name-plus-contact format and supported content types were accepted. The collector remains implemented, but this source error is isolated: the other collectors continue, their successful evidence is retained and the job reports `complete_with_errors`. No more time is being spent on EDGAR in this phase.
 - Google News RSS was blocked by its `robots.txt`; WhyNow continues to respect that. News collection now uses dated Serper News results inside the authorized query budget.
 - The Wikidata API path was disallowed by its current robots policy during the check. Free-search firmographics still produced the receipted tiers above; no access control was bypassed.
 - Databricks's Greenhouse board exceeded the earlier 8 MB ATS-only ceiling. The offline fix raises only ATS JSON to 16 MB. No new fetch was made for this checkpoint.

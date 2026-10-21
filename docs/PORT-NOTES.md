@@ -110,7 +110,7 @@ The captured Binance-like account has strong public signals and scores **90/100*
 
 ### `scripts/collectors/runtime.cjs`
 
-**What it does:** Provides the only live network path for collectors. **How it decides:** It requires the crawler contact email, public HTTPS/DNS, allowed redirects, robots permission, per-source pacing, size/type limits and cached budgets. **What changed from SignalScout:** SignalScout's relevant source budgets and cache times are preserved, while WhyNow keeps its stricter DNS pinning, robots checks, atomic cache writes and saved health counters. Skipped sources have no runtime budget.
+**What it does:** Provides the only live network path for collectors. **How it decides:** It requires the crawler contact email, public HTTPS/DNS, allowed redirects, robots permission, per-source pacing, size/type limits and cached budgets. Documented SEC data APIs are the only exception to the robots preflight; they still require SEC's name-plus-contact identity and every other network guard. **What changed from SignalScout:** SignalScout's relevant source budgets and cache times are preserved, while WhyNow keeps its stricter DNS pinning, robots checks, atomic cache writes and saved health counters. The narrow SEC-data exception matches SignalScout's direct official-API behavior after a curl proved the endpoint itself accepted this machine. Skipped sources have no runtime budget.
 
 ATS JSON has a source-specific 16 MB ceiling because large public boards such as Databricks can exceed the normal page limit; every other source keeps its tighter ceiling. Greenhouse, Lever and Ashby slugs are derived from configured domain/name aliases and their standard public board URL shapes. A failed or forbidden source is recorded independently and never blocks unrelated collectors.
 
@@ -140,7 +140,7 @@ ATS JSON has a source-specific 16 MB ceiling because large public boards such as
 
 ### `scripts/collectors/edgar-form-d.cjs`
 
-**What it does:** Checks SEC daily indexes and one workspace segment query for matching Form D fundraising. **How it decides:** Company/alias matching is exact after legal-suffix normalization, and details are included only when disclosed in the filing. **What changed from SignalScout:** Resolve segment queries moved into workspace configuration. Risk-factor collection and discovery promotion are not run; account refresh keeps only events for the named account. The live SEC endpoint still returned 403 with the required name-plus-contact identity; that error is retained without blocking other sources, and Phase B does not spend more time retrying it.
+**What it does:** Checks SEC daily indexes and one workspace segment query for matching Form D fundraising. **How it decides:** Company/alias matching is exact after legal-suffix normalization, and details are included only when disclosed in the filing. **What changed from SignalScout:** Resolve segment queries moved into workspace configuration. Risk-factor collection and discovery promotion are not run; account refresh keeps only events for the named account. WhyNow now calls only documented SEC data URLs directly, using the required name-plus-contact identity; its earlier 403 came from a robots pre-check rather than the data API. SEC errors remain isolated from every other collector.
 
 ### `scripts/collectors/tech-culture.cjs`
 

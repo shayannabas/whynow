@@ -73,6 +73,21 @@ function redirectStaysInDomain(value,domain) {
   return host===allowed||host.endsWith(`.${allowed}`);
 }
 
+// The SEC publishes these as documented data endpoints. Its robots.txt can
+// reject automated clients even when the data endpoint itself accepts the
+// SEC-required name + contact identity. Skip only that preflight; URL/DNS,
+// pacing, response-size, content-type, and request-budget guards still apply.
+function officialSecDataEndpoint(value) {
+  let url;
+  try {url=new URL(value);} catch {return false;}
+  if(url.protocol!=='https:')return false;
+  if(url.hostname==='efts.sec.gov')return url.pathname==='/LATEST/search-index';
+  if(url.hostname==='data.sec.gov')return /^\/submissions\/CIK\d{10}\.json$/i.test(url.pathname);
+  if(url.hostname!=='www.sec.gov')return false;
+  return /^\/files\/company_tickers(?:_exchange)?\.json$/i.test(url.pathname)
+    || /^\/Archives\/edgar\/(?:daily-index|data)\//i.test(url.pathname);
+}
+
 class CollectorRuntime {
   constructor({env=process.env,now=Date.now,fetch=publicFetch,lookup=dns.lookup.bind(dns),sleep=ms=>new Promise(r=>setTimeout(r,ms)),cacheDir=path.resolve(__dirname,'../../.whynow/collector-cache'),budgets=DEFAULT_BUDGETS,timeoutMs}={}) {
     Object.assign(this,{env,now,fetch,lookup,sleep,cacheDir,budgets,timeoutMs});
@@ -116,7 +131,8 @@ class CollectorRuntime {
     const {url}=checked;
     if(options.allowedRedirectDomain&&!redirectStaysInDomain(url.href,options.allowedRedirectDomain))throw new CollectorHttpError('REDIRECT_BLOCKED','The request left the approved company domain');
     let crawlDelay=0;
-    if(source!=='robots' && source!=='serper') {
+    const secDataRequest=String(source).startsWith('edgar_')&&officialSecDataEndpoint(url.href);
+    if(source!=='robots' && source!=='serper' && !secDataRequest) {
       const robotsUrl=new URL('/robots.txt',url).href;
       const response=await this.request('robots',robotsUrl,{...(options.allowedRedirectDomain?{allowedRedirectDomain:options.allowedRedirectDomain}:{}),userAgent:this.identity(source)});
       const rules=robotsParser(robotsUrl,response.status===404?'':response.text);
@@ -170,4 +186,4 @@ class CollectorRuntime {
     } finally {clearTimeout(timer);}
   }
 }
-module.exports={CollectorRuntime,CollectorHttpError,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress,redirectStaysInDomain};
+module.exports={CollectorRuntime,CollectorHttpError,DEFAULT_BUDGETS,assertPublicHttpsUrl,isPublicAddress,officialSecDataEndpoint,redirectStaysInDomain};
