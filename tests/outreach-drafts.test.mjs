@@ -63,7 +63,8 @@ describe('receipt-backed deterministic outreach',()=>{
   });
   it('builds but does not execute a Responses structured-output request and prices its upper bound',()=>{
     const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'}),estimate=model.estimateOutreachRequest(request);
-    expect(request).toMatchObject({model:'gpt-5.5',store:false,max_output_tokens:600,text:{format:{type:'json_schema',strict:true}}});expect(estimate).toMatchObject({model:'gpt-5.5',maxOutputTokens:600});expect(estimate.maximumTotalCostUsd).toBeGreaterThan(0);expect(()=>model.assertRecordedModel({model:'gpt-5.4'},{OPENAI_OUTREACH_MODEL:'gpt-5.5'})).toThrow('gpt-5.5');
+    expect(request).toMatchObject({model:'gpt-5.5',store:false,reasoning:{effort:'medium'},max_output_tokens:4000,text:{format:{type:'json_schema',strict:true}}});expect(estimate).toMatchObject({model:'gpt-5.5',maxOutputTokens:4000});expect(estimate.maximumTotalCostUsd).toBeGreaterThan(.12);expect(()=>model.assertRecordedModel({model:'gpt-5.4'},{OPENAI_OUTREACH_MODEL:'gpt-5.5'})).toThrow('gpt-5.5');
+    expect(model.maxOutputTokens('gpt-5.5')).toBe(4000);expect(model.maxOutputTokens('gpt-4o-mini')).toBe(600);
   });
   it('pins the model prompt to the exact Demo merge greeting',()=>{
     const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'});

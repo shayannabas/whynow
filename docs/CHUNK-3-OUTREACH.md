@@ -25,24 +25,25 @@ WhyNow deliberately narrows the current surface. Apollo/contact selection, candi
 - Free read-only check: `GET /v1/models` returned HTTP 200 and listed `gpt-5.5` for the configured API key.
 - Official model documentation confirms Responses API and Structured Outputs support: <https://developers.openai.com/api/docs/models/gpt-5.5>.
 - Official price checked October 21, 2026: $5 per million input tokens and $30 per million output tokens.
-- The Structured Outputs request is built and tested offline. One bounded Binance request was executed and returned provider status `incomplete` before a validator-ready draft existed.
+- The Structured Outputs request uses reasoning effort `medium` and a 4,000-token output budget for GPT-5.x, matching SignalScout's proven default. There is no automatic output-budget escalation retry.
+- Incomplete responses retain only safe diagnostic metadata: `incomplete_details.reason`, input/cached-input/output/reasoning token counts, response identity and calculated cost. Prompt contents and keys are never copied into the report.
 - No recorded model-output fixture exists yet. A guard requires any future recorded response to name the configured outreach model.
 
 ## Per-draft estimate
 
-The estimate uses the actual request built from the saved Binance account context:
+The estimate uses the corrected request built from the saved Binance account context:
 
 | Item | Estimate |
 | --- | ---: |
-| Request size | 3,253 bytes |
-| Estimated input | 814 tokens |
-| Input cost | $0.004070 |
+| Request size | 3,211 bytes |
+| Estimated input | 803 tokens |
+| Input cost | $0.004015 |
 | Typical 150-token output | $0.004500 |
-| Typical total | about $0.008570 |
-| Hard request output allowance | 600 tokens |
-| Conservative maximum total | $0.022070 |
+| Typical total | about $0.008515 |
+| Hard request output allowance | 4,000 tokens, including reasoning |
+| Conservative maximum total | $0.124015 |
 
-Actual cost can differ because the API bills real input, visible output and reasoning tokens. The maximum is not authorized spending; it is only a planning estimate. The owner must separately approve any generation call and cap.
+Across Binance, Coalition and CrowdStrike, the three-request conservative maximum is $0.371815. Adding one maximum-size transient retry yields $0.495855, inside the authorized temporary $0.50 cap. Actual cost can differ because the API bills real input, visible output and reasoning tokens; the runtime still stops before a reservation would exceed the cap.
 
 ## Bounded paid-test outcome
 
@@ -55,4 +56,4 @@ The owner authorized one three-target batch for Binance, Coalition and CrowdStri
 - Actual billed cost: unavailable because usage metadata from the incomplete response was not retained. The reservation is an upper bound, not a claim that this amount was charged.
 - Normal local configuration after the stop: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`.
 
-No draft, subject, receipt citation or persona result can be reported as model output from this checkpoint. Another paid request requires a new explicit owner authorization.
+No draft, subject, receipt citation or persona result can be reported as model output from this first checkpoint. The owner later supplied the separate corrected-run authorization described above; any request beyond that one corrected batch requires new explicit authorization.
