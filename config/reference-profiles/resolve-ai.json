@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v3-phase-b",
+  "referenceProfileVersion": "resolve-ai-v4-chunk-3",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -15,7 +15,9 @@
     "sourceModules": [
       "scripts/resolve-gtm.cjs",
       "scripts/stage3-signals.cjs",
-      "scripts/tiering.cjs"
+      "scripts/tiering.cjs",
+      "scripts/resolve-outreach.cjs",
+      "scripts/message-targeting.cjs"
     ],
     "customerSourceUrl": "https://resolve.ai/customers",
     "customerEvidenceStatus": "requires_live_research",
@@ -51,6 +53,9 @@
       ,{"target":"icpConfig.collectorRules.transactionalUrgency","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"189-194","note":"Segment transaction-loss rules and public keyword cues moved out of runtime code."}
       ,{"target":"icpConfig.collectorRules.edgarSegmentQueries","sourceFile":"scripts/collectors/edgar.cjs","sourceLines":"10-21","note":"Resolve Form D segment query expressions moved out of the collector."}
       ,{"target":"icpConfig.slaDays","sourceFile":"scripts/stage3-signals.cjs","sourceLines":"5-22","note":"Collector trigger decay windows moved out of runtime code."}
+      ,{"target":"icpConfig.outreach.claims","sourceFile":"scripts/resolve-outreach.cjs","sourceLines":"14-77","note":"Resolve product, credential and named customer proof constants moved into the frozen workspace configuration."}
+      ,{"target":"icpConfig.outreach.rules","sourceFile":"scripts/resolve-outreach.cjs","sourceLines":"759-881,939-1003","note":"The deterministic first-touch structure and validator limits moved into workspace-readable configuration."}
+      ,{"target":"icpConfig.outreach.targeting","sourceFile":"scripts/message-targeting.cjs","sourceLines":"3-112","note":"Power-line, awareness, Maslow and CTA vocabularies are declared as reference outreach settings instead of Resolve runtime constants."}
     ],
     "whyNowExtensions": [
       {"target":"icpConfig.killRules.whyNowExtension","note":"WhyNow additionally excludes the seller and configured competitors. This does not alter SignalScout's five-code precedence fixture."}
@@ -267,6 +272,45 @@
     },
     "painSources": {"statuspage": false, "hn": false, "news": false, "filings": false},
     "pitch": {"receiptOpenerStyle": "", "oneSentenceProduct": "", "credentialLine": "", "ctaStyle": ""},
+    "outreach": {
+      "claims": {
+        "status": "frozen_reference",
+        "product": {
+          "value": "Resolve AI puts an autonomous AI production engineer on-call: if production slips, it investigates logs and hands your team the root cause in minutes.",
+          "sourceUrl": "https://resolve.ai/product/ai-sre"
+        },
+        "credential": {
+          "value": "Built by the creators of OpenTelemetry.",
+          "sourceUrl": "https://resolve.ai/product/ai-sre"
+        },
+        "customerProofs": [
+          {
+            "customer": "Coinbase",
+            "claim": "Coinbase achieved 73% faster time to root cause.",
+            "sourceUrl": "https://resolve.ai/product/ai-sre",
+            "segments": ["crypto_fintech", "data_ai_infrastructure", "cybersecurity"]
+          },
+          {
+            "customer": "DoorDash",
+            "claim": "DoorDash cut investigation times by 87%.",
+            "sourceUrl": "https://resolve.ai/product/overview",
+            "segments": ["delivery_marketplaces", "ticketing_live_events", "travel_hospitality", "restaurant_commerce_saas", "insurance_vertical_saas", "enterprise_platforms", "sports_betting"]
+          }
+        ]
+      },
+      "rules": {
+        "subjectMaxWords": 8,
+        "bodyMinWords": 60,
+        "bodyMaxWords": 110,
+        "bodyBlocks": 5,
+        "firstTouchLinksAllowed": false
+      },
+      "targeting": {
+        "powerLines": ["above", "below"],
+        "awarenessLevels": ["unaware", "knows_space", "knows_seller"],
+        "maslowLayers": ["systems_online", "stability", "deploying_on_time", "performance_at_scale", "innovation"]
+      }
+    },
     "objectionTemplates": [],
     "weights": {
       "techStack": 1.3,

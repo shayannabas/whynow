@@ -5,7 +5,7 @@ const {loadReferenceProfile,validateReferenceProfile,SIGNAL_KEYS}=require('../sc
 
 it('loads a frozen, load-only Resolve reference without seller facts or runtime state',()=>{
   const reference=loadReferenceProfile();
-  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v3-phase-b',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
+  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v4-chunk-3',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
   expect(reference.sellerProfile).toBeUndefined();
   expect(reference.status).toBeUndefined();
   expect(reference.provenance.customerEvidenceStatus).toBe('requires_live_research');
@@ -27,6 +27,8 @@ it('matches the reference implementation constants and keeps unsupported fields 
   expect(reference.provenance.movedRuntimeConstants.every(row=>row.sourceFile&&row.sourceLines)).toBe(true);
   expect(config.tierRules.tier1).toEqual({revenue:500000000,employees:2000,valuation:5000000000});
   expect(config.pitch).toEqual({receiptOpenerStyle:'',oneSentenceProduct:'',credentialLine:'',ctaStyle:''});
+  expect(config.outreach.claims).toMatchObject({status:'frozen_reference',product:{sourceUrl:'https://resolve.ai/product/ai-sre'},credential:{sourceUrl:'https://resolve.ai/product/ai-sre'}});
+  expect(config.outreach.claims.customerProofs).toHaveLength(2);
   expect(config.objectionTemplates).toEqual([]);
   expect(Object.keys(config.collectorRules.edgarSegmentQueries)).toEqual(config.segments.map(row=>row.key));
   expect(config.collectorRules.transactionalUrgency.transactionGoneSegments).toContain('sports_betting');

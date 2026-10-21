@@ -23,7 +23,7 @@ function publicHttps(value) {
   }
 }
 function validateReferenceProfile(value) {
-  if (!plainObject(value) || value.schemaVersion !== 1 || value.referenceProfileVersion !== 'resolve-ai-v3-phase-b' || value.id !== 'resolve-ai' || value.kind !== 'load_only_reference' || value.loadOnly !== true) throw new Error('Invalid Resolve reference profile header.');
+  if (!plainObject(value) || value.schemaVersion !== 1 || value.referenceProfileVersion !== 'resolve-ai-v4-chunk-3' || value.id !== 'resolve-ai' || value.kind !== 'load_only_reference' || value.loadOnly !== true) throw new Error('Invalid Resolve reference profile header.');
   if (FORBIDDEN_RUNTIME_KEYS.some(key => Object.hasOwn(value,key))) throw new Error('Reference profiles cannot contain runtime workspace state.');
   if (!plainObject(value.seller) || value.seller.name !== 'Resolve AI' || value.seller.domain !== 'resolve.ai' || value.seller.website !== 'https://resolve.ai') throw new Error('Invalid Resolve reference identity.');
   const provenance=value.provenance;
@@ -44,6 +44,8 @@ function validateReferenceProfile(value) {
   const collectorRules=config.collectorRules;
   if (!plainObject(collectorRules) || !publicHttps(collectorRules.customerSourceUrl) || typeof collectorRules.customerSourceId!=='string' || !collectorRules.customerSourceId || !plainObject(collectorRules.transactionalUrgency) || !nonEmptyStrings(collectorRules.transactionalUrgency.transactionGoneSegments) || !nonEmptyStrings(collectorRules.transactionalUrgency.customerReturnsSegments) || !nonEmptyStrings(collectorRules.transactionalUrgency.transactionGoneKeywords) || !nonEmptyStrings(collectorRules.transactionalUrgency.customerReturnsKeywords) || !plainObject(collectorRules.edgarSegmentQueries) || !segmentKeys.every(key=>typeof collectorRules.edgarSegmentQueries[key]==='string'&&collectorRules.edgarSegmentQueries[key].trim())) throw new Error('Invalid Resolve reference collector rules.');
   if (!plainObject(config.tierRules) || !plainObject(config.triggerMapping) || !plainObject(config.killPatterns) || !nonEmptyStrings(config.killPatterns.solvingInHousePatterns) || !nonEmptyStrings(config.killPatterns.buildCulturePatterns) || !plainObject(config.scoring) || config.scoring.liveTriggerDays!==90 || !plainObject(config.decisionRules) || !Array.isArray(config.killRules?.precedence) || !Array.isArray(config.entityRules) || !plainObject(config.exclusions) || !nonEmptyStrings(config.exclusions.existingCustomers) || !publicHttps(config.exclusions.customerSourceUrl)) throw new Error('Invalid Resolve reference rules.');
+  const outreach=config.outreach,claims=outreach?.claims;
+  if (!plainObject(outreach) || claims?.status!=='frozen_reference' || !plainObject(claims.product) || !claims.product.value || !publicHttps(claims.product.sourceUrl) || !plainObject(claims.credential) || !claims.credential.value || !publicHttps(claims.credential.sourceUrl) || !Array.isArray(claims.customerProofs) || claims.customerProofs.length<1 || claims.customerProofs.some(row=>!row.customer||!row.claim||!publicHttps(row.sourceUrl)||!nonEmptyStrings(row.segments)||row.segments.some(key=>!segmentKeys.includes(key))) || !plainObject(outreach.rules) || !plainObject(outreach.targeting)) throw new Error('Invalid Resolve reference outreach config.');
   return true;
 }
 function deepFreeze(value) {
