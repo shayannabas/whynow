@@ -24,4 +24,20 @@ describe('simple account lifecycle and Today queue',()=>{
     expect(skipped.workspaces.w.accounts[0]).toMatchObject({status:'skipped',statusReason:'No current timing'});expect(skipped.auditLog[0]).toMatchObject({type:'account_status_changed',reason:'No current timing'});
     const working=lifecycle.updateAccountStatus(skipped,'w','a',{status:'working',expectedUpdatedAt:'2026-10-20T12:00:00.000Z'},{now:()=> '2026-10-20T13:00:00.000Z'});expect(working.workspaces.w.accounts[0]).toMatchObject({status:'working',statusReason:''});
   });
+
+  it('splits Act now, Worth researching and Needs review without ranking wrong-entity evidence',()=>{
+    const now=new Date('2026-10-21T12:00:00.000Z'),base={status:'new',signals:{},kills:[],tier:1,priority:.1};
+    const workspace={accounts:[
+      {...base,id:'act',name:'Act',fitScore:35,triggers:[{type:'reliability_hiring',title:'Senior SRE',evidenceUrl:'https://act.example/jobs/sre',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-12-20T00:00:00.000Z'}]},
+      {...base,id:'research',name:'Research',fitScore:48,triggers:[]},
+      {...base,id:'thin',name:'Thin',fitScore:20,triggers:[]},
+      {...base,id:'circle',name:'Circle',fitScore:55,triggers:[],triggerHistory:[{type:'outage_news',title:'Mann Circle Water Outage',evidenceUrl:'https://news.example/mann-circle',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-11-20T00:00:00.000Z',metadata:{citable:false,notCitableReason:'The receipt describes a different entity.'}}]},
+    ]};
+    const sections=lifecycle.todaySections(workspace,now);
+    expect(sections.actNow.map(row=>row.id)).toEqual(['act']);
+    expect(sections.worthResearching.map(row=>row.id)).toEqual(['research']);
+    expect(sections.needsReview.map(row=>row.id)).toEqual(['circle']);
+    expect(sections.needsReview[0].reviewReason).toContain('different entity');
+    expect(lifecycle.todayQueue(workspace,now).map(row=>row.id)).toEqual(['act','research']);
+  });
 });

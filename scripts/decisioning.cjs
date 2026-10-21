@@ -7,7 +7,7 @@ const DEFAULT_MAX_PRIORITY_RAW=9.375;
 function ageDays(value,now=new Date()){const timestamp=Date.parse(value||'');return Number.isFinite(timestamp)?(now.getTime()-timestamp)/86400000:Infinity;}
 function activeTriggers(account={},now=new Date()){
   return (account.triggers||[]).filter(trigger=>{
-    if(!trigger.evidenceUrl||trigger.weakEvidenceFlag===true||trigger.reviewState==='needs_more_research')return false;
+    if(!trigger.evidenceUrl||trigger.weakEvidenceFlag===true||trigger.reviewState==='needs_more_research'||trigger.citable===false||trigger.metadata?.citable===false)return false;
     if(['serper','public_search','google_news_rss'].includes(trigger.sourceId)&&/incident|outage|news|exec|executive/.test(String(trigger.type||trigger.triggerType||''))&&trigger.metadata?.eventDateReported!==true)return false;
     const end=Date.parse(trigger.decaysAt||''),start=Date.parse(trigger.occurredAt||trigger.detectedAt||'');
     if(Number.isFinite(end))return now.getTime()<end;
