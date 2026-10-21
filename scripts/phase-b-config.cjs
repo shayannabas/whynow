@@ -44,6 +44,7 @@ function collectorTargetForAccount(account={},collectorConfig={}){
     segmentConfig:structuredClone(collectorConfig.segments?.[segment]||{}),
     buyerTitles:structuredClone(collectorConfig.personas?.buyerTitles||[]),
     championTitles:structuredClone(collectorConfig.personas?.championTitles||[]),
+    triggerMapping:structuredClone(collectorConfig.triggerMapping||{}),
     competitors:structuredClone(collectorConfig.competitors||[]),
     aliases:Array.from(new Set([...(account.aliases||[]),...(parent?.aliases||[]),parent?.canonicalName].filter(Boolean))),
     firmographicTarget,

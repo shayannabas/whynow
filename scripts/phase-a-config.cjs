@@ -29,6 +29,7 @@ function phaseAConfigForWorkspace(workspace={}) {
     entityRules:icpConfig.entityRules||[],
     signalDefinitions:icpConfig.signalDefinitions||{},
     personas:icpConfig.personas||{},
+    triggerMapping:icpConfig.triggerMapping||{},
     segments:icpConfig.segments||[],
     slaDays:icpConfig.slaDays||{},
     themeBBoost:icpConfig.decisionRules?.themeBBoost||{enabled:true,multiplier:1.08},

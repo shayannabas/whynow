@@ -38,11 +38,11 @@ describe('Phase B demo-quality gates',()=>{
   it('dedupes evidence and moves stale or date-less triggers out of the active list',()=>{
     const account={...target,signals:{activePain:{key:'activePain',score:4,evidenceUrl:'https://downdetector.com/status/acme',evidenceText:'Acme has no current problems and is currently healthy.',observedAt:NOW.toISOString(),sourceId:'serper',metadata:{eventDateReported:false}}},triggers:[
       {id:'old-exec',type:'exec_change',evidenceUrl:'https://news.example/old',occurredAt:NOW.toISOString(),sourceId:'serper',metadata:{eventDateReported:false}},
-      {id:'hire-1',type:'reliability_hiring',evidenceUrl:'https://jobs.example/acme/1',occurredAt:'2026-10-19T00:00:00Z',sourceId:'greenhouse'},
-      {id:'hire-duplicate',type:'reliability_hiring',evidenceUrl:'https://jobs.example/acme/1?ref=copy',occurredAt:'2026-10-19T00:00:00Z',sourceId:'greenhouse'},
+      {id:'hire-1',type:'reliability_hiring',title:'Senior Site Reliability Engineer',evidenceUrl:'https://jobs.example/acme/1',occurredAt:'2026-10-19T00:00:00Z',sourceId:'greenhouse'},
+      {id:'hire-duplicate',type:'reliability_hiring',title:'Senior Site Reliability Engineer',evidenceUrl:'https://jobs.example/acme/1?ref=copy',occurredAt:'2026-10-19T00:00:00Z',sourceId:'greenhouse'},
       {id:'old-outage',type:'outage_news',evidenceUrl:'https://news.example/august',occurredAt:'2026-08-01T00:00:00Z',sourceId:'serper',metadata:{eventDateReported:true}},
     ]};
-    const clean=sanitizeWhyNow(account,{slaDays:{default:90,outage:30,reliability_hiring:90,exec_change:30}},NOW);
+    const clean=sanitizeWhyNow(account,{personas:{buyerTitles:['VP Engineering'],championTitles:['Head of SRE']},triggerMapping:{function_roles:['reliability_hiring'],buying_intent:['ai_rca_hiring']},slaDays:{default:90,outage:30,reliability_hiring:90,exec_change:30}},NOW);
     expect(clean.signals).not.toHaveProperty('activePain');expect(clean.triggers.map(row=>row.id)).toEqual(['hire-duplicate']);expect(clean.triggerHistory).toHaveLength(3);
   });
 

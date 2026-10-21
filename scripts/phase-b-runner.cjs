@@ -21,6 +21,7 @@ const {activeTriggers}=require('./decisioning.cjs');
 const {decorateTrigger}=require('./collector-triggers.cjs');
 const {operationalPainEvidence}=require('./collectors/active-pain.cjs');
 const {evidenceBelongsToTarget}=require('./collectors/common.cjs');
+const {hiringTriggerRelevance}=require('./collectors/hiring.cjs');
 
 const defaultCollectors={collectHiring,collectActivePain,collectSerperEvidence,collectExecutiveChange,collectTechCulture,collectAiCompatibility,collectCompetitiveWedge,collectRevenueSensitivity,collectFirmographics,collectEdgarFormDUniverse};
 function phaseBSerperLimit(env={}){const requested=Number(env.PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT);return Number.isInteger(requested)&&requested>0?Math.min(5,requested):Math.min(5,Math.max(1,serperSettings(env).perRunLimit));}
@@ -33,7 +34,10 @@ function signalWins(current={},incoming={}){
 }
 function dedupeTriggers(rows=[]){return [...new Map(rows.filter(Boolean).map(row=>[`${String(row.type||row.triggerType||'').toLowerCase()}:${String(row.evidenceUrl||'').replace(/[?#].*$/,'')}`,row])).values()];}
 function sanitizeWhyNow(account={},config={},now=new Date()){
-  const all=dedupeTriggers(account.triggers||[]).map(trigger=>trigger.decaysAt?trigger:decorateTrigger(trigger,config.slaDays||{})),history=uniq([...(account.triggerHistory||[]),...all],row=>row.id||`${row.type}:${row.evidenceUrl}:${row.occurredAt}`),eligible=all.filter(trigger=>!/incident|outage|downtime|degraded/.test(String(trigger.type||trigger.triggerType||''))||operationalPainEvidence(account,{url:trigger.evidenceUrl,title:trigger.evidenceText||trigger.title,date:trigger.occurredAt})),triggers=activeTriggers({...account,triggers:eligible},now);
+  const all=dedupeTriggers(account.triggers||[]).map(trigger=>trigger.decaysAt?trigger:decorateTrigger(trigger,config.slaDays||{})),history=uniq([...(account.triggerHistory||[]),...all],row=>row.id||`${row.type}:${row.evidenceUrl}:${row.occurredAt}`),targeting={buyerTitles:config.personas?.buyerTitles||[],championTitles:config.personas?.championTitles||[],triggerMapping:config.triggerMapping||{}},eligible=all.filter(trigger=>{
+    if(!hiringTriggerRelevance(trigger,targeting).relevant)return false;
+    return !/incident|outage|downtime|degraded/.test(String(trigger.type||trigger.triggerType||''))||operationalPainEvidence(account,{url:trigger.evidenceUrl,title:trigger.evidenceText||trigger.title,date:trigger.occurredAt});
+  }),triggers=activeTriggers({...account,triggers:eligible},now);
   const signals={...(account.signals||{})};for(const [key,value] of Object.entries(signals))if(value?.evidenceUrl&&value.sourceId==='serper'&&!evidenceBelongsToTarget(account,value))delete signals[key];const pain=signals.activePain;
   if(pain){const external=['serper','public_search','google_news_rss'].includes(pain.sourceId),dated=pain.metadata?.eventDateReported!==false&&(!external||pain.metadata?.eventDateReported===true),fresh=Number.isFinite(Date.parse(pain.observedAt))&&now.getTime()<Date.parse(pain.observedAt)+(Number(config.slaDays?.outage)||30)*86400000;if(!dated||!fresh||!operationalPainEvidence(account,{url:pain.evidenceUrl,title:pain.evidenceText,date:pain.observedAt}))delete signals.activePain;}
   const killHints=(account.killHints||[]).filter(hint=>!hint.evidenceUrl||evidenceBelongsToTarget(account,hint));

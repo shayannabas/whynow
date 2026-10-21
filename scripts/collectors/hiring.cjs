@@ -8,6 +8,62 @@ const FIRST_INFRA_ROLE = /\b(founding|first|head of)\b/i;
 const INTERNAL_TOOL_MAINTENANCE = /\b(?:maintain|maintaining|operate|operating|support|own|owning|extend|improve|administer)\b[\s\S]{0,160}\b(?:internal|in-house|homegrown)\b[\s\S]{0,160}\b(?:ai|llm|debugg(?:ing)?|investigation|root[- ]cause|incident|triage|observability)\b|\b(?:internal|in-house|homegrown)\b[\s\S]{0,160}\b(?:ai|llm|debugg(?:ing)?|investigation|root[- ]cause|incident|triage|observability)\b[\s\S]{0,160}\b(?:tool|platform|system|workflow)\b/i;
 const AI_RCA_HIRING = /\b(?:ai[-\s]?(?:assisted|powered|driven)|llm[-\s]?(?:assisted|powered|driven)|machine[-\s]?learning[-\s]?(?:assisted|powered|driven))\b[\s\S]{0,180}\b(?:root[-\s]?cause(?: analysis)?|rca|incident investigation|production investigation|incident triage|debugg(?:ing)?|remediation)\b|\b(?:build|building|develop|developing|operate|operating|own|owning|maintain|maintaining)\b[\s\S]{0,140}\b(?:ai|llm|machine learning)\b[\s\S]{0,140}\b(?:root[-\s]?cause|rca|incident investigation|production investigation|incident triage|debugg(?:ing)?|remediation)\b/i;
 const TOOL_PATTERNS = ["Datadog", "Grafana", "PagerDuty", "OpenTelemetry", "Kubernetes", "Prometheus", "Splunk", "AWS", "GCP", "Azure"];
+const HIRING_TRIGGER_TYPES = new Set(["ai_rca_hiring", "buying_intent_hiring", "function_hiring", "hiring_surge", "first_infra_hire", "internal_tool_maintenance", "reliability_hiring"]);
+const TARGETING_STOP_WORDS = new Set(["and", "engineering", "head", "hiring", "lead", "manager", "of", "role", "senior", "the"]);
+
+function normalizedPhrase(value = "") {
+  return String(value).toLowerCase().replace(/[_-]+/g, " ").replace(/[^a-z0-9+#. ]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function phrasePattern(value = "") {
+  const phrase = normalizedPhrase(value);
+  if (!phrase || phrase.length < 3) return null;
+  return new RegExp(`\\b${phrase.split(" ").filter(Boolean).map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("\\s+")}\\b`, "i");
+}
+
+function configuredTargetingPhrases(target = {}) {
+  const mapping = target.triggerMapping || {};
+  const canonical = {
+    ai_rca_hiring: ["ai assisted root cause", "ai assisted incident investigation", "production investigation", "incident triage"],
+    buying_intent_hiring: ["ai assisted root cause", "production investigation", "incident triage"],
+    function_hiring: ["site reliability", "platform engineering", "infrastructure engineering", "incident management", "observability engineering"],
+    reliability_hiring: ["site reliability", "platform engineering", "infrastructure engineering", "incident management", "observability engineering", "performance engineering", "production engineering"],
+  };
+  const configured = [
+    ...(target.buyerTitles || []),
+    ...(target.championTitles || []),
+    ...(mapping.function_roles || []),
+    ...(mapping.buying_intent || []),
+  ].flatMap((value) => canonical[normalizedPhrase(value).replaceAll(" ", "_")] || [value]);
+  return unique(configured.map(normalizedPhrase).filter((value) => value && !TARGETING_STOP_WORDS.has(value)));
+}
+
+function hiringTriggerType(value = "") {
+  return HIRING_TRIGGER_TYPES.has(normalizedPhrase(value).replaceAll(" ", "_"));
+}
+
+function jobTargetingMatch(job = {}, target = {}) {
+  const title = String(job.title || job.metadata?.jobTitle || "");
+  const description = String(job.text || job.evidenceText || "");
+  const titleAndDescription = `${title} ${description}`;
+  const phrases = configuredTargetingPhrases(target);
+  const personaMatch = [...(target.buyerTitles || []), ...(target.championTitles || [])].find((value) => phrasePattern(value)?.test(title));
+  if (personaMatch) return { relevant: true, source: "persona_title", matched: personaMatch };
+  if (RELIABILITY_ROLE.test(title)) return { relevant: true, source: "function_title", matched: title.match(RELIABILITY_ROLE)?.[0] || "reliability role" };
+  if (AI_RCA_HIRING.test(titleAndDescription)) return { relevant: true, source: "buying_intent", matched: "AI-assisted production investigation" };
+  const phrase = phrases.find((value) => phrasePattern(value)?.test(titleAndDescription));
+  if (phrase) return { relevant: true, source: "workspace_targeting", matched: phrase };
+  const operational = titleAndDescription.match(/\b(?:incident (?:management|response|triage|investigation)|infrastructure engineering|observability engineering|on-call|performance engineering|platform engineering|production engineering|production reliability|root cause analysis|site reliability)\b/i)?.[0];
+  if (operational) return { relevant: true, source: "operational_targeting", matched: operational };
+  return { relevant: false, source: "outside_workspace_targeting", matched: "" };
+}
+
+function hiringTriggerRelevance(trigger = {}, target = {}) {
+  const type = trigger.triggerType || trigger.type || "";
+  if (!hiringTriggerType(type)) return { relevant: true, source: "not_hiring", matched: "" };
+  if (normalizedPhrase(type) === "hiring surge" && /\b(?:sre|site reliability|reliability|platform|infrastructure|incident|observability|performance|production)\b/i.test(`${trigger.title || ""} ${trigger.evidenceText || ""}`)) return { relevant: true, source: "qualified_hiring_surge", matched: "reliability/platform" };
+  return jobTargetingMatch({ title: trigger.metadata?.jobTitle || trigger.title, text: trigger.evidenceText, metadata: trigger.metadata }, target);
+}
 
 function slugCandidates(target) {
   const domain = domainForTarget(target).split(".")[0];
@@ -51,7 +107,8 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
   for (const job of jobs) {
     const text = `${job.title || ""} ${job.text || ""}`;
     if (!job.url) continue;
-    if (AI_RCA_HIRING.test(text)) {
+    const targeting = jobTargetingMatch(job, target);
+    if (AI_RCA_HIRING.test(text) && targeting.relevant) {
       const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${String(job.text || "").slice(0, 420)}`;
       const aiRcaEvent = themedHiringEvent({
         type: "ai_rca_hiring",
@@ -67,6 +124,7 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
           jobTitle: job.title,
           hiringForWhatWeSell: true,
           reason: "ai_assisted_production_investigation_hiring",
+          targeting,
         },
       }, painThemeConfig);
       events.push(stage3Signals.decorateTrigger(aiRcaEvent, slaConfig));
@@ -81,7 +139,7 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
         metadata: { jobId: job.id, hiringForWhatWeSell: true },
       }));
     }
-    if (INTERNAL_TOOL_MAINTENANCE.test(text)) {
+    if (INTERNAL_TOOL_MAINTENANCE.test(text) && targeting.relevant) {
       const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${String(job.text || "").slice(0, 420)}`;
       events.push(themedHiringEvent({
         type: "internal_tool_maintenance",
@@ -90,7 +148,7 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
         evidenceText,
         occurredAt: job.updatedAt || now.toISOString(),
         sourceId: provider,
-        metadata: { provider, jobId: job.id, jobTitle: job.title, buildWatchEvidence: true, reason: "maintenance_hiring_req" },
+        metadata: { provider, jobId: job.id, jobTitle: job.title, buildWatchEvidence: true, reason: "maintenance_hiring_req", targeting },
       }, painThemeConfig));
       quoteReceipts.push({ kind: "internal_tool_maintenance", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, postingDate: job.updatedAt || now.toISOString() });
     }
@@ -194,4 +252,4 @@ async function collectHiring(target, context) {
   return { collectorId: "hiring", signals: output.signals, events, targetPatch: { ats: { provider: match.provider, slug: match.slug, endpoint: match.url }, hiringHistory: mergeHiringHistory(target.hiringHistory || [], snapshot), quotebook: painThemes.mergeQuotebook(target.quotebook || [], output.quotebook || []) }, itemsFound: events.length };
 }
 
-module.exports = { AI_RCA_HIRING, FIRST_INFRA_ROLE, INTERNAL_TOOL_MAINTENANCE, RELIABILITY_ROLE, atsVelocityEvents, collectHiring, discoverAts, hiringSnapshot, jobSignals, matchingInfraJobs, mergeHiringHistory, normalizeJobs, providerEndpoints, slugCandidates, toolsIn };
+module.exports = { AI_RCA_HIRING, FIRST_INFRA_ROLE, HIRING_TRIGGER_TYPES, INTERNAL_TOOL_MAINTENANCE, RELIABILITY_ROLE, atsVelocityEvents, collectHiring, configuredTargetingPhrases, discoverAts, hiringSnapshot, hiringTriggerRelevance, hiringTriggerType, jobSignals, jobTargetingMatch, matchingInfraJobs, mergeHiringHistory, normalizeJobs, providerEndpoints, slugCandidates, toolsIn };
