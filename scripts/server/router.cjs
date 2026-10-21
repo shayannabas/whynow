@@ -24,6 +24,7 @@ const {createPhaseBRefreshCoordinator}=require('../phase-b-runner.cjs');
 const {createRefreshAllCoordinator}=require('../refresh-all-runner.cjs');
 const {createDiscoveryCoordinator}=require('../discovery-runner.cjs');
 const {updateAccountStatus}=require('../account-lifecycle.cjs');
+const {createTemplateDraft}=require('../outreach-drafts.cjs');
 function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,phaseBRefreshCoordinator:providedPhaseBRefresh,phaseBRefreshAllCoordinator:providedPhaseBRefreshAll,discoveryCoordinator:providedDiscovery,llm:providedLlm} = {}) {
   stateFile=stateFile||statePath(env);
   loadState(stateFile);
@@ -71,7 +72,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         const current=loadState(stateFile);try{await phaseBRefreshAllCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,todayPage(loadState(stateFile),error.message));}
         res.writeHead(303,{Location:'/today'});return res.end();
       }
-      const accountMatch=pathname.match(/^\/accounts\/([^/]+)$/),refreshMatch=pathname.match(/^\/accounts\/([^/]+)\/refresh$/),statusMatch=pathname.match(/^\/accounts\/([^/]+)\/status$/);
+      const accountMatch=pathname.match(/^\/accounts\/([^/]+)$/),refreshMatch=pathname.match(/^\/accounts\/([^/]+)\/refresh$/),statusMatch=pathname.match(/^\/accounts\/([^/]+)\/status$/),templateDraftMatch=pathname.match(/^\/accounts\/([^/]+)\/drafts\/template$/);
       if(req.method==='GET'&&accountMatch)return html(200,accountPage(loadState(stateFile),decodeURIComponent(accountMatch[1])));
       if(req.method==='POST'&&refreshMatch){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
@@ -86,6 +87,13 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
         let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>4096)return json(res,413,{error:'Form too large'});}const fields=Object.fromEntries(new URLSearchParams(body)),accountId=decodeURIComponent(statusMatch[1]);
         try{await mutate(state=>updateAccountStatus(state,state.activeWorkspaceId,accountId,fields));}catch(error){return html(400,accountPage(loadState(stateFile),accountId,error.message));}
+        res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}`});return res.end();
+      }
+      if(req.method==='POST'&&templateDraftMatch){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192)return json(res,413,{error:'Form too large'});}const fields=Object.fromEntries(new URLSearchParams(body)),accountId=decodeURIComponent(templateDraftMatch[1]);
+        try{await mutate(state=>createTemplateDraft(state,state.activeWorkspaceId,accountId,fields));}catch(error){return html(400,accountPage(loadState(stateFile),accountId,error.message));}
         res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}`});return res.end();
       }
       if(req.method==='GET'&&pathname==='/scorecard')return html(200,scorecardPage(loadState(stateFile)));
