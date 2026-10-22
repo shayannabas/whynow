@@ -66,7 +66,7 @@ function createSynthesisCoordinator({read,mutate,llm,now=()=>new Date().toISOStr
           if(current.research?.synthesisJob?.id!==jobId)throw new SynthesisRunError('STALE_RESEARCH','A newer draft replaced this one.');
           let next=saveGeneratedProfile(state,id,{output:generated.output,...generated.guard,model:generated.model,promptVersion:generated.promptVersion,now});
           return updateWorkspace(next,id,workspace=>{
-            workspace.research.synthesisJob={schemaVersion:1,id:jobId,status:'complete',startedAt,completedAt:now(),error:null,cached:generated.cached,evidence:generated.evidence};
+            workspace.research.synthesisJob={schemaVersion:1,id:jobId,status:'complete',startedAt,completedAt:now(),error:null,cached:generated.cached,evidence:generated.evidence,calls:generated.calls,actualCostUsd:generated.actualCostUsd};
           });
         });
       } catch(error) {

@@ -181,7 +181,7 @@ it('uses an injected LLM interface and performs no network access in synthesis t
   expect(seen[2].messages[0].content).toContain('Explicitly forbidden');
   expect(JSON.parse(seen[2].messages[1].content).resolveWorkedExample.segments.length).toBeGreaterThanOrEqual(3);
   const expected=structuredClone(raw);expected.sellerProfile.customers=[];expected.sellerProfile.competitors=[];
-  expect(result).toMatchObject({output:expected,cached:false,promptVersion:FOCUSED_PROMPT_VERSION,guard:{expectedResearchRevision:4},model:{sellerFacts:'gpt-5.5',organizationReview:'gpt-5.5',icpTargeting:'gpt-5.5'}});
+  expect(result).toMatchObject({output:expected,cached:false,promptVersion:FOCUSED_PROMPT_VERSION,guard:{expectedResearchRevision:4},model:{sellerFacts:'gpt-5.5',organizationReview:'gpt-5.5',icpTargeting:'gpt-5.5'},actualCostUsd:0,calls:[{purpose:'sellerFacts'},{purpose:'organizationReview'},{purpose:'icpTargeting'}]});
   const invalid=structuredClone(values.whynow_seller_facts);invalid.sellerProfile.category.receiptId='R999';
   expect(()=>seen[0].validate(invalid)).toThrow('outside this request');
 });

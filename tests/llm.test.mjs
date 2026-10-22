@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 const require=createRequire(import.meta.url);
-const {createLlm,settings,estimatedUsage,MAX_REQUEST_BYTES}=require('../scripts/llm.cjs');
+const {createLlm,settings,estimatedUsage,actualUsage,actualCostUsd,MAX_REQUEST_BYTES}=require('../scripts/llm.cjs');
 const {defaultState,createWorkspace,loadState,saveState}=require('../scripts/server/state.cjs');
 const env={OPENAI_ENABLED:'true',OPENAI_API_KEY:'test-only-placeholder',OPENAI_MONTHLY_LIMIT_USD:'1'};
 const schema={type:'object',properties:{facts:{type:'array',items:{type:'string'}}},required:['facts'],additionalProperties:false};
@@ -39,6 +39,14 @@ it('uses the configured Stage 2 model and Chat Completions endpoint, with strict
   expect(JSON.stringify(h.read())).not.toContain(env.OPENAI_API_KEY);
   expect(h.read().workspaces[h.id].sellerProfile.approvedAt).toBeUndefined();
 });
+it('reports provider token usage and exact configured-model cost without storing secrets',async()=>{
+  const payload={choices:[{finish_reason:'stop',message:{content:'{"facts":[]}'}}],usage:{prompt_tokens:1000,prompt_tokens_details:{cached_tokens:200},completion_tokens:300,completion_tokens_details:{reasoning_tokens:180}}};
+  const h=harness({fetchImpl:async()=>new Response(JSON.stringify(payload),{status:200})});
+  const result=await h.run();
+  expect(result).toMatchObject({usage:{inputTokens:1000,cachedInputTokens:200,outputTokens:300,reasoningTokens:180},costUsd:.0131});
+  expect(actualUsage(payload)).toEqual(result.usage);expect(actualCostUsd(result.usage,'gpt-5.5')).toBe(.0131);
+  expect(JSON.stringify(h.read())).not.toContain(env.OPENAI_API_KEY);
+});
 it('caches by prompt version/input, scopes cache and prevents duplicate concurrent calls',async()=>{
   let calls=0;const h=harness({fetchImpl:async()=>{calls++;return success();}});
   await Promise.all([h.run(),h.run()]);expect(calls).toBe(1);
@@ -68,6 +76,8 @@ it('bounds retries, handles refusal/incomplete/invalid output, never logs provid
     const h=harness({fetchImpl:async()=>new Response(JSON.stringify(payload))});
     await expect(h.run()).rejects.toThrow();expect(h.read().workspaces[h.id].llmCache).toBeUndefined();
   }
+  const incomplete=harness({fetchImpl:async()=>new Response(JSON.stringify({choices:[{finish_reason:'length',message:{content:''}}],usage:{prompt_tokens:100,completion_tokens:50,completion_tokens_details:{reasoning_tokens:50}}}))});
+  await expect(incomplete.run()).rejects.toMatchObject({code:'INCOMPLETE',finishReason:'length',usage:{inputTokens:100,outputTokens:50,reasoningTokens:50},costUsd:.002});
   const error=harness({fetchImpl:async()=>new Response(JSON.stringify({error:{message:env.OPENAI_API_KEY}}),{status:401})});
   const failure=await error.run().catch(item=>item);
   expect(failure).toMatchObject({code:'REQUEST_FAILED',httpStatus:401});

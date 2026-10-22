@@ -176,7 +176,8 @@ async function generateSynthesis({state,workspaceId,llm,env=process.env,rawPages
   const sellerValue=expandRunLocalReceiptIds(seller.value,built.receiptIdMap),icpValue=expandRunLocalReceiptIds(icp.value,built.receiptIdMap);
   const reviewed=require('./review-organizations.cjs').materializeReview(organizations.value,built.candidates);
   const output={sellerProfile:{...sellerValue.sellerProfile,...reviewed},icpConfig:icpValue.icpConfig};assertSynthesisOutput(output);
-  return {output,cached:Boolean(seller.cached&&organizations.cached&&icp.cached),model:{sellerFacts:seller.model,organizationReview:organizations.model,icpTargeting:icp.model},guard:built.guard,evidence:built.evidence,promptVersion:FOCUSED_PROMPT_VERSION};
+  const calls=[['sellerFacts',seller],['organizationReview',organizations],['icpTargeting',icp]].map(([purpose,result])=>({purpose,model:result.model,cached:result.cached,usage:result.usage||null,costUsd:Number(result.costUsd||0)}));
+  return {output,cached:Boolean(seller.cached&&organizations.cached&&icp.cached),model:{sellerFacts:seller.model,organizationReview:organizations.model,icpTargeting:icp.model},calls,actualCostUsd:Number(calls.reduce((sum,row)=>sum+row.costUsd,0).toFixed(6)),guard:built.guard,evidence:built.evidence,promptVersion:FOCUSED_PROMPT_VERSION};
 }
 
 module.exports={PROMPT_VERSION,FOCUSED_PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisSchema,buildSynthesisRequest,buildFocusedSynthesisRequests,estimateFocusedSynthesisCost,validateKnownReceiptIds,validateRunLocalReceiptIds,expandRunLocalReceiptIds,generateSynthesis};
