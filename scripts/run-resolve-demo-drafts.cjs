@@ -6,6 +6,7 @@ const path=require('node:path');
 const {execFileSync}=require('node:child_process');
 const {loadEnv}=require('./env.cjs');
 const {loadState,atomicWrite}=require('./server/state.cjs');
+const {loadResolveReferenceDemo}=require('./reference-demo.cjs');
 const {buildDraftContext,OUTREACH_VERSION}=require('./outreach-drafts.cjs');
 const {buildOutreachRequest,estimateOutreachRequest}=require('./outreach-model.cjs');
 const {createOutreachGenerator}=require('./outreach-live.cjs');
@@ -21,7 +22,7 @@ function providerDefaults(){const env=localEnvironment();return {openaiDisabled:
 async function main(){
   if(fs.existsSync(MARKER_FILE)||fs.existsSync(REPORT_FILE))throw new Error('The authorized two-draft accuracy run has already started or completed.');
   const loaded=localEnvironment(),defaultsBefore=providerDefaults();if(!defaultsBefore.openaiDisabled||!defaultsBefore.openaiLocalLimitZero)throw new Error('Normal local OpenAI settings must be disabled with a zero local limit before the bounded run.');if(!loaded.OPENAI_API_KEY?.trim())throw new Error('The private OpenAI API key is not configured.');
-  const state=loadState(),workspace=Object.values(state.workspaces).find(row=>row.referenceDemo?.loadOnly===true);if(!workspace)throw new Error('Load the frozen Resolve reference demo first.');
+  const state=loadResolveReferenceDemo(loadState()),workspace=Object.values(state.workspaces).find(row=>row.referenceDemo?.loadOnly===true);if(!workspace)throw new Error('Load the frozen Resolve reference demo first.');
   const now=new Date(),contexts=TARGETS.map(name=>{const account=workspace.accounts.find(row=>row.name===name);if(!account)throw new Error(`${name} is missing from the Resolve demo.`);const context=buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},now);if(context.blockers.length)throw new Error(`${name} is blocked: ${context.blockers.map(row=>row.code).join(', ')}`);return {name,context};});
   const paidEnv={...loaded,OPENAI_ENABLED:'true',OPENAI_MONTHLY_LIMIT_USD:String(PROCESS_CAP_USD),OPENAI_OUTREACH_CALL_LIMIT:String(TARGETS.length),OPENAI_OUTREACH_MODEL:'gpt-5.5'},estimates=contexts.map(({name,context})=>({name,...estimateOutreachRequest(buildOutreachRequest(context,paidEnv))})),plannedUsd=Number(estimates.reduce((sum,row)=>sum+row.plannedTotalCostUsd,0).toFixed(6)),oneTransientRetryPlannedUsd=Number((plannedUsd+Math.max(...estimates.map(row=>row.plannedTotalCostUsd))).toFixed(6));if(oneTransientRetryPlannedUsd>PROCESS_CAP_USD)throw new Error('The two-call plan plus one transient retry exceeds the authorized process cap.');
   fs.mkdirSync(path.dirname(MARKER_FILE),{recursive:true});const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim(),startedAt=new Date().toISOString();atomicWrite(MARKER_FILE,JSON.stringify({schemaVersion:1,startedAt,commit,authorization:'resolve-demo-accuracy-two-draft-run',targets:TARGETS,model:'gpt-5.5',logicalCallLimit:2,processCapUsd:PROCESS_CAP_USD,noSend:true}));
