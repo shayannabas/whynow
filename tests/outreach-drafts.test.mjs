@@ -61,6 +61,31 @@ describe('receipt-backed deterministic outreach',()=>{
     expect(outreach.validateOutreachDraft({...base,body:body.replace('AWS','GCP')},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
   });
 
+  it('revalidates the two recorded allowed-facts drafts under the corrected rules',()=>{
+    const {workspace,account}=fixture(),coalition={...account,id:'coalition',name:'Coalition',domain:'coalitioninc.com',icpSegment:'insurance_vertical_saas',triggers:[{...account.triggers[0],title:'Senior Site Reliability Engineer',evidenceText:"Senior Site Reliability Engineer. Location: Any location, Canada. Named stack: Kubernetes, AWS. About us Coalition is the world's first Active Insurance provider designed to help prevent digital risk before it strikes.",evidenceUrl:'https://www.coalitioninc.com/job-posting?gh_jid=4742193005'}]},coalitionContext=outreach.buildDraftContext(workspace,coalition,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),coalitionBase=outreach.templateDraft(coalitionContext),coalitionDraft={...coalitionBase,subject:'Production investigations during incidents',body:`Hi {{first_name}},
+
+I saw "Senior Site Reliability Engineer." "Location: Any location, Canada." "Named stack: Kubernetes, AWS." Also noted, "About us Coalition is the world's first Active Insurance provider designed to help prevent digital risk before it strikes."
+
+Agents that investigate your production systems during on-call, incidents, and daily production tasks. Investigations went from hours to minutes...
+
+Open to a brief conversation about on-call, incidents, and daily production tasks?
+
+Shayan`};
+    expect(outreach.validateOutreachDraft(coalitionDraft,coalitionContext)).toMatchObject({ok:true,reasons:[]});
+
+    const executiveTriggers=[{...account.triggers[0],id:'exec-1',type:'executive_departure',title:'CrowdStrike CTO Elia Zaitsev Leaves After 13 Years',evidenceText:'CrowdStrike CTO Elia Zaitsev leaves after 13 years.',evidenceUrl:'https://news-one.example/crowdstrike'},{...account.triggers[0],id:'exec-2',type:'executive_departure',title:'CrowdStrike technology leader steps down',evidenceText:'A second publisher reports the CrowdStrike leadership change.',evidenceUrl:'https://news-two.example/crowdstrike'}],crowdstrike={...account,id:'crowdstrike',name:'CrowdStrike',domain:'crowdstrike.com',triggers:executiveTriggers},crowdstrikeContext=outreach.buildDraftContext(workspace,crowdstrike,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),crowdstrikeBase=outreach.templateDraft(crowdstrikeContext),crowdstrikeDraft={...crowdstrikeBase,subject:'Engineering leadership and production investigations',body:`Hi {{first_name}},
+
+Saw the recent engineering leadership change. I’m reaching out because that timing can make on-call, incidents, and daily production tasks worth revisiting.
+
+Agents that investigate your production systems during on-call, incidents, and daily production tasks. 72% reduction in investigation time
+
+If not, no problem—just thought the overlap with production investigation might be timely. Open to a brief conversation to see if this is relevant?
+
+Shayan`},crowdstrikeValidation=outreach.validateOutreachDraft(crowdstrikeDraft,crowdstrikeContext);
+    expect(crowdstrikeValidation.ok).toBe(false);expect(crowdstrikeValidation.reasons).toEqual([expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL',message:expect.stringContaining('on-call, production')})]);
+    expect(crowdstrikeBase.validation.ok).toBe(true);
+  });
+
   it('rejects a shortened Binance title and invented production-reliability detail',()=>{
     const {workspace,account}=fixture(),baseContext=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),context={...baseContext,account:{...baseContext.account,id:'binance',name:'Binance',domain:'binance.com'},trigger:{...baseContext.trigger,title:'Binance Accelerator Program - System Performance Engineer (AI)',text:'Binance Accelerator Program - System Performance Engineer (AI). Location: Singapore. Work on system performance.',sourceUrl:'https://jobs.example/binance/performance'}},base=outreach.templateDraft(context),body=base.body.replace(/I saw[^\n]+/, 'I saw the “System Performance Engineer” posting in Singapore, focused on production reliability.');
     expect(outreach.validateOutreachDraft({...base,body},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
