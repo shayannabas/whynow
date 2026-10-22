@@ -13,7 +13,7 @@ const MODEL_PRICING_USD_PER_MILLION=Object.freeze({
 const DEFAULT_TIMEOUT_MS=90000;
 const MAX_REQUEST_BYTES=360000;
 const ESTIMATED_BYTES_PER_INPUT_TOKEN=3;
-class LlmError extends Error {constructor(code,message,{httpStatus,usage,costUsd,finishReason}={}){super(message);this.code=code;if(Number.isInteger(httpStatus))this.httpStatus=httpStatus;if(usage)this.usage=usage;if(Number.isFinite(costUsd))this.costUsd=costUsd;if(finishReason)this.finishReason=String(finishReason).slice(0,80);}}
+class LlmError extends Error {constructor(code,message,{httpStatus,usage,costUsd,finishReason,incompleteReason}={}){super(message);this.code=code;if(Number.isInteger(httpStatus))this.httpStatus=httpStatus;if(usage)this.usage=usage;if(Number.isFinite(costUsd))this.costUsd=costUsd;if(finishReason)this.finishReason=String(finishReason).slice(0,80);if(incompleteReason)this.incompleteReason=String(incompleteReason).slice(0,120);}}
 function settings(env={}) {
   const model=env.OPENAI_MODEL||DEFAULT_MODEL;
   const dollars=Number(env.OPENAI_MONTHLY_LIMIT_USD||0);
@@ -55,18 +55,21 @@ function actualCostUsd(usage,model=DEFAULT_MODEL) {
   const uncached=Math.max(0,usage.inputTokens-usage.cachedInputTokens);
   return Number(((uncached*pricing.input+usage.cachedInputTokens*pricing.cachedInput+usage.outputTokens*pricing.output)/1e6).toFixed(6));
 }
-function serializeRequestBody({model,messages,schema,name,maxOutputTokens}) {
-  const request={model,messages,store:false,max_completion_tokens:maxOutputTokens,response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}};if(!/^gpt-5(?:\.|$)/i.test(model))request.temperature=0;return JSON.stringify(request);
+function serializeRequestBody({model,messages,schema,name,maxOutputTokens,reasoningEffort}) {
+  const request={model,messages,store:false,max_completion_tokens:maxOutputTokens,response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}};
+  if(/^gpt-5(?:\.|$)/i.test(model)){if(reasoningEffort)request.reasoning_effort=reasoningEffort;}else request.temperature=0;
+  return JSON.stringify(request);
 }
 function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date().toISOString(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}) {
   if(typeof read!=='function'||typeof mutate!=='function')throw new Error('A serialized persistent state adapter is required');
   const pending=new Map();
-  async function generate({workspaceId,promptVersion,messages,schema,name='whynow_result',validate,maxOutputTokens=4096,model}) {
+  async function generate({workspaceId,promptVersion,messages,schema,name='whynow_result',validate,maxOutputTokens=4096,model,reasoningEffort}) {
     const config={...settings(env),model:model||settings(env).model};assertReady(config);
     if(!promptVersion || typeof promptVersion!=='string' || promptVersion.length>100 || typeof validate!=='function' || !schema || !/^[a-zA-Z0-9_-]{1,64}$/.test(name))throw new LlmError('INVALID_INPUT','A versioned prompt, schema and local validator are required.');
     if(!Array.isArray(messages)||!messages.length||messages.length>20||messages.some(m=>!['system','user','assistant'].includes(m.role)||typeof m.content!=='string'))throw new LlmError('INVALID_INPUT','Use bounded text-only messages.');
-    if(!Number.isInteger(maxOutputTokens)||maxOutputTokens<1||maxOutputTokens>4096)throw new LlmError('INVALID_INPUT','Output must be limited to 1–4096 tokens.');
-    const body=serializeRequestBody({model:config.model,messages,schema,name,maxOutputTokens});
+    if(!Number.isInteger(maxOutputTokens)||maxOutputTokens<1||maxOutputTokens>8000)throw new LlmError('INVALID_INPUT','Output must be limited to 1–8000 tokens.');
+    if(reasoningEffort!==undefined&&!['none','low','medium','high','xhigh'].includes(reasoningEffort))throw new LlmError('INVALID_INPUT','Use a supported bounded reasoning effort.');
+    const body=serializeRequestBody({model:config.model,messages,schema,name,maxOutputTokens,reasoningEffort});
     const bytes=Buffer.byteLength(body);
     if(bytes>MAX_REQUEST_BYTES)throw new LlmError('INPUT_TOO_LARGE','Source excerpts exceed the AI request limit.');
     // Pricing is selected from the reviewed per-model table above. JSON and
@@ -117,7 +120,7 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
         const choice=payload.choices?.[0];
         const usage=actualUsage(payload),costUsd=actualCostUsd(usage,config.model);
         if(choice?.message?.refusal)throw new LlmError('REFUSED','OpenAI declined this request. No profile was generated.',{usage,costUsd,finishReason:choice?.finish_reason});
-        if(choice?.finish_reason!=='stop')throw new LlmError('INCOMPLETE','OpenAI returned incomplete output. No profile was generated.',{usage,costUsd,finishReason:choice?.finish_reason});
+        if(choice?.finish_reason!=='stop')throw new LlmError('INCOMPLETE','OpenAI returned incomplete output. No profile was generated.',{usage,costUsd,finishReason:choice?.finish_reason,incompleteReason:payload?.incomplete_details?.reason||choice?.incomplete_details?.reason||choice?.finish_reason});
         let value;try {value=JSON.parse(choice.message.content);}catch {throw new LlmError('INVALID_OUTPUT','OpenAI returned invalid JSON.');}
         check(value);
         await mutate(state=>updateWorkspace(state,workspaceId,w=>{

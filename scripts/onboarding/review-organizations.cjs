@@ -16,7 +16,7 @@ function request({workspaceId,company,candidates,model}) {
     'Keep a competitor only when a first-party comparison, versus or alternatives source compares it with the seller.',
     'A missing domain is allowed but must not be guessed. The server preserves the deterministic name, URL, quote and domain status.'
   ].join('\n');
-  return {workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_organization_review',model,maxOutputTokens:1024,schema:schemaFor(candidateIds),messages:[{role:'system',content:instructions},{role:'user',content:JSON.stringify({company,candidates:publicCandidates})}],validate:value=>{
+  return {workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_organization_review',model,maxOutputTokens:8000,reasoningEffort:'low',schema:schemaFor(candidateIds),messages:[{role:'system',content:instructions},{role:'user',content:JSON.stringify({company,candidates:publicCandidates})}],validate:value=>{
     if(!value||!Array.isArray(value.customers)||!Array.isArray(value.competitors)||Object.keys(value).sort().join(',')!=='competitors,customers')throw Error('Invalid organization-review output.');
     const ids=[...value.customers,...value.competitors].map(item=>item?.candidateId);if(ids.some(id=>!allowed.has(id))||new Set(ids).size!==ids.length)throw Error('Organization review referenced an unknown or duplicate candidate.');return true;
   }};

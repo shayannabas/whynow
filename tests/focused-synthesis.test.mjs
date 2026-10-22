@@ -22,6 +22,8 @@ it('builds three bounded focused requests and keeps organization output limited 
   expect(built.requests.organizationReview.validate({customers:[{candidateId:candidate.id}],competitors:[]})).toBe(true);
   expect(()=>built.requests.organizationReview.validate({customers:[{candidateId:'invented'}],competitors:[]})).toThrow();
   for(const request of Object.values(built.requests)) {
+    expect(request.maxOutputTokens).toBe(8000);
+    expect(request.reasoningEffort).toBe('low');
     const metrics=measureStructuredOutputSchema(request.schema);
     expect(()=>assertStructuredOutputSchemaWithinLimits(request.schema),request.name).not.toThrow();
     expect(metrics.enumValues,request.name).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.enumValues);
@@ -30,5 +32,5 @@ it('builds three bounded focused requests and keeps organization output limited 
     expect(metrics.schemaStringLength,request.name).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.schemaStringLength);
     for(const item of metrics.enums)if(item.values>STRUCTURED_OUTPUT_LIMITS.largeEnumThreshold)expect(item.stringLength,request.name).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.largeEnumStringLength);
   }
-  const estimate=estimateFocusedSynthesisCost(state,id,{rawPages:raw,env:{OPENAI_MODEL:'gpt-5.5'}});expect(estimate.calls).toHaveLength(3);expect(estimate.calls.every(row=>row.model==='gpt-5.5')).toBe(true);expect(estimate.totalMaximumCostUsd).toBeGreaterThan(0);
+  const estimate=estimateFocusedSynthesisCost(state,id,{rawPages:raw,env:{OPENAI_MODEL:'gpt-5.5'}});expect(estimate.calls).toHaveLength(3);expect(estimate.calls.every(row=>row.model==='gpt-5.5'&&row.maxOutputTokens===8000&&row.reasoningEffort==='low')).toBe(true);expect(estimate.totalMaximumCostUsd).toBeGreaterThan(0);
 });

@@ -40,6 +40,13 @@ it('uses the configured Stage 2 model and Chat Completions endpoint, with strict
   expect(JSON.stringify(h.read())).not.toContain(env.OPENAI_API_KEY);
   expect(h.read().workspaces[h.id].sellerProfile.approvedAt).toBeUndefined();
 });
+it('sends bounded GPT-5 reasoning effort and accepts the Stage 2 research output ceiling',async()=>{
+  let body;const h=harness({env:{...env,OPENAI_MONTHLY_LIMIT_USD:'1'},fetchImpl:async(_url,options)=>{body=JSON.parse(options.body);return success();}});
+  await h.run({maxOutputTokens:8000,reasoningEffort:'low'});
+  expect(body).toMatchObject({model:'gpt-5.5',max_completion_tokens:8000,reasoning_effort:'low'});
+  await expect(h.run({promptVersion:'invalid-reasoning',reasoningEffort:'minimal'})).rejects.toMatchObject({code:'INVALID_INPUT'});
+  await expect(h.run({promptVersion:'too-large',maxOutputTokens:8001})).rejects.toMatchObject({code:'INVALID_INPUT'});
+});
 it('reports provider token usage and exact configured-model cost without storing secrets',async()=>{
   const payload={choices:[{finish_reason:'stop',message:{content:'{"facts":[]}'}}],usage:{prompt_tokens:1000,prompt_tokens_details:{cached_tokens:200},completion_tokens:300,completion_tokens_details:{reasoning_tokens:180}}};
   const h=harness({fetchImpl:async()=>new Response(JSON.stringify(payload),{status:200})});
@@ -80,7 +87,9 @@ it('bounds retries, handles refusal/incomplete/invalid output, never logs provid
     await expect(h.run()).rejects.toThrow();expect(h.read().workspaces[h.id].llmCache).toBeUndefined();
   }
   const incomplete=harness({fetchImpl:async()=>new Response(JSON.stringify({choices:[{finish_reason:'length',message:{content:''}}],usage:{prompt_tokens:100,completion_tokens:50,completion_tokens_details:{reasoning_tokens:50}}}))});
-  await expect(incomplete.run()).rejects.toMatchObject({code:'INCOMPLETE',finishReason:'length',usage:{inputTokens:100,outputTokens:50,reasoningTokens:50},costUsd:.002});
+  await expect(incomplete.run()).rejects.toMatchObject({code:'INCOMPLETE',finishReason:'length',incompleteReason:'length',usage:{inputTokens:100,outputTokens:50,reasoningTokens:50},costUsd:.002});
+  const detailed=harness({fetchImpl:async()=>new Response(JSON.stringify({choices:[{finish_reason:'length',message:{content:''}}],incomplete_details:{reason:'max_output_tokens'},usage:{prompt_tokens:100,completion_tokens:50,completion_tokens_details:{reasoning_tokens:50}}}))});
+  await expect(detailed.run()).rejects.toMatchObject({code:'INCOMPLETE',finishReason:'length',incompleteReason:'max_output_tokens',usage:{reasoningTokens:50}});
   const error=harness({fetchImpl:async()=>new Response(JSON.stringify({error:{message:env.OPENAI_API_KEY}}),{status:401})});
   const failure=await error.run().catch(item=>item);
   expect(failure).toMatchObject({code:'REQUEST_FAILED',httpStatus:401});

@@ -21,7 +21,7 @@ function request({workspaceId,company,evidence,receiptIds,referenceProfile,model
     'Kill patterns describe companies that will not buy and must not repeat pain or positive buying signals.',
     'Do not invent factual example targets. Leave exampleTargets empty unless a supplied receipt directly supports the company.'
   ].join('\n');
-  return {workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_icp_targeting',model,maxOutputTokens:3072,schema:schemaFor(receiptIds),
+  return {workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_icp_targeting',model,maxOutputTokens:8000,reasoningEffort:'low',schema:schemaFor(receiptIds),
     messages:[{role:'system',content:instructions},{role:'user',content:JSON.stringify({company,resolveWorkedExample:workedExample(referenceProfile),evidence:JSON.parse(evidence)})}],
     validate:value=>{if(!value||typeof value!=='object'||Object.keys(value).join(',')!=='icpConfig')throw Error('Invalid ICP output.');return validateReceiptIds(value);}};
 }

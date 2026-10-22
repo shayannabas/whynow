@@ -17,7 +17,7 @@ function request({workspaceId,company,evidence,receiptIds,model,validateReceiptI
     'Never guess. Every non-empty fact needs a supplied receiptId that directly supports the wording.',
     'Prefer precise facts over headlines or slogans. Partner, marketplace and template pages cannot support seller facts.'
   ].join('\n');
-  return {workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_seller_facts',model,maxOutputTokens:2048,schema:schemaFor(receiptIds),
+  return {workspaceId,promptVersion:PROMPT_VERSION,name:'whynow_seller_facts',model,maxOutputTokens:8000,reasoningEffort:'low',schema:schemaFor(receiptIds),
     messages:[{role:'system',content:instructions},{role:'user',content:JSON.stringify({company,evidence:JSON.parse(evidence)})}],
     validate:value=>{if(!value||typeof value!=='object'||Object.keys(value).join(',')!=='sellerProfile')throw Error('Invalid seller-facts output.');return validateReceiptIds(value);}};
 }
