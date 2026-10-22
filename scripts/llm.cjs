@@ -19,10 +19,12 @@ function settings(env={}) {
   const dollars=Number(env.OPENAI_MONTHLY_LIMIT_USD||0);
   const callLimit=Number(env.OPENAI_WORKSPACE_MONTHLY_CALL_LIMIT||100);
   const requestedTimeout=Number(env.OPENAI_TIMEOUT_MS||DEFAULT_TIMEOUT_MS);
+  const requestedRetryLimit=Number(env.OPENAI_RETRY_LIMIT??1);
   return {model,enabled:env.OPENAI_ENABLED==='true',keyPresent:Boolean(env.OPENAI_API_KEY?.trim()),
     limitMicros:Number.isFinite(dollars)&&dollars>0&&dollars<=1000?Math.floor(dollars*1e6):0,
     callLimit:Number.isInteger(callLimit)&&callLimit>0&&callLimit<=1000?callLimit:0,
-    timeoutMs:Number.isInteger(requestedTimeout)&&requestedTimeout>=1000&&requestedTimeout<=180000?requestedTimeout:DEFAULT_TIMEOUT_MS};
+    timeoutMs:Number.isInteger(requestedTimeout)&&requestedTimeout>=1000&&requestedTimeout<=180000?requestedTimeout:DEFAULT_TIMEOUT_MS,
+    retryLimit:Number.isInteger(requestedRetryLimit)&&requestedRetryLimit>=0&&requestedRetryLimit<=1?requestedRetryLimit:1};
 }
 function assertReady(config) {
   if(!config.enabled)throw new LlmError('DISABLED','OpenAI calls are disabled.');
@@ -80,7 +82,7 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
     if(workspace.llmCache?.[key])return {value:check(structuredClone(workspace.llmCache[key].value)),cached:true,model:config.model,usage:null,costUsd:0};
     if(pending.has(pendingKey))return structuredClone(await pending.get(pendingKey));
     const operation=(async()=>{
-      for(let attempt=0;attempt<2;attempt++) {
+      for(let attempt=0;attempt<=config.retryLimit;attempt++) {
         const month=now().slice(0,7);
         await mutate(state=>{
           const w=getWorkspace(state,workspaceId);
@@ -102,7 +104,7 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
           // Never expose provider errors, response bodies or echoed credentials.
           if(!response.ok) {
             await response.body?.cancel();
-            if((response.status===429||response.status>=500)&&attempt===0){await sleep(500);continue;}
+            if((response.status===429||response.status>=500)&&attempt<config.retryLimit){await sleep(500);continue;}
             throw new LlmError('REQUEST_FAILED',`OpenAI request failed (HTTP ${response.status}). Check account access, billing and limits.`,{httpStatus:response.status});
           }
           const raw=await response.text();

@@ -25,6 +25,7 @@ it('fails closed with paid calls disabled, absent key or absent approved budget'
     await expect(h.run()).rejects.toThrow();
   }
   expect(calls).toBe(0);expect(settings({})).toMatchObject({model:'gpt-5.5',timeoutMs:90000});
+  expect(settings({})).toMatchObject({retryLimit:1});expect(settings({OPENAI_RETRY_LIMIT:'0'})).toMatchObject({retryLimit:0});
   expect(settings({OPENAI_TIMEOUT_MS:'60000'}).timeoutMs).toBe(60000);
   expect(settings({OPENAI_TIMEOUT_MS:'999999'}).timeoutMs).toBe(90000);
 });
@@ -67,6 +68,8 @@ it('bounds retries, handles refusal/incomplete/invalid output, never logs provid
   let calls=0;
   const retry=harness({fetchImpl:async()=>{calls++;return calls===1?new Response('',{status:503}):success();}});
   await retry.run();expect(calls).toBe(2);expect(retry.read().workspaces[retry.id].budgets.openai.calls).toBe(2);
+  let noRetryCalls=0;const noRetry=harness({env:{...env,OPENAI_RETRY_LIMIT:'0'},fetchImpl:async()=>{noRetryCalls++;return new Response('',{status:503});}});
+  await expect(noRetry.run()).rejects.toMatchObject({code:'REQUEST_FAILED',httpStatus:503});expect(noRetryCalls).toBe(1);
   for(const payload of [
     {choices:[{finish_reason:'stop',message:{refusal:'declined'}}]},
     {choices:[{finish_reason:'length',message:{content:'{"facts":[]}'}}]},
