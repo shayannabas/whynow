@@ -5,7 +5,7 @@ const {modelForPurpose,estimatedUsage,PROPOSED_STRONG_MODEL}=require('../scripts
 const {checkModelAvailability,MODELS_ENDPOINT}=require('../scripts/openai-model-check.cjs');
 
 it('keeps focused calls on the default model until explicit configuration changes them',()=>{
-  expect(modelForPurpose({},'seller_facts')).toBe('gpt-4o-mini');
+  expect(modelForPurpose({},'seller_facts')).toBe('gpt-5.5');
   expect(modelForPurpose({OPENAI_MODEL:'gpt-4o-mini',OPENAI_ORGANIZATION_REVIEW_MODEL:PROPOSED_STRONG_MODEL},'organization_review')).toBe(PROPOSED_STRONG_MODEL);
   expect(modelForPurpose({OPENAI_ICP_TARGETING_MODEL:PROPOSED_STRONG_MODEL},'icp_targeting')).toBe(PROPOSED_STRONG_MODEL);
   expect(estimatedUsage({bodyBytes:100000,maxOutputTokens:2000,model:PROPOSED_STRONG_MODEL}).reserveMicros).toBeGreaterThan(estimatedUsage({bodyBytes:100000,maxOutputTokens:2000,model:'gpt-4o-mini'}).reserveMicros);

@@ -24,17 +24,17 @@ it('fails closed with paid calls disabled, absent key or absent approved budget'
     const h=harness({env:config,fetchImpl:()=>{calls++;return success();}});
     await expect(h.run()).rejects.toThrow();
   }
-  expect(calls).toBe(0);expect(settings({})).toMatchObject({model:'gpt-4o-mini',timeoutMs:90000});
+  expect(calls).toBe(0);expect(settings({})).toMatchObject({model:'gpt-5.5',timeoutMs:90000});
   expect(settings({OPENAI_TIMEOUT_MS:'60000'}).timeoutMs).toBe(60000);
   expect(settings({OPENAI_TIMEOUT_MS:'999999'}).timeoutMs).toBe(90000);
 });
-it('matches the friend’s model and Chat Completions endpoint, with strict schema and no secret persistence',async()=>{
+it('uses the configured Stage 2 model and Chat Completions endpoint, with strict schema and no secret persistence',async()=>{
   let seen;
   const h=harness({fetchImpl:async(url,options)=>{seen={url,options};return success();}});
-  expect(await h.run()).toMatchObject({value:{facts:[]},cached:false,model:'gpt-4o-mini'});
+  expect(await h.run()).toMatchObject({value:{facts:[]},cached:false,model:'gpt-5.5'});
   expect(seen.url).toBe('https://api.openai.com/v1/chat/completions');
   const body=JSON.parse(seen.options.body);
-  expect(body).toMatchObject({model:'gpt-4o-mini',store:false,temperature:0,response_format:{type:'json_schema',json_schema:{strict:true,schema}}});
+  expect(body).toMatchObject({model:'gpt-5.5',store:false,response_format:{type:'json_schema',json_schema:{strict:true,schema}}});expect(body).not.toHaveProperty('temperature');
   expect(seen.options.redirect).toBe('error');
   expect(JSON.stringify(h.read())).not.toContain(env.OPENAI_API_KEY);
   expect(h.read().workspaces[h.id].sellerProfile.approvedAt).toBeUndefined();
@@ -82,13 +82,13 @@ it('rejects oversized inputs, invalid schemas/validators and archived workspace 
   await expect(h.run()).rejects.toMatchObject({code:'ARCHIVED'});
 });
 it('accepts the fixed Stage 2 packet request range and reserves a conservative token estimate',async()=>{
-  let calls=0;const h=harness({env:{...env,OPENAI_MONTHLY_LIMIT_USD:'0.05'},fetchImpl:async()=>{calls++;return success();}});
+  let calls=0;const h=harness({env:{...env,OPENAI_MONTHLY_LIMIT_USD:'0.5'},fetchImpl:async()=>{calls++;return success();}});
   await h.run({messages:[{role:'user',content:'customer and competitor evidence '.repeat(5500)}]});
   expect(calls).toBe(1);
   const reserved=h.read().workspaces[h.id].budgets.openai.reservedMicros;
   expect(reserved).toBeGreaterThan(0);
-  expect(reserved).toBeLessThan(50000);
-  expect(estimatedUsage({bodyBytes:175534,maxOutputTokens:4096})).toMatchObject({inputTokens:59194,reserveMicros:11337});
+  expect(reserved).toBeLessThan(500000);
+  expect(estimatedUsage({bodyBytes:175534,maxOutputTokens:4096})).toMatchObject({inputTokens:59194,reserveMicros:418850});
 });
 it('persists charges and cached responses across restart without a network request',async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-llm-')),file=path.join(dir,'state.json');

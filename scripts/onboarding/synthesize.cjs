@@ -2,7 +2,7 @@ const path=require('node:path');
 const { getWorkspace } = require('../server/state.cjs');
 const { SIGNAL_KEYS, assertSynthesisOutput, buildReceiptEvidence, sourceSetHash, SynthesisValidationError } = require('./validate.cjs');
 const { assertStructuredOutputSchemaWithinLimits } = require('../openai-schema.cjs');
-const {modelForPurpose}=require('../llm.cjs');
+const {modelForPurpose,estimatedUsage,serializeRequestBody}=require('../llm.cjs');
 const {extractOrganizationCandidates,rawPageMap}=require('./extract-organizations.cjs');
 const {loadReferenceProfile}=require('./reference-profile.cjs');
 
@@ -167,6 +167,7 @@ function buildFocusedSynthesisRequests(state,workspaceId,{env=process.env,rawPag
     evidence:{sourceIds:evidence.sourceIds,sourceSetHash:evidence.sourceSetHash,bytes:Buffer.byteLength(evidence.serialized),receiptCount:evidence.receiptIds.length,
       customerCandidates:candidates.customers.length,competitorCandidates:candidates.competitors.length,customerDomains:candidates.customers.filter(item=>item.domain).length,rawHtml:candidates.rawHtml}};
 }
+function estimateFocusedSynthesisCost(state,workspaceId,options={}){const built=buildFocusedSynthesisRequests(state,workspaceId,options),calls=Object.entries(built.requests).map(([purpose,request])=>{const body=serializeRequestBody({model:request.model,messages:request.messages,schema:request.schema,name:request.name,maxOutputTokens:request.maxOutputTokens}),usage=estimatedUsage({bodyBytes:Buffer.byteLength(body),maxOutputTokens:request.maxOutputTokens,model:request.model});return {purpose,model:request.model,estimatedInputTokens:usage.inputTokens,maxOutputTokens:usage.maxOutputTokens,maximumCostUsd:Number((usage.reserveMicros/1e6).toFixed(6))};});return {calls,totalMaximumCostUsd:Number(calls.reduce((sum,row)=>sum+row.maximumCostUsd,0).toFixed(6))};}
 
 async function generateSynthesis({state,workspaceId,llm,env=process.env,rawPages,referenceProfile}) {
   if(!llm||typeof llm.generate!=='function')throw new SynthesisValidationError('INVALID_INPUT','An injected LLM client is required.');
@@ -178,4 +179,4 @@ async function generateSynthesis({state,workspaceId,llm,env=process.env,rawPages
   return {output,cached:Boolean(seller.cached&&organizations.cached&&icp.cached),model:{sellerFacts:seller.model,organizationReview:organizations.model,icpTargeting:icp.model},guard:built.guard,evidence:built.evidence,promptVersion:FOCUSED_PROMPT_VERSION};
 }
 
-module.exports={PROMPT_VERSION,FOCUSED_PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisSchema,buildSynthesisRequest,buildFocusedSynthesisRequests,validateKnownReceiptIds,validateRunLocalReceiptIds,expandRunLocalReceiptIds,generateSynthesis};
+module.exports={PROMPT_VERSION,FOCUSED_PROMPT_VERSION,MAX_SCHEMA_RECEIPTS,SYNTHESIS_SCHEMA,remapReceiptEvidence,buildEvidencePacket,buildSynthesisSchema,buildSynthesisRequest,buildFocusedSynthesisRequests,estimateFocusedSynthesisCost,validateKnownReceiptIds,validateRunLocalReceiptIds,expandRunLocalReceiptIds,generateSynthesis};

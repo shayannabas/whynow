@@ -2,10 +2,11 @@ const {createHash}=require('node:crypto');
 const {getWorkspace,updateWorkspace}=require('./server/state.cjs');
 
 const ENDPOINT='https://api.openai.com/v1/chat/completions';
-const DEFAULT_MODEL='gpt-4o-mini';
+const DEFAULT_MODEL='gpt-5.5';
 const PROPOSED_STRONG_MODEL='gpt-5.4-mini-2026-03-17';
-const SUPPORTED_MODELS=new Set([DEFAULT_MODEL,'gpt-4o-mini-2024-07-18','gpt-5.4-mini',PROPOSED_STRONG_MODEL]);
+const SUPPORTED_MODELS=new Set([DEFAULT_MODEL,'gpt-5.5-2026-04-23','gpt-4o-mini','gpt-4o-mini-2024-07-18','gpt-5.4-mini',PROPOSED_STRONG_MODEL]);
 const MODEL_PRICING_USD_PER_MILLION=Object.freeze({
+  'gpt-5.5':{input:5,output:30},'gpt-5.5-2026-04-23':{input:5,output:30},
   'gpt-4o-mini':{input:0.15,output:0.60},'gpt-4o-mini-2024-07-18':{input:0.15,output:0.60},
   'gpt-5.4-mini':{input:0.75,output:4.50},[PROPOSED_STRONG_MODEL]:{input:0.75,output:4.50}
 });
@@ -41,8 +42,7 @@ function estimatedUsage({bodyBytes,maxOutputTokens,model=DEFAULT_MODEL}) {
   return {inputTokens,maxOutputTokens,inputMicros,outputMicros,reserveMicros:Math.ceil(inputMicros+outputMicros)};
 }
 function serializeRequestBody({model,messages,schema,name,maxOutputTokens}) {
-  return JSON.stringify({model,messages,store:false,temperature:0,max_completion_tokens:maxOutputTokens,
-    response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}});
+  const request={model,messages,store:false,max_completion_tokens:maxOutputTokens,response_format:{type:'json_schema',json_schema:{name,strict:true,schema}}};if(!/^gpt-5(?:\.|$)/i.test(model))request.temperature=0;return JSON.stringify(request);
 }
 function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date().toISOString(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}) {
   if(typeof read!=='function'||typeof mutate!=='function')throw new Error('A serialized persistent state adapter is required');

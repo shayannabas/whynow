@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace,updateWorkspace}=require('../scripts/server/state.cjs');
 const {recordSource}=require('../scripts/sources.cjs');
-const {buildFocusedSynthesisRequests}=require('../scripts/onboarding/synthesize.cjs');
+const {buildFocusedSynthesisRequests,estimateFocusedSynthesisCost}=require('../scripts/onboarding/synthesize.cjs');
 const {PROPOSED_STRONG_MODEL}=require('../scripts/llm.cjs');
 const {STRUCTURED_OUTPUT_LIMITS,measureStructuredOutputSchema,assertStructuredOutputSchemaWithinLimits}=require('../scripts/openai-schema.cjs');
 
@@ -30,4 +30,5 @@ it('builds three bounded focused requests and keeps organization output limited 
     expect(metrics.schemaStringLength,request.name).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.schemaStringLength);
     for(const item of metrics.enums)if(item.values>STRUCTURED_OUTPUT_LIMITS.largeEnumThreshold)expect(item.stringLength,request.name).toBeLessThanOrEqual(STRUCTURED_OUTPUT_LIMITS.largeEnumStringLength);
   }
+  const estimate=estimateFocusedSynthesisCost(state,id,{rawPages:raw,env:{OPENAI_MODEL:'gpt-5.5'}});expect(estimate.calls).toHaveLength(3);expect(estimate.calls.every(row=>row.model==='gpt-5.5')).toBe(true);expect(estimate.totalMaximumCostUsd).toBeGreaterThan(0);
 });
