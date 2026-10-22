@@ -25,6 +25,10 @@ function termsForSegment(segment={}){
 function taskId(segment,kind,query){return `discovery_${crypto.createHash('sha256').update(`${segment}:${kind}:${query}`).digest('hex').slice(0,12)}`;}
 function buildDiscoveryTasks(workspace={},options={}){
   const config=phaseAConfigForWorkspace(workspace),limit=Math.min(MAX_DISCOVERY_QUERIES,Math.max(1,Number(options.maxQueries)||MAX_DISCOVERY_QUERIES));
+  const enabled=config.segments.filter(segment=>segment.enabled!==false),tasks=[],add=(segment,kind,query)=>{if(tasks.length>=limit||!query)return;tasks.push({id:taskId(segment.key,kind,query),segment:segment.key,segmentLabel:segment.label,kind,query,terms:termsForSegment(segment)});};
+  const templateDepth=Math.max(0,...enabled.map(segment=>(segment.queryTemplates||segment.searchQueryTemplates||[]).length));for(let index=0;index<templateDepth;index++)for(const segment of enabled)add(segment,'icp_query_template',String((segment.queryTemplates||segment.searchQueryTemplates||[])[index]||''));
+  const personaTitles=[...(config.personas?.buyerTitles||[]),...(config.personas?.championTitles||[])].slice(0,8);for(const title of personaTitles)for(const segment of enabled)add(segment,'persona_hiring',`"${title}" hiring "${segment.label}"`);
+  for(const competitor of config.competitors||[])for(const segment of enabled)add(segment,'competitor_customer',`"${competitor.name}" customer case study "${segment.label}"`);
   const variants=[
     segment=>`"${segment.label}" companies official website`,
     segment=>`"${segment.label}" platform company`,
@@ -33,9 +37,7 @@ function buildDiscoveryTasks(workspace={},options={}){
     segment=>`"${segment.label}" engineering careers`,
     segment=>`"${segment.label}" funding company`,
   ];
-  const enabled=config.segments.filter(segment=>segment.enabled!==false),tasks=[];
-  for(let variant=0;variant<variants.length;variant++)for(const segment of enabled){const query=variants[variant](segment);tasks.push({id:taskId(segment.key,variant,query),segment:segment.key,segmentLabel:segment.label,kind:`matrix_${variant+1}`,query,terms:termsForSegment(segment)});if(tasks.length>=limit)return tasks;}
-  return tasks;
+  for(let variant=0;variant<variants.length;variant++)for(const segment of enabled)add(segment,`matrix_${variant+1}`,variants[variant](segment));return tasks.slice(0,limit);
 }
 function candidateFromResult(task={},result={}){
   const sourceUrl=String(result.url||result.link||'').trim(),domain=rootDomain(sourceUrl);if(!sourceUrl||!domain||blockedHost(domain))return null;

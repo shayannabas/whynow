@@ -20,7 +20,11 @@ describe('Chunk 2 discovery core',()=>{
   it('builds a workspace-driven matrix with a hard 60-query ceiling',()=>{
     const tasks=discovery.buildDiscoveryTasks(workspace(),{maxQueries:60});
     expect(tasks).toHaveLength(60);expect(new Set(tasks.map(row=>row.segment))).toHaveLength(10);
-    expect(tasks[0]).toMatchObject({segment:'crypto_fintech',kind:'matrix_1'});expect(tasks[0].query).toContain('Crypto / fintech');
+    expect(tasks[0]).toMatchObject({segment:'crypto_fintech',kind:'icp_query_template'});expect(tasks[0].query).toContain('cryptocurrency exchange');expect(tasks.some(row=>row.kind==='persona_hiring')).toBe(true);
+  });
+  it('adds approved ICP personas and competitor-customer discovery for a new seller',()=>{
+    const current=workspace();current.icpConfig.segments=current.icpConfig.segments.slice(0,1).map(row=>({...row,queryTemplates:['fintech reliability buyers']}));current.icpConfig.personas={buyerTitles:['VP Engineering'],championTitles:['Head of SRE'],wrongOrgTitles:[]};current.sellerProfile.competitors=[{name:'Rival One',domain:'rival.example',sourceUrl:'https://rival.example/compare'}];const tasks=discovery.buildDiscoveryTasks(current,{maxQueries:20});
+    expect(tasks).toEqual(expect.arrayContaining([expect.objectContaining({kind:'icp_query_template',query:'fintech reliability buyers'}),expect.objectContaining({kind:'persona_hiring',query:expect.stringContaining('VP Engineering')}),expect.objectContaining({kind:'competitor_customer',query:expect.stringContaining('Rival One')})]));
   });
 
   it('keeps only official-looking, segment-supported search results',()=>{
