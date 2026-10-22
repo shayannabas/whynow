@@ -54,7 +54,7 @@ function createOutreachGenerator({env=process.env,fetchImpl=fetch,sleep=ms=>new 
         throw new OutreachLiveError('INCOMPLETE',`OpenAI returned an incomplete draft (${incompleteReason}).`,{incompleteReason,usage,costUsd,responseId,responseModel});
       }
       let value;try{value=JSON.parse(outputText(payload));}catch(error){if(error instanceof OutreachLiveError)throw error;throw new OutreachLiveError('INVALID_OUTPUT','OpenAI returned invalid structured draft JSON.');}
-      const draft=validatedDraft(value,context);return {draft,costUsd,usage,responseId,responseModel,estimate};
+      let draft;try{draft=validatedDraft(value,context);}catch(error){if(error instanceof OutreachLiveError){error.usage=usage;error.costUsd=costUsd;error.responseId=responseId;error.responseModel=responseModel;}throw error;}return {draft,costUsd,usage,responseId,responseModel,estimate};
     }
     throw new OutreachLiveError('REQUEST_FAILED','OpenAI outreach request failed.');
   }
