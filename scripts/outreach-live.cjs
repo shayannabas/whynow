@@ -10,8 +10,8 @@ class OutreachLiveError extends Error {
   constructor(code,message,{httpStatus=null,incompleteReason=null,usage=null,costUsd=null,responseId='',responseModel=''}={}){super(message);this.name='OutreachLiveError';this.code=code;if(Number.isInteger(httpStatus))this.httpStatus=httpStatus;if(incompleteReason)this.incompleteReason=String(incompleteReason).slice(0,80);if(usage)this.usage=usage;if(Number.isFinite(costUsd))this.costUsd=costUsd;if(responseId)this.responseId=String(responseId).slice(0,120);if(responseModel)this.responseModel=String(responseModel).slice(0,120);}
 }
 function settings(env={}){
-  const limitUsd=Number(env.OPENAI_MONTHLY_LIMIT_USD),callLimit=Number(env.OPENAI_OUTREACH_CALL_LIMIT),timeoutMs=Number(env.OPENAI_TIMEOUT_MS||DEFAULT_TIMEOUT_MS);
-  return {enabled:env.OPENAI_ENABLED==='true',keyPresent:Boolean(env.OPENAI_API_KEY?.trim()),model:outreachModel(env),limitUsd:Number.isFinite(limitUsd)?limitUsd:0,callLimit:Number.isInteger(callLimit)?callLimit:0,timeoutMs:Number.isInteger(timeoutMs)&&timeoutMs>=1000&&timeoutMs<=180000?timeoutMs:DEFAULT_TIMEOUT_MS};
+  const limitUsd=Number(env.OPENAI_MONTHLY_LIMIT_USD),callLimit=Number(env.OPENAI_OUTREACH_CALL_LIMIT),retryLimit=env.OPENAI_OUTREACH_RETRY_LIMIT===undefined?1:Number(env.OPENAI_OUTREACH_RETRY_LIMIT),timeoutMs=Number(env.OPENAI_TIMEOUT_MS||DEFAULT_TIMEOUT_MS);
+  return {enabled:env.OPENAI_ENABLED==='true',keyPresent:Boolean(env.OPENAI_API_KEY?.trim()),model:outreachModel(env),limitUsd:Number.isFinite(limitUsd)?limitUsd:0,callLimit:Number.isInteger(callLimit)?callLimit:0,retryLimit:[0,1].includes(retryLimit)?retryLimit:1,timeoutMs:Number.isInteger(timeoutMs)&&timeoutMs>=1000&&timeoutMs<=180000?timeoutMs:DEFAULT_TIMEOUT_MS};
 }
 function assertReady(config){
   if(!config.enabled)throw new OutreachLiveError('DISABLED','OpenAI outreach is disabled.');
@@ -32,7 +32,7 @@ function usageSummary(usage={}){return {inputTokens:Math.max(0,Number(usage.inpu
 function claimsUsed(context={}){const claims=context.seller?.claims||{};return [claims.product,claims.credential,context.seller?.proof&&{value:context.seller.proof.claim,quote:context.seller.proof.quote,sourceUrl:context.seller.proof.sourceUrl}].filter(Boolean);}
 function validatedDraft(value={},context={}){
   const usedClaims=claimsUsed(context),draft={subject:String(value.subject||''),body:String(value.body||''),usedClaims,evidenceRefs:Array.from(new Set([context.trigger?.sourceUrl,...(context.trigger?.corroboration?.sourceUrls||[]),...usedClaims.map(row=>row.sourceUrl)].filter(Boolean)))};
-  const validation=validateOutreachDraft(draft,context);if(!validation.ok)throw new OutreachLiveError('DRAFT_BLOCKED',`The generated draft failed local validation: ${validation.reasons.map(row=>row.code).join(', ')}`);
+  const validation=validateOutreachDraft(draft,context);if(!validation.ok){const error=new OutreachLiveError('DRAFT_BLOCKED',`The generated draft failed local validation: ${validation.reasons.map(row=>row.code).join(', ')}`);error.rejectedDraft={subject:draft.subject,body:draft.body};error.validation=validation;throw error;}
   return {...draft,validation,wordCount:validation.wordCount,generatedBy:'openai',model:'gpt-5.5'};
 }
 function createOutreachGenerator({env=process.env,fetchImpl=fetch,sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
@@ -40,12 +40,12 @@ function createOutreachGenerator({env=process.env,fetchImpl=fetch,sleep=ms=>new 
   async function generate(context={}){
     if(logicalCalls>=config.callLimit)throw new OutreachLiveError('CALL_LIMIT',`The ${config.callLimit}-call outreach limit is exhausted.`);
     const request=buildOutreachRequest(context,env),estimate=estimateOutreachRequest(request);logicalCalls++;
-    for(let attempt=0;attempt<2;attempt++){
+    for(let attempt=0;attempt<=config.retryLimit;attempt++){
       if(actualUsd+estimate.plannedTotalCostUsd>config.limitUsd)throw new OutreachLiveError('BUDGET_EXHAUSTED','The process-only outreach cap would be exceeded by the planning allowance.');
       reservedUsd=Number((reservedUsd+estimate.plannedTotalCostUsd).toFixed(6));attempts++;
       let response;
       try{response=await fetchImpl(RESPONSES_ENDPOINT,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:`Bearer ${env.OPENAI_API_KEY}`},body:JSON.stringify(request),signal:AbortSignal.timeout(config.timeoutMs)});}catch{throw new OutreachLiveError('REQUEST_FAILED','OpenAI outreach request failed or timed out.');}
-      if(!response.ok){await response.body?.cancel();if((response.status===429||response.status>=500)&&attempt===0){await sleep(500);continue;}throw new OutreachLiveError('REQUEST_FAILED',`OpenAI outreach request failed (HTTP ${response.status}).`,{httpStatus:response.status});}
+      if(!response.ok){await response.body?.cancel();if((response.status===429||response.status>=500)&&attempt<config.retryLimit){await sleep(500);continue;}throw new OutreachLiveError('REQUEST_FAILED',`OpenAI outreach request failed (HTTP ${response.status}).`,{httpStatus:response.status});}
       let payload;try{payload=await response.json();}catch{throw new OutreachLiveError('INVALID_OUTPUT','OpenAI returned unreadable JSON.');}
       const usage=usageSummary(payload.usage),costUsd=actualCost(payload.usage),responseId=String(payload.id||''),responseModel=String(payload.model||config.model);actualUsd=Number((actualUsd+costUsd).toFixed(6));
       if(actualUsd>config.limitUsd)throw new OutreachLiveError('BUDGET_EXHAUSTED','Provider-reported usage exceeded the process-only outreach cap.',{usage,costUsd,responseId,responseModel});
