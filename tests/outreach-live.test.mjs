@@ -6,6 +6,7 @@ const {loadResolveReferenceDemo}=require('../scripts/reference-demo.cjs');
 const outreach=require('../scripts/outreach-drafts.cjs');
 const live=require('../scripts/outreach-live.cjs');
 const runner=require('../scripts/run-chunk3-outreach-paid.cjs');
+const regeneration=require('../scripts/run-resolve-demo-allowed-facts-drafts.cjs');
 
 const NOW='2026-10-21T00:00:00.000Z';
 function context(){
@@ -18,6 +19,7 @@ function payload(ctx,id='resp_1'){
 const env={OPENAI_ENABLED:'true',OPENAI_MONTHLY_LIMIT_USD:'.50',OPENAI_OUTREACH_CALL_LIMIT:'3',OPENAI_OUTREACH_MODEL:'gpt-5.5',OPENAI_API_KEY:'test-key'};
 
 describe('bounded live outreach client',()=>{
+  it('pins the allowed-facts regeneration to two accounts, no retry and a $0.15 cap',()=>{expect(regeneration.TARGETS).toEqual(['Coalition','CrowdStrike']);expect(regeneration.PROCESS_CAP_USD).toBe(.15);});
   it('prices cached and uncached tokens from provider usage',()=>expect(live.actualCost({input_tokens:1000,input_tokens_details:{cached_tokens:200},output_tokens:100})).toBe(.0071));
   it('makes one Responses call and applies the local receipt and merge-field validator',async()=>{
     const ctx=context(),calls=[],generator=live.createOutreachGenerator({env,fetchImpl:async(url,options)=>{calls.push({url,options});return new Response(JSON.stringify(payload(ctx)),{status:200,headers:{'content-type':'application/json'}});}}),result=await generator.generate(ctx);
