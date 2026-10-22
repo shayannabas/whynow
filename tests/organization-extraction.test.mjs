@@ -59,7 +59,7 @@ it('uses a matching outbound host when a generic link label does not repeat the 
 });
 
 it('extracts the competitors named on the saved Vercel comparisons page',()=>{
-  const page=JSON.parse(fs.readFileSync(path.join(FIXTURE_DIR,'fixtures','onboarding','vercel-comparisons-saved.json'),'utf8'));
+  const page=JSON.parse(fs.readFileSync(path.join(FIXTURE_DIR,'fixtures','extraction','vercel-comparisons-saved.json'),'utf8'));
   let state=createWorkspace(defaultState(),{name:'Vercel'}),id=state.activeWorkspaceId;
   const saved=recordSource(state,{url:page.url,title:page.title,text:page.text,fetchedAt:page.capturedAt});state=saved.state;
   state=updateWorkspace(state,id,w=>{w.research={schemaVersion:1,status:'evidence_ready',revision:1,runId:'saved-vercel-comparisons',selectedCandidate:{name:'Vercel',domain:'vercel.com'},sources:[{sourceId:saved.source.id,kind:'seller_site',ownerDomain:'vercel.com'}]};});
