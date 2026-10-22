@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v4-chunk-3",
+  "referenceProfileVersion": "resolve-ai-v5-current-claims-2026-10-21",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -59,7 +59,21 @@
     ],
     "whyNowExtensions": [
       {"target":"icpConfig.killRules.whyNowExtension","note":"WhyNow additionally excludes the seller and configured competitors. This does not alter SignalScout's five-code precedence fixture."}
-    ]
+    ],
+    "sellerClaimRefresh": {
+      "changedOn": "2026-10-21",
+      "reason": "The frozen SignalScout outreach constants had drifted from Resolve AI's current first-party pages. WhyNow re-fetched the approved product and customer pages through its robots-aware public-page runtime and retained only verbatim, currently receipted wording.",
+      "pages": [
+        {"url":"https://resolve.ai/product/ai-sre","fetchedAt":"2026-10-22T00:06:42.060Z"},
+        {"url":"https://resolve.ai/product/overview","fetchedAt":"2026-10-22T00:06:43.109Z"},
+        {"url":"https://resolve.ai/customers/coinbase","fetchedAt":"2026-10-22T00:06:44.584Z"},
+        {"url":"https://resolve.ai/customers/doordash","fetchedAt":"2026-10-22T00:06:46.484Z"}
+      ],
+      "droppedClaims": [
+        {"value":"Built by the creators of OpenTelemetry.","reason":"The wording was not present on any of the four refreshed first-party pages."},
+        {"value":"DoorDash cut investigation times by 87%.","reason":"The exact wording was not present; the demo now uses the current verbatim customer quote instead."}
+      ]
+    }
   },
   "icpConfig": {
     "schemaVersion": 1,
@@ -276,24 +290,26 @@
       "claims": {
         "status": "frozen_reference",
         "product": {
-          "value": "Resolve AI puts an autonomous AI production engineer on-call: if production slips, it investigates logs and hands your team the root cause in minutes.",
-          "sourceUrl": "https://resolve.ai/product/ai-sre"
-        },
-        "credential": {
-          "value": "Built by the creators of OpenTelemetry.",
-          "sourceUrl": "https://resolve.ai/product/ai-sre"
+          "value": "Agents that investigate your production systems during on-call, incidents, and daily production tasks.",
+          "quote": "Agents that investigate your production systems during on-call, incidents, and daily production tasks.",
+          "sourceUrl": "https://resolve.ai/product/ai-sre",
+          "fetchedAt": "2026-10-22T00:06:42.060Z"
         },
         "customerProofs": [
           {
             "customer": "Coinbase",
-            "claim": "Coinbase achieved 73% faster time to root cause.",
-            "sourceUrl": "https://resolve.ai/product/ai-sre",
+            "claim": "72% reduction in investigation time",
+            "quote": "72% reduction in investigation time : incidents that previously required long manual triage now move from alert to informed action in minutes, not half an hour or more.",
+            "sourceUrl": "https://resolve.ai/customers/coinbase",
+            "fetchedAt": "2026-10-22T00:06:44.584Z",
             "segments": ["crypto_fintech", "data_ai_infrastructure", "cybersecurity"]
           },
           {
             "customer": "DoorDash",
-            "claim": "DoorDash cut investigation times by 87%.",
+            "claim": "Investigations went from hours to minutes...",
+            "quote": "Investigations went from hours to minutes...",
             "sourceUrl": "https://resolve.ai/product/overview",
+            "fetchedAt": "2026-10-22T00:06:43.109Z",
             "segments": ["delivery_marketplaces", "ticketing_live_events", "travel_hospitality", "restaurant_commerce_saas", "insurance_vertical_saas", "enterprise_platforms", "sports_betting"]
           }
         ]
