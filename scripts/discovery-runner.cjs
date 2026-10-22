@@ -22,7 +22,7 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     workspace.budgets.serperQueries={month,queries:current+1};run.serperQueries+=1;
   });
   async function execute(workspaceId,runId){
-    const settings=assertDiscoveryReady(env);await updateRun(workspaceId,runId,run=>{run.status='running';});
+    assertSerperReady(serperSettings(env));const saved=findRun(read().workspaces[workspaceId],runId),settings={...discoverySettings(env),maxQueries:saved.queryCap};await updateRun(workspaceId,runId,run=>{run.status='running';});
     const initial=read(),workspace=initial.workspaces[workspaceId];phaseAConfigForWorkspace(workspace);const runtime=runtimeFactory({env});runtime.identity();
     const tasks=buildDiscoveryTasks(workspace,{maxQueries:settings.maxQueries}),seeded=seedCandidates(workspace),live=[],reports=[],minimumQueries=phaseAConfigForWorkspace(workspace).segments.filter(row=>row.enabled!==false).length;
     for(const task of tasks){
@@ -35,10 +35,10 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     await mutate(state=>{const promoted=promoteDiscoveryCandidates(state,workspaceId,selection.selected);state=promoted.state;const currentWorkspace=state.workspaces[workspaceId],run=findRun(currentWorkspace,runId);run.status=reports.some(row=>row.status==='error')?'complete_with_errors':'complete';run.finishedAt=now().toISOString();run.tasks=reports;run.rawFound=seeded.length+live.length;run.passedNoiseGate=selection.selected.length;run.newAccounts=promoted.added.length;run.newAccountIds=promoted.added.map(row=>row.id);run.rejectedCount=selection.rejected.length;run.errors=reports.filter(row=>row.error).map(row=>({taskId:row.taskId,segment:row.segment,...row.error}));currentWorkspace.budgets.discoveryCollector={day:now().toISOString().slice(0,10),...runtime.snapshot()};return state;});
     return findRun(read().workspaces[workspaceId],runId);
   }
-  async function start(workspaceId){
-    const workspace=read().workspaces[workspaceId];if(!workspace)throw new Error('Workspace not found.');phaseAConfigForWorkspace(workspace);assertDiscoveryReady(env);
+  async function start(workspaceId,options={}){
+    const workspace=read().workspaces[workspaceId];if(!workspace)throw new Error('Workspace not found.');phaseAConfigForWorkspace(workspace);assertSerperReady(serperSettings(env));const settings=discoverySettings(env),requested=positiveInteger(options.queryCap,60),queryCap=requested||settings.maxQueries;if(!queryCap)throw new Error('Set DISCOVERY_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 60.');
     if(workspace.runs.some(row=>row.type==='company_discovery'&&['queued','running'].includes(row.status)))throw new Error('A discovery run is already active.');
-    const run={schemaVersion:1,id:id(),type:'company_discovery',status:'queued',startedAt:now().toISOString(),finishedAt:'',serperQueries:0,tasks:[],rawFound:0,passedNoiseGate:0,newAccounts:0,newAccountIds:[],rejectedCount:0,errors:[]};
+    const run={schemaVersion:1,id:id(),type:'company_discovery',status:'queued',startedAt:now().toISOString(),finishedAt:'',queryCap,serperQueries:0,tasks:[],rawFound:0,passedNoiseGate:0,newAccounts:0,newAccountIds:[],rejectedCount:0,errors:[]};
     await mutate(state=>{state.workspaces[workspaceId].runs.push(run);return state;});
     const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
   }

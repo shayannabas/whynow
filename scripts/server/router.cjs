@@ -23,9 +23,10 @@ const {addManualAccountToState}=require('../accounts.cjs');
 const {createPhaseBRefreshCoordinator}=require('../phase-b-runner.cjs');
 const {createRefreshAllCoordinator}=require('../refresh-all-runner.cjs');
 const {createDiscoveryCoordinator}=require('../discovery-runner.cjs');
+const {createPrepareDemoCoordinator}=require('../prepare-demo.cjs');
 const {updateAccountStatus}=require('../account-lifecycle.cjs');
 const {createTemplateDraft}=require('../outreach-drafts.cjs');
-function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,phaseBRefreshCoordinator:providedPhaseBRefresh,phaseBRefreshAllCoordinator:providedPhaseBRefreshAll,discoveryCoordinator:providedDiscovery,llm:providedLlm} = {}) {
+function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,phaseBRefreshCoordinator:providedPhaseBRefresh,phaseBRefreshAllCoordinator:providedPhaseBRefreshAll,discoveryCoordinator:providedDiscovery,prepareDemoCoordinator:providedPrepareDemo,llm:providedLlm} = {}) {
   stateFile=stateFile||statePath(env);
   loadState(stateFile);
   let writes = Promise.resolve();
@@ -44,6 +45,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   const phaseBRefreshCoordinator=providedPhaseBRefresh||createPhaseBRefreshCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
   const phaseBRefreshAllCoordinator=providedPhaseBRefreshAll||createRefreshAllCoordinator({read,mutate,env,accountCoordinator:phaseBRefreshCoordinator});
   const discoveryCoordinator=providedDiscovery||createDiscoveryCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
+  const prepareDemoCoordinator=providedPrepareDemo||(typeof discoveryCoordinator.wait==='function'&&typeof phaseBRefreshAllCoordinator.wait==='function'?createPrepareDemoCoordinator({read,mutate,env,discoveryCoordinator,refreshAllCoordinator:phaseBRefreshAllCoordinator}):{start:async()=>{throw new Error('Prepare demo coordinator is unavailable.');}});
   // Persisted interrupted research can resume after a local restart. Errors are
   // saved in the workspace and never crash the HTTP server.
   if(typeof researchCoordinator.resumePending==='function')void researchCoordinator.resumePending().catch(()=>{});
@@ -59,6 +61,12 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       const localAdmin=env.NODE_ENV!=='production'&&['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)&&/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||'');
       if(req.method==='GET'&&pathname==='/today')return html(200,todayPage(loadState(stateFile)));
       if(req.method==='GET'&&pathname==='/discovery')return html(200,discoveryPage(loadState(stateFile)));
+      if(req.method==='POST'&&pathname==='/prepare-demo'){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const current=loadState(stateFile);try{await prepareDemoCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,todayPage(loadState(stateFile),error.message));}
+        res.writeHead(303,{Location:'/today'});return res.end();
+      }
       if(req.method==='POST'&&pathname==='/discovery/run'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});

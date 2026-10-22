@@ -30,4 +30,10 @@ describe('Refresh all coordinator',()=>{
     expect(refreshAllSettings({})).toMatchObject({maxQueries:0});
     expect(refreshAllSettings({REFRESH_ALL_MAX_SERPER_QUERIES_PER_RUN:'999',PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT:'5'})).toEqual({maxQueries:150,perAccountQueries:5});
   });
+  it('accepts an explicit lower cap from the bounded prepare-demo workflow',async()=>{
+    const h=setup(),accountCoordinator={start:async(_workspaceId,accountId)=>({id:`run-${accountId}`}),wait:async runId=>({id:runId,status:'complete',serperQueries:4,errors:[]})};
+    const coordinator=createRefreshAllCoordinator({read:h.read,mutate:h.mutate,accountCoordinator,env:{PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT:'5',REFRESH_ALL_MAX_SERPER_QUERIES_PER_RUN:'150'},id:()=> 'refresh-all-local-cap'});
+    const queued=await coordinator.start(h.workspaceId,{queryCap:10}),finished=await coordinator.wait(queued.id);
+    expect(finished).toMatchObject({queryCap:10,serperQueries:8,status:'complete'});
+  });
 });

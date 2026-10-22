@@ -34,4 +34,8 @@ describe('background company discovery',()=>{
     const coordinator=createDiscoveryCoordinator({read,mutate,env:{SERPER_ENABLED:'true',SERPER_API_KEY:'x',SERPER_MAX_QUERIES_PER_RUN:'4',SERPER_MONTHLY_QUERY_LIMIT:'60',DISCOVERY_MAX_SERPER_QUERIES_PER_RUN:'0'}});
     await expect(coordinator.start(REFERENCE_WORKSPACE_ID)).rejects.toThrow(/DISCOVERY_MAX_SERPER/);
   });
+  it('accepts a lower run-local cap for a larger bounded workflow',async()=>{
+    const h=harness(),started=await h.coordinator.start(REFERENCE_WORKSPACE_ID,{queryCap:3}),run=await h.coordinator.wait(started.id);
+    expect(run.queryCap).toBe(3);expect(run.serperQueries).toBe(3);expect(h.searchProvider).toHaveBeenCalledTimes(3);
+  });
 });

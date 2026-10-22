@@ -25,13 +25,13 @@ function createRefreshAllCoordinator({read,mutate,accountCoordinator,env=process
     await updateRun(workspaceId,runId,run=>{run.status=run.failedAccounts||run.accountRuns.some(row=>row.errorCount)?'complete_with_errors':'complete';run.finishedAt=now().toISOString();});
     return findRun(read().workspaces[workspaceId],runId);
   }
-  async function start(workspaceId){
+  async function start(workspaceId,options={}){
     const workspace=read().workspaces[workspaceId];if(!workspace)throw new Error('Workspace not found.');
-    const settings=refreshAllSettings(env);if(!settings.maxQueries)throw new Error('Set REFRESH_ALL_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 150.');
+    const settings=refreshAllSettings(env),requested=positiveInteger(options.queryCap,HARD_MAX_REFRESH_ALL_SERPER_QUERIES),maxQueries=requested||settings.maxQueries;if(!maxQueries)throw new Error('Set REFRESH_ALL_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 150.');
     if(workspace.runs.some(row=>row.type==='account_collector_refresh_all'&&['queued','running'].includes(row.status)))throw new Error('Refresh all is already running.');
     const accountIds=workspace.accounts.filter(row=>row.discoveryQuality?.sourceKind).map(row=>row.id);if(!accountIds.length)throw new Error('No discovered accounts are available to refresh.');
-    if(accountIds.length*settings.perAccountQueries>settings.maxQueries)throw new Error(`Refreshing ${accountIds.length} accounts could exceed the ${settings.maxQueries}-query cap.`);
-    const run={schemaVersion:1,id:id(),type:'account_collector_refresh_all',status:'queued',startedAt:now().toISOString(),finishedAt:'',accountIds,totalAccounts:accountIds.length,completedAccounts:0,failedAccounts:0,queryCap:settings.maxQueries,perAccountQueryCeiling:settings.perAccountQueries,serperQueries:0,accountRuns:[],errors:[]};
+    if(accountIds.length*settings.perAccountQueries>maxQueries)throw new Error(`Refreshing ${accountIds.length} accounts could exceed the ${maxQueries}-query cap.`);
+    const run={schemaVersion:1,id:id(),type:'account_collector_refresh_all',status:'queued',startedAt:now().toISOString(),finishedAt:'',accountIds,totalAccounts:accountIds.length,completedAccounts:0,failedAccounts:0,queryCap:maxQueries,perAccountQueryCeiling:settings.perAccountQueries,serperQueries:0,accountRuns:[],errors:[]};
     await mutate(state=>{state.workspaces[workspaceId].runs.push(run);return state;});
     const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
   }
