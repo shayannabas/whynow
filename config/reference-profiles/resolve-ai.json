@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v5-current-claims-2026-10-21",
+  "referenceProfileVersion": "resolve-ai-v6-readable-outreach-2026-10-21",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -73,6 +73,10 @@
         {"value":"Built by the creators of OpenTelemetry.","reason":"The wording was not present on any of the four refreshed first-party pages."},
         {"value":"DoorDash cut investigation times by 87%.","reason":"The exact wording was not present; the demo now uses the current verbatim customer quote instead."}
       ]
+    },
+    "outreachQualityRefresh": {
+      "changedOn": "2026-10-21",
+      "reason": "The owner replaced whole-sentence copying with exact risky-fact validation, customer attribution and editable non-factual framing so Demo emails remain grounded but read naturally."
     }
   },
   "icpConfig": {
@@ -287,6 +291,11 @@
     "painSources": {"statuspage": false, "hn": false, "news": false, "filings": false},
     "pitch": {"receiptOpenerStyle": "", "oneSentenceProduct": "", "credentialLine": "", "ctaStyle": ""},
     "outreach": {
+      "framingLibrary": [
+        "Teams growing SRE often feel it first in on-call investigations.",
+        "Senior reliability hires can be a useful moment to review how investigation work is handled.",
+        "Engineering leadership changes can be a useful moment to review how investigation work is supported."
+      ],
       "claims": {
         "status": "frozen_reference",
         "product": {

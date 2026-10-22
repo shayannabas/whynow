@@ -21,7 +21,8 @@ describe('receipt-backed deterministic outreach',()=>{
     expect(draft).toMatchObject({blocked:false,generatedBy:'deterministic_template',model:null,validation:{ok:true}});
     expect(draft.wordCount).toBeGreaterThanOrEqual(60);expect(draft.wordCount).toBeLessThanOrEqual(110);
     expect(draft.body.split(/\n\s*\n/)).toHaveLength(5);
-    expect(draft.body).toContain(workspace.icpConfig.outreach.claims.product.value);
+    expect(draft.body).toContain('Resolve AI provides agents that investigate');
+    expect(draft.body).toContain('Coinbase saw a 72% reduction in investigation time.');
     expect(draft.evidenceRefs).toEqual(expect.arrayContaining(['https://acme.example/jobs/sre','https://resolve.ai/product/ai-sre']));
   });
   it('uses the exact Demo merge token and chooses an approved trigger-matched persona without inventing a person',()=>{
@@ -47,18 +48,29 @@ describe('receipt-backed deterministic outreach',()=>{
     const wrong=outreach.buildDraftContext(workspace,account,{...fields,title:'Chief Financial Officer'},new Date(NOW));expect(wrong.blockers).toContainEqual(expect.objectContaining({code:'PERSONA_MISMATCH'}));
     const ordinary={...workspace,status:'active',referenceDemo:undefined,icpConfig:{...workspace.icpConfig,outreach:undefined},sellerProfile:{name:'Seller',domain:'seller.example',approvedAt:'2026-10-20T00:00:00.000Z',customers:[],competitors:[],evidence:{}}};expect(outreach.buildDraftContext(ordinary,account,fields,new Date(NOW)).blockers).toContainEqual(expect.objectContaining({code:'NO_APPROVED_SELLER_CLAIM'}));
   });
-  it('rejects changed or unreceipted seller wording and first-touch links',()=>{
-    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context),changed={...draft,body:draft.body.replace('Agents that investigate','Tools that investigate')};
-    expect(outreach.validateOutreachDraft(changed,context).reasons).toContainEqual(expect.objectContaining({code:'SELLER_CLAIM_CHANGED'}));
+  it('allows natural connective paraphrase while rejecting unsupported risky facts, unreceipted claims and links',()=>{
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context),paraphrased={...draft,body:draft.body.replace('Resolve AI provides agents that investigate','Resolve AI offers agents that investigate')};
+    expect(outreach.validateOutreachDraft(paraphrased,context).reasons).not.toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('production systems','GCP production systems')},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
     expect(outreach.validateOutreachDraft({...draft,usedClaims:draft.usedClaims.map((row,index)=>index?row:{...row,quote:'Different wording.'})},context).reasons).toContainEqual(expect.objectContaining({code:'SELLER_CLAIM_NOT_VERBATIM'}));
     expect(outreach.validateOutreachDraft({...draft,body:`${draft.body} https://example.com`},context).reasons).toContainEqual(expect.objectContaining({code:'FIRST_TOUCH_LINK'}));
+  });
+
+  it('requires exact risky numbers, locations and people while allowing non-factual paraphrase',()=>{
+    const {workspace,account}=fixture(),detailed={...account,name:'Acme Cloud',triggers:[{...account.triggers[0],evidenceText:'Acme Cloud is hiring a Senior Site Reliability Engineer in Any location, Canada. Jordan Lee leads the team using Kubernetes and AWS.'}]},context=outreach.buildDraftContext(workspace,detailed,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context);
+    expect(draft.validation.ok).toBe(true);
+    const exact={...draft,body:draft.body.replace('Teams growing SRE often feel it first in on-call investigations.','Jordan Lee leads this work from Any location, Canada. Teams growing SRE often feel it first in on-call investigations.')};
+    expect(outreach.validateOutreachDraft(exact,context).reasons).not.toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
+    expect(outreach.validateOutreachDraft({...exact,body:exact.body.replace('Jordan Lee','Jordan Smith')},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
+    expect(outreach.validateOutreachDraft({...exact,body:exact.body.replace('Canada','New York')},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('72%','73%')},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
   });
 
   it('accepts Coalition details only because title, location, Kubernetes and AWS are in the saved receipt',()=>{
     const {workspace,account}=fixture(),coalition={...account,id:'coalition',name:'Coalition',domain:'coalitioninc.com',triggers:[{...account.triggers[0],title:'Senior Site Reliability Engineer',evidenceText:"Senior Site Reliability Engineer. Location: Any location, Canada. Named stack: Kubernetes, AWS. About us Coalition is the world's first Active Insurance provider.",evidenceUrl:'https://www.coalitioninc.com/job-posting?gh_jid=4742193005'}]},context=outreach.buildDraftContext(workspace,coalition,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),base=outreach.templateDraft(context),body=base.body.replace(/I saw[^\n]+/, 'I saw the “Senior Site Reliability Engineer” posting in Any location, Canada naming Kubernetes and AWS.');
     expect(outreach.validateOutreachDraft({...base,body},context).reasons).not.toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
     expect(outreach.validateOutreachDraft({...base,body:body.replace('I saw','Also saw')},context).reasons).not.toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
-    expect(outreach.validateOutreachDraft({...base,body:body.replace('AWS','GCP')},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
+    expect(outreach.validateOutreachDraft({...base,body:body.replace('AWS','GCP')},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
   });
 
   it('revalidates the two recorded allowed-facts drafts under the corrected rules',()=>{
@@ -71,7 +83,11 @@ Agents that investigate your production systems during on-call, incidents, and d
 Open to a brief conversation about on-call, incidents, and daily production tasks?
 
 Shayan`};
-    expect(outreach.validateOutreachDraft(coalitionDraft,coalitionContext)).toMatchObject({ok:true,reasons:[]});
+    expect(outreach.validateOutreachDraft(coalitionDraft,coalitionContext).reasons).toEqual(expect.arrayContaining([
+      expect.objectContaining({code:'STACKED_QUOTES'}),
+      expect.objectContaining({code:'ABOUT_US_COPY'}),
+      expect.objectContaining({code:'SENTENCE_FRAGMENT'})
+    ]));
 
     const executiveTriggers=[{...account.triggers[0],id:'exec-1',type:'executive_departure',title:'CrowdStrike CTO Elia Zaitsev Leaves After 13 Years',evidenceText:'CrowdStrike CTO Elia Zaitsev leaves after 13 years.',evidenceUrl:'https://news-one.example/crowdstrike'},{...account.triggers[0],id:'exec-2',type:'executive_departure',title:'CrowdStrike technology leader steps down',evidenceText:'A second publisher reports the CrowdStrike leadership change.',evidenceUrl:'https://news-two.example/crowdstrike'}],crowdstrike={...account,id:'crowdstrike',name:'CrowdStrike',domain:'crowdstrike.com',triggers:executiveTriggers},crowdstrikeContext=outreach.buildDraftContext(workspace,crowdstrike,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),crowdstrikeBase=outreach.templateDraft(crowdstrikeContext),crowdstrikeDraft={...crowdstrikeBase,subject:'Engineering leadership and production investigations',body:`Hi {{first_name}},
 
@@ -82,21 +98,32 @@ Agents that investigate your production systems during on-call, incidents, and d
 If not, no problem—just thought the overlap with production investigation might be timely. Open to a brief conversation to see if this is relevant?
 
 Shayan`},crowdstrikeValidation=outreach.validateOutreachDraft(crowdstrikeDraft,crowdstrikeContext);
-    expect(crowdstrikeValidation.ok).toBe(false);expect(crowdstrikeValidation.reasons).toEqual([expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL',message:expect.stringContaining('on-call, production')})]);
+    expect(crowdstrikeValidation.ok).toBe(false);expect(crowdstrikeValidation.reasons).toEqual(expect.arrayContaining([expect.objectContaining({code:'SENTENCE_FRAGMENT'}),expect.objectContaining({code:'STAT_NOT_ATTRIBUTED'})]));
     expect(crowdstrikeBase.validation.ok).toBe(true);
   });
 
   it('rejects a shortened Binance title and invented production-reliability detail',()=>{
     const {workspace,account}=fixture(),baseContext=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),context={...baseContext,account:{...baseContext.account,id:'binance',name:'Binance',domain:'binance.com'},trigger:{...baseContext.trigger,title:'Binance Accelerator Program - System Performance Engineer (AI)',text:'Binance Accelerator Program - System Performance Engineer (AI). Location: Singapore. Work on system performance.',sourceUrl:'https://jobs.example/binance/performance'}},base=outreach.templateDraft(context),body=base.body.replace(/I saw[^\n]+/, 'I saw the “System Performance Engineer” posting in Singapore, focused on production reliability.');
-    expect(outreach.validateOutreachDraft({...base,body},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
+    expect(outreach.validateOutreachDraft({...base,body},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
   });
 
   it('uses neutral, corroborated executive-change framing and blocks departure details, amounts and the banned phrase',()=>{
     const {workspace,account}=fixture(),triggers=[{...account.triggers[0],id:'exec-1',type:'executive_departure',title:'Acme Cloud CTO departs',evidenceText:'Acme Cloud CTO departs after five years.',evidenceUrl:'https://news-one.example/acme',occurredAt:'2026-10-20T00:00:00.000Z'},{...account.triggers[0],id:'exec-2',type:'executive_departure',title:'Acme Cloud technology leader steps down',evidenceText:'A second publisher reports the Acme Cloud leadership change.',evidenceUrl:'https://news-two.example/acme',occurredAt:'2026-10-19T00:00:00.000Z'}],context=outreach.buildDraftContext(workspace,{...account,triggers},{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context);
-    expect(context.trigger.corroboration).toMatchObject({sourceCount:2,label:'corroborated by 2 saved sources'});expect(draft.validation.ok).toBe(true);expect(draft.subject).toBe('Engineering leadership and investigation support');expect(draft.subject).not.toMatch(/depart|CTO|Acme/i);expect(draft.evidenceRefs).toEqual(expect.arrayContaining(['https://news-one.example/acme','https://news-two.example/acme']));
+    expect(context.trigger.corroboration).toMatchObject({sourceCount:2,label:'corroborated by 2 saved sources'});expect(draft.validation.ok).toBe(true);expect(draft.subject).toBe('Engineering leadership timing');expect(draft.subject).not.toMatch(/depart|CTO|Acme/i);expect(draft.evidenceRefs).toEqual(expect.arrayContaining(['https://news-one.example/acme','https://news-two.example/acme']));
     const neutral={...draft,body:draft.body.replace(/I noticed[^\n]+/,'I noticed the recent engineering leadership change. It may be a useful moment to review how investigation work is supported.')};const neutralValidation=outreach.validateOutreachDraft(neutral,context);expect(neutralValidation.reasons).not.toContainEqual(expect.objectContaining({code:'TRIGGER_NOT_GROUNDED'}));expect(neutralValidation.reasons).not.toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
     const unsafe=draft.body.replace(/I noticed[^\n]+/, 'I saw the CTO depart after 13 years to launch a $170 million fund and revisit the next operating state.');
     expect(outreach.validateOutreachDraft({...draft,body:unsafe},context).reasons).toEqual(expect.arrayContaining([expect.objectContaining({code:'EXECUTIVE_OPENER'}),expect.objectContaining({code:'EXECUTIVE_DETAIL_TONE'}),expect.objectContaining({code:'BANNED_TONE'})]));
+  });
+  it('enforces customer attribution, exact quotes, readable sentences and one-question structure',()=>{
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context);
+    expect(draft.validation.ok).toBe(true);
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Coinbase saw a 72%','The team saw a 72%')},context).reasons).toContainEqual(expect.objectContaining({code:'STAT_NOT_ATTRIBUTED'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Coinbase saw a 72% reduction in investigation time.','Coinbase said, “roughly seventy percent faster.”')},context).reasons).toContainEqual(expect.objectContaining({code:'QUOTE_NOT_VERBATIM'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Noticed','About us: Noticed')},context).reasons).toContainEqual(expect.objectContaining({code:'ABOUT_US_COPY'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Coinbase saw','“Production.” “Incidents.” Coinbase saw')},context).reasons).toContainEqual(expect.objectContaining({code:'STACKED_QUOTES'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Resolve AI provides agents that investigate','Agents that investigate')},context).reasons).toContainEqual(expect.objectContaining({code:'SENTENCE_FRAGMENT'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('rotation?','rotation? Would another question help?')},context).reasons).toContainEqual(expect.objectContaining({code:'ASK_QUESTION_COUNT'}));
+    expect(outreach.validateOutreachDraft({...draft,subject:'One two three four five six seven eight'},context).reasons).toContainEqual(expect.objectContaining({code:'SUBJECT_TOO_LONG'}));
   });
   it('persists a Demo-only copy draft and an audit record without approving or sending anything',()=>{
     const {state,workspace}=fixture(),next=outreach.createTemplateDraft(state,workspace.id,'acct-acme',fields,{now:()=>NOW,id:()=> 'draft-1'}),saved=next.workspaces[workspace.id].drafts[0];
