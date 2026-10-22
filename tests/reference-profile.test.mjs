@@ -5,7 +5,7 @@ const {loadReferenceProfile,validateReferenceProfile,SIGNAL_KEYS}=require('../sc
 
 it('loads a frozen, load-only Resolve reference without seller facts or runtime state',()=>{
   const reference=loadReferenceProfile();
-  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v6-readable-outreach-2026-10-21',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
+  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v7-outreach-polish-2026-10-21',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
   expect(reference.sellerProfile).toBeUndefined();
   expect(reference.status).toBeUndefined();
   expect(reference.provenance.customerEvidenceStatus).toBe('requires_live_research');
@@ -33,6 +33,8 @@ it('matches the reference implementation constants and keeps unsupported fields 
   expect(config.outreach.claims.customerProofs.map(row=>row.claim)).toEqual(['72% reduction in investigation time','Investigations went from hours to minutes...']);
   expect(config.outreach.claims.customerProofs.every(row=>row.quote.includes(row.claim))).toBe(true);
   expect(config.outreach.framingLibrary).toEqual(expect.arrayContaining(['Teams growing SRE often feel it first in on-call investigations.']));
+  expect(config.outreach.closingQuestions).toHaveLength(3);
+  expect(config.outreach.rules).toMatchObject({quoteMaxWords:15,maxFramingSentences:1,closingQuestionCount:3});
   expect(config.objectionTemplates).toEqual([]);
   expect(Object.keys(config.collectorRules.edgarSegmentQueries)).toEqual(config.segments.map(row=>row.key));
   expect(config.collectorRules.transactionalUrgency.transactionGoneSegments).toContain('sports_betting');

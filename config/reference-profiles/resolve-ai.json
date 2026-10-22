@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v6-readable-outreach-2026-10-21",
+  "referenceProfileVersion": "resolve-ai-v7-outreach-polish-2026-10-21",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -77,6 +77,10 @@
     "outreachQualityRefresh": {
       "changedOn": "2026-10-21",
       "reason": "The owner replaced whole-sentence copying with exact risky-fact validation, customer attribution and editable non-factual framing so Demo emails remain grounded but read naturally."
+    },
+    "outreachPolish": {
+      "changedOn": "2026-10-21",
+      "reason": "The owner limited quotes to 15 words without trailing ellipses, one framing sentence and three rotating approved closing questions."
     }
   },
   "icpConfig": {
@@ -296,6 +300,11 @@
         "Senior reliability hires can be a useful moment to review how investigation work is handled.",
         "Engineering leadership changes can be a useful moment to review how investigation work is supported."
       ],
+      "closingQuestions": [
+        "Would it be worth a look at how this could help keep investigations from slowing on-call and deployment work?",
+        "Worth a quick look at how this could support your on-call rotation?",
+        "Worth a look at where this could support your on-call and incident workflows?"
+      ],
       "claims": {
         "status": "frozen_reference",
         "product": {
@@ -324,11 +333,14 @@
         ]
       },
       "rules": {
-        "subjectMaxWords": 8,
+        "subjectMaxWordsExclusive": 8,
         "bodyMinWords": 60,
         "bodyMaxWords": 110,
         "bodyBlocks": 5,
-        "firstTouchLinksAllowed": false
+        "firstTouchLinksAllowed": false,
+        "quoteMaxWords": 15,
+        "maxFramingSentences": 1,
+        "closingQuestionCount": 3
       },
       "targeting": {
         "powerLines": ["above", "below"],

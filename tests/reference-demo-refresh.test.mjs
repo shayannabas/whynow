@@ -12,6 +12,6 @@ it('refreshes a stale load-only Resolve config in memory without removing saved 
   workspace.accounts.push({id:'saved-account',name:'Saved Account'});
   const refreshed=loadResolveReferenceDemo(original),next=refreshed.workspaces[REFERENCE_WORKSPACE_ID];
   expect(next.accounts).toEqual([{id:'saved-account',name:'Saved Account'}]);
-  expect(next.referenceDemo.referenceProfileVersion).toBe('resolve-ai-v6-readable-outreach-2026-10-21');
+  expect(next.referenceDemo.referenceProfileVersion).toBe('resolve-ai-v7-outreach-polish-2026-10-21');
   expect(approvedSellerClaims(next)).not.toBeNull();
 });

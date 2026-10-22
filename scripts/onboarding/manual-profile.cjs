@@ -141,6 +141,12 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
     'Growing technical teams often revisit workflows as responsibilities change.'
   ]).join('\n')),8);
   if(!framingLibrary.length||framingLibrary.some(row=>!/[.!?]$/.test(row)))throw new Error('Add at least one complete outreach framing sentence ending in punctuation.');
+  const closingQuestions=lines(field(form,'outreach.closingQuestions',(savedOutreach.closingQuestions||[
+    'Would it be worth a look at how this could help keep investigations from slowing on-call and deployment work?',
+    'Worth a quick look at how this could support your on-call rotation?',
+    'Worth a look at where this could support your on-call and incident workflows?'
+  ]).join('\n')),3);
+  if(closingQuestions.length!==3||closingQuestions.some(row=>!row.endsWith('?'))||new Set(closingQuestions.map(row=>row.toLowerCase())).size!==3)throw new Error('Keep exactly three different approved closing questions.');
   const objectionDefaults=['Acknowledge the concern and ask a clarifying question.','Use a verified proof point only when relevant.','Offer a small next step without pressure.'];
   const objectionTemplates=[0,1,2].map(index=>text(field(form,`objectionTemplates.${index}`,workspace.icpConfig?.objectionTemplates?.[index]||objectionDefaults[index]),500));
   if(objectionTemplates.some(item=>!item)||new Set(objectionTemplates.map(item=>item.toLowerCase())).size!==3)throw new Error('Keep three different objection response guidelines.');
@@ -177,7 +183,7 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
     killPatterns:{solvingInHouse:lines(form.get('solvingInHouse')),buildCulture:lines(form.get('buildCulture')),sizeMetric:{label:text(form.get('sizeLabel')||'employees',100),floor}},
     painSources:{statuspage:form.has('source.statuspage'),hn:form.has('source.hn'),news:form.has('source.news'),filings:form.has('source.filings')},
     pitch:{receiptOpenerStyle:text(field(form,'pitch.receiptOpenerStyle',savedPitch.receiptOpenerStyle||'Start with a verified prospect event.'),500),oneSentenceProduct:text(field(form,'pitch.oneSentenceProduct',savedPitch.oneSentenceProduct||profile.productOneLiner),500),credentialLine:text(field(form,'pitch.credentialLine',savedPitch.credentialLine||''),500),ctaStyle:text(field(form,'pitch.ctaStyle',savedPitch.ctaStyle||'Ask permission for a brief conversation.'),500)},
-    outreach:{...structuredClone(savedOutreach),framingLibrary},
+    outreach:{...structuredClone(savedOutreach),framingLibrary,closingQuestions},
     objectionTemplates,
     weights,slaDays,tierRules,
     defaultsReviewRequired:true};

@@ -109,6 +109,7 @@ it('shows and saves the deeper targeting and messaging rules before approval',()
   f.set('tierRules.tier3.maxEmployees','249');f.set('tierRules.tier3.minRaised','5000000');f.set('tierRules.unclassified','manual review');
   f.set('pitch.receiptOpenerStyle','Open with one verified change.');f.set('pitch.oneSentenceProduct','A concise reviewed product sentence.');f.set('pitch.credentialLine','Use only a verified credential.');f.set('pitch.ctaStyle','Ask for a short conversation.');
   f.set('outreach.framingLibrary','Teams adding reliability leaders often revisit investigation workflows.\nA verified hiring change can open a practical conversation.');
+  f.set('outreach.closingQuestions','Worth reviewing together?\nOpen to a short comparison?\nWould a quick walkthrough help?');
   f.set('objectionTemplates.0','Ask what concern matters most.');
   const saved=saveManualProfile(state,id,f),config=saved.workspaces[id].icpConfig,html=profilePage(saved);
   expect(config.segments[0]).toMatchObject({enabled:false,revenueSensitivityBase:5,wedgeCustomers:['Customer One','Customer Two'],exampleTargets:[{name:'Example Target',domain:'target.example',inferred:false}]});
@@ -118,8 +119,9 @@ it('shows and saves the deeper targeting and messaging rules before approval',()
   expect(config.tierRules).toEqual({tier1:{public:false,revenue:750000000,employees:3000,valuation:7000000000},tier2:{revenue:50000000,employees:250,fundingStages:['Series B','Series C']},tier3:{maxEmployees:249,minRaised:5000000},unclassified:'manual review'});
   expect(config.pitch).toMatchObject({receiptOpenerStyle:'Open with one verified change.',oneSentenceProduct:'A concise reviewed product sentence.',credentialLine:'Use only a verified credential.',ctaStyle:'Ask for a short conversation.'});
   expect(config.outreach.framingLibrary).toEqual(['Teams adding reliability leaders often revisit investigation workflows.','A verified hiring change can open a practical conversation.']);
+  expect(config.outreach.closingQuestions).toEqual(['Worth reviewing together?','Open to a short comparison?','Would a quick walkthrough help?']);
   expect(config.objectionTemplates[0]).toBe('Ask what concern matters most.');
-  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Use this signal for this seller','Timing windows','Company tier rules','manual review','A concise reviewed product sentence.','Open with one verified change.','Teams adding reliability leaders often revisit investigation workflows.','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
+  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Use this signal for this seller','Timing windows','Company tier rules','manual review','A concise reviewed product sentence.','Open with one verified change.','Teams adding reliability leaders often revisit investigation workflows.','Worth reviewing together?','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
   for(const key of Object.keys(WEIGHTS))expect(html).toContain(`name="weights.${key}"`);
   for(const key of Object.keys(SLAS))expect(html).toContain(`name="slaDays.${key}"`);
   for(const key of ['tier1.public','tier1.revenue','tier1.employees','tier1.valuation','tier2.revenue','tier2.employees','tier2.fundingStages','tier3.maxEmployees','tier3.minRaised','unclassified'])expect(html).toContain(`name="tierRules.${key}"`);

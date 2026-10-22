@@ -21,7 +21,7 @@ describe('receipt-backed deterministic outreach',()=>{
     expect(draft).toMatchObject({blocked:false,generatedBy:'deterministic_template',model:null,validation:{ok:true}});
     expect(draft.wordCount).toBeGreaterThanOrEqual(60);expect(draft.wordCount).toBeLessThanOrEqual(110);
     expect(draft.body.split(/\n\s*\n/)).toHaveLength(5);
-    expect(draft.body).toContain('Resolve AI provides agents that investigate');
+    expect(draft.body).toContain('Resolve AI provides AI agents that investigate');
     expect(draft.body).toContain('Coinbase saw a 72% reduction in investigation time.');
     expect(draft.evidenceRefs).toEqual(expect.arrayContaining(['https://acme.example/jobs/sre','https://resolve.ai/product/ai-sre']));
   });
@@ -49,7 +49,7 @@ describe('receipt-backed deterministic outreach',()=>{
     const ordinary={...workspace,status:'active',referenceDemo:undefined,icpConfig:{...workspace.icpConfig,outreach:undefined},sellerProfile:{name:'Seller',domain:'seller.example',approvedAt:'2026-10-20T00:00:00.000Z',customers:[],competitors:[],evidence:{}}};expect(outreach.buildDraftContext(ordinary,account,fields,new Date(NOW)).blockers).toContainEqual(expect.objectContaining({code:'NO_APPROVED_SELLER_CLAIM'}));
   });
   it('allows natural connective paraphrase while rejecting unsupported risky facts, unreceipted claims and links',()=>{
-    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context),paraphrased={...draft,body:draft.body.replace('Resolve AI provides agents that investigate','Resolve AI offers agents that investigate')};
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context),paraphrased={...draft,body:draft.body.replace('Resolve AI provides AI agents that investigate','Resolve AI offers agents that investigate')};
     expect(outreach.validateOutreachDraft(paraphrased,context).reasons).not.toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
     expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('production systems','GCP production systems')},context).reasons).toContainEqual(expect.objectContaining({code:'UNSUPPORTED_RISKY_FACT'}));
     expect(outreach.validateOutreachDraft({...draft,usedClaims:draft.usedClaims.map((row,index)=>index?row:{...row,quote:'Different wording.'})},context).reasons).toContainEqual(expect.objectContaining({code:'SELLER_CLAIM_NOT_VERBATIM'}));
@@ -121,9 +121,20 @@ Shayan`},crowdstrikeValidation=outreach.validateOutreachDraft(crowdstrikeDraft,c
     expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Coinbase saw a 72% reduction in investigation time.','Coinbase said, “roughly seventy percent faster.”')},context).reasons).toContainEqual(expect.objectContaining({code:'QUOTE_NOT_VERBATIM'}));
     expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Noticed','About us: Noticed')},context).reasons).toContainEqual(expect.objectContaining({code:'ABOUT_US_COPY'}));
     expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Coinbase saw','“Production.” “Incidents.” Coinbase saw')},context).reasons).toContainEqual(expect.objectContaining({code:'STACKED_QUOTES'}));
-    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Resolve AI provides agents that investigate','Agents that investigate')},context).reasons).toContainEqual(expect.objectContaining({code:'SENTENCE_FRAGMENT'}));
-    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('rotation?','rotation? Would another question help?')},context).reasons).toContainEqual(expect.objectContaining({code:'ASK_QUESTION_COUNT'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Resolve AI provides AI agents that investigate','Agents that investigate')},context).reasons).toContainEqual(expect.objectContaining({code:'SENTENCE_FRAGMENT'}));
+    const ask=draft.body.split(/\n\s*\n/).at(-2);expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace(ask,`${ask} Would another question help?`)},context).reasons).toContainEqual(expect.objectContaining({code:'ASK_QUESTION_COUNT'}));
     expect(outreach.validateOutreachDraft({...draft,subject:'One two three four five six seven eight'},context).reasons).toContainEqual(expect.objectContaining({code:'SUBJECT_TOO_LONG'}));
+  });
+  it('limits quotes and framing while rotating across three approved closing questions',()=>{
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context),ask=draft.body.split(/\n\s*\n/).at(-2),frame=context.approvedFraming[0];
+    expect(context.approvedFraming).toHaveLength(1);expect(context.approvedClosings).toHaveLength(3);expect(context.approvedClosings).toContain(ask);
+    expect(new Set(['A','B','C'].map(name=>outreach.closingForAccount({name},context.approvedClosings))).size).toBe(3);
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace(frame,`${frame} ${frame}`)},context).reasons).toContainEqual(expect.objectContaining({code:'FRAMING_SENTENCE_COUNT'}));
+    const trailing={...draft,body:draft.body.replace('Coinbase saw a 72% reduction in investigation time.','DoorDash said “Investigations went from hours to minutes...”')};
+    expect(outreach.validateOutreachDraft(trailing,context).reasons).toContainEqual(expect.objectContaining({code:'QUOTE_TRAILING_ELLIPSIS'}));
+    const longQuote='incidents that previously required long manual triage now move from alert to informed action in minutes, not half an hour or more.';
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace('Coinbase saw a 72% reduction in investigation time.',`Coinbase said “${longQuote}”`)},context).reasons).toContainEqual(expect.objectContaining({code:'QUOTE_TOO_LONG'}));
+    expect(outreach.validateOutreachDraft({...draft,body:draft.body.replace(ask,'Could we discuss this?')},context).reasons).toContainEqual(expect.objectContaining({code:'CLOSING_QUESTION_NOT_APPROVED'}));
   });
   it('persists a Demo-only copy draft and an audit record without approving or sending anything',()=>{
     const {state,workspace}=fixture(),next=outreach.createTemplateDraft(state,workspace.id,'acct-acme',fields,{now:()=>NOW,id:()=> 'draft-1'}),saved=next.workspaces[workspace.id].drafts[0];
@@ -143,6 +154,6 @@ Shayan`},crowdstrikeValidation=outreach.validateOutreachDraft(crowdstrikeDraft,c
   });
   it('pins the model prompt to the exact Demo merge greeting',()=>{
     const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'});
-    expect(request.instructions).toContain('Hi {{first_name}},');expect(request.instructions).toContain('allowedFacts list is exhaustive');expect(request.instructions).toContain('invented people');expect(request.instructions).toContain('next operating state');expect(request.instructions).toContain('complete supplied job title');expect(request.input).toContain('allowedFacts');expect(request.input).toContain('merge_field');
+    expect(request.instructions).toContain('Hi {{first_name}},');expect(request.instructions).toContain('allowedFacts list is exhaustive');expect(request.instructions).toContain('invented people');expect(request.instructions).toContain('next operating state');expect(request.instructions).toContain('complete supplied job title');expect(request.instructions).toContain('no more than 15 words');expect(request.input).toContain('allowedFacts');expect(request.input).toContain('approvedClosings');expect(request.input).toContain('merge_field');
   });
 });
