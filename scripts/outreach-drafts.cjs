@@ -15,7 +15,7 @@ const GENERIC_WORDS=new Set(['about','after','again','along','also','been','befo
 const EXECUTIVE_TRIGGER=/^(?:exec_change|executive_change|executive_departure)$/i;
 const HIRING_TRIGGER=/(?:^|_)(?:hiring|hire)(?:_|$)|internal_tool_maintenance/i;
 const SPECIFIC_TECH_AND_OPERATIONS=['AWS','Azure','Datadog','GCP','Grafana','Kubernetes','OpenTelemetry','PagerDuty','Prometheus','Splunk','incident','on-call','outage','production','production reliability','reliability','root cause','system performance'];
-const CAPITALIZED_GENERIC=new Set(['Given','Hi','I','It','Since','That','The','This','We','Worth']);
+const CAPITALIZED_GENERIC=new Set(['Also','For','Given','Hi','I','It','Saw','Since','That','The','This','We','Worth']);
 function clean(value='',max=700){const text=String(value).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();return text.length<=max?text:`${text.slice(0,max).replace(/\s+\S*$/,'').trim()}…`;}
 function words(value=''){return String(value).trim().split(/\s+/).filter(Boolean);}
 function wordCount(value=''){return words(value).length;}

@@ -57,6 +57,7 @@ describe('receipt-backed deterministic outreach',()=>{
   it('accepts Coalition details only because title, location, Kubernetes and AWS are in the saved receipt',()=>{
     const {workspace,account}=fixture(),coalition={...account,id:'coalition',name:'Coalition',domain:'coalitioninc.com',triggers:[{...account.triggers[0],title:'Senior Site Reliability Engineer',evidenceText:"Senior Site Reliability Engineer. Location: Any location, Canada. Named stack: Kubernetes, AWS. About us Coalition is the world's first Active Insurance provider.",evidenceUrl:'https://www.coalitioninc.com/job-posting?gh_jid=4742193005'}]},context=outreach.buildDraftContext(workspace,coalition,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),base=outreach.templateDraft(context),body=base.body.replace(/I saw[^\n]+/, 'I saw the “Senior Site Reliability Engineer” posting in Any location, Canada naming Kubernetes and AWS.');
     expect(outreach.validateOutreachDraft({...base,body},context).reasons).not.toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
+    expect(outreach.validateOutreachDraft({...base,body:body.replace('I saw','Also saw')},context).reasons).not.toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
     expect(outreach.validateOutreachDraft({...base,body:body.replace('AWS','GCP')},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
   });
 
