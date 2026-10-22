@@ -21,11 +21,12 @@ function serializedState(file){let queue=Promise.resolve();return {read:()=>load
 function monthUsage(state,month){let serper=0;for(const workspace of Object.values(state.workspaces))if(workspace.budgets?.serper?.month===month)serper+=workspace.budgets.serper.queries||0;return serper;}
 function workspaceFor(state,{name,domain}){return Object.values(state.workspaces).find(workspace=>workspace.research?.selectedCandidate?.domain===domain&&workspace.name.toLowerCase()===name.toLowerCase());}
 function isVercelPriorityPage(value){try{const url=new URL(value),pathname=url.pathname.toLowerCase();return (url.hostname==='vercel.com'||url.hostname.endsWith('.vercel.com'))&&(/^(?:\/customers)(?:\/|$)/.test(pathname)||/(?:^|\/)(?:compare|comparisons|alternatives?)(?:\/|$)|(?:^|[-/])vs(?:[-/]|$)/.test(pathname));}catch{return false;}}
+function isSavedVercelResearchPage(value){try{const url=new URL(value),pathname=url.pathname.toLowerCase();return (url.hostname==='vercel.com'||url.hostname.endsWith('.vercel.com'))&&!/(?:^|\/)(?:careers?|marketplace|partners?|solution-partners|templates?)(?:\/|$)/.test(pathname);}catch{return false;}}
 function mergeSavedVercelPriorityPages(state,saved){
   const target=workspaceFor(state,TARGETS[0]),sourceWorkspace=workspaceFor(saved,TARGETS[0]);if(!target||!sourceWorkspace)return state;
-  const reusable=(sourceWorkspace.research?.sources||[]).filter(ref=>isVercelPriorityPage(saved.sources[ref.sourceId]?.url));if(!reusable.length)return state;
+  const reusable=(sourceWorkspace.research?.sources||[]).filter(ref=>isSavedVercelResearchPage(saved.sources[ref.sourceId]?.url)).sort((left,right)=>Number(isVercelPriorityPage(saved.sources[right.sourceId]?.url))-Number(isVercelPriorityPage(saved.sources[left.sourceId]?.url)));if(!reusable.length)return state;
   const next=structuredClone(state);for(const ref of reusable){const source=saved.sources[ref.sourceId];if(source)next.sources[ref.sourceId]=structuredClone(source);}
-  const workspace=next.workspaces[target.id],priority=[...reusable.map(ref=>structuredClone(ref)),...(workspace.research.sources||[])],deduped=[];for(const ref of priority)if(ref?.sourceId&&!deduped.some(row=>row.sourceId===ref.sourceId))deduped.push(ref);workspace.research.sources=deduped.slice(0,20);workspace.research.revision=(workspace.research.revision||0)+1;return next;
+  const workspace=next.workspaces[target.id];workspace.research.sources=reusable.slice(0,20).map(ref=>structuredClone(ref));workspace.research.revision=(workspace.research.revision||0)+1;return next;
 }
 function reuseSavedVercelPriorityPages(state,file){const acceptanceFile=path.join(path.dirname(file),'acceptance-state.json');let saved;try{saved=loadState(acceptanceFile);}catch{return state;}return mergeSavedVercelPriorityPages(state,saved);}
 function publicResult(workspace){
@@ -81,4 +82,4 @@ async function run(){
 }
 async function main(){const mode=process.argv[2];const report=mode==='--prepare'?await prepare():mode==='--run'?await run():null;if(!report)throw Error('Use --prepare or --run.');process.stdout.write(`${JSON.stringify(report,null,2)}\n`);}
 if(require.main===module)main().catch(error=>{process.stderr.write(`${JSON.stringify({code:error.code||'RUN_FAILED',message:error.message,httpStatus:error.httpStatus||null,finishReason:error.finishReason||null})}\n`);process.exitCode=1;});
-module.exports={OPENAI_CAP_USD,SERPER_CAP,MODEL,TARGETS,REPORT_FILE,providerDefaults,assertProviderDefaultsOff,monthUsage,workspaceFor,isVercelPriorityPage,mergeSavedVercelPriorityPages,reuseSavedVercelPriorityPages,publicResult,prepare,run};
+module.exports={OPENAI_CAP_USD,SERPER_CAP,MODEL,TARGETS,REPORT_FILE,providerDefaults,assertProviderDefaultsOff,monthUsage,workspaceFor,isVercelPriorityPage,isSavedVercelResearchPage,mergeSavedVercelPriorityPages,reuseSavedVercelPriorityPages,publicResult,prepare,run};

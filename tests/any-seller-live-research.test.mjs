@@ -15,11 +15,12 @@ it('reports only review data and never presents a generated profile as approved'
   const result=runner.publicResult(workspace);expect(result).toMatchObject({workspaceId:'w',status:'needs_review',customers:[],competitors:[],sizeMetric:{label:'employees',floor:500}});expect(result).not.toHaveProperty('approvedAt');
 });
 
-it('reuses saved Vercel customer and comparison pages before the 20-source ceiling without mutating the saved state',()=>{
+it('replaces noisy Vercel pages with the saved canonical research set without mutating the saved state',()=>{
   const generic=Array.from({length:20},(_,index)=>({sourceId:`generic-${index}`}));
   const current={schemaVersion:1,activeWorkspaceId:'v',workspaces:{v:{id:'v',name:'Vercel',research:{selectedCandidate:{domain:'vercel.com'},sources:generic,revision:1}}},sources:Object.fromEntries(generic.map((row,index)=>[row.sourceId,{id:row.sourceId,url:`https://vercel.com/blog/${index}`}]))};
-  const saved={schemaVersion:1,activeWorkspaceId:'old',workspaces:{old:{id:'old',name:'Vercel',research:{selectedCandidate:{domain:'vercel.com'},sources:[{sourceId:'customer'},{sourceId:'comparison'},{sourceId:'pricing'}]}}},sources:{customer:{id:'customer',url:'https://vercel.com/customers/acme'},comparison:{id:'comparison',url:'https://domains.vercel.com/kb/comparisons'},pricing:{id:'pricing',url:'https://vercel.com/pricing'}}};
+  const saved={schemaVersion:1,activeWorkspaceId:'old',workspaces:{old:{id:'old',name:'Vercel',research:{selectedCandidate:{domain:'vercel.com'},sources:[{sourceId:'pricing'},{sourceId:'customer'},{sourceId:'comparison'},{sourceId:'career'}]}}},sources:{customer:{id:'customer',url:'https://vercel.com/customers/acme'},comparison:{id:'comparison',url:'https://domains.vercel.com/kb/comparisons'},pricing:{id:'pricing',url:'https://vercel.com/pricing'},career:{id:'career',url:'https://vercel.com/careers/engineer'}}};
   const original=structuredClone(saved),merged=runner.mergeSavedVercelPriorityPages(current,saved),ids=merged.workspaces.v.research.sources.map(row=>row.sourceId);
-  expect(ids).toHaveLength(20);expect(ids.slice(0,2)).toEqual(['customer','comparison']);expect(ids).not.toContain('pricing');expect(merged.workspaces.v.research.revision).toBe(2);expect(saved).toEqual(original);
+  expect(ids).toEqual(['customer','comparison','pricing']);expect(ids).not.toContain('career');expect(ids.some(id=>id.startsWith('generic-'))).toBe(false);expect(merged.workspaces.v.research.revision).toBe(2);expect(saved).toEqual(original);
   expect(runner.isVercelPriorityPage('https://domains.vercel.com/kb/comparisons')).toBe(true);
+  expect(runner.isSavedVercelResearchPage('https://vercel.com/enterprise')).toBe(true);expect(runner.isSavedVercelResearchPage('https://vercel.com/templates/nextjs')).toBe(false);
 });
