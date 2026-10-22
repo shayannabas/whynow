@@ -25,7 +25,7 @@ function reuseSavedVercelCustomerPages(state,file){
   const target=workspaceFor(state,TARGETS[0]),sourceWorkspace=workspaceFor(saved,TARGETS[0]);if(!target||!sourceWorkspace)return state;
   const reusable=(sourceWorkspace.research?.sources||[]).filter(ref=>{const source=saved.sources[ref.sourceId];try{return /^\/customers(?:\/|$)/.test(new URL(source?.url||'').pathname);}catch{return false;}});if(!reusable.length)return state;
   const next=structuredClone(state);for(const ref of reusable){const source=saved.sources[ref.sourceId];if(source)next.sources[ref.sourceId]=structuredClone(source);}
-  const workspace=next.workspaces[target.id],existing=new Set((workspace.research.sources||[]).map(ref=>ref.sourceId));workspace.research.sources=[...(workspace.research.sources||[]),...reusable.filter(ref=>!existing.has(ref.sourceId)).map(ref=>structuredClone(ref))];workspace.research.revision=(workspace.research.revision||0)+1;return next;
+  const workspace=next.workspaces[target.id],priority=[...reusable.map(ref=>structuredClone(ref)),...(workspace.research.sources||[])],deduped=[];for(const ref of priority)if(ref?.sourceId&&!deduped.some(row=>row.sourceId===ref.sourceId))deduped.push(ref);workspace.research.sources=deduped.slice(0,20);workspace.research.revision=(workspace.research.revision||0)+1;return next;
 }
 function publicResult(workspace){
   const findings=workspaceQualityFindings(workspace),evidence=workspace.sellerProfile.evidence||{};
