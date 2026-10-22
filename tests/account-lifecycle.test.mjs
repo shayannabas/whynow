@@ -42,4 +42,11 @@ describe('simple account lifecycle and Today queue',()=>{
     expect(sections.needsReview[1].reviewReason).toContain('Tier unknown');
     expect(lifecycle.todayQueue(workspace,now).map(row=>row.id)).toEqual(['act','research']);
   });
+
+  it('does not place an early-career hiring post in Act now even when the role is technically relevant',()=>{
+    const now=new Date('2026-10-21T12:00:00.000Z'),account={id:'binance',name:'Binance',domain:'binance.com',status:'new',signals:{},kills:[],tier:1,fitScore:49,priority:.2,triggers:[{type:'reliability_hiring',title:'Binance Accelerator Program - System Performance Engineer (AI)',evidenceText:'Binance Accelerator Program - System Performance Engineer (AI). Location: Singapore.',evidenceUrl:'https://jobs.example/binance/accelerator',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-12-20T00:00:00.000Z'}]};
+    const sections=lifecycle.todaySections({accounts:[account]},now);
+    expect(sections.actNow).toEqual([]);
+    expect(sections.worthResearching.map(row=>row.name)).toEqual(['Binance']);
+  });
 });

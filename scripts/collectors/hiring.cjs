@@ -10,6 +10,7 @@ const AI_RCA_HIRING = /\b(?:ai[-\s]?(?:assisted|powered|driven)|llm[-\s]?(?:assi
 const TOOL_PATTERNS = ["Datadog", "Grafana", "PagerDuty", "OpenTelemetry", "Kubernetes", "Prometheus", "Splunk", "AWS", "GCP", "Azure"];
 const HIRING_TRIGGER_TYPES = new Set(["ai_rca_hiring", "buying_intent_hiring", "function_hiring", "hiring_surge", "first_infra_hire", "internal_tool_maintenance", "reliability_hiring"]);
 const TARGETING_STOP_WORDS = new Set(["and", "engineering", "head", "hiring", "lead", "manager", "of", "role", "senior", "the"]);
+const EARLY_CAREER_ROLE = /\b(?:accelerator program|intern(?:ship)?|graduate(?: programme| program)?|new[- ]?grad(?:uate)?|junior)\b/i;
 
 function normalizedPhrase(value = "") {
   return String(value).toLowerCase().replace(/[_-]+/g, " ").replace(/[^a-z0-9+#. ]+/g, " ").replace(/\s+/g, " ").trim();
@@ -42,10 +43,15 @@ function hiringTriggerType(value = "") {
   return HIRING_TRIGGER_TYPES.has(normalizedPhrase(value).replaceAll(" ", "_"));
 }
 
+function isEarlyCareerPosting(value = {}) {
+  return EARLY_CAREER_ROLE.test(`${value.title || value.metadata?.jobTitle || ""} ${value.text || value.evidenceText || ""}`);
+}
+
 function jobTargetingMatch(job = {}, target = {}) {
   const title = String(job.title || job.metadata?.jobTitle || "");
   const description = String(job.text || job.evidenceText || "");
   const titleAndDescription = `${title} ${description}`;
+  if (isEarlyCareerPosting(job)) return { relevant: false, source: "early_career", matched: title.match(EARLY_CAREER_ROLE)?.[0] || "early-career posting" };
   const phrases = configuredTargetingPhrases(target);
   const personaMatch = [...(target.buyerTitles || []), ...(target.championTitles || [])].find((value) => phrasePattern(value)?.test(title));
   if (personaMatch) return { relevant: true, source: "persona_title", matched: personaMatch };
@@ -61,6 +67,7 @@ function jobTargetingMatch(job = {}, target = {}) {
 function hiringTriggerRelevance(trigger = {}, target = {}) {
   const type = trigger.triggerType || trigger.type || "";
   if (!hiringTriggerType(type)) return { relevant: true, source: "not_hiring", matched: "" };
+  if (isEarlyCareerPosting(trigger)) return { relevant: false, source: "early_career", matched: `${trigger.metadata?.jobTitle || trigger.title || ""}`.match(EARLY_CAREER_ROLE)?.[0] || "early-career posting" };
   if (normalizedPhrase(type) === "hiring surge" && /\b(?:sre|site reliability|reliability|platform|infrastructure|incident|observability|performance|production)\b/i.test(`${trigger.title || ""} ${trigger.evidenceText || ""}`)) return { relevant: true, source: "qualified_hiring_surge", matched: "reliability/platform" };
   return jobTargetingMatch({ title: trigger.metadata?.jobTitle || trigger.title, text: trigger.evidenceText, metadata: trigger.metadata }, target);
 }
@@ -107,6 +114,7 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
   for (const job of jobs) {
     const text = `${job.title || ""} ${job.text || ""}`;
     if (!job.url) continue;
+    if (isEarlyCareerPosting(job)) continue;
     const targeting = jobTargetingMatch(job, target);
     if (AI_RCA_HIRING.test(text) && targeting.relevant) {
       const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${String(job.text || "").slice(0, 420)}`;
@@ -165,7 +173,7 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
 }
 
 function matchingInfraJobs(jobs = []) {
-  return jobs.filter((job) => RELIABILITY_ROLE.test(job.title || "") && /^https?:\/\//i.test(String(job.url || "")));
+  return jobs.filter((job) => !isEarlyCareerPosting(job) && RELIABILITY_ROLE.test(job.title || "") && /^https?:\/\//i.test(String(job.url || "")));
 }
 
 function hiringSnapshot(provider, jobs = [], now = new Date()) {
@@ -252,4 +260,4 @@ async function collectHiring(target, context) {
   return { collectorId: "hiring", signals: output.signals, events, targetPatch: { ats: { provider: match.provider, slug: match.slug, endpoint: match.url }, hiringHistory: mergeHiringHistory(target.hiringHistory || [], snapshot), quotebook: painThemes.mergeQuotebook(target.quotebook || [], output.quotebook || []) }, itemsFound: events.length };
 }
 
-module.exports = { AI_RCA_HIRING, FIRST_INFRA_ROLE, HIRING_TRIGGER_TYPES, INTERNAL_TOOL_MAINTENANCE, RELIABILITY_ROLE, atsVelocityEvents, collectHiring, configuredTargetingPhrases, discoverAts, hiringSnapshot, hiringTriggerRelevance, hiringTriggerType, jobSignals, jobTargetingMatch, matchingInfraJobs, mergeHiringHistory, normalizeJobs, providerEndpoints, slugCandidates, toolsIn };
+module.exports = { AI_RCA_HIRING, EARLY_CAREER_ROLE, FIRST_INFRA_ROLE, HIRING_TRIGGER_TYPES, INTERNAL_TOOL_MAINTENANCE, RELIABILITY_ROLE, atsVelocityEvents, collectHiring, configuredTargetingPhrases, discoverAts, hiringSnapshot, hiringTriggerRelevance, hiringTriggerType, isEarlyCareerPosting, jobSignals, jobTargetingMatch, matchingInfraJobs, mergeHiringHistory, normalizeJobs, providerEndpoints, slugCandidates, toolsIn };

@@ -1,6 +1,7 @@
 'use strict';
 
 const {applyKillEngine}=require('./kills.cjs');
+const {hiringTriggerType,isEarlyCareerPosting}=require('./collectors/hiring.cjs');
 const DECISION_SCHEMA_VERSION='priority-v5-playbook-signals';
 const DEFAULT_TIER_WEIGHTS={1:3,2:2,3:1,parked:0};
 const DEFAULT_MAX_PRIORITY_RAW=9.375;
@@ -8,6 +9,7 @@ function ageDays(value,now=new Date()){const timestamp=Date.parse(value||'');ret
 function activeTriggers(account={},now=new Date()){
   return (account.triggers||[]).filter(trigger=>{
     if(!trigger.evidenceUrl||trigger.weakEvidenceFlag===true||trigger.reviewState==='needs_more_research'||trigger.citable===false||trigger.metadata?.citable===false)return false;
+    if(hiringTriggerType(trigger.type||trigger.triggerType||'')&&isEarlyCareerPosting(trigger))return false;
     if(['serper','public_search','google_news_rss'].includes(trigger.sourceId)&&/incident|outage|news|exec|executive/.test(String(trigger.type||trigger.triggerType||''))&&trigger.metadata?.eventDateReported!==true)return false;
     const end=Date.parse(trigger.decaysAt||''),start=Date.parse(trigger.occurredAt||trigger.detectedAt||'');
     if(Number.isFinite(end))return now.getTime()<end;

@@ -19,6 +19,22 @@ describe('workspace-targeted hiring relevance',()=>{
     ['Director of Incident Management','function_hiring'],
   ])('accepts the targeted %s role',(title,type)=>expect(hiring.hiringTriggerRelevance(trigger(title,type),target).relevant).toBe(true));
 
+  it.each([
+    ['Binance Accelerator Program - System Performance Engineer (AI)','reliability_hiring'],
+    ['Site Reliability Engineering Intern','reliability_hiring'],
+    ['Graduate Platform Engineer','function_hiring'],
+    ['New Grad Observability Engineer','reliability_hiring'],
+    ['Junior SRE','reliability_hiring'],
+  ])('never promotes the real early-career pattern in %s to why-now',(title,type)=>{
+    expect(hiring.hiringTriggerRelevance(trigger(title,type),target)).toMatchObject({relevant:false,source:'early_career'});
+  });
+
+  it('does not emit trigger events or count velocity for an early-career reliability posting',()=>{
+    const job={id:'early-1',title:'Binance Accelerator Program - System Performance Engineer (AI)',text:'Work on system performance.',url:'https://jobs.example/binance/early-1',location:'Singapore',updatedAt:'2026-10-20T00:00:00.000Z'};
+    expect(hiring.jobSignals(target,'greenhouse',[job],new Date('2026-10-21T00:00:00.000Z')).events).toEqual([]);
+    expect(hiring.matchingInfraJobs([job])).toEqual([]);
+  });
+
   it('accepts a generic title only when the description contains explicit workspace buying intent',()=>{
     const row=trigger('Senior Software Engineer','ai_rca_hiring','Build AI-assisted production investigation and root cause analysis for on-call engineers.');
     expect(hiring.hiringTriggerRelevance(row,target)).toMatchObject({relevant:true,source:'buying_intent'});
