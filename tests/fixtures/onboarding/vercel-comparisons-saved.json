@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-19T00:00:00.000Z",
+  "provenance": "Public excerpt and headings preserved from WhyNow's saved first-party Vercel comparisons page.",
+  "url": "https://domains.vercel.com/kb/comparisons",
+  "title": "Comparisons | Vercel Knowledge Base",
+  "text": "Comparisons. Side-by-side comparisons of Vercel and alternative platforms, frameworks, and tools. Vercel vs Cloudflare. A detailed guide to Vercel WAF vs Cloudflare WAF: framework-aware rules, sub-300ms propagation, BotID bot detection, OWASP paranoia levels, leaked credential lookup, and when to choose each product for your web application. Vercel vs Netlify. A detailed guide to Vercel vs Netlify: runtimes, compute architecture, AI infrastructure, security, and when to choose each platform for your project. Vercel vs Webflow Cloud. Compare Vercel and Webflow Cloud for deploying Next.js and Astro apps, including runtime, framework support, storage, pricing, and where your code runs.",
+  "html": "<html><head><title>Comparisons | Vercel Knowledge Base</title></head><body><h1>Comparisons</h1><h2>Vercel vs Cloudflare</h2><h2>Vercel vs Netlify</h2><h2>Vercel vs Webflow Cloud</h2></body></html>"
+}

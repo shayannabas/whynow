@@ -1,9 +1,13 @@
 import {it,expect} from 'vitest';
 import {createRequire} from 'node:module';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 const require=createRequire(import.meta.url);
 const {defaultState,createWorkspace,updateWorkspace}=require('../scripts/server/state.cjs');
 const {recordSource}=require('../scripts/sources.cjs');
 const {extractOrganizationCandidates}=require('../scripts/onboarding/extract-organizations.cjs');
+const FIXTURE_DIR=path.dirname(fileURLToPath(import.meta.url));
 
 const NOW='2026-10-20T00:00:00.000Z';
 function fixture(customPages){
@@ -52,4 +56,14 @@ it('uses a matching outbound host when a generic link label does not repeat the 
   f.raw.set(url,{url,text:'<html><title>Example Seller vs RivalCo</title><h1>Example Seller vs RivalCo</h1><a href="https://rivalco.com/">Visit website</a></html>'});
   const result=extractOrganizationCandidates({state:f.state,workspace:f.state.workspaces[f.id],rawPages:f.raw});
   expect(result.competitors).toContainEqual(expect.objectContaining({name:'RivalCo',domain:'rivalco.com',domainStatus:'verified'}));
+});
+
+it('extracts the competitors named on the saved Vercel comparisons page',()=>{
+  const page=JSON.parse(fs.readFileSync(path.join(FIXTURE_DIR,'fixtures','onboarding','vercel-comparisons-saved.json'),'utf8'));
+  let state=createWorkspace(defaultState(),{name:'Vercel'}),id=state.activeWorkspaceId;
+  const saved=recordSource(state,{url:page.url,title:page.title,text:page.text,fetchedAt:page.capturedAt});state=saved.state;
+  state=updateWorkspace(state,id,w=>{w.research={schemaVersion:1,status:'evidence_ready',revision:1,runId:'saved-vercel-comparisons',selectedCandidate:{name:'Vercel',domain:'vercel.com'},sources:[{sourceId:saved.source.id,kind:'seller_site',ownerDomain:'vercel.com'}]};});
+  const result=extractOrganizationCandidates({state,workspace:state.workspaces[id],rawPages:new Map([[page.url,{url:page.url,text:page.html}]])});
+  expect(result.competitors.map(item=>item.name)).toEqual(['Cloudflare','Netlify','Webflow']);
+  expect(result.competitors.every(item=>item.sourceUrl===page.url&&item.receiptId)).toBe(true);
 });

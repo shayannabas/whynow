@@ -20,13 +20,14 @@ function assertProviderDefaultsOff(env){const defaults=providerDefaults(env);if(
 function serializedState(file){let queue=Promise.resolve();return {read:()=>loadState(file),mutate:fn=>{const operation=queue.then(()=>{const next=fn(loadState(file));saveState(next,file);return loadState(file);});queue=operation.catch(()=>{});return operation;}};}
 function monthUsage(state,month){let serper=0;for(const workspace of Object.values(state.workspaces))if(workspace.budgets?.serper?.month===month)serper+=workspace.budgets.serper.queries||0;return serper;}
 function workspaceFor(state,{name,domain}){return Object.values(state.workspaces).find(workspace=>workspace.research?.selectedCandidate?.domain===domain&&workspace.name.toLowerCase()===name.toLowerCase());}
-function reuseSavedVercelCustomerPages(state,file){
-  const acceptanceFile=path.join(path.dirname(file),'acceptance-state.json');let saved;try{saved=loadState(acceptanceFile);}catch{return state;}
+function isVercelPriorityPage(value){try{const url=new URL(value),pathname=url.pathname.toLowerCase();return (url.hostname==='vercel.com'||url.hostname.endsWith('.vercel.com'))&&(/^(?:\/customers)(?:\/|$)/.test(pathname)||/(?:^|\/)(?:compare|comparisons|alternatives?)(?:\/|$)|(?:^|[-/])vs(?:[-/]|$)/.test(pathname));}catch{return false;}}
+function mergeSavedVercelPriorityPages(state,saved){
   const target=workspaceFor(state,TARGETS[0]),sourceWorkspace=workspaceFor(saved,TARGETS[0]);if(!target||!sourceWorkspace)return state;
-  const reusable=(sourceWorkspace.research?.sources||[]).filter(ref=>{const source=saved.sources[ref.sourceId];try{return /^\/customers(?:\/|$)/.test(new URL(source?.url||'').pathname);}catch{return false;}});if(!reusable.length)return state;
+  const reusable=(sourceWorkspace.research?.sources||[]).filter(ref=>isVercelPriorityPage(saved.sources[ref.sourceId]?.url));if(!reusable.length)return state;
   const next=structuredClone(state);for(const ref of reusable){const source=saved.sources[ref.sourceId];if(source)next.sources[ref.sourceId]=structuredClone(source);}
   const workspace=next.workspaces[target.id],priority=[...reusable.map(ref=>structuredClone(ref)),...(workspace.research.sources||[])],deduped=[];for(const ref of priority)if(ref?.sourceId&&!deduped.some(row=>row.sourceId===ref.sourceId))deduped.push(ref);workspace.research.sources=deduped.slice(0,20);workspace.research.revision=(workspace.research.revision||0)+1;return next;
 }
+function reuseSavedVercelPriorityPages(state,file){const acceptanceFile=path.join(path.dirname(file),'acceptance-state.json');let saved;try{saved=loadState(acceptanceFile);}catch{return state;}return mergeSavedVercelPriorityPages(state,saved);}
 function publicResult(workspace){
   const findings=workspaceQualityFindings(workspace),evidence=workspace.sellerProfile.evidence||{};
   const org=(kind,rows)=>(rows||[]).map((row,index)=>({name:row.name,domain:row.domain||'',sourceUrl:row.sourceUrl||evidence[`${kind}.${index}`]?.sourceUrl||'',quote:row.evidenceQuote||evidence[`${kind}.${index}`]?.evidenceQuote||''}));
@@ -35,7 +36,7 @@ function publicResult(workspace){
 async function prepare(){
   const baseEnv=loadedEnv(),defaultsBefore=assertProviderDefaultsOff(baseEnv),file=statePath(baseEnv),store=serializedState(file),month=new Date().toISOString().slice(0,7),before=monthUsage(store.read(),month);
   const env={...baseEnv,SERPER_ENABLED:'true',SERPER_MONTHLY_QUERY_LIMIT:String(before+SERPER_CAP),SERPER_RESEARCH_QUERY_LIMIT:'4',WORKSPACE_MAX_SERPER_QUERIES_PER_RUN:'4',ONBOARDING_MAX_PAGES:'20',OPENAI_ENABLED:'false',OPENAI_MONTHLY_LIMIT_USD:'0'};
-  await store.mutate(current=>reuseSavedVercelCustomerPages(current,file));let state=store.read(),gong=workspaceFor(state,TARGETS[1]);
+  await store.mutate(current=>reuseSavedVercelPriorityPages(current,file));let state=store.read(),gong=workspaceFor(state,TARGETS[1]);
   if(!gong){await store.mutate(current=>requestResearch(current,'Gong'));state=store.read();gong=Object.values(state.workspaces).find(row=>row.name==='Gong'&&row.status==='draft');}
   const coordinator=createResearchCoordinator({read:store.read,mutate:store.mutate,env,runtimeFactory:options=>new CollectorRuntime({...options,env,cacheDir:path.join(path.dirname(file),'collector-cache')})});
   if(!gong.research?.selectedCandidate){
@@ -80,4 +81,4 @@ async function run(){
 }
 async function main(){const mode=process.argv[2];const report=mode==='--prepare'?await prepare():mode==='--run'?await run():null;if(!report)throw Error('Use --prepare or --run.');process.stdout.write(`${JSON.stringify(report,null,2)}\n`);}
 if(require.main===module)main().catch(error=>{process.stderr.write(`${JSON.stringify({code:error.code||'RUN_FAILED',message:error.message,httpStatus:error.httpStatus||null,finishReason:error.finishReason||null})}\n`);process.exitCode=1;});
-module.exports={OPENAI_CAP_USD,SERPER_CAP,MODEL,TARGETS,REPORT_FILE,providerDefaults,assertProviderDefaultsOff,monthUsage,workspaceFor,reuseSavedVercelCustomerPages,publicResult,prepare,run};
+module.exports={OPENAI_CAP_USD,SERPER_CAP,MODEL,TARGETS,REPORT_FILE,providerDefaults,assertProviderDefaultsOff,monthUsage,workspaceFor,isVercelPriorityPage,mergeSavedVercelPriorityPages,reuseSavedVercelPriorityPages,publicResult,prepare,run};
