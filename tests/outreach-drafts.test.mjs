@@ -36,6 +36,8 @@ describe('receipt-backed deterministic outreach',()=>{
   it('chooses an engineering buyer for executive change while real named recipients still work',()=>{
     const {workspace,account}=fixture(),executive={...account,triggers:[{...account.triggers[0],type:'executive_change',title:'Acme Cloud CTO departs',evidenceText:'Acme Cloud CTO departs after five years.'}]},merge=outreach.buildDraftContext(workspace,executive,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),named=outreach.buildDraftContext(workspace,account,fields,new Date(NOW));
     expect(merge.persona).toMatchObject({title:'VP Engineering',role:'buyer',recipientMode:'merge_field'});expect(merge.persona.selectionReason).toContain('budget owner');
+    expect(merge.trigger.corroboration).toMatchObject({sourceCount:1,label:'single source — verify before outreach'});
+    expect(outreach.templateDraft(merge)).toMatchObject({blocked:false,validation:{ok:true}});
     expect(named.persona).toMatchObject({firstName:'Ava',title:'VP Engineering',recipientMode:'named',contactSource:'manual local entry'});expect(outreach.templateDraft(named).validation.ok).toBe(true);
   });
   it('blocks killed accounts, stale evidence, mismatched personas and unapproved seller claims',()=>{
@@ -46,9 +48,28 @@ describe('receipt-backed deterministic outreach',()=>{
     const ordinary={...workspace,status:'active',referenceDemo:undefined,icpConfig:{...workspace.icpConfig,outreach:undefined},sellerProfile:{name:'Seller',domain:'seller.example',approvedAt:'2026-10-20T00:00:00.000Z',customers:[],competitors:[],evidence:{}}};expect(outreach.buildDraftContext(ordinary,account,fields,new Date(NOW)).blockers).toContainEqual(expect.objectContaining({code:'NO_APPROVED_SELLER_CLAIM'}));
   });
   it('rejects changed or unreceipted seller wording and first-touch links',()=>{
-    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context),changed={...draft,body:draft.body.replace('73%','91%')};
+    const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,fields,new Date(NOW)),draft=outreach.templateDraft(context),changed={...draft,body:draft.body.replace('Agents that investigate','Tools that investigate')};
     expect(outreach.validateOutreachDraft(changed,context).reasons).toContainEqual(expect.objectContaining({code:'SELLER_CLAIM_CHANGED'}));
+    expect(outreach.validateOutreachDraft({...draft,usedClaims:draft.usedClaims.map((row,index)=>index?row:{...row,quote:'Different wording.'})},context).reasons).toContainEqual(expect.objectContaining({code:'SELLER_CLAIM_NOT_VERBATIM'}));
     expect(outreach.validateOutreachDraft({...draft,body:`${draft.body} https://example.com`},context).reasons).toContainEqual(expect.objectContaining({code:'FIRST_TOUCH_LINK'}));
+  });
+
+  it('accepts Coalition details only because title, location, Kubernetes and AWS are in the saved receipt',()=>{
+    const {workspace,account}=fixture(),coalition={...account,id:'coalition',name:'Coalition',domain:'coalitioninc.com',triggers:[{...account.triggers[0],title:'Senior Site Reliability Engineer',evidenceText:"Senior Site Reliability Engineer. Location: Any location, Canada. Named stack: Kubernetes, AWS. About us Coalition is the world's first Active Insurance provider.",evidenceUrl:'https://www.coalitioninc.com/job-posting?gh_jid=4742193005'}]},context=outreach.buildDraftContext(workspace,coalition,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),base=outreach.templateDraft(context),body=base.body.replace(/I saw[^\n]+/, 'I saw the “Senior Site Reliability Engineer” posting in Any location, Canada naming Kubernetes and AWS.');
+    expect(outreach.validateOutreachDraft({...base,body},context).reasons).not.toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
+    expect(outreach.validateOutreachDraft({...base,body:body.replace('AWS','GCP')},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
+  });
+
+  it('rejects a shortened Binance title and invented production-reliability detail',()=>{
+    const {workspace,account}=fixture(),baseContext=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),context={...baseContext,account:{...baseContext.account,id:'binance',name:'Binance',domain:'binance.com'},trigger:{...baseContext.trigger,title:'Binance Accelerator Program - System Performance Engineer (AI)',text:'Binance Accelerator Program - System Performance Engineer (AI). Location: Singapore. Work on system performance.',sourceUrl:'https://jobs.example/binance/performance'}},base=outreach.templateDraft(context),body=base.body.replace(/I saw[^\n]+/, 'I saw the “System Performance Engineer” posting in Singapore, focused on production reliability.');
+    expect(outreach.validateOutreachDraft({...base,body},context).reasons).toContainEqual(expect.objectContaining({code:'UNGROUNDED_PROSPECT_DETAIL'}));
+  });
+
+  it('uses neutral, corroborated executive-change framing and blocks departure details, amounts and the banned phrase',()=>{
+    const {workspace,account}=fixture(),triggers=[{...account.triggers[0],id:'exec-1',type:'executive_departure',title:'Acme Cloud CTO departs',evidenceText:'Acme Cloud CTO departs after five years.',evidenceUrl:'https://news-one.example/acme',occurredAt:'2026-10-20T00:00:00.000Z'},{...account.triggers[0],id:'exec-2',type:'executive_departure',title:'Acme Cloud technology leader steps down',evidenceText:'A second publisher reports the Acme Cloud leadership change.',evidenceUrl:'https://news-two.example/acme',occurredAt:'2026-10-19T00:00:00.000Z'}],context=outreach.buildDraftContext(workspace,{...account,triggers},{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context);
+    expect(context.trigger.corroboration).toMatchObject({sourceCount:2,label:'corroborated by 2 saved sources'});expect(draft.validation.ok).toBe(true);expect(draft.evidenceRefs).toEqual(expect.arrayContaining(['https://news-one.example/acme','https://news-two.example/acme']));
+    const unsafe=draft.body.replace(/I noticed[^\n]+/, 'I saw the CTO depart after 13 years to launch a $170 million fund and revisit the next operating state.');
+    expect(outreach.validateOutreachDraft({...draft,body:unsafe},context).reasons).toEqual(expect.arrayContaining([expect.objectContaining({code:'EXECUTIVE_OPENER'}),expect.objectContaining({code:'EXECUTIVE_DETAIL_TONE'}),expect.objectContaining({code:'BANNED_TONE'})]));
   });
   it('persists a Demo-only copy draft and an audit record without approving or sending anything',()=>{
     const {state,workspace}=fixture(),next=outreach.createTemplateDraft(state,workspace.id,'acct-acme',fields,{now:()=>NOW,id:()=> 'draft-1'}),saved=next.workspaces[workspace.id].drafts[0];
@@ -68,6 +89,6 @@ describe('receipt-backed deterministic outreach',()=>{
   });
   it('pins the model prompt to the exact Demo merge greeting',()=>{
     const {workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),request=model.buildOutreachRequest(context,{OPENAI_OUTREACH_MODEL:'gpt-5.5'});
-    expect(request.instructions).toContain('Hi {{first_name}},');expect(request.instructions).toContain('invented people');expect(request.input).toContain('merge_field');
+    expect(request.instructions).toContain('Hi {{first_name}},');expect(request.instructions).toContain('invented people');expect(request.instructions).toContain('next operating state');expect(request.instructions).toContain('complete supplied job title');expect(request.input).toContain('merge_field');
   });
 });

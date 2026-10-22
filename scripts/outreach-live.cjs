@@ -29,9 +29,9 @@ function actualCost(usage={},pricing=OUTREACH_MODEL_PRICING){
   return Number(((uncached*pricing.inputUsdPerMillion+cached*Number(pricing.cachedInputUsdPerMillion||pricing.inputUsdPerMillion)+output*pricing.outputUsdPerMillion)/1_000_000).toFixed(6));
 }
 function usageSummary(usage={}){return {inputTokens:Math.max(0,Number(usage.input_tokens)||0),cachedInputTokens:Math.max(0,Number(usage.input_tokens_details?.cached_tokens)||0),outputTokens:Math.max(0,Number(usage.output_tokens)||0),reasoningTokens:Math.max(0,Number(usage.output_tokens_details?.reasoning_tokens)||0)};}
-function claimsUsed(context={}){const claims=context.seller?.claims||{};return [claims.product,claims.credential,context.seller?.proof&&{value:context.seller.proof.claim,sourceUrl:context.seller.proof.sourceUrl}].filter(Boolean);}
+function claimsUsed(context={}){const claims=context.seller?.claims||{};return [claims.product,claims.credential,context.seller?.proof&&{value:context.seller.proof.claim,quote:context.seller.proof.quote,sourceUrl:context.seller.proof.sourceUrl}].filter(Boolean);}
 function validatedDraft(value={},context={}){
-  const usedClaims=claimsUsed(context),draft={subject:String(value.subject||''),body:String(value.body||''),usedClaims,evidenceRefs:Array.from(new Set([context.trigger?.sourceUrl,...usedClaims.map(row=>row.sourceUrl)].filter(Boolean)))};
+  const usedClaims=claimsUsed(context),draft={subject:String(value.subject||''),body:String(value.body||''),usedClaims,evidenceRefs:Array.from(new Set([context.trigger?.sourceUrl,...(context.trigger?.corroboration?.sourceUrls||[]),...usedClaims.map(row=>row.sourceUrl)].filter(Boolean)))};
   const validation=validateOutreachDraft(draft,context);if(!validation.ok)throw new OutreachLiveError('DRAFT_BLOCKED',`The generated draft failed local validation: ${validation.reasons.map(row=>row.code).join(', ')}`);
   return {...draft,validation,wordCount:validation.wordCount,generatedBy:'openai',model:'gpt-5.5'};
 }
