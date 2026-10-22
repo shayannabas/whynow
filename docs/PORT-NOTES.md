@@ -2,6 +2,30 @@
 
 Updated October 21, 2026. SignalScout by Isa Iqbal is the read-only behavioral reference and is used with permission. WhyNow keeps its own isolated workspaces, atomic JSON state, receipts, human approval and send-free Demo mode. Phases A and B, Chunk 2, Refresh-all and Chunk 3's validated outreach checkpoint are complete. After the first GPT-5.5 request stopped incomplete, the corrected three-account batch completed with three validator-passing Demo drafts and no send or application-state mutation. No further paid call is authorized.
 
+## `scripts/prepare-demo.cjs`
+
+**What it does:** Runs the night-before pipeline—discover prospects, refresh their public evidence, then expose the recalculated Today ranking—as one persisted background job.
+
+**How it decides:** It requires an owner-approved active workspace and refuses to run while OpenAI is enabled. It shares one hard 150-query Serper budget across discovery and account refresh, reserves the refresh allowance first, records progress and child run IDs, and fails closed if the full set cannot fit.
+
+**What changed from SignalScout:** WhyNow uses an explicit manual button instead of a scheduler, keeps model drafting separate, and persists each stage through atomic workspace state. The reference behavior informs the funnel, but no single-seller constant or unattended send path was copied.
+
+## Any-seller discovery and scorecard configuration
+
+**What it does:** Builds discovery queries and six-signal scoring from the approved seller workspace rather than Resolve-specific constants.
+
+**How it decides:** Search tasks start with the seller's approved segment query templates, then add approved buyer/champion hiring searches and named competitors' customer-story searches. A signal explicitly marked unused is removed from the fit denominator and displayed as **Not used for this seller**; an applicable but uncollected signal stays **Unknown · low confidence**.
+
+**What changed from SignalScout:** SignalScout's single Resolve strategy becomes per-workspace configuration. Existing workspaces remain backward-compatible—all six signals are used unless the owner turns one off. The Vercel recorded-fixture test proves approved ICP → discovery → collected receipt → tier/score/kill → Today without importing Resolve data.
+
+## Focused Stage 2 drafting for a new seller
+
+**What it does:** Separates seller facts, deterministic organization-candidate review and ICP targeting into three bounded Structured Outputs requests.
+
+**How it decides:** Customer and competitor candidates come from saved pages before the model runs; the organization call may keep or drop candidate IDs but cannot invent a company. The targeting call receives the frozen Resolve example and the seller's own evidence. Every purpose is independently configurable and now defaults to GPT-5.5 behind the existing disabled-by-default switch and spending cap.
+
+**What changed from SignalScout:** WhyNow retains the evidence menu, receipt mapping, human review and approval boundary. A free model-list check confirmed GPT-5.5 access; no any-seller paid research call ran in this checkpoint.
+
 ## `scripts/scoring.cjs`
 
 **What it does:** Turns six 1–5 signal scores into a 0–100 fit score while showing how much each signal contributed.

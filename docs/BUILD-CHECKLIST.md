@@ -1,6 +1,6 @@
 # WhyNow — build checklist
 
-Updated: October 21, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused. The saved extractor remains a future improvement. Phases A and B, Chunk 2, the one authorized Refresh-all run and Chunk 3 outreach are complete, but draft demo readiness is reopened for accuracy. Current Resolve claims are now verbatim and receipted, early-career jobs cannot become why-now triggers, and prospect/executive wording has stricter grounding. No profile was approved and no send path exists. The prior $0.072110 batch is retained as historical test output, not demo-ready copy.
+Updated: October 21, 2026. Current direction: port mode. Stage 2.5 and the trimmed remaining-stage plan are paused, while its deterministic extractor now supports the any-seller research path. Phases A and B, Chunk 2, trigger-first discovery, outreach accuracy and the offline any-seller pipeline are complete. Coalition has a passing recorded model draft; CrowdStrike correctly falls back to the deterministic template. No profile was approved, OpenAI is disabled/zero, and no send path exists.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
@@ -70,8 +70,18 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 - [x] Exclude Accelerator Program, intern, graduate, new-grad and junior roles from why-now, scoring boosts and Today `Act now`; keep saved evidence/history intact.
 - [x] Ban “next operating state”; require neutral executive-change opening language and either a second publisher domain or the visible `single source — verify before outreach` label.
 - [x] Rerank Today from saved evidence only: `Act now` now contains Coalition and CrowdStrike; Binance is not eligible. The authorized exact-three regeneration therefore made zero paid calls rather than substituting an ineligible account.
-- [ ] Owner decides whether to authorize two calls for the two eligible accounts, or first create a third valid `Act now` account from new evidence. No paid call is currently runnable under the exact-three/top-three condition.
-- [ ] Later port chunks remain blocked until the owner approves each one separately.
+- [x] Resolve the executive neutral-language grounding conflict, pass an exhaustive allowed-facts list to the model, and retain strict grounding for every other prospect detail.
+- [x] Revalidate the exact paid outputs offline: Coalition passes after the general “Also” false-positive fix; CrowdStrike still fails on unsupported on-call/production wording and uses the passing deterministic template.
+- [x] Complete the conditional paid regeneration in exactly two calls/attempts for $0.080280, restore OpenAI to disabled/zero and save/send nothing.
+- [x] Run trigger-first ATS discovery inside the authorized 40-query ceiling: 26 queries, 39 candidates, 3 verified new Act-now accounts (Okta, SecurityScorecard, Altana), 0 OpenAI calls and no customer/competitor leak.
+- [x] Make focused new-seller research use configurable GPT-5.5 calls after deterministic organization extraction. Free model listing confirmed account access; official Structured Outputs support and pricing were checked.
+- [x] Drive discovery from each approved ICP's segment query templates, buyer/champion hiring searches and competitors' customer searches; keep the default hard cap at 60.
+- [x] Let the owner mark a signal “not used for this seller”; remove it from the denominator while keeping uncollected applicable signals unknown/low-confidence.
+- [x] Add the owner-approved **Prepare demo** background action: discovery → Refresh all → re-rank, one default/hard 150-query Serper cap, progress persistence and zero OpenAI calls.
+- [x] Prove the non-Resolve path offline with the saved Vercel ICP: approved config → discovery → recorded collection → tier/fit/kill → Today.
+- [x] Add `docs/DEMO-PREP-GUIDE.md` with the night-before workflow, time estimate, model/Serper budget and three-minute interview walkthrough.
+- [ ] The owner reviews and approves each real seller profile in the browser. WhyNow never approves it automatically.
+- [ ] No further paid call, Apollo/contact lookup, sending, deployment or later port chunk is authorized.
 
 ## Stage 2.5 — research quality
 
@@ -94,7 +104,7 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 
 ## Current decision
 
-The current boundary is Chunk 3's offline accuracy checkpoint. Phase A/B parity and Chunk 2 remain green. The earlier three drafts are historical and fail the new accuracy bar. Resolve reference v5 now uses only current verbatim first-party claims; early-career hiring does not count as timing; prospect-specific wording must be present in the saved receipt; and executive-change copy is neutral and corroboration-labeled. Saved evidence now yields only two eligible `Act now` accounts: Coalition (Tier 1, fit 40, Senior Site Reliability Engineer receipt) and CrowdStrike (Tier 1, fit 35, engineering leadership change corroborated across five publisher domains). The owner-authorized exact-three regeneration did not run because no third eligible account exists. Nothing was saved as sent or written into application state. OpenAI remains disabled/zero.
+The current boundary is the complete local portfolio-demo pipeline. Resolve Today has five eligible `Act now` accounts: Okta, Coalition, Altana, CrowdStrike and SecurityScorecard. Coalition's recorded model draft passes; CrowdStrike's model draft remains blocked and its deterministic template is the approved fallback behavior. A new seller can be researched with focused GPT-5.5 calls, reviewed and owner-approved, then prepared through one capped background discovery/refresh/rank action. No new-seller paid call ran in this checkpoint. Nothing was sent, no profile was approved on the owner's behalf, and normal OpenAI settings remain disabled/zero.
 
 Owner chose OpenAI first, matching the friend's GPT-4o mini/direct HTTP setup. The bounded recovery run persisted three snapshots and three `needs_review` workspaces. It made four attempts because Shopify used the existing transient retry. Shopify and Vercel reported an estimated combined $0.005177; Resolve AI's usage record was lost when the first process stopped, so the exact total is unknown. The conservative reservation reached $0.038686 under the temporary $0.05 cap. The ignored local `.env` was then verified without displaying secrets: `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. Local operation avoids hosting charges, but provider calls still consume credits.
 
@@ -192,6 +202,10 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 - Stage 12 advanced integrations — optional expansion after the core portfolio flow works.
 
 ## Change log
+
+- **2026-10-21:** Finished Resolve trigger-first discovery with 26/40 Serper queries and zero OpenAI calls. Three verified direct-job-text prospects—Okta, SecurityScorecard and Altana—joined Coalition and CrowdStrike in `Act now`.
+- **2026-10-21:** Finished allowed-facts draft validation. Coalition's exact recorded draft passes after a general false-positive fix; CrowdStrike remains blocked for unsupported on-call/production language and uses the deterministic template. The conditional two-call run cost $0.080280; no draft was saved or sent and OpenAI returned to disabled/zero.
+- **2026-10-21:** Completed the offline any-seller pipeline: configurable GPT-5.5 focused research, ICP/persona/competitor-driven discovery, seller-specific signal applicability, capped Prepare demo background workflow and a recorded Vercel end-to-end test. The saved Vercel-size packet has a conservative three-call maximum estimate of $0.615. Added the night-before demo guide.
 
 - **2026-10-21:** Finished the already-running 25-account Refresh-all job without launching a duplicate. It completed 25/25 accounts with 125/150 authorized Serper queries and zero OpenAI calls. Seven batch accounts (eight across Today) have a dated in-window trigger; fit scores span 11–51 with median 34. Optional-source failures remain unknown evidence.
 - **2026-10-21:** Completed Chunk 3's offline checkpoint. Ported workspace-neutral message targeting and validator gates, added a deterministic receipt-backed five-block template, Demo watermark and Copy button, and kept the application send-free. The real Circle false-positive receipt is rejected for drafting. A free `GET /v1/models` check confirmed `gpt-5.5`; official pricing yields about $0.00857 typical and $0.02207 conservative maximum per saved-context request. No generation call ran.

@@ -159,3 +159,60 @@ Receipts:
 - <https://resolve.ai/product/ai-sre>
 
 The report confirms `savedToApplicationState=false`, `noSend=true`, `OPENAI_ENABLED=false` and `OPENAI_MONTHLY_LIMIT_USD=0`. No draft was marked or saved as sent. This authorization is exhausted.
+
+## Allowed-facts regeneration and final demo status
+
+The next offline fix gave GPT-5.5 an exhaustive `allowedFacts` list: verbatim prospect receipt facts, exact approved seller claims, and—only for a corroborated executive change—the approved phrase “the recent engineering leadership change.” The neutral phrase is now treated as grounded by its corroborating receipts; every other prospect detail still needs exact saved text.
+
+The owner-authorized conditional regeneration made exactly two calls, one for Coalition and one for CrowdStrike, with no retry. It used 2,106 input tokens, 2,325 output tokens (including 2,068 reasoning tokens) and **$0.080280** total. OpenAI returned to disabled/zero; nothing was saved or sent.
+
+- Coalition originally failed because the capitalization check treated the discourse word **“Also”** as a prospect-specific proper noun. After that general false-positive rule was fixed offline, the exact recorded draft revalidates with zero findings and is the Demo model draft.
+- CrowdStrike still correctly fails `UNGROUNDED_PROSPECT_DETAIL`. The sentence “I’m reaching out because that timing can make on-call, incidents, and daily production tasks worth revisiting.” adds **on-call** and **production** to the prospect opener even though the executive-change receipts do not say them. The deterministic template passes and remains the Demo fallback.
+
+### Coalition Demo model draft
+
+**Subject:** Production investigations during incidents
+
+```text
+Hi {{first_name}},
+
+I saw "Senior Site Reliability Engineer." "Location: Any location, Canada." "Named stack: Kubernetes, AWS." Also noted, "About us Coalition is the world's first Active Insurance provider designed to help prevent digital risk before it strikes."
+
+Agents that investigate your production systems during on-call, incidents, and daily production tasks. Investigations went from hours to minutes...
+
+Open to a brief conversation about on-call, incidents, and daily production tasks?
+
+Shayan
+```
+
+Receipts: <https://www.coalitioninc.com/job-posting?gh_jid=4742193005>, <https://resolve.ai/product/ai-sre>, <https://resolve.ai/product/overview>. Persona: **Head of SRE**, because the saved senior SRE opening maps to the approved reliability champion.
+
+### CrowdStrike deterministic fallback
+
+**Subject:** Engineering leadership and investigation support
+
+```text
+Hi {{first_name}},
+
+I noticed the recent engineering leadership change at CrowdStrike. It may be a useful moment to review how investigation work is supported.
+
+It could help engineering leadership improve the operating model without another manual reliability program. Agents that investigate your production systems during on-call, incidents, and daily production tasks. 72% reduction in investigation time
+
+Would it be useful to compare how AI-assisted investigation could fit the current workflow?
+
+Shayan
+```
+
+Persona: **VP Engineering**, because an engineering leadership change belongs with an approved budget-owner persona. The template cites the five saved corroborating publisher receipts plus <https://resolve.ai/product/ai-sre> and <https://resolve.ai/customers/coinbase>.
+
+## Trigger-first discovery checkpoint
+
+The bounded live run used **26/40 Serper queries**, zero OpenAI calls, found 39 ATS candidates and admitted three new accounts after job verification, entity/noise checks, customer/competitor exclusion, firmographics, scoring, tiering and kills:
+
+| Account | Role | Fit | Tier | Receipt surface |
+| --- | --- | ---: | --- | --- |
+| Okta | Principal Site Reliability Engineer | 42 | Tier 1 provisional | [Direct job text](https://www.okta.com/company/careers/opportunity/8002576?gh_jid=8002576) |
+| SecurityScorecard | Senior Site Reliability Engineer | 38 | Tier 2 provisional | [Direct job text](https://job-boards.greenhouse.io/securityscorecard/jobs/8062312) |
+| Altana | Principal Platform Engineer | 38 | Tier 1 provisional | [Direct job text](https://job-boards.greenhouse.io/altanaai/jobs/8034201003) |
+
+All three qualifying links exposed the job text directly; zero qualifying receipts were generic JavaScript careers shells. Together with Coalition and CrowdStrike, Today now has five genuine `Act now` accounts. MongoDB and Zscaler were excluded as known customers. The run recorded ATS/page errors instead of weakening the gate.
