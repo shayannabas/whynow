@@ -6,9 +6,9 @@ const {recordSource}=require('../scripts/sources.cjs');
 const {extractOrganizationCandidates}=require('../scripts/onboarding/extract-organizations.cjs');
 
 const NOW='2026-10-20T00:00:00.000Z';
-function fixture(){
+function fixture(customPages){
   let state=createWorkspace(defaultState(),{name:'Example Seller'}),id=state.activeWorkspaceId;const sources=[],raw=new Map();
-  const pages=[
+  const pages=customPages||[
     {url:'https://example.com/customers',title:'Customers',kind:'seller_customer_page',text:'Customer stories Acme Corp',html:'<html><title>Customers</title><a href="/customers/acme"><img alt="Acme Corp"></a><a href="/customers/logo-only"><img alt="Logo-only Customer"></a></html>'},
     {url:'https://example.com/customers/acme',title:'How Acme Corp uses Example Seller',kind:'seller_customer_page',text:'How Acme Corp uses Example Seller. Acme Corp improved its workflow.',html:'<html><title>How Acme Corp uses Example Seller</title><h1>How Acme Corp uses Example Seller</h1><p>Acme Corp improved its workflow.</p><a href="https://acme.com/">Acme Corp</a></html>'},
     {url:'https://example.com/customers/beta',title:'Beta customer story',kind:'seller_customer_page',text:'Beta uses Example Seller for production work.',html:'<html><title>Beta customer story</title><h1>Beta uses Example Seller for production work</h1></html>'},
@@ -27,6 +27,15 @@ it('extracts first-party customers and competitors, preserves evidence, and neve
   expect(result.customers).toContainEqual(expect.objectContaining({name:'Logo Only',domain:'',domainStatus:'domain_missing',status:'uncertain_candidate',quoteOrigin:'raw_html_alt'}));
   expect(result.competitors).toContainEqual(expect.objectContaining({name:'RivalCo',domain:'rivalco.com',domainStatus:'verified',sourceUrl:'https://example.com/compare/example-seller-vs-rivalco'}));
   expect(result.customers.every(item=>item.sourceUrl.startsWith('https://example.com/'))).toBe(true);
+});
+
+it('extracts a nested customer case-study path without treating the index as a customer',()=>{
+  const pages=[
+    {url:'https://example.com/customers/case-studies',title:'Customer stories',kind:'seller_customer_page',text:'Customer stories Acme',html:'<html><title>Customer stories</title><a href="/customers/case-studies/how-acme-wins">Acme</a></html>'},
+    {url:'https://example.com/customers/case-studies/how-acme-wins',title:'How Acme wins with Example Seller',kind:'seller_customer_page',text:'How Acme wins with Example Seller.',html:'<html><title>How Acme wins with Example Seller</title><h1>How Acme wins with Example Seller</h1><a href="https://acme.example/">Acme</a></html>'}
+  ];
+  const built=fixture(pages),result=extractOrganizationCandidates({state:built.state,workspace:built.state.workspaces[built.id],rawPages:built.raw});
+  expect(result.customers).toHaveLength(1);expect(result.customers[0]).toMatchObject({name:'Acme',domain:'acme.example',sourceUrl:'https://example.com/customers/case-studies/how-acme-wins'});
 });
 
 it('skips logo-alt extraction when raw HTML is unavailable while retaining URL/title extraction',()=>{

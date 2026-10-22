@@ -6,6 +6,7 @@ const {CollectorRuntime}=require('./collectors/runtime.cjs');
 const {requestResearch}=require('./onboarding/research-request.cjs');
 const {createResearchCoordinator}=require('./onboarding/research.cjs');
 const {buildFocusedSynthesisRequests,estimateFocusedSynthesisCost,generateSynthesis}=require('./onboarding/synthesize.cjs');
+const {rawPageMap}=require('./onboarding/extract-organizations.cjs');
 const {saveGeneratedProfile,workspaceQualityFindings}=require('./onboarding/validate.cjs');
 const {createLlm}=require('./llm.cjs');
 const {loadState,saveState,statePath,atomicWrite,updateWorkspace}=require('./server/state.cjs');
@@ -19,6 +20,13 @@ function assertProviderDefaultsOff(env){const defaults=providerDefaults(env);if(
 function serializedState(file){let queue=Promise.resolve();return {read:()=>loadState(file),mutate:fn=>{const operation=queue.then(()=>{const next=fn(loadState(file));saveState(next,file);return loadState(file);});queue=operation.catch(()=>{});return operation;}};}
 function monthUsage(state,month){let serper=0;for(const workspace of Object.values(state.workspaces))if(workspace.budgets?.serper?.month===month)serper+=workspace.budgets.serper.queries||0;return serper;}
 function workspaceFor(state,{name,domain}){return Object.values(state.workspaces).find(workspace=>workspace.research?.selectedCandidate?.domain===domain&&workspace.name.toLowerCase()===name.toLowerCase());}
+function reuseSavedVercelCustomerPages(state,file){
+  const acceptanceFile=path.join(path.dirname(file),'acceptance-state.json');let saved;try{saved=loadState(acceptanceFile);}catch{return state;}
+  const target=workspaceFor(state,TARGETS[0]),sourceWorkspace=workspaceFor(saved,TARGETS[0]);if(!target||!sourceWorkspace)return state;
+  const reusable=(sourceWorkspace.research?.sources||[]).filter(ref=>{const source=saved.sources[ref.sourceId];try{return /^\/customers(?:\/|$)/.test(new URL(source?.url||'').pathname);}catch{return false;}});if(!reusable.length)return state;
+  const next=structuredClone(state);for(const ref of reusable){const source=saved.sources[ref.sourceId];if(source)next.sources[ref.sourceId]=structuredClone(source);}
+  const workspace=next.workspaces[target.id],existing=new Set((workspace.research.sources||[]).map(ref=>ref.sourceId));workspace.research.sources=[...(workspace.research.sources||[]),...reusable.filter(ref=>!existing.has(ref.sourceId)).map(structuredClone)];workspace.research.revision=(workspace.research.revision||0)+1;return next;
+}
 function publicResult(workspace){
   const findings=workspaceQualityFindings(workspace),evidence=workspace.sellerProfile.evidence||{};
   const org=(kind,rows)=>(rows||[]).map((row,index)=>({name:row.name,domain:row.domain||'',sourceUrl:row.sourceUrl||evidence[`${kind}.${index}`]?.sourceUrl||'',quote:row.evidenceQuote||evidence[`${kind}.${index}`]?.evidenceQuote||''}));
@@ -27,7 +35,7 @@ function publicResult(workspace){
 async function prepare(){
   const baseEnv=loadedEnv(),defaultsBefore=assertProviderDefaultsOff(baseEnv),file=statePath(baseEnv),store=serializedState(file),month=new Date().toISOString().slice(0,7),before=monthUsage(store.read(),month);
   const env={...baseEnv,SERPER_ENABLED:'true',SERPER_MONTHLY_QUERY_LIMIT:String(before+SERPER_CAP),SERPER_RESEARCH_QUERY_LIMIT:'4',WORKSPACE_MAX_SERPER_QUERIES_PER_RUN:'4',ONBOARDING_MAX_PAGES:'20',OPENAI_ENABLED:'false',OPENAI_MONTHLY_LIMIT_USD:'0'};
-  let state=store.read(),gong=workspaceFor(state,TARGETS[1]);
+  await store.mutate(current=>reuseSavedVercelCustomerPages(current,file));let state=store.read(),gong=workspaceFor(state,TARGETS[1]);
   if(!gong){await store.mutate(current=>requestResearch(current,'Gong'));state=store.read();gong=Object.values(state.workspaces).find(row=>row.name==='Gong'&&row.status==='draft');}
   const coordinator=createResearchCoordinator({read:store.read,mutate:store.mutate,env,runtimeFactory:options=>new CollectorRuntime({...options,env,cacheDir:path.join(path.dirname(file),'collector-cache')})});
   if(!gong.research?.selectedCandidate){
@@ -37,11 +45,17 @@ async function prepare(){
     if(!candidate)throw Error('The bounded identity search did not return Gong at gong.io; stopping before paid calls.');
     await coordinator.confirm(gong.id,candidate.id,gong.research.revision);
   } else if(gong.research.status!=='evidence_ready') await coordinator.start(gong.id);
+  gong=workspaceFor(store.read(),TARGETS[1]);
+  if(gong.research.status==='evidence_ready'&&gong.research.organizationPlanVersion!=='priority-customer-path-v2'){
+    await store.mutate(current=>updateWorkspace(current,gong.id,row=>{row.research.status='failed';row.research.error={code:'PRIORITY_RESEARCH_REQUIRED',message:'Rebuild the saved plan with customer-story priority.'};row.research.organizationPlanVersion='priority-customer-path-v2';return row;}));
+    await coordinator.retry(gong.id);
+  }
   state=store.read();const vercel=workspaceFor(state,TARGETS[0]);gong=workspaceFor(state,TARGETS[1]);
   for(const [target,workspace] of [[TARGETS[0],vercel],[TARGETS[1],gong]])if(!workspace||workspace.status!=='draft'||workspace.research?.status!=='evidence_ready')throw Error(`${target.name} is not a draft workspace with saved evidence; stopping before paid calls.`);
   const after=monthUsage(state,month),serperQueries=after-before;if(serperQueries>SERPER_CAP)throw Error('The research run exceeded its authorized Serper cap.');
   const paidEnv={...baseEnv,OPENAI_ENABLED:'true',OPENAI_MONTHLY_LIMIT_USD:String(OPENAI_CAP_USD),OPENAI_WORKSPACE_MONTHLY_CALL_LIMIT:'3',OPENAI_RETRY_LIMIT:'0',OPENAI_MODEL:MODEL,OPENAI_SELLER_FACTS_MODEL:MODEL,OPENAI_ORGANIZATION_REVIEW_MODEL:MODEL,OPENAI_ICP_TARGETING_MODEL:MODEL};
-  const sellers=TARGETS.map(target=>{const workspace=workspaceFor(state,target),built=buildFocusedSynthesisRequests(state,workspace.id,{env:paidEnv}),estimate=estimateFocusedSynthesisCost(state,workspace.id,{env:paidEnv});return {name:target.name,domain:target.domain,workspaceId:workspace.id,savedPages:workspace.research.sources.length,evidence:built.evidence,candidates:{customers:built.candidates.customers.length,customerDomains:built.candidates.customers.filter(row=>row.domain).length,competitors:built.candidates.competitors.length},estimate};});
+  const rawPages=rawPageMap([path.join(path.dirname(file),'collector-cache'),path.join(path.dirname(file),'stage2-final-live-cache')]);
+  const sellers=TARGETS.map(target=>{const workspace=workspaceFor(state,target),built=buildFocusedSynthesisRequests(state,workspace.id,{env:paidEnv,rawPages}),estimate=estimateFocusedSynthesisCost(state,workspace.id,{env:paidEnv,rawPages});if(!built.candidates.customers.length)throw Error(`${target.name} still has no deterministic customer candidates; stopping before paid calls.`);return {name:target.name,domain:target.domain,workspaceId:workspace.id,savedPages:workspace.research.sources.length,evidence:built.evidence,candidates:{customers:built.candidates.customers.length,customerDomains:built.candidates.customers.filter(row=>row.domain).length,competitors:built.candidates.competitors.length},estimate};});
   const totalMaximumCostUsd=Number(sellers.reduce((sum,row)=>sum+row.estimate.totalMaximumCostUsd,0).toFixed(6));if(totalMaximumCostUsd>OPENAI_CAP_USD)throw Error(`The exact six-call maximum estimate is $${totalMaximumCostUsd}, above the authorized $${OPENAI_CAP_USD.toFixed(2)} cap; stopping before paid calls.`);
   const report={schemaVersion:1,status:'prepared',preparedAt:new Date().toISOString(),commit:execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim(),authorization:{targets:TARGETS,model:MODEL,focusedCallsPerSeller:3,openaiCapUsd:OPENAI_CAP_USD,serperCap:SERPER_CAP,retryLimit:0,noApproval:true,noPrepareDemo:true},providerDefaultsBefore:defaultsBefore,serperQueries,sellers,totalMaximumCostUsd};atomicWrite(REPORT_FILE,JSON.stringify(report,null,2));return report;
 }
@@ -66,4 +80,4 @@ async function run(){
 }
 async function main(){const mode=process.argv[2];const report=mode==='--prepare'?await prepare():mode==='--run'?await run():null;if(!report)throw Error('Use --prepare or --run.');process.stdout.write(`${JSON.stringify(report,null,2)}\n`);}
 if(require.main===module)main().catch(error=>{process.stderr.write(`${JSON.stringify({code:error.code||'RUN_FAILED',message:error.message,httpStatus:error.httpStatus||null,finishReason:error.finishReason||null})}\n`);process.exitCode=1;});
-module.exports={OPENAI_CAP_USD,SERPER_CAP,MODEL,TARGETS,REPORT_FILE,providerDefaults,assertProviderDefaultsOff,monthUsage,workspaceFor,publicResult,prepare,run};
+module.exports={OPENAI_CAP_USD,SERPER_CAP,MODEL,TARGETS,REPORT_FILE,providerDefaults,assertProviderDefaultsOff,monthUsage,workspaceFor,reuseSavedVercelCustomerPages,publicResult,prepare,run};

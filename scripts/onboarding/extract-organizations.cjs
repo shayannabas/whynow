@@ -50,7 +50,7 @@ function meaningfulName(value) {
 }
 function isCustomerStoryPath(value) {
   const pathname=String(value||'').toLowerCase();
-  return /^\/customers\/[^/]+\/?$/.test(pathname)||/^\/case-studies\/[^/]+\/?$/.test(pathname)||/^\/blog\/case-study-[^/]+\/?$/.test(pathname);
+  return /^\/customers\/case-studies\/[^/]+\/?$/.test(pathname)||/^\/customers\/(?!case-studies\/?$)[^/]+\/?$/.test(pathname)||/^\/case-studies\/[^/]+\/?$/.test(pathname)||/^\/blog\/case-study-[^/]+\/?$/.test(pathname);
 }
 function titleCaseSlug(value) {return decodeURIComponent(value).split('-').filter(Boolean).map(token=>token.length<=3&&token===token.toUpperCase()?token:`${token[0]?.toUpperCase()||''}${token.slice(1)}`).join(' ');}
 function exactCasing(candidate,haystacks) {
@@ -60,16 +60,17 @@ function exactCasing(candidate,haystacks) {
 }
 function customerNameFromPage(url,titleValue,html) {
   const parsed=new URL(url),segments=parsed.pathname.split('/').filter(Boolean);let slug='';
-  if(segments[0]==='customers'&&segments.length>1)slug=segments[1];
+  if(segments[0]==='customers'&&segments[1]==='case-studies'&&segments.length>2)slug=segments[2];
+  else if(segments[0]==='customers'&&segments.length>1)slug=segments[1];
   else if(segments[0]==='case-studies'&&segments.length>1)slug=segments[1];
   else if(segments[0]==='blog'&&segments[1]?.startsWith('case-study-'))slug=segments[1].slice('case-study-'.length);
   const title=text(titleValue||htmlTitle(html)),heading=headings(html)[0]||'';
   for(const value of [title,heading]) {
-    let found=meaningfulName(value.match(/^How (.+?) (?:ships|shipped|serves|went|uses|built|moved|scaled|grew|runs|powers|transformed)\b/i)?.[1]);
+    let found=meaningfulName(value.match(/^How (.+?) (?:ships|shipped|serves|went|uses|built|moved|scaled|grew|runs|powers|transformed|wins)\b/i)?.[1]);
     if(found){if(/^the\s/.test(found))found=`T${found.slice(1)}`;return found;}
   }
   if(slug) {
-    let candidate=titleCaseSlug(slug.replace(/^how-/,'').replace(/-(?:ships|shipped|serves|went|uses|built|moved|scaled|grew|runs|powers|transformed|turns|cut|kept|are)-.*$/,''));
+    let candidate=titleCaseSlug(slug.replace(/^how-/,'').replace(/-(?:ships|shipped|serves|went|uses|built|moved|scaled|grew|runs|powers|transformed|wins|turns|cut|kept|are)-.*$/,''));
     candidate=meaningfulName(exactCasing(candidate,[title,heading,text(html)]));
     if(candidate){if(/^the\s/.test(candidate))candidate=`T${candidate.slice(1)}`;return candidate;}
   }
@@ -130,7 +131,7 @@ function extractOrganizationCandidates({state,workspace,rawPages}) {
       add(customers,candidate({kind:'customer',name,domain,sourceUrl:ref.source.url,quote:receipt?.evidenceQuote||titleValue,quoteOrigin:'saved_page_title',sourceId:ref.sourceId,receipt,
         status:receipt?'confirmed_candidate':'uncertain_candidate',foundBy:['customer_story_url','page_title',...(domain?['outbound_company_link']:[])]}));
     }
-    if(page&&/^\/(?:customers?|case-studies)\/?$/i.test(pathname)) {
+    if(page&&/^\/(?:customers?(?:\/case-studies)?|case-studies)\/?$/i.test(pathname)) {
       for(const anchor of anchors(page.text,page.url)) {
         const target=new URL(anchor.url),targetPath=target.pathname;
         if(!hostMatches(target.hostname.toLowerCase().replace(/^www\./,''),sellerDomain)||!isCustomerStoryPath(targetPath)||targetPath===pathname)continue;

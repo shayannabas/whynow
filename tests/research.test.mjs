@@ -213,6 +213,17 @@ it('discovers only relevant same-domain homepage and sitemap links',()=>{
   expect(sitemap.map(item=>item.url)).toEqual(['https://example.com/customers/acme','https://example.com/about']);
 });
 
+it('does not let generic customer-blog links crowd real case studies out of the twenty-page plan',()=>{
+  const candidate={name:'Example',domain:'example.com',website:'https://example.com'};
+  const noisy=Array.from({length:250},(_,index)=>`<a href="/blog/customer-tip-${index}">Tip</a>`).join('');
+  const stories=['/customers/case-studies/acme-wins','/case-studies/beta-scales'];
+  const discovered=homepageTargets(candidate,`${noisy}${stories.map(url=>`<a href="${url}">Story</a>`).join('')}`,'https://example.com/');
+  const targets=selectResearchTargets(candidate,discovered.map(row=>({url:row.url}))),urls=targets.map(row=>new URL(row.url).pathname);
+  expect(urls).toEqual(expect.arrayContaining(stories));
+  expect(targets.find(row=>new URL(row.url).pathname===stories[0])).toMatchObject({kind:'seller_customer_page'});
+  expect(targets.filter(row=>new URL(row.url).pathname.startsWith('/blog/customer-tip-')).length).toBeLessThan(10);
+});
+
 it('admits only seller-tied allowlisted ATS and SEC search results',()=>{
   const candidate={name:'Example',domain:'example.com',website:'https://example.com'};
   expect(externalTargetForRow(candidate,{title:'Jobs at Example',url:'https://boards.greenhouse.io/example/jobs/123'})).toMatchObject({source:'greenhouse',kind:'greenhouse_jobs',expectedHost:'boards.greenhouse.io'});

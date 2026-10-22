@@ -101,7 +101,7 @@ function rankUrl(url,candidate) {
   if(parsed.origin===new URL(candidate.website).origin&&path==='/')return 0;
   if(/sitemap[^/]*\.xml$/.test(path))return 1;
   if(LOW_PRIORITY_PATH_PATTERN.test(path))return 50;
-  if(/customer|case-stud|stories/.test(path))return 2;
+  if(/(?:^|\/)(?:customers?|case-stud(?:y|ies)|customer-stories|stories)(?:\/|$)/.test(path))return 2;
   if(/(?:^|\/)enterprise(?:\/|$)/.test(path))return 3;
   if(/pricing/.test(path))return 4;
   if(/alternative|compare|comparison|(?:^|[-_/])vs(?:[-_/]|$)/.test(path))return 5;
@@ -152,7 +152,8 @@ function internalTarget(candidate,value) {
   if(!normalized||BLOCKED_PAGE_EXTENSION.test(new URL(normalized).pathname))return null;
   const path=new URL(normalized).pathname;
   const kind=/sitemap[^/]*\.xml$/i.test(path)?'seller_sitemap':LOW_PRIORITY_PATH_PATTERN.test(path)?'seller_partner_page':
-    /customer|case-stud|stories/i.test(path)?'seller_customer_page':'seller_site';
+    /(?:^|\/)(?:customers?|case-stud(?:y|ies)|customer-stories|stories)(?:\/|$)/i.test(path)?'seller_customer_page':
+      /(?:^|\/)(?:compare|comparisons|alternatives?)(?:\/|$)|(?:^|[-/])vs(?:[-/]|$)/i.test(path)?'seller_comparison_page':'seller_site';
   return {schemaVersion:1,url:normalized,source:'seller_site',kind,expectedHost:candidate.domain};
 }
 function targetRank(target,candidate) {
@@ -199,7 +200,7 @@ function relevantInternalTarget(candidate,value,baseUrl,{allowSitemap=false}={})
 }
 function homepageTargets(candidate,html,baseUrl) {
   const targets=[],pattern=/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;let match;
-  while((match=pattern.exec(String(html||'')))&&targets.length<100) {
+  while((match=pattern.exec(String(html||'')))&&targets.length<5000) {
     const target=relevantInternalTarget(candidate,match[1]??match[2]??match[3],baseUrl,{allowSitemap:true});
     if(target)targets.push(target);
   }
@@ -207,7 +208,7 @@ function homepageTargets(candidate,html,baseUrl) {
 }
 function sitemapTargets(candidate,xml,baseUrl) {
   const targets=[],pattern=/<loc\b[^>]*>([\s\S]*?)<\/loc>/gi;let match;
-  while((match=pattern.exec(String(xml||'')))&&targets.length<200) {
+  while((match=pattern.exec(String(xml||'')))&&targets.length<5000) {
     const target=relevantInternalTarget(candidate,match[1],baseUrl,{allowSitemap:true});
     if(target)targets.push(target);
   }
@@ -217,6 +218,7 @@ function targetsFromFetchedPage(candidate,target,page) {
   const parsed=new URL(target.url),isHomepage=target.source==='seller_site'&&parsed.origin===new URL(candidate.website).origin&&parsed.pathname==='/';
   if(isHomepage)return homepageTargets(candidate,page.text,page.url);
   if(target.kind==='seller_sitemap')return sitemapTargets(candidate,page.text,page.url);
+  if(target.kind==='seller_customer_page'||target.kind==='seller_comparison_page')return homepageTargets(candidate,page.text,page.url);
   return [];
 }
 function restoredTargets(candidate,plan) {
