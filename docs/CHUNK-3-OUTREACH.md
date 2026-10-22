@@ -216,3 +216,18 @@ The bounded live run used **26/40 Serper queries**, zero OpenAI calls, found 39 
 | Altana | Principal Platform Engineer | 38 | Tier 1 provisional | [Direct job text](https://job-boards.greenhouse.io/altanaai/jobs/8034201003) |
 
 All three qualifying links exposed the job text directly; zero qualifying receipts were generic JavaScript careers shells. Together with Coalition and CrowdStrike, Today now has five genuine `Act now` accounts. MongoDB and Zscaler were excluded as known customers. The run recorded ATS/page errors instead of weakening the gate.
+
+## Readable, fact-grounded Demo drafts
+
+Template version `whynow-outreach-template-v2` replaces pasted receipt fragments with natural sentences while keeping risky facts exact. Company names, complete job titles, technologies, locations, people and numbers must appear in the allowed-facts menu; every statistic or quote names the source customer; quotes remain verbatim. The validator also requires fewer than eight subject words, 60–110 body words, complete sentences, five blocks, exactly one ask question, and no stacked quotes, “About us” copy or noun-phrase fragments.
+
+The owner-authorized GPT-5.5 check ran from commit `ee5d798` with 4,000 maximum output tokens, medium reasoning, no retry and a $0.25 process cap. Exactly three calls/attempts passed validation:
+
+| Account | Persona | Input | Output | Reasoning | Cost |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Coalition | Head of SRE | 1,317 | 637 | 516 | $0.025695 |
+| Okta | Head of Platform Engineering | 1,355 | 640 | 516 | $0.025975 |
+| CrowdStrike | VP Engineering | 1,506 | 655 | 516 | $0.027180 |
+| **Total** |  | **4,178** | **1,932** | **1,548** | **$0.078850** |
+
+The generated emails and their deterministic fallbacks both pass the same local validator. Nothing was saved as sent or written to application state. The normal local OpenAI settings were confirmed disabled/zero after the run.

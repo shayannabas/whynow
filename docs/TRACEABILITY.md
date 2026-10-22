@@ -186,6 +186,18 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Accuracy rerank and paid gate | Saved Resolve account evidence; `todaySections` | `Act now` contains only Coalition and CrowdStrike; exact-three authorization could not be satisfied, so 0 paid calls and OpenAI remained disabled/zero |
 | Accuracy regression | All tests | 49 files passed; 252 active tests passed; 1 intentional future scaffold skipped |
 
+## Readable outreach correction — October 21, 2026
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| Fact-level grounding with natural prose | `scripts/outreach-drafts.cjs`; `scripts/outreach-model.cjs` | Synthetic positives allow connective paraphrase; changed company/title/technology/location/person/number facts fail locally |
+| Attributed proof | `outreach-drafts.cjs`; Resolve reference v6 | Every percentage or quote names its saved customer in the same paragraph; quotes remain verbatim |
+| Seller framing library | `config/reference-profiles/resolve-ai.json`; manual profile parser/page | Complete general framing sentences are stored per workspace and remain owner-editable |
+| Readability gates | `validateOutreachDraft` | Fewer than 8 subject words, 60–110 body words, five blocks, complete sentences, no stacked quotes/About-us copy/noun fragments, exactly one question |
+| Historical revalidation | Saved Coalition and CrowdStrike outputs | Coalition fails `ABOUT_US_COPY`, `STACKED_QUOTES`, `SENTENCE_FRAGMENT`, `QUOTE_NOT_VERBATIM`; CrowdStrike fails `INCOMPLETE_SENTENCE`, `SENTENCE_FRAGMENT`, `STAT_NOT_ATTRIBUTED` |
+| Bounded paid verification | `scripts/run-resolve-demo-readable-drafts.cjs`; ignored local report | Exactly 3 GPT-5.5 calls/attempts; Coalition, Okta and CrowdStrike all pass; 4,178 input, 1,932 output, 1,548 reasoning tokens; $0.078850; no send/state write; OpenAI off/zero afterward |
+| Full regression and CI | All tests; GitHub Actions | 53 files passed; 270 active tests passed; 1 intentional future scaffold skipped; commit `ee5d798` CI passed |
+
 | Requirement | Implementation | Verification |
 | --- | --- | --- |
 | Node 22, CommonJS, allowed dependencies | package.json, .nvmrc, CI | Seven tests passed on Node 22.23.2 |
