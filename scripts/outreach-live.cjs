@@ -17,7 +17,7 @@ function assertReady(config){
   if(!config.enabled)throw new OutreachLiveError('DISABLED','OpenAI outreach is disabled.');
   if(!config.keyPresent)throw new OutreachLiveError('KEY_MISSING','The private OpenAI API key is not configured.');
   if(config.model!=='gpt-5.5')throw new OutreachLiveError('MODEL_MISMATCH','This bounded run permits only gpt-5.5.');
-  if(!(config.limitUsd>0&&config.limitUsd<=.50)||config.callLimit!==3)throw new OutreachLiveError('BUDGET_MISMATCH','This bounded run requires a $0.50-or-lower process cap and exactly three logical calls.');
+  if(!(config.limitUsd>0&&config.limitUsd<=.50)||config.callLimit<1||config.callLimit>3)throw new OutreachLiveError('BUDGET_MISMATCH','This bounded run requires a $0.50-or-lower process cap and one to three logical calls.');
 }
 function outputText(payload={}){
   if(typeof payload.output_text==='string'&&payload.output_text.trim())return payload.output_text;
@@ -38,16 +38,17 @@ function validatedDraft(value={},context={}){
 function createOutreachGenerator({env=process.env,fetchImpl=fetch,sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
   const config=settings(env);assertReady(config);let logicalCalls=0,attempts=0,reservedUsd=0,actualUsd=0;
   async function generate(context={}){
-    if(logicalCalls>=config.callLimit)throw new OutreachLiveError('CALL_LIMIT','The three-call outreach limit is exhausted.');
+    if(logicalCalls>=config.callLimit)throw new OutreachLiveError('CALL_LIMIT',`The ${config.callLimit}-call outreach limit is exhausted.`);
     const request=buildOutreachRequest(context,env),estimate=estimateOutreachRequest(request);logicalCalls++;
     for(let attempt=0;attempt<2;attempt++){
-      if(reservedUsd+estimate.maximumTotalCostUsd>config.limitUsd)throw new OutreachLiveError('BUDGET_EXHAUSTED','The process-only outreach cap would be exceeded.');
-      reservedUsd=Number((reservedUsd+estimate.maximumTotalCostUsd).toFixed(6));attempts++;
+      if(actualUsd+estimate.plannedTotalCostUsd>config.limitUsd)throw new OutreachLiveError('BUDGET_EXHAUSTED','The process-only outreach cap would be exceeded by the planning allowance.');
+      reservedUsd=Number((reservedUsd+estimate.plannedTotalCostUsd).toFixed(6));attempts++;
       let response;
       try{response=await fetchImpl(RESPONSES_ENDPOINT,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:`Bearer ${env.OPENAI_API_KEY}`},body:JSON.stringify(request),signal:AbortSignal.timeout(config.timeoutMs)});}catch{throw new OutreachLiveError('REQUEST_FAILED','OpenAI outreach request failed or timed out.');}
       if(!response.ok){await response.body?.cancel();if((response.status===429||response.status>=500)&&attempt===0){await sleep(500);continue;}throw new OutreachLiveError('REQUEST_FAILED',`OpenAI outreach request failed (HTTP ${response.status}).`,{httpStatus:response.status});}
       let payload;try{payload=await response.json();}catch{throw new OutreachLiveError('INVALID_OUTPUT','OpenAI returned unreadable JSON.');}
       const usage=usageSummary(payload.usage),costUsd=actualCost(payload.usage),responseId=String(payload.id||''),responseModel=String(payload.model||config.model);actualUsd=Number((actualUsd+costUsd).toFixed(6));
+      if(actualUsd>config.limitUsd)throw new OutreachLiveError('BUDGET_EXHAUSTED','Provider-reported usage exceeded the process-only outreach cap.',{usage,costUsd,responseId,responseModel});
       if(payload.status&&payload.status!=='completed'){
         const incompleteReason=String(payload.incomplete_details?.reason||payload.status||'unknown').slice(0,80);
         throw new OutreachLiveError('INCOMPLETE',`OpenAI returned an incomplete draft (${incompleteReason}).`,{incompleteReason,usage,costUsd,responseId,responseModel});

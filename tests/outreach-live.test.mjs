@@ -39,6 +39,7 @@ describe('bounded live outreach client',()=>{
     expect(()=>live.createOutreachGenerator({env:{...env,OPENAI_ENABLED:'false'}})).toThrow('disabled');
     expect(()=>live.createOutreachGenerator({env:{...env,OPENAI_OUTREACH_MODEL:'gpt-5.4'}})).toThrow('gpt-5.5');
     expect(()=>live.createOutreachGenerator({env:{...env,OPENAI_MONTHLY_LIMIT_USD:'.51'}})).toThrow('$0.50');
-    expect(()=>live.createOutreachGenerator({env:{...env,OPENAI_OUTREACH_CALL_LIMIT:'4'}})).toThrow('three logical calls');
+    expect(()=>live.createOutreachGenerator({env:{...env,OPENAI_OUTREACH_CALL_LIMIT:'4'}})).toThrow('one to three logical calls');
+    expect(()=>live.createOutreachGenerator({env:{...env,OPENAI_MONTHLY_LIMIT_USD:'.15',OPENAI_OUTREACH_CALL_LIMIT:'2'}})).not.toThrow();
   });
 });
