@@ -7,7 +7,7 @@ const {loadResolveReferenceDemo}=require('../scripts/reference-demo.cjs');
 
 describe('trigger-first discovery',()=>{
   it('builds nine bounded ATS searches and parses direct job links',()=>{
-    const tasks=trigger.buildTriggerFirstTasks();expect(tasks).toHaveLength(9);expect(tasks.every(row=>/site:(?:job-boards\.greenhouse\.io|jobs\.lever\.co|jobs\.ashbyhq\.com)/.test(row.query))).toBe(true);
+    const tasks=trigger.buildTriggerFirstTasks();expect(tasks).toHaveLength(12);expect(tasks.every(row=>/site:(?:job-boards\.greenhouse\.io|boards\.greenhouse\.io|jobs\.lever\.co|jobs\.ashbyhq\.com)/.test(row.query))).toBe(true);
     expect(trigger.atsDescriptor('https://job-boards.greenhouse.io/acme/jobs/123')).toMatchObject({provider:'greenhouse',slug:'acme',direct:true});
     expect(trigger.atsDescriptor('https://jobs.ashbyhq.com/acme')).toMatchObject({provider:'ashby',slug:'acme',direct:false});
   });
