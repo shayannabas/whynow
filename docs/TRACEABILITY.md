@@ -179,6 +179,12 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | Bounded paid checkpoint | `outreach-live.cjs`; `run-chunk3-outreach-paid.cjs`; ignored local safe report | Binance returned `incomplete` after one logical call/one attempt; no retry, no Coalition/CrowdStrike call, no validated/sent draft; exact billed cost unavailable, $0.022015 conservatively reserved; OpenAI disabled/zero afterward |
 | Corrected paid checkpoint | 4,000-token GPT-5.x request; safe incomplete telemetry; ignored v2 report | Binance, Coalition and CrowdStrike completed in three logical calls/three attempts with no retry; all passed local validation; input/output/reasoning totals 1,966/2,076/1,628; actual total $0.072110; no send/state mutation; OpenAI disabled/zero afterward |
 | Deployment direction | `AGENTS.md`; checklist | Local screen-share is the demo path; no snapshot/deploy; Railway backup and Apollo lookup remain deferred and owner-gated |
+| Current seller-claim receipts | `resolve-ai.json` v5; `reference-profile.cjs`; guarded seller-page runtime | Four current first-party pages fetched, one robots request, zero Serper/OpenAI; obsolete credential removed; every retained value is a verbatim substring of its saved quote |
+| Prospect-detail grounding | `outreach-drafts.cjs`; `outreach-model.cjs` | Real Coalition title/location/Kubernetes/AWS positive plus invented-tech and Binance-title negative tests; unsupported concrete details block the draft |
+| Early-career exclusion | `collectors/hiring.cjs`; `decisioning.cjs` | Accelerator Program, intern, graduate, new-grad and junior tests; saved Binance leaves `Act now` without deleting evidence history |
+| Executive-change quality | `outreach-drafts.cjs`; account draft UI | Neutral phrase and banned-tone tests; distinct publisher-domain count; visible single-source verification label; corroborating receipt URLs retained |
+| Accuracy rerank and paid gate | Saved Resolve account evidence; `todaySections` | `Act now` contains only Coalition and CrowdStrike; exact-three authorization could not be satisfied, so 0 paid calls and OpenAI remained disabled/zero |
+| Accuracy regression | All tests | 49 files passed; 252 active tests passed; 1 intentional future scaffold skipped |
 
 | Requirement | Implementation | Verification |
 | --- | --- | --- |

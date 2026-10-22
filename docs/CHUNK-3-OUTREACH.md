@@ -1,6 +1,27 @@
 # Chunk 3 — outreach drafts
 
-Updated October 21, 2026. The first bounded paid checkpoint stopped safely on an incomplete response; the corrected 4,000-token batch then produced three validator-passing Demo drafts. Drafts remain copy-only and cannot be sent.
+Updated October 21, 2026. The first bounded paid checkpoint stopped safely on an incomplete response; the corrected 4,000-token batch then produced three drafts that passed the older validator. A later accuracy audit rejected those drafts for demo use and tightened the rules below. Drafts remain copy-only and cannot be sent.
+
+## Accuracy checkpoint
+
+The current Resolve reference is `resolve-ai-v5-current-claims-2026-10-21`. WhyNow fetched the current AI SRE, product overview, Coinbase and DoorDash pages through its guarded, robots-aware collector (four pages, one robots request, zero Serper/OpenAI calls). The demo may now use only these exact, saved claims:
+
+- Product: “Agents that investigate your production systems during on-call, incidents, and daily production tasks.” — <https://resolve.ai/product/ai-sre>
+- Coinbase: “72% reduction in investigation time” — the saved receipt continues, “incidents that previously required long manual triage now move from alert to informed action in minutes, not half an hour or more.” — <https://resolve.ai/customers/coinbase>
+- DoorDash: “Investigations went from hours to minutes...” — <https://resolve.ai/product/overview>
+
+“Built by the creators of OpenTelemetry.” was not present and was removed. The former DoorDash sentence “cut investigation times by 87%” was not verbatim and was replaced by the current exact quote. Every seller claim now carries a saved quote, and validation fails unless the claim is a verbatim substring of that quote.
+
+The prospect validator now requires a hiring draft to preserve the complete saved job title. Any mentioned location, number, named technology or operational detail must occur in the saved receipt text. Coalition's saved receipt says **Senior Site Reliability Engineer**, **Location: Any location, Canada**, and **Named stack: Kubernetes, AWS**; those details pass. An added GCP, New York or production-reliability statement would fail unless the receipt said it.
+
+Accelerator Program, intern, graduate, new-grad and junior posts stay in evidence history but never become why-now triggers. The saved rerank therefore removed Binance and produced only two `Act now` accounts:
+
+1. Coalition — Tier 1, fit 40 — Senior Site Reliability Engineer — <https://www.coalitioninc.com/job-posting?gh_jid=4742193005>
+2. CrowdStrike — Tier 1, fit 35 — recent engineering leadership change, corroborated across five saved publisher domains — <https://www.thekeyexecutives.com/2026/09/04/crowdstrike-cto-elia-zaitsev-leaves-after-13-years-to-launch-170-million-ai-security-fund/>
+
+The phrase “next operating state” is banned. Executive-change emails must say “the recent engineering leadership change,” may not lead with the person's departure or dollar amount, and show `single source — verify before outreach` unless a second publisher domain corroborates the event.
+
+The owner authorized exactly three paid calls for the top three reranked `Act now` accounts. Because only two accounts qualify, zero calls were made. WhyNow did not substitute a `Worth researching`, `Needs review` or untiered account. OpenAI stayed disabled with a zero local limit.
 
 ## What is built
 
@@ -58,9 +79,9 @@ The owner authorized one three-target batch for Binance, Coalition and CrowdStri
 
 No draft, subject, receipt citation or persona result can be reported as model output from this first checkpoint. The owner later supplied the separate corrected-run authorization described above; any request beyond that one corrected batch requires new explicit authorization.
 
-## Corrected 4,000-token paid checkpoint
+## Corrected 4,000-token paid checkpoint — historical, not demo-ready
 
-The corrected batch used commit `21f3451`, GPT-5.5 reasoning effort `medium`, exactly three logical calls and three provider attempts, with no retry. The provider returned model snapshot `gpt-5.5-2026-04-23` for every result. All three drafts passed the local receipt, claim, greeting and structure validator.
+The corrected batch used commit `21f3451`, GPT-5.5 reasoning effort `medium`, exactly three logical calls and three provider attempts, with no retry. The provider returned model snapshot `gpt-5.5-2026-04-23` for every result. All three drafts passed the validator that existed then; they fail the later accuracy standard and are retained only as an audit trail.
 
 | Account | Persona | Why this persona | Input | Output | Reasoning | Cost |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
