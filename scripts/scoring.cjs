@@ -1,6 +1,6 @@
 'use strict';
 
-const {SIGNAL_KEYS}=require('./signal-rubric.cjs');
+const {SIGNAL_KEYS,signalRubric}=require('./signal-rubric.cjs');
 const SCORING_VERSION='resolve-confidence-fit-v6';
 const SCORING_CONFIG_VERSION='resolve-scoring-priority-v2';
 const DEFAULT_WEIGHTS={techStack:1.3,activePain:1.2,revenueSensitivity:1.1,observabilityScale:1,aiCompatibility:0.9,competitiveWedge:0.8};
@@ -55,17 +55,19 @@ function liveTrigger(account={},now=new Date(),windowDays=90) {
   return candidates.sort((a,b)=>Date.parse(b.occurredAt)-Date.parse(a.occurredAt))[0];
 }
 function scoreSignals(account={},configInput={},nowInput=new Date()) {
-  const now=nowInput instanceof Date?nowInput:new Date(nowInput),config=normalizeScoringConfig(configInput),breakdown={};
+  const now=nowInput instanceof Date?nowInput:new Date(nowInput),config=normalizeScoringConfig(configInput),breakdown={},rubric=signalRubric(configInput),usedSignals=rubric.filter(row=>row.used);
   let weightedTotal=0,signalTotal=0,weightedConfidence=0;
-  for(const key of SIGNAL_KEYS){
+  for(const row of rubric){
+    const key=row.key;
+    if(!row.used){breakdown[key]={used:false,status:'not_used',rawScore:null,weight:0,receiptFactor:0,confidence:null,recencyFactor:0,contribution:0,fitPoints:0,evidenceUrl:'',observedAt:''};continue;}
     const value=account.signals?.[key]||{score:1,evidenceUrl:'',evidenceText:'Signal not collected.',inferred:true};
     const rawScore=finiteNumber(value.score,1,1,5),weight=config.weights[key],confidence=sourceConfidence(value,account),receiptFactor=confidence,recencyFactor=key==='activePain'?painRecencyFactor(value,now):1,contribution=rawScore*weight*receiptFactor*recencyFactor;
     signalTotal+=rawScore;weightedTotal+=contribution;weightedConfidence+=weight*confidence;
-    breakdown[key]={rawScore,weight,receiptFactor,confidence,recencyFactor,contribution:Number(contribution.toFixed(2)),evidenceUrl:value.evidenceUrl||'',observedAt:value.observedAt||''};
+    breakdown[key]={used:true,status:value.evidenceUrl?'collected':'unknown',rawScore,weight,receiptFactor,confidence,recencyFactor,contribution:Number(contribution.toFixed(2)),evidenceUrl:value.evidenceUrl||'',observedAt:value.observedAt||''};
   }
-  const weightedMax=SIGNAL_KEYS.reduce((total,key)=>total+(config.weights[key]*5),0),roundedTotal=Number(weightedTotal.toFixed(2)),roundedMax=Number(weightedMax.toFixed(2)),fitScore=Math.round((roundedTotal/roundedMax)*100);
-  for(const item of Object.values(breakdown))item.fitPoints=Number(((item.contribution/roundedMax)*100).toFixed(2));
-  const trigger=liveTrigger(account,now,config.liveTriggerDays),fitBand=fitScore>=70?'strong':fitScore>=40?'moderate':'weak',fitConfidence=Number((weightedConfidence/SIGNAL_KEYS.reduce((total,key)=>total+config.weights[key],0)).toFixed(2)),confidenceBand=fitConfidence>=.8?'high-confidence':fitConfidence>=.55?'mixed-confidence':'mostly-inferred',receiptedSignals=SIGNAL_KEYS.filter(key=>Boolean(account.signals?.[key]?.evidenceUrl)&&sourceConfidence(account.signals[key],account)>=.7).length;
-  return {scoringVersion:SCORING_VERSION,signalTotal,signalMax:30,weightedTotal:roundedTotal,weightedMax:roundedMax,weightedPercent:fitScore,fitScore,totalScore:fitScore,fitBand,fitConfidence,confidenceBand,fitReason:`${fitScore}/100 at ${Math.round(fitConfidence*100)}% evidence confidence (${confidenceBand}); ${receiptedSignals} of 6 signals carry URL receipts.`,receiptedSignals,breakdown,weights:config.weights,liveTriggerDays:config.liveTriggerDays,liveTrigger:Boolean(trigger),liveTriggerAt:trigger?.occurredAt||'',liveTriggerUrl:trigger?.evidenceUrl||''};
+  const weightedMax=usedSignals.reduce((total,row)=>total+(config.weights[row.key]*5),0),roundedTotal=Number(weightedTotal.toFixed(2)),roundedMax=Number(weightedMax.toFixed(2)),fitScore=roundedMax?Math.round((roundedTotal/roundedMax)*100):0;
+  for(const item of Object.values(breakdown))item.fitPoints=roundedMax?Number(((item.contribution/roundedMax)*100).toFixed(2)):0;
+  const confidenceWeight=usedSignals.reduce((total,row)=>total+config.weights[row.key],0),trigger=liveTrigger(account,now,config.liveTriggerDays),fitBand=fitScore>=70?'strong':fitScore>=40?'moderate':'weak',fitConfidence=confidenceWeight?Number((weightedConfidence/confidenceWeight).toFixed(2)):0,confidenceBand=fitConfidence>=.8?'high-confidence':fitConfidence>=.55?'mixed-confidence':'mostly-inferred',receiptedSignals=usedSignals.filter(row=>Boolean(account.signals?.[row.key]?.evidenceUrl)&&sourceConfidence(account.signals[row.key],account)>=.7).length;
+  return {scoringVersion:SCORING_VERSION,signalTotal,signalMax:usedSignals.length*5,signalsUsed:usedSignals.length,weightedTotal:roundedTotal,weightedMax:roundedMax,weightedPercent:fitScore,fitScore,totalScore:fitScore,fitBand,fitConfidence,confidenceBand,fitReason:`${fitScore}/100 at ${Math.round(fitConfidence*100)}% evidence confidence (${confidenceBand}); ${receiptedSignals} of ${usedSignals.length} used signals carry URL receipts.`,receiptedSignals,breakdown,weights:config.weights,liveTriggerDays:config.liveTriggerDays,liveTrigger:Boolean(trigger),liveTriggerAt:trigger?.occurredAt||'',liveTriggerUrl:trigger?.evidenceUrl||''};
 }
 module.exports={DEFAULT_WEIGHTS,SCORING_CONFIG_VERSION,SCORING_VERSION,ageDays,liveTrigger,normalizeScoringConfig,painRecencyFactor,scoreSignals,sourceConfidence};

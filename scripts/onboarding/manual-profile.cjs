@@ -116,7 +116,10 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
   const savedDefinitions=workspace.icpConfig?.signalDefinitions||{};
   const definitions=Object.fromEntries(Object.keys(WEIGHTS).map(key=>{
     const saved=savedDefinitions[key]||{},prefix=`signals.${key}`;
+    const enabledRaw=String(field(form,`${prefix}.enabled`,String(saved.enabled??true))).trim();
+    if(!['true','false'].includes(enabledRaw))throw new Error(`${LABELS[key]} must be used or marked not applicable.`);
     return [key,{
+      enabled:enabledRaw==='true',
       label:text(field(form,`${prefix}.label`,saved.label||LABELS[key]),100),
       description:text(field(form,`${prefix}.description`,saved.description||'Manual starting configuration; review before scoring.'),500),
       evidenceKeywords:lines(field(form,`${prefix}.evidenceKeywords`,field(form,prefix,saved.evidenceKeywords?.join('\n')||''))),

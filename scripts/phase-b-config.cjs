@@ -16,6 +16,7 @@ function collectorConfigForWorkspace(workspace={}){
     segments:mapSegments(phaseA.segments),
     enabledSegments:phaseA.segments.filter(row=>row.enabled!==false).map(row=>row.key),
     personas:structuredClone(phaseA.personas),
+    signalDefinitions:structuredClone(icp.signalDefinitions||{}),
     triggerMapping:structuredClone(icp.triggerMapping||{}),
     painThemeConfig:structuredClone(rules.painThemes||{}),
     slaDays:structuredClone(phaseA.slaDays||{}),

@@ -66,4 +66,11 @@ describe('Phase A workspace-driven rules',()=>{
     expect(score.fitScore).toBe(8);expect(score.confidenceBand).toBe('mostly-inferred');expect(score.receiptedSignals).toBe(0);
     expect(Object.values(score.breakdown).every(row=>row.rawScore===1&&row.confidence===.4&&row.evidenceUrl==='')).toBe(true);
   });
+  it('removes seller-inapplicable signals from the denominator instead of scoring them as zero',()=>{
+    const icpConfig={signalDefinitions:{competitiveWedge:{enabled:false}},weights:{}};
+    const score=scoreSignals({},icpConfig);
+    expect(score.signalsUsed).toBe(5);expect(score.signalMax).toBe(25);
+    expect(score.breakdown.competitiveWedge).toMatchObject({used:false,status:'not_used',rawScore:null,fitPoints:0});
+    expect(signalRubric(icpConfig).find(row=>row.key==='competitiveWedge').used).toBe(false);
+  });
 });

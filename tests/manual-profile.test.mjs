@@ -98,6 +98,7 @@ it('shows and saves the deeper targeting and messaging rules before approval',()
   f.set('segments.0.exampleTargets.0.name','Example Target');f.set('segments.0.exampleTargets.0.domain','target.example');
   f.set('segments.0.exampleTargets.0.url','https://example.org/example-target');f.set('segments.0.exampleTargets.0.quote','Example Target uses Fixture Seller for production workflows.');
   f.set('signals.techStack.label','Technical environment fit');f.set('signals.techStack.description','Review the public technical environment.');
+  f.set('signals.techStack.enabled','false');
   f.set('signals.techStack.evidenceKeywords','Node.js\nTypeScript');f.set('signals.techStack.negativeKeywords','Legacy only');
   f.set('signals.techStack.preferredSources','Engineering blog');f.set('signals.techStack.rubric.1','No matching environment');
   f.set('signals.techStack.rubric.3','Some matching environment');f.set('signals.techStack.rubric.5','Strong matching environment');
@@ -110,13 +111,13 @@ it('shows and saves the deeper targeting and messaging rules before approval',()
   f.set('objectionTemplates.0','Ask what concern matters most.');
   const saved=saveManualProfile(state,id,f),config=saved.workspaces[id].icpConfig,html=profilePage(saved);
   expect(config.segments[0]).toMatchObject({enabled:false,revenueSensitivityBase:5,wedgeCustomers:['Customer One','Customer Two'],exampleTargets:[{name:'Example Target',domain:'target.example',inferred:false}]});
-  expect(config.signalDefinitions.techStack).toMatchObject({label:'Technical environment fit',description:'Review the public technical environment.',negativeKeywords:['Legacy only'],preferredSources:['Engineering blog'],rubric:{1:'No matching environment',3:'Some matching environment',5:'Strong matching environment'}});
+  expect(config.signalDefinitions.techStack).toMatchObject({enabled:false,label:'Technical environment fit',description:'Review the public technical environment.',negativeKeywords:['Legacy only'],preferredSources:['Engineering blog'],rubric:{1:'No matching environment',3:'Some matching environment',5:'Strong matching environment'}});
   expect(config.weights).toEqual(Object.fromEntries(Object.keys(WEIGHTS).map((key,index)=>[key,1.5+index/10])));
   expect(config.slaDays).toEqual(Object.fromEntries(Object.keys(SLAS).map((key,index)=>[key,20+index])));
   expect(config.tierRules).toEqual({tier1:{public:false,revenue:750000000,employees:3000,valuation:7000000000},tier2:{revenue:50000000,employees:250,fundingStages:['Series B','Series C']},tier3:{maxEmployees:249,minRaised:5000000},unclassified:'manual review'});
   expect(config.pitch).toMatchObject({receiptOpenerStyle:'Open with one verified change.',oneSentenceProduct:'A concise reviewed product sentence.',credentialLine:'Use only a verified credential.',ctaStyle:'Ask for a short conversation.'});
   expect(config.objectionTemplates[0]).toBe('Ask what concern matters most.');
-  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Timing windows','Company tier rules','manual review','A concise reviewed product sentence.','Open with one verified change.','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
+  for(const visible of ['Technical environment fit','Review the public technical environment.','Engineering blog','Use this signal for this seller','Timing windows','Company tier rules','manual review','A concise reviewed product sentence.','Open with one verified change.','Ask what concern matters most.','Example Target'])expect(html).toContain(visible);
   for(const key of Object.keys(WEIGHTS))expect(html).toContain(`name="weights.${key}"`);
   for(const key of Object.keys(SLAS))expect(html).toContain(`name="slaDays.${key}"`);
   for(const key of ['tier1.public','tier1.revenue','tier1.employees','tier1.valuation','tier2.revenue','tier2.employees','tier2.fundingStages','tier3.maxEmployees','tier3.minRaised','unclassified'])expect(html).toContain(`name="tierRules.${key}"`);
