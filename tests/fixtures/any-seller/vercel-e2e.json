@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Synthetic provider responses for an offline pipeline test. Seller strategy comes from the saved Vercel live ICP fixture; no company claim in this file is production data.",
+  "searchResult": {
+    "title": "Large Venture Labs | Official",
+    "url": "https://largeventurelabs.example/about",
+    "snippet": "A large enterprise team building AI applications."
+  },
+  "collectorResult": {
+    "signals": [
+      {
+        "key": "techStack",
+        "score": 4,
+        "evidenceText": "The recorded engineering page describes modern web-framework adoption.",
+        "evidenceUrl": "https://largeventurelabs.example/engineering",
+        "observedAt": "2026-10-21T00:00:00.000Z",
+        "confidence": 1,
+        "inferred": false
+      }
+    ],
+    "events": [
+      {
+        "id": "vercel-e2e-platform-hire",
+        "type": "function_hiring",
+        "title": "Principal Platform Engineer",
+        "evidenceText": "Principal Platform Engineer",
+        "evidenceUrl": "https://largeventurelabs.example/jobs/principal-platform-engineer",
+        "occurredAt": "2026-10-20T00:00:00.000Z",
+        "decaysAt": "2027-01-18T00:00:00.000Z",
+        "confidence": 1,
+        "citable": true
+      }
+    ],
+    "killHints": [],
+    "targetPatch": {
+      "firmographics": {
+        "employeeCount": 250,
+        "confidence": 0.9,
+        "source": "free",
+        "sourceUrl": "https://largeventurelabs.example/about",
+        "fields": {
+          "employeeCount": {
+            "provider": "free",
+            "sourceUrl": "https://largeventurelabs.example/about"
+          }
+        }
+      }
+    }
+  }
+}

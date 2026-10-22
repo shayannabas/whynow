@@ -1,0 +1,30 @@
+import {createRequire} from 'node:module';
+import {expect,it} from 'vitest';
+const require=createRequire(import.meta.url);
+const snapshot=require('./fixtures/onboarding/vercel-live-icp.json');
+const recorded=require('./fixtures/any-seller/vercel-e2e.json');
+const {defaultState}=require('../scripts/server/state.cjs');
+const {buildDiscoveryTasks,candidateFromResult,promoteDiscoveryCandidates}=require('../scripts/company-discovery.cjs');
+const {collectorConfigForWorkspace}=require('../scripts/phase-b-config.cjs');
+const {mergeCollectorResult}=require('../scripts/phase-b-runner.cjs');
+const {phaseAConfigForWorkspace}=require('../scripts/phase-a-config.cjs');
+const {scoreAccount}=require('../scripts/score-account.cjs');
+const {todaySections}=require('../scripts/account-lifecycle.cjs');
+
+it('runs the saved non-Resolve Vercel strategy through discovery, collection, scoring and Today offline',()=>{
+  const workspaceId='vercel-offline-e2e',state=defaultState();
+  state.activeWorkspaceId=workspaceId;
+  state.workspaces[workspaceId]={id:workspaceId,name:'Vercel offline fixture',status:'active',sellerProfile:{...structuredClone(snapshot.sellerProfile),approvedAt:'2026-10-21T00:00:00.000Z'},icpConfig:structuredClone(snapshot.icpConfig),accounts:[],runs:[],budgets:{},createdAt:'2026-10-21T00:00:00.000Z',updatedAt:'2026-10-21T00:00:00.000Z'};
+  state.workspaces[workspaceId].icpConfig.signalDefinitions.competitiveWedge.enabled=false;
+  const workspace=state.workspaces[workspaceId],tasks=buildDiscoveryTasks(workspace,{maxQueries:60});
+  expect(tasks.length).toBeLessThanOrEqual(60);expect(tasks[0]).toMatchObject({kind:'icp_query_template',query:snapshot.icpConfig.segments[0].queryTemplates[0]});
+  expect(tasks.some(row=>row.kind==='persona_hiring'&&row.query.includes('CTO'))).toBe(true);
+  const candidate=candidateFromResult(tasks[0],recorded.searchResult);expect(candidate).toMatchObject({domain:'largeventurelabs.example',segment:snapshot.icpConfig.segments[0].key});
+  const promoted=promoteDiscoveryCandidates(state,workspaceId,[candidate],{now:()=> '2026-10-21T00:00:00.000Z',id:()=> 'vercel-prospect-1'}),approvedWorkspace=promoted.state.workspaces[workspaceId],base=approvedWorkspace.accounts[0];
+  expect(base).toMatchObject({name:'Large Venture Labs',status:'new',kills:[]});
+  const collectorConfig=collectorConfigForWorkspace(approvedWorkspace);expect(collectorConfig.personas.buyerTitles).toContain('CTO');expect(collectorConfig.signalDefinitions.techStack.evidenceKeywords.length).toBeGreaterThan(0);
+  const merged=mergeCollectorResult(base,recorded.collectorResult,'recorded-vercel-refresh'),scored=scoreAccount(merged,phaseAConfigForWorkspace(approvedWorkspace),new Date('2026-10-21T12:00:00.000Z'));
+  approvedWorkspace.accounts=[scored];const sections=todaySections(approvedWorkspace,new Date('2026-10-21T12:00:00.000Z'));
+  expect(scored).toMatchObject({tier:2,kills:[]});expect(scored.score.breakdown.competitiveWedge).toMatchObject({used:false,status:'not_used'});
+  expect(sections.actNow.map(row=>row.name)).toEqual(['Large Venture Labs']);expect(sections.actNow[0].whyNow).toMatchObject({line:'Principal Platform Engineer',receipt:'https://largeventurelabs.example/jobs/principal-platform-engineer'});
+});
