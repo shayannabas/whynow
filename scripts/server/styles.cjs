@@ -86,6 +86,7 @@ const WHY_NOW_CSS = `
 .rail-status.review,.rail-status.new{border-color:var(--warn-border);background:var(--warn-soft);color:var(--warn)}
 .rail-status.blocked,.rail-status.killed{border-color:var(--danger-border);background:var(--danger-soft);color:var(--danger)}
 .score-box strong{display:block;font-size:48px;line-height:1;font-weight:800}
+.scorecard-page .ss-table td>a.ss-source-link{display:block;min-height:36px}
 .brief-body>.brief-main{min-width:0;max-width:none;width:auto;margin:0;padding:0;overflow:visible}
 .brief-body>aside{min-width:0}
 .overview-toolbar>label{display:grid;gap:5px;color:var(--ink-2);font-size:10px;font-weight:700}

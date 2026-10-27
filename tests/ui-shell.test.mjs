@@ -64,6 +64,7 @@ describe('WhyNow SignalScout UI shell', () => {
     expect(html).toContain('.credibility-signal-grid{');
     expect(html).toContain('grid-template-columns:252px minmax(0,1fr)');
     expect(html).toContain('.brief-body>.brief-main');
+    expect(html).toContain('.scorecard-page .ss-table td>a.ss-source-link{display:block;min-height:36px}');
     expect(html).toContain('.results-page .metrics-kpis{grid-template-columns:repeat(4');
     expect(html).toContain('.workspace-grid{display:grid;grid-template-columns:repeat(2');
     expect(html).toContain('.ss-toolbar input:not([type=checkbox]):not([type=radio])');
