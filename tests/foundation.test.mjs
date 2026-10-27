@@ -62,7 +62,7 @@ it('serves health, empty overview, local font, creation and switching across res
     await post(`${base}/workspaces`,'name=Second+workspace');
     expect((await post(`${base}/workspaces/switch`,`id=${id}`)).status).toBe(303);
     await stop();base=await start();
-    const page=await(await fetch(base)).text();expect(page).toContain('<h1>Interview preparation</h1>');expect(page).toContain('0 accounts');
+    const page=await(await fetch(base)).text();expect(page).toContain('<title>Interview preparation · WhyNow</title>');expect(page).toContain('<h1>Pipeline overview</h1>');expect(page).toContain('0 accounts');
     expect(Object.keys(loadState(file).workspaces)).toHaveLength(2);
   } finally {if(server?.listening)await stop();}
 });

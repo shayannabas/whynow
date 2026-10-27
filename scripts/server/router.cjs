@@ -17,7 +17,7 @@ const {createSynthesisCoordinator}=require('../onboarding/synthesis-runner.cjs')
 const {createRefreshCoordinator,refreshProvidersReady}=require('../onboarding/refresh-runner.cjs');
 const {createLlm}=require('../llm.cjs');
 const {changeArchive,workspacesPage}=require('./workspaces.cjs');
-const {accountPage,accountsPage,discoveryPage,killLogPage,scorecardPage,todayPage}=require('./phase-a-pages.cjs');
+const {accountPage,accountsPage,discoveryPage,killLogPage,scorecardPage,todayPage,resultsPage}=require('./phase-a-pages.cjs');
 const {loadResolveReferenceDemo}=require('../reference-demo.cjs');
 const {addManualAccountToState}=require('../accounts.cjs');
 const {createPhaseBRefreshCoordinator}=require('../phase-b-runner.cjs');
@@ -26,6 +26,9 @@ const {createDiscoveryCoordinator}=require('../discovery-runner.cjs');
 const {createPrepareDemoCoordinator}=require('../prepare-demo.cjs');
 const {updateAccountStatus}=require('../account-lifecycle.cjs');
 const {createTemplateDraft}=require('../outreach-drafts.cjs');
+const {historyPage,runsPage,funnelPage,metricsPage}=require('./activity-pages.cjs');
+async function actionWorkspaceMatches(req,state,res){let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192){json(res,413,{error:'Form too large'});return false;}}const workspaceId=new URLSearchParams(body).get('workspaceId');if(workspaceId&&workspaceId!==state.activeWorkspaceId){json(res,409,{error:'Workspace changed. Refresh and try again.'});return false;}return true;}
+function checkActionWorkspace(state,fields){if(fields.workspaceId&&fields.workspaceId!==state.activeWorkspaceId)throw Error('Workspace changed. Refresh and try again.');return state;}
 function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,phaseBRefreshCoordinator:providedPhaseBRefresh,phaseBRefreshAllCoordinator:providedPhaseBRefreshAll,discoveryCoordinator:providedDiscovery,prepareDemoCoordinator:providedPrepareDemo,llm:providedLlm} = {}) {
   stateFile=stateFile||statePath(env);
   loadState(stateFile);
@@ -57,35 +60,38 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   return async (req,res) => {
     const html = (status, body) => {res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end(body);};
     try {
-      const pathname = new URL(req.url,'http://localhost').pathname;
+      const requestUrl = new URL(req.url,'http://localhost'),pathname=requestUrl.pathname;
       const localAdmin=env.NODE_ENV!=='production'&&['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)&&/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||'');
-      if(req.method==='GET'&&pathname==='/today')return html(200,todayPage(loadState(stateFile)));
-      if(req.method==='GET'&&pathname==='/discovery')return html(200,discoveryPage(loadState(stateFile)));
+      const activityPages={'/history':historyPage,'/runs':runsPage,'/funnel':funnelPage,'/metrics':metricsPage};
+      if(req.method==='GET'&&activityPages[pathname])return html(200,activityPages[pathname](loadState(stateFile)));
+      if(req.method==='GET'&&pathname==='/today')return html(200,todayPage(loadState(stateFile),'',requestUrl.searchParams));
+      if(req.method==='GET'&&pathname==='/results')return html(200,resultsPage(loadState(stateFile),requestUrl.searchParams));
+      if(req.method==='GET'&&pathname==='/discovery')return html(200,discoveryPage(loadState(stateFile),'',requestUrl.searchParams));
       if(req.method==='POST'&&pathname==='/prepare-demo'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
-        const current=loadState(stateFile);try{await prepareDemoCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,todayPage(loadState(stateFile),error.message));}
+        const current=loadState(stateFile);if(!await actionWorkspaceMatches(req,current,res))return;try{await prepareDemoCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,todayPage(loadState(stateFile),error.message));}
         res.writeHead(303,{Location:'/today'});return res.end();
       }
       if(req.method==='POST'&&pathname==='/discovery/run'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
-        const current=loadState(stateFile);try{await discoveryCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,discoveryPage(loadState(stateFile),error.message));}
+        const current=loadState(stateFile);if(!await actionWorkspaceMatches(req,current,res))return;try{await discoveryCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,discoveryPage(loadState(stateFile),error.message));}
         res.writeHead(303,{Location:'/discovery'});return res.end();
       }
-      if(req.method==='GET'&&pathname==='/accounts')return html(200,accountsPage(loadState(stateFile)));
+      if(req.method==='GET'&&pathname==='/accounts')return html(200,accountsPage(loadState(stateFile),'',requestUrl.searchParams));
       if(req.method==='POST'&&pathname==='/accounts/refresh-all'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
-        const current=loadState(stateFile);try{await phaseBRefreshAllCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,todayPage(loadState(stateFile),error.message));}
+        const current=loadState(stateFile);if(!await actionWorkspaceMatches(req,current,res))return;try{await phaseBRefreshAllCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,todayPage(loadState(stateFile),error.message));}
         res.writeHead(303,{Location:'/today'});return res.end();
       }
       const accountMatch=pathname.match(/^\/accounts\/([^/]+)$/),refreshMatch=pathname.match(/^\/accounts\/([^/]+)\/refresh$/),statusMatch=pathname.match(/^\/accounts\/([^/]+)\/status$/),templateDraftMatch=pathname.match(/^\/accounts\/([^/]+)\/drafts\/template$/);
-      if(req.method==='GET'&&accountMatch)return html(200,accountPage(loadState(stateFile),decodeURIComponent(accountMatch[1])));
+      if(req.method==='GET'&&accountMatch)return html(200,accountPage(loadState(stateFile),decodeURIComponent(accountMatch[1]),'',requestUrl.searchParams));
       if(req.method==='POST'&&refreshMatch){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
-        const current=loadState(stateFile),accountId=decodeURIComponent(refreshMatch[1]);
+        const current=loadState(stateFile),accountId=decodeURIComponent(refreshMatch[1]);if(!await actionWorkspaceMatches(req,current,res))return;
         try{await phaseBRefreshCoordinator.start(current.activeWorkspaceId,accountId);}
         catch(error){return html(409,accountPage(loadState(stateFile),accountId,error.message));}
         res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}`});return res.end();
@@ -94,15 +100,15 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
         let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>4096)return json(res,413,{error:'Form too large'});}const fields=Object.fromEntries(new URLSearchParams(body)),accountId=decodeURIComponent(statusMatch[1]);
-        try{await mutate(state=>updateAccountStatus(state,state.activeWorkspaceId,accountId,fields));}catch(error){return html(400,accountPage(loadState(stateFile),accountId,error.message));}
+        try{await mutate(state=>updateAccountStatus(checkActionWorkspace(state,fields),state.activeWorkspaceId,accountId,fields));}catch(error){return html(400,accountPage(loadState(stateFile),accountId,error.message));}
         res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}`});return res.end();
       }
       if(req.method==='POST'&&templateDraftMatch){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
         let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192)return json(res,413,{error:'Form too large'});}const fields=Object.fromEntries(new URLSearchParams(body)),accountId=decodeURIComponent(templateDraftMatch[1]);
-        try{await mutate(state=>createTemplateDraft(state,state.activeWorkspaceId,accountId,fields));}catch(error){return html(400,accountPage(loadState(stateFile),accountId,error.message));}
-        res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}`});return res.end();
+        try{await mutate(state=>createTemplateDraft(checkActionWorkspace(state,fields),state.activeWorkspaceId,accountId,fields));}catch(error){return html(400,accountPage(loadState(stateFile),accountId,error.message,new URLSearchParams({tab:'outreach'})));}
+        res.writeHead(303,{Location:`/accounts/${encodeURIComponent(accountId)}?tab=outreach`});return res.end();
       }
       if(req.method==='GET'&&pathname==='/scorecard')return html(200,scorecardPage(loadState(stateFile)));
       if(req.method==='GET'&&pathname==='/kill-log')return html(200,killLogPage(loadState(stateFile)));
@@ -117,7 +123,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
         let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192)return json(res,413,{error:'Form too large'});}
         const fields=Object.fromEntries(new URLSearchParams(body));
-        try{await mutate(state=>addManualAccountToState(state,state.activeWorkspaceId,fields));}
+        try{await mutate(state=>addManualAccountToState(checkActionWorkspace(state,fields),state.activeWorkspaceId,fields));}
         catch(error){return html(400,accountsPage(loadState(stateFile),error.message));}
         res.writeHead(303,{Location:'/scorecard'});return res.end();
       }
@@ -193,7 +199,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         const font=fs.readFileSync(path.resolve(__dirname,'../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2'));
         res.writeHead(200,{'Content-Type':'font/woff2'});return res.end(font);
       }
-      if (req.method==='GET' && pathname==='/') return html(200,overview(loadState(stateFile)));
+      if (req.method==='GET' && (pathname==='/'||pathname==='/overview')) return html(200,overview(loadState(stateFile),requestUrl.searchParams));
       if (req.method==='POST' && ['/workspaces','/workspaces/switch'].includes(pathname)) {
         // Queue complete read-modify-write operations to avoid lost updates.
         const work = writes.then(async()=>{const next=await workspaceAction(req,loadState(stateFile),pathname);saveState(next,stateFile);});
