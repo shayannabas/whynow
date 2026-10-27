@@ -265,3 +265,19 @@ Uncollected signals follow SignalScout exactly: the six-signal scorer assigns an
 **Worked example:** Coalition's final model email turns the raw receipt into “Noticed Coalition is hiring a Senior Site Reliability Engineer with Kubernetes and AWS experience.” It keeps the exact risky facts, uses a general approved framing sentence instead of pasted “About us” copy, and attributes the verbatim customer quote to DoorDash.
 
 **Free polish:** WhyNow now allows at most one approved framing sentence, caps a quoted excerpt at 15 words, rejects a quote ending in an ellipsis and deterministically rotates among three owner-editable closing questions. Revalidating the saved GPT-5.5 outputs leaves Okta passing, blocks Coalition only for its trailing quote ellipsis and blocks CrowdStrike only for its overlong quote. Their deterministic template-v2 fallbacks all pass without another provider call.
+
+## SignalScout UI port — October 26, 2026
+
+### `scripts/server/signalscout-styles.cjs`, `styles.cjs` and `pages.cjs`
+
+**What they do:** Bring SignalScout's full public design system, dark grouped sidebar, type, cards, charts and account board into WhyNow. **How they decide:** Navigation counts and Overview metrics come from the selected workspace's saved state; filters are GET parameters, not decorative controls. **What changed:** WhyNow branding, local fonts, explicit workspace switching, narrow-screen Menu and semantic setup forms sit on top of the unchanged source style layers. Full-page navigation keeps the sidebar and scripts current; local detail tabs support browser history.
+
+### `scripts/server/phase-a-pages.cjs`
+
+**What it does:** Renders separate Today, Results, Accounts, account work, Discovery, Scorecard and Kill Log screens in the source layout. **How it decides:** Existing workspace scoring/lifecycle/receipt functions remain authoritative. Missing evidence displays unknown; kills retain scores/tiers/receipts. **What changed:** Source send/contact controls are omitted. Outreach uses approved persona titles, a validated deterministic template and a Demo-only Copy action. Discovery plan previews link to the seller review form rather than silently changing an ICP. Saved signals and trigger history have separate Evidence sections.
+
+**Worked example:** Coalition shows Act now, Tier 1 and fit 40 independently. Its real SRE receipt and approved Resolve claims produce a local merge-field template; Copy reproduces that displayed body exactly. A generic invented recipient is blocked, not accepted to make the demo look complete.
+
+### `scripts/server/activity-pages.cjs` and setup/review renderers
+
+**What they do:** Show saved audit history, background progress, discovery funnel and evidence metrics; restyle existing onboarding, workspace and collector forms. **How they decide:** Only persisted workspace records are counted, including Prepare-demo stage progress. Typed warning reasons, revision checks and unchecked approval acknowledgment remain intact. **What changed:** No fabricated contacts, sends, subscriptions or production integrations are shown. Setup screens have no exact SignalScout counterpart, so their original safe workflow uses the same visual system.
