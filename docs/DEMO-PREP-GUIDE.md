@@ -1,6 +1,6 @@
 # WhyNow — night-before interview demo guide
 
-Updated October 21, 2026. WhyNow is designed to be prepared locally the day before an interview. The owner reviews and approves the seller profile; the software never approves one automatically. The demo stays copy-only and has no sending path.
+Updated October 27, 2026. WhyNow is designed to be prepared locally the day before an interview. The owner reviews and approves the seller profile; the software never approves one automatically. The demo stays copy-only and has no sending path.
 
 ## What the workflow does
 
@@ -21,7 +21,7 @@ Technically: Stage 2 uses the guarded public-page collector, deterministic custo
 2. **Price the model step.** A free `GET /v1/models` check confirmed this account can access `gpt-5.5`. For the saved 106 KB Vercel evidence packet, the three focused calls estimate 40,453 + 1,174 + 44,509 input tokens and a conservative maximum of **$0.615** at the official $5/M input and $30/M output pricing checked October 21. Set a process cap only after reviewing this estimate.
 3. **Generate the draft profile.** Temporarily enable OpenAI with the chosen cap, run the three focused calls, then immediately restore `OPENAI_ENABLED=false` and the local limit to `0`.
 4. **Review every field yourself.** Check customers, competitors, buyer/champion titles, measurable size floor, segment searches, signal definitions and every receipt. Edit weak fields. Resolve blocking warnings or type a specific acknowledgement. Click Approve only when you personally accept the profile.
-5. **Prepare the prospect queue.** On Today, click **Prepare demo**. It runs in the background, makes no OpenAI call, and shares a maximum of 150 Serper queries across ICP-driven discovery and Refresh all. Progress and query use are saved in the workspace.
+5. **Prepare the prospect queue.** Select the owner-approved seller in **Active workspace**, click **Switch**, then open **Today**. Expand **Prepare or refresh the queue** and click **Prepare demo** only after its provider/query budget is authorized. It runs in the background, makes no OpenAI call, and shares a maximum of 150 Serper queries across ICP-driven discovery and Refresh all. Progress and query use are saved in the workspace. This control is disabled for the unapproved frozen reference; do not approve a real profile just to enable it.
 6. **Quality-check Today.** Open each top `Act now` account. Confirm the company identity, tier/size receipt, current trigger, why-now line and public receipt. Move an account to `working`, or `skipped` with a reason. Signals that do not apply show **Not used for this seller**; uncollected signals remain **Unknown · low confidence** rather than being treated as negative.
 7. **Prepare outreach separately.** Use the deterministic template for a free, grounded fallback. A model draft is always a separate manual action and needs its own cost authorization. Demo mode uses `{{first_name}}`, an approved persona title and a Copy button; it cannot send.
 
@@ -44,9 +44,15 @@ Technically: Stage 2 uses the guarded public-page collector, deterministic custo
 
 ## Three-minute interview flow
 
-1. Show the approved seller profile and one exact receipt.
-2. Open Today and explain `Act now` versus `Worth researching` versus `Needs review`.
-3. Open one account and walk through its fit score, firmographic tier, active trigger, kill result and clickable receipts.
-4. Generate or open the deterministic merge-field draft, explain that only approved seller claims and current prospect evidence are allowed, and use Copy. Point out that WhyNow has no send path.
+The native [Demo Script](https://docs.google.com/document/d/1ySTmwMnjl9hzSjagK3OJi7z3uZ8BMRydmPXLOjX83_4) retains its three-minute structure and is the speaking script. Its October 27 click paths were walked in the real browser without provider calls, profile approval or Prepare demo.
+
+1. Select **Resolve AI · Reference demo** in **Active workspace**, click **Switch**, then **Today** (`/today`). If the sidebar is collapsed, open **Menu** first.
+2. Point to **Daily Brief**, then **Open Act now list →**. The saved queue currently contains Okta, Coalition, Altana, CrowdStrike and SecurityScorecard; verify freshness before the interview.
+3. Click **Coalition** or its **Open account** button. **Overview** shows **Why now**, **Open trigger receipt ↗** and **Open size receipt ↗**. **Score** shows the six-signal breakdown; **Evidence** shows saved signal text and separate trigger history.
+4. Sidebar **Scorecard** → Tier 1 / 40–69 **View accounts →** opens `/accounts?tier=1&fit=40-69`. Sidebar **Kill Log** (`/kill-log`) shows Databricks's retained `KILL_BUILD_CULTURE` reason and **View receipt ↗**.
+5. Return through **Today** → **Open Act now list →** → **Coalition** → **Outreach**. Under **Receipt-backed template**, use **Latest saved draft**, or **Create template draft** if needed (blank recipient fields, sender Shayan). Under **Copy after review**, use **Copy email**. No contact lookup or send action exists.
+6. For future preparation, **Workspaces** → **Add a company** → **Who are you selling for?** (`/onboarding`) → **Company name** → **Continue**. Only after the owner's review and **Approve saved profile** at `/onboarding/profile` should **Today** → **Prepare or refresh the queue** → **Prepare demo** be run with a separately authorized budget. For a walkthrough, reveal the controls but do not submit research, approve or start the job.
+
+The browser walkthrough also exposed source CSS hiding WhyNow's account-name column on narrow screens. The local adapter now keeps the first data cell visible; Databricks is clickable in the mobile Kill Log.
 
 The core explanation: **WhyNow turns public evidence into a reviewed sales strategy, uses that strategy to find and rank accounts, and refuses to turn unsupported claims into outreach.**

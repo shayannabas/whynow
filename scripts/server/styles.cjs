@@ -100,6 +100,8 @@ const WHY_NOW_CSS = `
 @media(max-width:960px){.today-followups{grid-template-columns:1fr}}
 @media(max-width:620px){.side{padding:10px 12px}.workspace-switcher{grid-template-columns:1fr;gap:5px}.workspace-switcher .workspace-control{max-width:none}.nav-section{grid-template-columns:1fr 1fr}.nav a{min-height:34px;padding:7px 8px;font-size:12px}.nav-count{min-width:20px;height:18px;font-size:9px}main{padding:17px 12px 28px}.ss-header,.top,.kanban-heading{align-items:flex-start;flex-direction:column}.ss-actions{width:100%}.overview-toolbar{display:grid;grid-template-columns:1fr 1fr;align-items:end}.overview-toolbar .overview-search{grid-column:1/-1;max-width:none}.overview-toolbar .button{width:100%}.results-page .metrics-kpis{grid-template-columns:1fr}.accounts-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.accounts-filters .accounts-search{grid-column:1/-1}.accounts-filters>button,.accounts-filters>a{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:1ms!important;animation-iteration-count:1!important}}
+/* The source hides its checkbox column on phones; WhyNow's first column is account identity. */
+@media(max-width:760px){.ss-page .ss-table td:first-child{display:block}}
 `;
 
 module.exports = `${designTokensCss()}${APP_CSS}${WHY_NOW_CSS}`;
