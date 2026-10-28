@@ -31,6 +31,8 @@ const WHY_NOW_CSS = `
 /* Existing local setup/review forms use semantic controls rather than source-only classes. */
 .ss-page input:not([type=hidden]):not([type=checkbox]):not([type=radio]),.ss-page textarea,.ss-page select,.overview-v2 input,.overview-v2 select{max-width:100%;min-height:38px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:500 13px/19px var(--font)}
 .ss-page textarea{width:100%;resize:vertical}
+.saved-draft label:has([data-autosize-draft]){grid-column:1/-1}
+.saved-draft [data-autosize-draft]{field-sizing:content;overflow-y:hidden;max-height:none;line-height:1.6}
 .ss-page button,.overview-v2 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:700 12px/18px var(--font);cursor:pointer}
 .ss-page button.primary,.overview-v2 button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
 .ss-page button:disabled,.overview-v2 button:disabled{cursor:not-allowed;opacity:.62}

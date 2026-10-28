@@ -61,6 +61,14 @@ function uiFixture() {
   return { state, workspace, task };
 }
 
+it('renders full-height saved email bodies and descriptive receipt labels',()=>{
+  const {state,workspace}=uiFixture(),claims=workspace.icpConfig.outreach.claims;
+  workspace.drafts[0].evidenceRefs=['https://acme.example/news/cto',claims.product.sourceUrl,claims.customerProofs[0].sourceUrl];
+  const html=accountPage(state,'ui-acme','',new URLSearchParams('tab=outreach'));
+  expect(html).toContain('data-autosize-draft rows="12"');expect(html).toContain('field.scrollHeight+2');
+  expect(html).toContain('Acme Systems leadership report');expect(html).toContain('Resolve AI product');expect(html).toContain(`${claims.customerProofs[0].customer} quote`);
+});
+
 it('renders Results as a distinct searchable master-detail workspace with working account tabs', () => {
   const { state } = uiFixture();
   const defaultResults = resultsPage(state);
