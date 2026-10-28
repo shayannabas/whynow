@@ -121,6 +121,15 @@ it('derives URLs and exact quotes from receipt IDs and marks out-of-run receipts
   expect(report.warnings).toContainEqual(expect.objectContaining({value:'Unsupported category'}));
 });
 
+it('retains a confirmed comparison without guessing its domain and reports the missing field',()=>{
+  const f=fixture(),raw=output(f.sellerSourceId),competitor=raw.sellerProfile.competitors[0];competitor.domain='';
+  const organizationReview={competitors:[{...competitor,kept:true,status:'confirmed_candidate',sourceUrl:'https://example.org/compare/rival',foundBy:['comparison_url_or_title']}]};
+  const result=materializeGeneratedDraft(f.state,f.state.workspaces[f.id],raw,{organizationReview});
+  expect(result.profile.competitors).toHaveLength(1);expect(result.profile.competitors[0]).toMatchObject({name:'Rival Corp',domain:null,domainStatus:'domain_missing',inferred:false});
+  expect(result.report.qualityFindings).toContainEqual(expect.objectContaining({code:'COMPETITOR_DOMAIN_MISSING',severity:'blocking'}));
+  expect(materializeGeneratedDraft(f.state,f.state.workspaces[f.id],raw).profile.competitors).toEqual([]);
+});
+
 it('drops unsupported customers and competitors while keeping receipted seller-site claims',()=>{
   const f=fixture(),raw=output(f.sellerSourceId);
   raw.sellerProfile.customers.push({name:'Customer Mirage',domain:'customer-mirage.com',receiptId:receiptIdFor(f.thirdPartySourceId,'Customer Mirage says it uses Fixture Seller.')});
@@ -171,7 +180,7 @@ it('uses an injected LLM interface and performs no network access in synthesis t
   const f=fixture(),raw=output(f.sellerSourceId),built=buildSynthesisRequest(f.state,f.id),runLocal=useRunLocalReceiptIds(raw,built.receiptIdMap),seen=[];
   const values={
     whynow_seller_facts:{sellerProfile:Object.fromEntries(Object.entries(runLocal.sellerProfile).filter(([key])=>!['customers','competitors'].includes(key)))},
-    whynow_organization_review:{customers:[],competitors:[]},whynow_icp_targeting:{icpConfig:runLocal.icpConfig}
+    whynow_organization_review:{customers:[],competitors:[],rejectedCompetitors:[]},whynow_icp_targeting:{icpConfig:runLocal.icpConfig}
   };
   const result=await generateSynthesis({state:f.state,workspaceId:f.id,rawPages:new Map(),llm:{generate:async request=>{seen.push(request);const value=values[request.name];expect(request.validate(value)).toBe(true);return {value,cached:false,model:request.model};}}});
   expect(seen.map(item=>item.name)).toEqual(['whynow_seller_facts','whynow_organization_review','whynow_icp_targeting']);

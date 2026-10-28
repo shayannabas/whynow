@@ -19,7 +19,7 @@ it('builds three bounded focused requests and keeps organization output limited 
   expect(built.requests.icpTargeting.messages[0].content).toContain('Explicitly forbidden');
   expect(JSON.parse(built.requests.icpTargeting.messages[1].content).resolveWorkedExample.segments.length).toBeGreaterThanOrEqual(3);
   const candidate=built.candidates.customers[0];expect(candidate).toMatchObject({name:'Acme',domain:'acme.com'});
-  expect(built.requests.organizationReview.validate({customers:[{candidateId:candidate.id}],competitors:[]})).toBe(true);
+  expect(built.requests.organizationReview.validate({customers:[{candidateId:candidate.id}],competitors:[],rejectedCompetitors:[]})).toBe(true);
   expect(()=>built.requests.organizationReview.validate({customers:[{candidateId:'invented'}],competitors:[]})).toThrow();
   for(const request of Object.values(built.requests)) {
     expect(request.maxOutputTokens).toBe(8000);

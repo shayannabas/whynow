@@ -220,7 +220,9 @@ function workspaceQualityFindings(value) {
   }
   if(!(profile.customers||[]).length)findings.push(finding('EMPTY_CUSTOMERS','sellerProfile.customers','customers','No verified customers are present. Add supported customers or explain why approval should proceed without them.'));
   if(!(profile.competitors||[]).length)findings.push(finding('EMPTY_COMPETITORS','sellerProfile.competitors','competitors','No verified competitors are present. Add supported competitors or explain why approval should proceed without them.'));
-  const size=config.killPatterns?.sizeMetric||{},sizeLabel=normalizeWhitespace(size.label),targetSize=normalizeWhitespace(profile.targetCompanySize);
+  for(const [index,item] of (profile.competitors||[]).entries())if(!item.domain)findings.push(finding('COMPETITOR_DOMAIN_MISSING',`sellerProfile.competitors.${index}.domain`,`competitors.${index}.domain`,`${item.name} is supported by a comparison receipt, but its domain is missing. Enter the verified domain before using domain-based exclusion.`));
+  // Accept config-style identifiers without rewriting the reviewed/model output.
+  const size=config.killPatterns?.sizeMetric||{},sizeLabel=normalizeWhitespace(String(size.label||'').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]+/g,' ')),targetSize=normalizeWhitespace(profile.targetCompanySize);
   if(!MEASURABLE_SIZE_PATTERN.test(sizeLabel))findings.push(finding('SIZE_METRIC_UNMEASURABLE','icpConfig.killPatterns.sizeMetric.label','sizeLabel','The minimum-size label must name a measurable unit such as employees, engineering headcount or revenue.'));
   const labelLower=sizeLabel.toLowerCase(),floor=Number(size.floor);
   if(/\benterprise\b/i.test(targetSize)&&!/\b(?:small|startup|all sizes?|any size)\b/i.test(targetSize)) {
@@ -383,7 +385,7 @@ function customerSourceAllowed(item,ref,sellerDomain) {
   return Boolean(customerDomain&&CUSTOMER_SOURCE_KINDS.has(ref.kind)&&ref.ownerDomain===customerDomain&&hostMatches(ref.host,customerDomain));
 }
 
-function materializeGeneratedDraft(state,workspace,output,{now=()=>new Date().toISOString()}={}) {
+function materializeGeneratedDraft(state,workspace,output,{organizationReview,now=()=>new Date().toISOString()}={}) {
   assertSynthesisOutput(output);
   const candidate=selectedCandidate(workspace), context=buildReceiptEvidence(state,workspace).receiptMap, evidence={}, warnings=[], droppedCustomers=[], droppedCompetitors=[];
   let attemptedClaims=0, acceptedClaims=0, receiptedClaims=0;
@@ -423,8 +425,9 @@ function materializeGeneratedDraft(state,workspace,output,{now=()=>new Date().to
     const name=clean(raw.name,200),domain=normalizeDomain(raw.domain),dedupe=domain||name.toLowerCase();
     if(!name||seenCompetitors.has(dedupe))continue;seenCompetitors.add(dedupe);attemptedClaims++;
     const item=evidenceFor(state,workspace,raw,name,context);
-    if(!name||!domain||item.inferred) { droppedCompetitors.push({name,reason:!domain?'Competitor domain was missing or invalid.':item.reason});continue; }
-    const index=profile.competitors.length;profile.competitors.push({name,domain,...item});evidence[`competitors.${index}`]=item;acceptedClaims++;receiptedClaims++;
+    const confirmed=(organizationReview?.competitors||[]).some(row=>row.kept&&row.name===name&&row.receiptId===raw.receiptId&&require('./review-organizations.cjs').confirmedComparison(row,{seller:candidate}));
+    if(!name||!domain&&!confirmed||item.inferred) { droppedCompetitors.push({name,reason:!domain?'Competitor domain was missing or invalid.':item.reason});continue; }
+    const index=profile.competitors.length;profile.competitors.push({name,domain,domainStatus:domain?'verified':'domain_missing',...item});evidence[`competitors.${index}`]=item;acceptedClaims++;receiptedClaims++;
   }
   profile.evidence=evidence;
   profile.sources=[...new Set(Object.values(evidence).filter(item=>!item.inferred).map(item=>item.sourceId))];
@@ -462,19 +465,20 @@ function materializeGeneratedDraft(state,workspace,output,{now=()=>new Date().to
   return {profile,config,report};
 }
 
-function saveGeneratedProfile(state,id,{output,expectedResearchRevision,expectedRunId,expectedSourceSetHash,expectedProfileRevision,model='unknown',promptVersion='unknown',now=()=>new Date().toISOString()}={}) {
+function saveGeneratedProfile(state,id,{output,organizationReview,expectedResearchRevision,expectedRunId,expectedSourceSetHash,expectedProfileRevision,model='unknown',promptVersion='unknown',now=()=>new Date().toISOString()}={}) {
   if(!Number.isInteger(expectedResearchRevision)||!Number.isInteger(expectedProfileRevision)||typeof expectedSourceSetHash!=='string')throw new SynthesisValidationError('INVALID_INPUT','Generation guards are required.');
   const workspace=getWorkspace(state,id);
   if(workspace.status==='archived')throw new SynthesisValidationError('ARCHIVED','Restore this workspace before saving generated research.');
   if(workspace.status==='active')throw new SynthesisValidationError('ACTIVE_PROFILE','Approved profiles require a reviewable refresh diff and cannot be overwritten.');
   if((workspace.research?.revision??0)!==expectedResearchRevision||String(workspace.profileRevision||0)!==String(expectedProfileRevision)||(expectedRunId&&workspace.research?.runId!==expectedRunId)||sourceSetHash(state,workspace)!==expectedSourceSetHash)throw new SynthesisValidationError('STALE_RESEARCH','Research changed while the profile was being generated. Run synthesis again.');
-  const generatedAt=now(),{profile,config,report}=materializeGeneratedDraft(state,workspace,output,{now:()=>generatedAt});
+  const generatedAt=now(),{profile,config,report}=materializeGeneratedDraft(state,workspace,output,{organizationReview,now:()=>generatedAt});
   let next=updateWorkspace(state,id,w=>{
     const candidate=selectedCandidate(w);
     w.onboarding={...(w.onboarding||{schemaVersion:1}),status:'selected',selectedCandidate:candidate};
     w.sellerProfile=profile;w.icpConfig=config;w.status='needs_review';w.deliveryMode='demo';w.profileRevision=(w.profileRevision||0)+1;
+    delete w.reviewAcknowledgments;
     const steps=(w.research.steps||[]).map(step=>({...step,status:step.key==='review'?'pending':'complete'}));
-    w.research={...w.research,status:'review_required',revision:(w.research.revision||0)+1,steps,synthesis:{schemaVersion:1,promptVersion,model,generatedAt,sourceSetHash:expectedSourceSetHash,report}};
+    w.research={...w.research,status:'review_required',revision:(w.research.revision||0)+1,steps,synthesis:{schemaVersion:1,promptVersion,model,generatedAt,sourceSetHash:expectedSourceSetHash,report,...(organizationReview?{organizationReview:structuredClone(organizationReview)}:{})}};
   });
   const revision=next.workspaces[id].profileRevision;
   next.auditLog.push({schemaVersion:1,id:stableId(`${id}:seller_profile_generated:${revision}:${generatedAt}`),workspaceId:id,type:'seller_profile_generated',occurredAt:generatedAt,profileRevision:revision,actor:'system',receiptedClaims:report.receiptedClaims,acceptedClaims:report.acceptedClaims,droppedClaims:report.droppedCustomers.length+report.droppedCompetitors.length});
