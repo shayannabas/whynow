@@ -23,6 +23,7 @@ function phaseAConfigForWorkspace(workspace={}) {
     tierRules:icpConfig.tierRules||{},
     decisionRules:icpConfig.decisionRules||{},
     killPatterns:icpConfig.killPatterns||{},
+    adjacentVendorCategories:icpConfig.killRules?.adjacentVendorCategories||[],
     killPrecedence:Array.from(new Set([...(icpConfig.killRules?.precedence||SOURCE_KILL_PRECEDENCE),icpConfig.killRules?.whyNowExtension||'KILL_SELLER_OR_COMPETITOR'])),
     customers:customers.map(row=>({name:row.name,domain:rootDomain(row.domain),sourceUrl:row.sourceUrl||reference.customerSourceUrl||icpConfig.exclusions?.customerSourceUrl||''})),
     competitors:competitors.map(row=>({name:row.name,domain:rootDomain(row.domain),sourceUrl:row.sourceUrl||''})),

@@ -31,6 +31,8 @@ function priorityForAccount(account={},nowInput=new Date(),config={}){
 }
 function applyDecisioning(account={},config={},now=new Date()){
   const decorated={...account,triggers:account.triggers||[],stage3SchemaVersion:'leading-indicators-v4-seed-watch-promotion'},killed=applyKillEngine(decorated,config),primaryKill=killed.kills?.[0]||null,prioritized=priorityForAccount(killed,now,config);
+  const retired=(account.kills||[]).filter(old=>!killed.kills.some(row=>row.code===old.code&&row.evidenceUrl===old.evidenceUrl&&row.reason===old.reason)).map(row=>({...row,status:'retired',retiredAt:now.toISOString(),reviewReason:'Re-evaluated under the current evidence policy; this receipt no longer supports the former decision.'}));
+  if(retired.length)killed.killHistory=[...(account.killHistory||[]),...retired];
   return {...killed,primaryKill,alsoKilledBy:(killed.kills||[]).slice(1),killReason:primaryKill?.reason||'',killEvidenceUrl:primaryKill?.evidenceUrl||'',hiringForWhatWeSell:prioritized.priorityBreakdown.hiringForWhatWeSell,...prioritized};
 }
 function decisionReport(accounts=[]){const killed=accounts.filter(account=>account.killStatus==='killed'),count=value=>accounts.filter(account=>account.tier===value).length,killCodes=killed.reduce((result,account)=>{const code=account.primaryKill?.code||'unknown';result[code]=(result[code]||0)+1;return result;},{});return {total:accounts.length,tier1:count(1),tier2:count(2),tier3:count(3),parked:count('parked'),killed:killed.length,prioritized:accounts.filter(account=>account.priority>0).length,maximumPriority:accounts.length?Math.max(...accounts.map(account=>Number(account.priority||0))):0,killCodes};}

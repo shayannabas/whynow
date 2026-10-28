@@ -23,7 +23,7 @@ function publicHttps(value) {
   }
 }
 function validateReferenceProfile(value) {
-  if (!plainObject(value) || value.schemaVersion !== 1 || value.referenceProfileVersion !== 'resolve-ai-v7-outreach-polish-2026-10-21' || value.id !== 'resolve-ai' || value.kind !== 'load_only_reference' || value.loadOnly !== true) throw new Error('Invalid Resolve reference profile header.');
+  if (!plainObject(value) || value.schemaVersion !== 1 || value.referenceProfileVersion !== 'resolve-ai-v8-kill-evidence-policy-2026-10-27' || value.id !== 'resolve-ai' || value.kind !== 'load_only_reference' || value.loadOnly !== true) throw new Error('Invalid Resolve reference profile header.');
   if (FORBIDDEN_RUNTIME_KEYS.some(key => Object.hasOwn(value,key))) throw new Error('Reference profiles cannot contain runtime workspace state.');
   if (!plainObject(value.seller) || value.seller.name !== 'Resolve AI' || value.seller.domain !== 'resolve.ai' || value.seller.website !== 'https://resolve.ai') throw new Error('Invalid Resolve reference identity.');
   const provenance=value.provenance;

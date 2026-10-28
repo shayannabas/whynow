@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceProfileVersion": "resolve-ai-v7-outreach-polish-2026-10-21",
+  "referenceProfileVersion": "resolve-ai-v8-kill-evidence-policy-2026-10-27",
   "id": "resolve-ai",
   "kind": "load_only_reference",
   "loadOnly": true,
@@ -10,6 +10,7 @@
     "website": "https://resolve.ai"
   },
   "provenance": {
+    "killEvidencePolicyChange": {"changedOn":"2026-10-27","authority":"Owner's demo review: internal-tooling kills require prospect-owned engineering evidence; observability/incident vendors are adjacent-vendor exclusions, not build-culture kills.","changedFields":["icpConfig.killRules.adjacentVendorCategories"],"note":"Deliberate quality deviation from the unchanged historical SignalScout parity captures; no seller claim or source fixture was invented."},
     "sourceProject": "flowfire",
     "sourceCommit": "130789f1bac1d5e11f5f5154f269155dc17f2d21",
     "sourceModules": [
@@ -419,6 +420,7 @@
       "competitors": []
     },
     "killRules": {
+      "adjacentVendorCategories": ["observability platform", "incident management", "on-call management"],
       "precedence": ["KILL_EXISTING_CUSTOMER", "KILL_UNSELLABLE_ORG", "KILL_SOLVING_IN_HOUSE", "KILL_BUILD_CULTURE", "KILL_BELOW_ICP_SIZE"],
       "whyNowExtension": "KILL_SELLER_OR_COMPETITOR"
     },

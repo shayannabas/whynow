@@ -5,7 +5,7 @@ const {loadReferenceProfile,validateReferenceProfile,SIGNAL_KEYS}=require('../sc
 
 it('loads a frozen, load-only Resolve reference without seller facts or runtime state',()=>{
   const reference=loadReferenceProfile();
-  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v7-outreach-polish-2026-10-21',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
+  expect(reference).toMatchObject({schemaVersion:1,referenceProfileVersion:'resolve-ai-v8-kill-evidence-policy-2026-10-27',id:'resolve-ai',kind:'load_only_reference',loadOnly:true,seller:{name:'Resolve AI',domain:'resolve.ai'}});
   expect(reference.sellerProfile).toBeUndefined();
   expect(reference.status).toBeUndefined();
   expect(reference.provenance.customerEvidenceStatus).toBe('requires_live_research');

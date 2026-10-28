@@ -56,6 +56,7 @@ async function collectTechCulture(target, context) {
     }
   }
   const output = analyzeDocuments(documents, context.now || new Date(), context.slaConfig || {});
+  output.killHints=output.killHints.filter(row=>require('../kill-evidence.cjs').internalToolEvidence(target,row));
   return { collectorId: "tech_culture", ...output, targetPatch: {}, itemsFound: output.signals.length + output.events.length + output.killHints.length };
 }
 

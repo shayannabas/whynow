@@ -28,8 +28,14 @@ describe('SignalScout Phase A immutable parity fixture',()=>{
       const staged={...row.input,...tier,fitScore:score.fitScore,fitConfidence:score.fitConfidence,score};
       expect(score).toEqual(row.output.score);
       expect(tier).toEqual(row.output.tier);
-      expect(kills.evaluateKills(staged,config)).toEqual(row.output.kills);
-      expect(decisioning.applyDecisioning(staged,config,now)).toEqual(row.output.decision);
+      const expectedKills=row.output.kills.filter(kill=>!['KILL_BUILD_CULTURE','KILL_SOLVING_IN_HOUSE'].includes(kill.code));
+      // Owner's October 27 evidence policy deliberately rejects these historical
+      // fixture kills: the citations don't themselves establish internal tooling.
+      // Frozen SignalScout outputs remain unchanged as provenance, not a bypass.
+      expect(kills.evaluateKills(staged,config)).toEqual(expectedKills);
+      const decision=decisioning.applyDecisioning(staged,config,now);
+      if(expectedKills.length===row.output.kills.length)expect(decision).toEqual(row.output.decision);
+      else {expect(decision.kills).toEqual(expectedKills);expect(decision.primaryKill).toEqual(expectedKills[0]||null);expect(decision.fitScore).toBe(row.output.score.fitScore);expect(decision.priority).toBe(expectedKills.length?0:decisioning.priorityForAccount({...staged,kills:[],killStatus:null},now,config).priority);}
     });
   }
 });
