@@ -1,4 +1,12 @@
-# Stage 2.5 — paused; port mode is the new direction
+# Seller research status — latest checkpoint October 27, 2026
+
+Vercel is unapproved in `needs_review`: 12 customers and three first-party comparison competitors (Cloudflare, Netlify, Webflow). Offline re-materialization of saved focused outputs retained those names instead of silently losing them. Their domains are not established by saved outbound links, so all three remain blank with explicit blocking warnings. There are three blocking quality findings and zero advisories. The missing target-company-size description is a separate required editable field; `minEmployees`/100 is measurable and does not contradict an absent description. See `VERCEL-REVIEW-FIXES.md`.
+
+Gong remains an evidence-only draft. The owner authorized three GPT-5.5 research calls at 8,000 maximum output tokens and low reasoning, capped at $0.60 with at most 10 Serper queries. Free preflight on its existing 30,079-byte/171-receipt packet yields maximum reservations of $0.303230/$0.249080/$0.323510, totaling $0.875820. Output allowances alone are $0.72; no full batch can be conservatively reserved within $0.60. No partial run was started. Actual usage/cost: zero calls, zero Serper queries, zero new fetches, $0. Await the owner's cap/token decision; do not approve either seller or run Prepare demo.
+
+The existing Drive Demo Script was updated in place and walked against the real current UI. The complete offline suite passes: 59 files, 302 tests, one intentional skip. OpenAI remains disabled with a zero local limit.
+
+## Historical Stage 2.5 pause and port-mode direction
 
 Updated October 20, 2026. The owner preserved the completed offline checkpoint but paused further Stage 2.5 work. Its extractor remains a future improvement. The trimmed roadmap is superseded by a phase-gated SignalScout port; Phase A has not started.
 

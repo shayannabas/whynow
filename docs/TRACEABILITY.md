@@ -1,5 +1,17 @@
 # WhyNow traceability
 
+## UI script and saved Vercel review correction — 2026-10-27
+
+The owner accepted the UI port, requested exact script click paths, offline competitor/size correction and a bounded Gong test. The existing Drive Demo Script was edited in place without replacing its document or structure. A browser walkthrough verified Today/Daily Brief, account tabs, Scorecard-to-Accounts drilldown, the Databricks Kill Log receipt, Outreach, workspace switching, company entry and the disabled Prepare-demo gate. An inherited mobile checkbox-column rule actually hid WhyNow's account name; `styles.cjs` and a regression test correct it (`7f761ac`, passed CI).
+
+`review-organizations.cjs` v2 retains confirmed first-party comparison candidates unless rejected with a named reason and an exact supporting quote. `competitor-review.cjs`, the profile renderer and local route retain dropped candidates/reasons and provide an origin/workspace/revision-guarded Restore button. Restoration records the prior reason in the audit log, resets approval acknowledgments and leaves `needs_review`. Grounding still revalidates the saved receipt. The synthesis coordinator persists these review decisions with the draft.
+
+`rematerialize-saved-research.cjs` reapplies the current policy to cached focused outputs only, with source-set/revision guards and atomic saveState persistence, no provider client or approval path. Vercel retains 12 customers and the three source-backed Cloudflare/Netlify/Webflow competitors. Missing domains no longer discard a confirmed name; they stay blank with individual blocking warnings and are never guessed. Size identifiers are normalized only for measurement recognition, not rewritten in model output. Blank target size remains a required owner-editable field, not a contradiction. Detailed receipts and remaining warnings: `docs/VERCEL-REVIEW-FIXES.md`.
+
+New tests cover the real Vercel comparison excerpt, a synthetic positive, evidence-based versus invalid rejection, wrong-kind/invented IDs, uncertain/third-party omissions, missing-domain retention, safe restoration/audit/ack reset, HTTP origin/workspace/revision guards, measurable identifier variants, blank targets and genuine enterprise-size contradictions. Full suite: 59 files, 302 passed, one intentional skip (303 total). Implementation `564b11c` passed CI.
+
+Gong stopped at free saved-packet preflight: three 8,000-token low-reasoning calls have a $0.875820 maximum estimate, above $0.60; output allowance alone totals $0.72. Zero calls, zero Serper, zero new page fetches and $0 actual cost. The owner must reconcile settings before a batch is started. Neither seller was approved; Prepare demo was not run; persistent OpenAI remains false/zero.
+
 ## Local SignalScout UI port — 2026-10-26
 
 The owner authorized the local UI port with Luna max implementation and GPT-6.1 Sol/Astra review. `scripts/server/signalscout-styles.cjs` preserves the full public design stylesheet from SignalScout commit `130789f1bac1d5e11f5f5154f269155dc17f2d21` (only its trailing newline differs). `styles.cjs` supplies WhyNow workspace/form/responsive adaptations; no reference environment file was read or copied. README credit remains intact.
