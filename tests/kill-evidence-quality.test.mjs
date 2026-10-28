@@ -20,6 +20,7 @@ it('rejects the three real weak kill receipts and never joins an ungrounded hypo
 it('classifies a receipted category vendor separately, without killing an ordinary buyer that uses the product',()=>{
   const row={sourceId:'greenhouse',evidenceUrl:'https://job-boards.greenhouse.io/grafanalabs/jobs/6101637004',evidenceText:'Grafana Labs is the company behind Grafana Cloud, the fully managed observability platform trusted by more than 10,000 organizations.'};
   const account={name:'Grafana Labs',domain:'grafana.com',triggers:[row]},kills=evaluateKills(account,config);expect(kills[0]).toMatchObject({code:'KILL_SELLER_OR_COMPETITOR',evidenceText:row.evidenceText});expect(kills[0].reason).toContain('Grafana Labs is an adjacent observability platform vendor');
+  expect(evaluateKills({...account,triggers:[{...row,sourceId:'seller_site',evidenceUrl:'https://grafana.com/products/observability'}]},config)[0].code).toBe('KILL_SELLER_OR_COMPETITOR');
   expect(evaluateKills({name:'Buyer',domain:'buyer.com',triggers:[{...row,evidenceText:'Buyer uses the Grafana observability platform.'}]},config)).toEqual([]);
 });
 it('retains retired kill decisions as history while removing them from active kills and priority suppression',()=>{

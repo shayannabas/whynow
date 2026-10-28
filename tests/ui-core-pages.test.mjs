@@ -68,6 +68,10 @@ it('renders full-height saved email bodies and descriptive receipt labels',()=>{
   expect(html).toContain('data-autosize-draft rows="12"');expect(html).toContain('field.scrollHeight+2');
   expect(html).toContain('Acme Systems leadership report');expect(html).toContain('Resolve AI product');expect(html).toContain(`${claims.customerProofs[0].customer} quote`);
 });
+it('shows retired kill evidence separately without counting it as an active kill',()=>{
+  const {state,workspace}=uiFixture();workspace.accounts[0].killHistory=[{code:'KILL_BUILD_CULTURE',reason:'Former weak reason',reviewReason:'Receipt was product documentation, not internal tooling.',evidenceUrl:'https://acme.example/docs'}];
+  const html=killLogPage(state);expect(html).toContain('Retired after evidence review');expect(html).toContain('Former weak reason');expect(html).toContain('Original receipt');expect(html).toContain('History only');
+});
 
 it('renders Results as a distinct searchable master-detail workspace with working account tabs', () => {
   const { state } = uiFixture();

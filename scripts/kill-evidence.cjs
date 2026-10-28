@@ -25,7 +25,9 @@ function adjacentVendorEvidence(account,config){
   for(const row of evidenceRows(account)){
     const text=row.evidenceText,category=categories.find(value=>text.toLowerCase().includes(value.toLowerCase()));
     const explicitVendor=/\b(?:company behind|provider of|provides|sells|our products|our platform)\b/i.test(text);
-    if(category&&explicitVendor&&new RegExp(`\\b${escape(account.name)}\\b`,'i').test(text)&&(ownSource(account,row)||['greenhouse','lever','ashby'].includes(row.sourceId)))return {...row,category};
+    let firstParty=false;try{const host=new URL(row.evidenceUrl).hostname.replace(/^www\./,''),domain=rootDomain(account.domain||account.website);firstParty=Boolean(domain&&(host===domain||host.endsWith(`.${domain}`)));}catch{}
+    // Product pages can establish vendor status, but never internal-tool ownership.
+    if(category&&explicitVendor&&new RegExp(`\\b${escape(account.name)}\\b`,'i').test(text)&&(firstParty||['greenhouse','lever','ashby'].includes(row.sourceId)))return {...row,category};
   }
   return null;
 }
