@@ -290,3 +290,17 @@ Uncollected signals follow SignalScout exactly: the six-signal scorer assigns an
 **What changed:** this intentionally supersedes three historical Phase A fixture decisions whose citation text did not itself establish internal tooling. The original SignalScout fixture file remains unchanged; scoring/tiering and unaffected decisions retain exact parity. Phase B's frozen pure analyzer output remains a historical normalization contract, while its live adapter and the authoritative kill engine enforce the stricter policy. The load-only Resolve reference is version 8 with dated owner-policy provenance.
 
 **Worked example:** live Databricks' receipt is product documentation describing features it sells, not its internal incident tools. Its build-culture kill is retired. Grafana Labs' saved ATS text explicitly says it is the company behind an observability platform, so its active code becomes `KILL_SELLER_OR_COMPETITOR` (adjacent vendor), not `KILL_BUILD_CULTURE`. The owner explicitly identified Atlassian/Opsgenie as another adjacent incident-tooling vendor; saved Opsgenie reporting is retained as its receipt. No new source was fetched.
+
+## October 27 — desktop review helpers
+
+### `trigger-identity.cjs` and `server/display-date.cjs`
+
+**What they do:** Prevent one job from counting twice and make saved dates readable. **How they decide:** ATS provider plus job ID identifies a job across trigger types; distinct job IDs remain distinct, and ordinary events retain their own identity. Dates use the demo's Los Angeles calendar day rather than rounding elapsed hours. **What changed from SignalScout:** WhyNow adds explicit cross-type receipt identity and a shared date label without changing saved source timestamps. **Worked example:** Okta's one Principal SRE posting no longer earns two independent-trigger boosts; Coalition displays `Oct 8, 2026 · 19 days ago` on October 27.
+
+### `save-recorded-demo-drafts.cjs`
+
+**What it does:** Promotes an existing recorded passing draft into local copy-only state without another generation call. **How it decides:** Revalidate against current allowed facts and receipt gates, keep the source model/template version, require Demo merge fields and save through the normal atomic path. **What changed from SignalScout:** This is an idempotent local recovery helper, not a contact or sending integration. **Worked example:** Okta's saved GPT-5.5 output appears beside its job/product/Coinbase receipt links after a server restart; CrowdStrike uses its passing template-v2 fallback.
+
+### `run-gong-live-research.cjs`
+
+**What it does:** Runs only the owner's three-call Gong authorization. **How it decides:** Reuse saved pages, preflight schema/model/budget, reserve every call's full allowance against $0.90, persist each result, never retry and leave the profile unapproved. **What changed from SignalScout:** A durable one-use marker prevents duplicate spend, and the process restores disabled/zero OpenAI settings in a `finally` block. **Worked example:** The $0.876110 maximum fits the raised cap; actual token-priced cost is $0.222170, but zero competitors still blocks quality approval. No score or status is fabricated to disguise that gap.
