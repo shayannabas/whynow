@@ -19,7 +19,7 @@ function restoreCompetitor(state,id,{candidateId,revision,now=()=>new Date().toI
   const evidence={schemaVersion:1,value:candidate.name,sourceUrl:receipt.source.url,sourceId:receipt.sourceId,evidenceQuote:receipt.evidenceQuote,inferred:false,verification:'matched_saved_quote',reason:'Owner restored a saved, grounded competitor candidate.'},time=now();
   const next=updateWorkspace(state,id,w=>{
     const index=w.sellerProfile.competitors.length;
-    w.sellerProfile.competitors.push({name:candidate.name,domain:candidate.domain||null,domainStatus:candidate.domain?'verified':'domain_missing',...evidence});
+    w.sellerProfile.competitors.push({name:candidate.name,domain:candidate.domain||null,domainStatus:candidate.domain?'verified':'domain_missing',domainEvidence:candidate.domainEvidence||null,...evidence});
     w.sellerProfile.evidence[`competitors.${index}`]=evidence;
     w.sellerProfile.sources=[...new Set([...(w.sellerProfile.sources||[]),receipt.sourceId])];
     w.sellerProfile.approvedAt=null;w.sellerProfile.deliveryAllowed=false;w.sellerProfile.updatedAt=time;

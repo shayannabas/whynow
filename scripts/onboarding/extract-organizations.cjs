@@ -40,7 +40,7 @@ function anchors(html,baseUrl) {
     if(!href)continue;
     let url;try{url=new URL(href,baseUrl).href;}catch{continue;}
     const alts=[...match[2].matchAll(/<img\b[^>]*\balt\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)].map(item=>decode(item[1]??item[2]).replace(/\s+/g,' ').trim()).filter(Boolean);
-    result.push({url,label:text(match[2]),alts});
+    result.push({url,label:text(match[2]),alts,rawHtml:match[0]});
   }
   return result;
 }
@@ -147,6 +147,10 @@ function extractOrganizationCandidates({state,workspace,rawPages}) {
       for(const name of names){const receipt=receiptFor(receiptMap,ref.sourceId,name),domain=page?outboundDomain(page,name,sellerDomain):'';add(competitors,candidate({kind:'competitor',name,domain,sourceUrl:ref.source.url,quote:receipt?.evidenceQuote||titleValue,quoteOrigin:'comparison_title_or_heading',sourceId:ref.sourceId,receipt,
         status:receipt?'confirmed_candidate':'uncertain_candidate',foundBy:['comparison_url_or_title',...(domain?['outbound_company_link']:[])]}));}
     }
+  }
+  for(const item of [...customers,...competitors])if(item.domain){
+    const page=raw.get(item.storyUrl)||raw.get(item.sourceUrl),anchor=page&&anchors(page.text,page.url).find(row=>normalizeDomain(row.url)===item.domain);
+    if(anchor)item.domainEvidence={sourceUrl:page.url,officialUrl:anchor.url,anchorText:anchor.label,exactHtml:anchor.rawHtml,kind:'saved_outbound_company_link'};
   }
   const sort=(a,b)=>a.name.localeCompare(b.name);customers.sort(sort);competitors.sort(sort);
   return {schemaVersion:1,seller:{name:sellerName,domain:sellerDomain},rawHtml:{available:raw.size>0,pagesMatched:refs.filter(ref=>raw.has(ref.source.url)).length,sources:refs.length},customers,competitors};

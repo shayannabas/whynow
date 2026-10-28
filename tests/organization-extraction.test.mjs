@@ -56,6 +56,7 @@ it('uses a matching outbound host when a generic link label does not repeat the 
   f.raw.set(url,{url,text:'<html><title>Example Seller vs RivalCo</title><h1>Example Seller vs RivalCo</h1><a href="https://rivalco.com/">Visit website</a></html>'});
   const result=extractOrganizationCandidates({state:f.state,workspace:f.state.workspaces[f.id],rawPages:f.raw});
   expect(result.competitors).toContainEqual(expect.objectContaining({name:'RivalCo',domain:'rivalco.com',domainStatus:'verified'}));
+  expect(result.competitors.find(row=>row.name==='RivalCo').domainEvidence).toMatchObject({sourceUrl:url,officialUrl:'https://rivalco.com/',exactHtml:'<a href="https://rivalco.com/">Visit website</a>',kind:'saved_outbound_company_link'});
 });
 
 it('extracts the competitors named on the saved Vercel comparisons page',()=>{
@@ -66,4 +67,5 @@ it('extracts the competitors named on the saved Vercel comparisons page',()=>{
   const result=extractOrganizationCandidates({state,workspace:state.workspaces[id],rawPages:new Map([[page.url,{url:page.url,text:page.html}]])});
   expect(result.competitors.map(item=>item.name)).toEqual(['Cloudflare','Netlify','Webflow']);
   expect(result.competitors.every(item=>item.sourceUrl===page.url&&item.receiptId)).toBe(true);
+  expect(result.competitors.every(item=>item.domain===''&&!item.domainEvidence)).toBe(true);
 });

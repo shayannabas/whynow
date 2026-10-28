@@ -427,7 +427,8 @@ function materializeGeneratedDraft(state,workspace,output,{organizationReview,no
     const item=evidenceFor(state,workspace,raw,name,context);
     const confirmed=(organizationReview?.competitors||[]).some(row=>row.kept&&row.name===name&&row.receiptId===raw.receiptId&&require('./review-organizations.cjs').confirmedComparison(row,{seller:candidate}));
     if(!name||!domain&&!confirmed||item.inferred) { droppedCompetitors.push({name,reason:!domain?'Competitor domain was missing or invalid.':item.reason});continue; }
-    const index=profile.competitors.length;profile.competitors.push({name,domain,domainStatus:domain?'verified':'domain_missing',...item});evidence[`competitors.${index}`]=item;acceptedClaims++;receiptedClaims++;
+    const domainEvidence=(organizationReview?.competitors||[]).find(row=>row.kept&&row.name===name&&row.domain===domain)?.domainEvidence||null;
+    const index=profile.competitors.length;profile.competitors.push({name,domain,domainStatus:domain?'verified':'domain_missing',domainEvidence,...item});evidence[`competitors.${index}`]=item;acceptedClaims++;receiptedClaims++;
   }
   profile.evidence=evidence;
   profile.sources=[...new Set(Object.values(evidence).filter(item=>!item.inferred).map(item=>item.sourceId))];
