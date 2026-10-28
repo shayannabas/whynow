@@ -10,6 +10,14 @@ function fixture(){const state=loadResolveReferenceDemo(defaultState(),{now:()=>
 const fields={firstName:'Ava',title:'VP Engineering',senderFirstName:'Shayan'};
 
 describe('receipt-backed deterministic outreach',()=>{
+  it('promotes recorded merge-field drafts only after current validation, idempotently and without a send state',()=>{
+    const {state,workspace,account}=fixture(),context=outreach.buildDraftContext(workspace,account,{demoMergeField:true,senderFirstName:'Shayan'},new Date(NOW)),draft=outreach.templateDraft(context),{saveRecordedDemoDraft}=require('../scripts/save-recorded-demo-drafts.cjs');
+    const next=saveRecordedDemoDraft(state,workspace.id,account.id,draft,{model:'gpt-5.5-recorded-test',now:new Date(NOW)}),saved=next.workspaces[workspace.id].drafts[0];
+    expect(saved).toMatchObject({deliveryMode:'demo',generatedBy:'openai',model:'gpt-5.5-recorded-test',validation:{ok:true},contact:{firstName:'{{first_name}}'}});expect(saved.sentAt).toBeUndefined();expect(saved.status).not.toBe('sent');
+    expect(saveRecordedDemoDraft(next,workspace.id,account.id,draft,{model:'gpt-5.5-recorded-test',now:new Date(NOW)}).workspaces[workspace.id].drafts).toHaveLength(1);
+    expect(()=>saveRecordedDemoDraft(state,workspace.id,account.id,{...draft,body:draft.body.replace('{{first_name}}','Invented')})).toThrow('merge-field');
+    expect(()=>saveRecordedDemoDraft(state,workspace.id,account.id,{...draft,body:draft.body.replace('72%','99%')},{now:new Date(NOW)})).toThrow('validation');
+  });
   it('uses only an account-relevant active trigger and rejects the real Circle-style false positive',()=>{
     const {account}=fixture(),falsePositive={id:'bad',type:'outage_news',title:'Clarksville reports Mann Circle Water Outage',evidenceText:'Water service on Mann Circle was turned off for repair.',evidenceUrl:'https://clarksville.example/water-outage',occurredAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-11-20T00:00:00.000Z',citable:false};
     expect(outreach.triggerRelevantToAccount(account.triggers[0],account)).toBe(true);
