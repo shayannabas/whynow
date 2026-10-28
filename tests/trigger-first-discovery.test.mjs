@@ -28,6 +28,7 @@ describe('trigger-first discovery',()=>{
   it('does not classify a supply-chain company as cybersecurity from generic service/query words',()=>{
     const workspace=loadResolveReferenceDemo(defaultState()).workspaces['reference-demo-resolve-ai'];
     expect(trigger.classifySegment(workspace,{name:'Altana',domain:'altana.com'},[{title:'Altana',snippet:'The network for trusted trade. An AI-powered product network supporting businesses and governments with service delivery.'}])).toMatchObject({segment:'unclassified',requiresReview:true});
+    expect(trigger.classifySegment(workspace,{name:'Delivery Example'},[{title:'Delivery marketplace',snippet:'Real-time delivery marketplaces for local orders.'}])).toMatchObject({segment:'delivery_marketplaces',requiresReview:false});
     workspace.icpConfig.segments.push({key:'supply_chain',label:'Supply-chain AI',subIndustries:['Trade networks'],enabled:true});
     expect(trigger.classifySegment(workspace,{name:'Trade Example'},[{title:'Supply-chain AI for trade networks',snippet:'Supply chain intelligence.'}])).toMatchObject({segment:'supply_chain',requiresReview:false});
   });
