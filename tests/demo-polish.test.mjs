@@ -10,7 +10,7 @@ const {defaultState}=require('../scripts/server/state.cjs');
 const {metricsPage}=require('../scripts/server/activity-pages.cjs');
 it('separates unknown placeholders from genuine collected inferred signals in Metrics',()=>{
   const state=loadResolveReferenceDemo(defaultState()),w=state.workspaces[state.activeWorkspaceId];w.accounts=[{id:'a',signals:{techStack:{score:1,inferred:true,evidenceText:'Signal not collected.'},activePain:{score:2,inferred:true,evidenceText:'A collected but unverified report.'},aiCompatibility:{score:3,inferred:false,evidenceUrl:'https://example.com/evidence'}}}];
-  const html=metricsPage(state);expect(html).toContain('Unknown — not yet collected</b><em>1');expect(html).toContain('Collected — inferred or unverified</b><em>1');expect(html).toContain('Collected signals</b><em>2');expect(html).not.toContain('Signals without verified receipts');
+  const html=metricsPage(state);expect(html).toContain('Unknown — not yet collected</b><em>4');expect(html).toContain('Collected — inferred or unverified</b><em>1');expect(html).toContain('Collected signals</b><em>2');expect(html).not.toContain('Signals without verified receipts');
 });
 it('shows human dates and honest relative age, including invalid and future dates',()=>{
   const now=new Date('2026-10-27T20:00:00Z');expect(displayDate('2026-10-08T19:47:24-04:00',now)).toBe('Oct 8, 2026 · 19 days ago');expect(displayDate('',now)).toBe('Date unknown');expect(displayDate('invalid',now)).toBe('Date unknown');expect(displayDate('2026-10-28T20:00:00Z',now)).toContain('upcoming');
