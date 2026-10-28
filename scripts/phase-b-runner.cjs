@@ -32,7 +32,7 @@ function signalWins(current={},incoming={}){
   if(Number(incoming.score||0)!==Number(current.score||0))return Number(incoming.score||0)>Number(current.score||0);
   return Date.parse(incoming.observedAt||0)>Date.parse(current.observedAt||0);
 }
-function dedupeTriggers(rows=[]){return [...new Map(rows.filter(Boolean).map(row=>[`${String(row.type||row.triggerType||'').toLowerCase()}:${String(row.evidenceUrl||'').replace(/[?#].*$/,'')}`,row])).values()];}
+const {dedupeTriggers}=require('./trigger-identity.cjs');
 function sanitizeWhyNow(account={},config={},now=new Date()){
   const all=dedupeTriggers(account.triggers||[]).map(trigger=>trigger.decaysAt?trigger:decorateTrigger(trigger,config.slaDays||{})),history=uniq([...(account.triggerHistory||[]),...all],row=>row.id||`${row.type}:${row.evidenceUrl}:${row.occurredAt}`),targeting={buyerTitles:config.personas?.buyerTitles||[],championTitles:config.personas?.championTitles||[],triggerMapping:config.triggerMapping||{}},eligible=all.filter(trigger=>{
     if(trigger.citable===false||trigger.metadata?.citable===false||!hiringTriggerRelevance(trigger,targeting).relevant)return false;

@@ -16,6 +16,8 @@ const WHY_NOW_CSS = `
 .workspace-switcher{display:grid;gap:6px;margin:0;padding:11px;border:1px solid rgba(var(--muted-rgb),.22);border-radius:12px;background:rgba(var(--surface-rgb),.04)}
 .workspace-switcher label{margin:0;color:var(--muted-on-dark);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .workspace-switcher .workspace-control{display:flex;gap:6px;min-width:0}
+.workspace-full-name,.sidebar-footer span{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.5}
+.workspace-full-name{margin:0 0 5px;color:var(--surface);font-size:12px;font-weight:700}
 .workspace-switcher select{flex:1;min-width:0;width:100%;min-height:34px;padding:6px 30px 6px 8px;border-color:rgba(var(--muted-rgb),.34);border-radius:8px;background:#151b23;color:var(--surface);font-size:12px}
 .workspace-switcher button{flex:0 0 auto;min-height:34px;padding:6px 9px;border-color:rgba(var(--muted-rgb),.34);border-radius:8px;background:#202832;color:var(--surface);font-size:11px}
 .nav{display:grid;align-content:start;gap:3px;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:2px;scrollbar-width:thin;scrollbar-color:rgba(var(--muted-rgb),.5) transparent}
