@@ -25,4 +25,10 @@ describe('trigger-first discovery',()=>{
     expect(trigger.matchVerifiedJob({sourceUrl:'https://jobs.lever.co/acme/two',roleTitle:'Wrong title'},jobs).title).toBe('Director of Platform Engineering');
     expect(trigger.matchVerifiedJob({sourceUrl:'https://jobs.lever.co/acme/missing',roleTitle:'Senior Site Reliability Engineer'},jobs).url).toContain('/one');
   });
+  it('does not classify a supply-chain company as cybersecurity from generic service/query words',()=>{
+    const workspace=loadResolveReferenceDemo(defaultState()).workspaces['reference-demo-resolve-ai'];
+    expect(trigger.classifySegment(workspace,{name:'Altana',domain:'altana.com'},[{title:'Altana',snippet:'The network for trusted trade. An AI-powered product network supporting businesses and governments with service delivery.'}])).toMatchObject({segment:'unclassified',requiresReview:true});
+    workspace.icpConfig.segments.push({key:'supply_chain',label:'Supply-chain AI',subIndustries:['Trade networks'],enabled:true});
+    expect(trigger.classifySegment(workspace,{name:'Trade Example'},[{title:'Supply-chain AI for trade networks',snippet:'Supply chain intelligence.'}])).toMatchObject({segment:'supply_chain',requiresReview:false});
+  });
 });

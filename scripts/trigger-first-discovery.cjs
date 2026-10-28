@@ -51,10 +51,14 @@ function identityFromResults(candidate={},results=[]){
   for(const result of results){const sourceUrl=String(result.url||result.link||''),domain=rootDomain(sourceUrl),text=normalizedEntityName(`${result.title||''} ${result.snippet||''}`);if(!domain||blockedHost(domain)||ATS_HOSTS[new URL(sourceUrl).hostname.toLowerCase()])continue;const score=(wanted&&text.includes(wanted)?3:0)+(slug&&text.includes(slug)?2:0)+(wanted&&normalizedEntityName(domain).includes(wanted.replace(/\s/g,''))?2:0);if(score)rows.push({score,domain,sourceUrl,title:clean(result.title),snippet:clean(result.snippet,1000)});}
   rows.sort((a,b)=>b.score-a.score);const best=rows[0];return best?{name:candidate.name,domain:best.domain,website:`https://${best.domain}`,sourceUrl:best.sourceUrl,identityReceipt:best}:null;
 }
-function segmentTerms(segment={}){return [...new Set(`${segment.key||''} ${segment.label||''} ${(segment.subIndustries||[]).join(' ')} ${(segment.queryTemplates||[]).join(' ')}`.toLowerCase().match(/[a-z][a-z0-9]+/g)?.filter(term=>term.length>=4&&!SEGMENT_STOP.has(term))||[])];}
+function segmentTerms(segment={}){
+  // Query-template terms describe how to search, not what an organization is.
+  const generic=new Set(['service','services','platform','platforms','enterprise','enterprises','software','system','systems','cloud','engineering','engineer','hiring','technology','vertical']);
+  return [...new Set(`${segment.key||''} ${segment.label||''} ${(segment.subIndustries||[]).join(' ')}`.toLowerCase().match(/[a-z][a-z0-9]+/g)?.filter(term=>term.length>=4&&!SEGMENT_STOP.has(term)&&!generic.has(term))||[])];
+}
 function classifySegment(workspace={},candidate={},identityResults=[]){
   const config=phaseAConfigForWorkspace(workspace),seed=(workspace.universeSeeds||[]).find(row=>normalizedEntityName(row.name)===normalizedEntityName(candidate.name)||rootDomain(row.domain)===rootDomain(candidate.domain));if(seed)return {segment:seed.segment,confidence:1,requiresReview:false,reason:'workspace_curated_seed'};
-  const haystack=`${candidate.name} ${identityResults.map(row=>`${row.title||''} ${row.snippet||row.text||''}`).join(' ')}`.toLowerCase(),ranked=config.segments.filter(row=>row.enabled!==false).map(segment=>{const matched=segmentTerms(segment).filter(term=>haystack.includes(term));return {segment:segment.key,matched};}).sort((a,b)=>b.matched.length-a.matched.length);
+  const haystack=`${candidate.name} ${identityResults.map(row=>`${row.title||''} ${row.snippet||row.text||''}`).join(' ')}`.toLowerCase(),words=new Set(haystack.match(/[a-z][a-z0-9]+/g)||[]),ranked=config.segments.filter(row=>row.enabled!==false).map(segment=>{const matched=segmentTerms(segment).filter(term=>words.has(term));return {segment:segment.key,matched};}).sort((a,b)=>b.matched.length-a.matched.length);
   const best=ranked[0];if(!best||!best.matched.length)return {segment:'unclassified',confidence:0,requiresReview:true,reason:'no_segment_evidence'};
   return {segment:best.segment,confidence:Math.min(.92,.62+best.matched.length*.1),requiresReview:false,reason:'workspace_segment_terms',matchedTerms:best.matched.slice(0,8)};
 }
