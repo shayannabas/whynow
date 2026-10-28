@@ -121,8 +121,8 @@ function createLlm({read,mutate,env=process.env,fetchImpl=fetch,now=()=>new Date
         const usage=actualUsage(payload),costUsd=actualCostUsd(usage,config.model);
         if(choice?.message?.refusal)throw new LlmError('REFUSED','OpenAI declined this request. No profile was generated.',{usage,costUsd,finishReason:choice?.finish_reason});
         if(choice?.finish_reason!=='stop')throw new LlmError('INCOMPLETE','OpenAI returned incomplete output. No profile was generated.',{usage,costUsd,finishReason:choice?.finish_reason,incompleteReason:payload?.incomplete_details?.reason||choice?.incomplete_details?.reason||choice?.finish_reason});
-        let value;try {value=JSON.parse(choice.message.content);}catch {throw new LlmError('INVALID_OUTPUT','OpenAI returned invalid JSON.');}
-        check(value);
+        let value;try {value=JSON.parse(choice.message.content);}catch {throw new LlmError('INVALID_OUTPUT','OpenAI returned invalid JSON.',{usage,costUsd});}
+        try{check(value);}catch(error){error.usage=usage;error.costUsd=costUsd;throw error;}
         await mutate(state=>updateWorkspace(state,workspaceId,w=>{
           if(w.status==='archived')throw new LlmError('ARCHIVED','The workspace was archived during the request.');
           w.llmCache={...(w.llmCache||{}),[key]:{schemaVersion:1,promptVersion,model:config.model,createdAt:now(),value}};

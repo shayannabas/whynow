@@ -69,3 +69,10 @@ it('extracts the competitors named on the saved Vercel comparisons page',()=>{
   expect(result.competitors.every(item=>item.sourceUrl===page.url&&item.receiptId)).toBe(true);
   expect(result.competitors.every(item=>item.domain===''&&!item.domainEvidence)).toBe(true);
 });
+it('takes company names rather than the entire saved Gong customer-story headline',()=>{
+  const {customerNameFromPage}=require('../scripts/onboarding/extract-organizations.cjs');
+  expect(customerNameFromPage('https://www.gong.io/customers/case-studies/how-a-google-sales-team-got-hours-of-its-time-back-using-gong','Read the story','')).toBe('Google');
+  expect(customerNameFromPage('https://www.gong.io/customers/case-studies/anthropics-64-productivity-gain-combining-revenue-ai-with-a-customer-centric-gtm-strategy',"Anthropic's 64% productivity gain: Combining revenue AI with a customer-centric GTM strategy",'')).toBe('Anthropic');
+  expect(customerNameFromPage('https://www.gong.io/customers/case-studies/the-future-of-fintech-nasdaq-uses-gong-to-make-bullish-bets','The future of Fintech: Nasdaq uses Gong to make bullish bets','')).toBe('Nasdaq');
+  expect(customerNameFromPage('https://seller.example/customers/how-a-exampleco-sales-team-got-time-back','How an ExampleCo sales team got time back','')).toBe('ExampleCo');
+});
