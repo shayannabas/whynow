@@ -5,6 +5,7 @@ const {FACT_FIELDS,COLLECTIONS,WEIGHTS,LABELS,SLAS,TIER_RULES,profileWarnings,qu
 
 function renderProfilePage(state,{error='',submitted=null}={}) {
   const w=state.activeWorkspaceId?getWorkspace(state,state.activeWorkspaceId):null;
+  if(w)w.icpConfig.outreach=require('./messaging-proposals.cjs').messagingProposals(w); // View-only proposals; never persist or overwrite owner entries here.
   if(!w?.onboarding?.selectedCandidate)return shell(state,'<h1>Seller profile</h1><p>Choose a company first.</p><a href="/onboarding">Choose seller</a>','Seller profile');
   const p=w.sellerProfile,c=w.icpConfig,selected=w.onboarding.selectedCandidate;
   const quality=qualityFindings(w);

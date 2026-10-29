@@ -21,6 +21,7 @@ it('saves a complete manual draft without calling providers and fills strategy d
   expect(next.workspaces[id].icpConfig.weights.techStack).toBe(1.3);
   expect(state.workspaces[id].sellerProfile.category).toBeUndefined();
 });
+it('does not turn a suggested customer-domain prefill into a verified domain on normal Save',()=>{let state=initial();const id=state.activeWorkspaceId,f=form();state.workspaces[id].sellerProfile.customers=[{name:'Example Customer',domain:null}];state=require('../scripts/onboarding/domain-suggestions.cjs').addDomainSuggestion(state,id,{group:'customers',name:'Example Customer',domain:'example-customer.org',sourceUrl:'https://www.wikidata.org/entity/Q1',method:'Wikidata P856',evidenceQuote:'https://example-customer.org'});f.set('customers.0.value','Example Customer');f.set('customers.0.domain','example-customer.org');f.set('customers.0.url','https://example.org/customers');expect(profilePage(state)).toContain('value="example-customer.org"');const next=saveManualProfile(state,id,f);expect(next.workspaces[id].sellerProfile.customers[0].domain).toBeNull();expect(next.workspaces[id].domainSuggestions[0].status).toBe('suggested');});
 it('retains unverified claims through explicit approval and keeps delivery off',()=>{
   let state=initial();const id=state.activeWorkspaceId;state=saveManualProfile(state,id,form());
   expect(()=>approveManualProfile(state,id,{revision:1})).toThrow('Confirm');

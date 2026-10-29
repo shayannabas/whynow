@@ -4,7 +4,7 @@ const {stableId}=require('../utils.cjs');
 const {researchSourceContext,buildReceiptEvidence}=require('./validate.cjs');
 
 const SOCIAL_HOSTS=new Set(['facebook.com','instagram.com','linkedin.com','pinterest.com','tiktok.com','twitter.com','x.com','youtube.com']);
-const GENERIC_HOSTS=new Set(['github.com','google.com']);
+const GENERIC_HOSTS=new Set(['github.com','google.com','urldefense.proofpoint.com','safelinks.protection.outlook.com','bit.ly','t.co','linkprotect.cudasvc.com']);
 const GENERIC_LABEL=/^(?:app store|blog|careers?|changelog|community|contact|developer docs?|docs?|documentation|download|facebook|github|help|instagram|learn more|linkedin|privacy|read (?:more|story)|service status|shop|start|support|theme store|tiktok|twitter|x|youtube)$/i;
 const GENERIC_ALT=/^(?:arrow|avatar|brand|copy|customer|hero|icon|image|logo|mark|menu|photo|screenshot|wordmark)$/i;
 const CUSTOMER_PATH=/(?:^|\/)(?:customers?|case-stud(?:y|ies)|customer-stories|stories)(?:\/|$)|\/blog\/case-study-/i;
@@ -108,14 +108,15 @@ function outboundDomain(page,name,sellerDomain) {
   const candidates=anchors(page.text,page.url).map(anchor=>{
     const host=normalizeDomain(anchor.url),label=compact(anchor.label),hostLabel=compact(host.split('.')[0]);
     return {host,label,hostLabel,url:anchor.url};
-  }).filter(item=>item.host&&!hostMatches(item.host,sellerDomain)&&!SOCIAL_HOSTS.has(item.host)&&![...SOCIAL_HOSTS].some(host=>item.host.endsWith(`.${host}`))&&!GENERIC_HOSTS.has(item.host));
+  }).filter(item=>item.host&&!hostMatches(item.host,sellerDomain)&&!SOCIAL_HOSTS.has(item.host)&&![...SOCIAL_HOSTS].some(host=>item.host.endsWith(`.${host}`))&&![...GENERIC_HOSTS].some(host=>item.host===host||item.host.endsWith(`.${host}`)));
   const match=candidates.find(item=>item.label===normalizedName||item.label===initials&&initials.length>=2||item.label.includes(normalizedName)||normalizedName.includes(item.label)&&item.label.length>=4||item.hostLabel===normalizedName||item.hostLabel.includes(normalizedName)||normalizedName.includes(item.hostLabel)&&item.hostLabel.length>=4);
   return match?.host||'';
 }
 function receiptFor(receiptMap,sourceId,name) {
   const needle=name.toLowerCase();
   const rows=[...receiptMap.values()].filter(item=>item.sourceId===sourceId&&item.evidenceQuote.toLowerCase().includes(needle));
-  rows.sort((a,b)=>a.evidenceQuote.length-b.evidenceQuote.length);
+  const support=row=>{let brand='';try{brand=new URL(row.source.url).hostname.replace(/^www\./,'').split('.')[0];}catch{}const quote=row.evidenceQuote.toLowerCase();return Number(Boolean(brand&&quote.includes(brand)&&/\b(?:use[sd]?|using|customer|with|adopt(?:ed|ing)?|leverag\w*|benefit\w*|help\w*|partner\w*|run[sn]?)\b/.test(quote)))*10;};
+  rows.sort((a,b)=>support(b)-support(a)||a.evidenceQuote.length-b.evidenceQuote.length);
   return rows[0]||null;
 }
 function candidate({kind,name,domain='',sourceUrl,storyUrl='',quote,quoteOrigin,sourceId,receipt,status='confirmed_candidate',foundBy=[]}) {
@@ -162,4 +163,4 @@ function extractOrganizationCandidates({state,workspace,rawPages}) {
   return {schemaVersion:1,seller:{name:sellerName,domain:sellerDomain},rawHtml:{available:raw.size>0,pagesMatched:refs.filter(ref=>raw.has(ref.source.url)).length,sources:refs.length},customers,competitors};
 }
 
-module.exports={CUSTOMER_PATH,COMPARISON_PATH,rawPageMap,htmlTitle,headings,anchors,customerNameFromPage,extractOrganizationCandidates};
+module.exports={CUSTOMER_PATH,COMPARISON_PATH,rawPageMap,htmlTitle,headings,anchors,customerNameFromPage,outboundDomain,receiptFor,extractOrganizationCandidates};

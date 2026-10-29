@@ -137,7 +137,7 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
   const floor=Number(form.get('sizeFloor')||0);
   if(!Number.isInteger(floor)||floor<0||floor>10000000)throw new Error('The minimum team size must be a whole number from 0 to 10,000,000.');
   const savedPitch=workspace.icpConfig?.pitch||{};
-  const savedOutreach=workspace.icpConfig?.outreach||{};
+  const savedOutreach=require('./messaging-proposals.cjs').messagingProposals(workspace);
   const framingLibrary=lines(field(form,'outreach.framingLibrary',(savedOutreach.framingLibrary||[
     'Use a verified change to open a practical conversation.',
     'Growing technical teams often revisit workflows as responsibilities change.'
