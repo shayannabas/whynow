@@ -23,7 +23,7 @@ const {operationalPainEvidence}=require('./collectors/active-pain.cjs');
 const {evidenceBelongsToTarget}=require('./collectors/common.cjs');
 const {hiringTriggerRelevance}=require('./collectors/hiring.cjs');
 
-const defaultCollectors={collectHiring,collectActivePain,collectSerperEvidence,collectExecutiveChange,collectTechCulture,collectAiCompatibility,collectCompetitiveWedge,collectRevenueSensitivity,collectFirmographics,collectEdgarFormDUniverse};
+const defaultCollectors={collectHiring,collectActivePain,collectSerperEvidence,collectExecutiveChange,collectTechCulture,collectAiCompatibility,collectCompetitiveWedge,collectRevenueSensitivity,collectFirmographics,collectEdgarFormDUniverse,collectGdeltNews:require('./collectors/gdelt-news.cjs').collectGdeltNews};
 function phaseBSerperLimit(env={}){const requested=Number(env.PHASE_B_MAX_SERPER_QUERIES_PER_ACCOUNT);return Number.isInteger(requested)&&requested>0?Math.min(5,requested):Math.min(5,Math.max(1,serperSettings(env).perRunLimit));}
 function uniq(rows=[],key=row=>row.id||JSON.stringify(row)){return [...new Map(rows.filter(Boolean).map(row=>[key(row),row])).values()];}
 function signalWins(current={},incoming={}){
@@ -98,6 +98,7 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
       ['competitive_wedge',()=>collectors.collectCompetitiveWedge(target,{runtime,now:now(),collectorConfig})],
       ['revenue_sensitivity',()=>collectors.collectRevenueSensitivity(target,{now:now(),collectorConfig})],
     ];
+    if(env.GDELT_ENABLED==='true'&&typeof collectors.collectGdeltNews==='function')steps.push(['gdelt_news',()=>collectors.collectGdeltNews(target,{runtime,now:now(),windowDays:Number(collectorConfig.slaDays?.outage)||30,painThemeConfig:collectorConfig.painThemeConfig,slaConfig:collectorConfig.slaDays})]);
     if(env.EDGAR_ENABLED==='true')steps.push(['edgar_form_d',async()=>{const output=await collectors.collectEdgarFormDUniverse({targets:[target],runtime,now:now(),segments:collectorConfig.segments,segmentQueries:collectorConfig.edgarSegmentQueries,enabledSegments:[target.segment],enabled:true,slaConfig:collectorConfig.slaDays});return {signals:[],events:output.eventsByTargetId[target.id]||[],killHints:[],itemsFound:(output.eventsByTargetId[target.id]||[]).length,collectorErrors:output.errors};}]);
     else await updateRun(workspaceId,runId,run=>run.collectors.push({collectorId:'edgar_form_d',status:'disabled',signals:0,events:0,killHints:0,itemsFound:0}));
     for(const [collectorId,task] of steps){try{const result=await task();await apply(workspaceId,accountId,runId,collectorId,result,runtime);if(result.collectorErrors?.length)await updateRun(workspaceId,runId,run=>run.errors.push(...result.collectorErrors.map(error=>({collectorId,...safeError(error)}))));}catch(error){await fail(workspaceId,runId,collectorId,error,runtime);}}

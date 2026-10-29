@@ -11,7 +11,7 @@ const minute=60000,hour=60*minute,day=24*hour;
 const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
   ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000,16*1024*1024],['lever',20,500,6*hour,12000,16*1024*1024],['ashby',20,500,6*hour,12000,16*1024*1024],
   ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
-  ['wikidata',60,250,7*day,12000],
+  ['wikidata',60,250,7*day,12000],['gdelt',20,5500,15*minute,20000],
   ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
   ['engineering_web',20,1500,12*hour,12000],
   ['seller_site',25,1000,day,12000],['seller_customers',2,2000,30*day,12000],['robots',30,500,day,8000]
@@ -175,7 +175,7 @@ class CollectorRuntime {
         if(options.allowedRedirectDomain&&!redirectStaysInDomain(destination,options.allowedRedirectDomain))throw new CollectorHttpError('REDIRECT_BLOCKED','The request tried to redirect away from the approved company domain');
         return this.perform(source,destination,options,depth+1);
       }
-      if(!(response.status>=200 && response.status<300) && !(source==='robots' && response.status===404))throw new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);
+      if(!(response.status>=200 && response.status<300) && !(source==='robots' && response.status===404)){const error=new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);if(response.status===429){const raw=response.headers.get('retry-after'),seconds=Number(raw);error.retryAfterMs=Number.isFinite(seconds)&&seconds>0?seconds*1000:Math.max(0,Date.parse(raw||'')-this.now())||60000;}throw error;}
       const maxBytes=Number(options.maxBytes)||Number(budget.maxBytes)||2*1024*1024;
       if(Buffer.byteLength(response.text)>maxBytes)throw new CollectorHttpError('TOO_LARGE',`Page exceeds the ${Math.round(maxBytes/1024/1024)} MB limit`);
       const contentType=response.headers.get('content-type')||'';

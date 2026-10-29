@@ -1,0 +1,71 @@
+{
+  "capturedOn": "2026-10-28",
+  "gdeltFailures": [
+    {
+      "name": "Okta",
+      "error": {
+        "code": "TIMEOUT",
+        "status": null,
+        "message": "The page request timed out"
+      }
+    },
+    {
+      "name": "Coalition",
+      "error": {
+        "code": "HTTP_ERROR",
+        "status": 429,
+        "message": "Public source returned HTTP 429"
+      }
+    },
+    {
+      "name": "Altana",
+      "error": {
+        "code": "HTTP_ERROR",
+        "status": 429,
+        "message": "Public source returned HTTP 429"
+      }
+    },
+    {
+      "name": "CrowdStrike",
+      "error": {
+        "code": "HTTP_ERROR",
+        "status": 429,
+        "message": "Public source returned HTTP 429"
+      }
+    },
+    {
+      "name": "SecurityScorecard",
+      "error": {
+        "code": "HTTP_ERROR",
+        "status": 429,
+        "message": "Public source returned HTTP 429"
+      }
+    }
+  ],
+  "publisherMetadata": {
+    "sourceUrl": "https://www.gong.io/blog/the-real-build-vs-buy-question",
+    "verbatimFragment": "\"datePublished\":\"2026-08-05\""
+  },
+  "recordedTrigger": {
+    "id": "evt_72228268ab253202",
+    "type": "executive_departure",
+    "title": "CrowdStrike's CTO is leaving to launch an AI-cyber fund",
+    "evidenceUrl": "https://finance.yahoo.com/technology/ai/articles/exclusive-crowdstrikes-cto-leaving-launch-102507811.html",
+    "evidenceText": "CrowdStrike's CTO is leaving to launch an AI-cyber fund. Update: CrowdStrike CTO Steps Down, Launches New Venture Capital Fund.",
+    "occurredAt": "2026-08-20T07:00:00.000Z",
+    "sourceId": "serper",
+    "painThemes": [],
+    "metadata": {
+      "role": "CTO",
+      "route": "news",
+      "action": "departure",
+      "eventDateReported": true,
+      "followUp": "find_successor"
+    },
+    "triggerType": "executive_departure",
+    "detectedAt": "2026-08-20T07:00:00.000Z",
+    "decaysAt": "2026-11-18T07:00:00.000Z",
+    "slaDays": 90,
+    "slaKey": "default"
+  }
+}
