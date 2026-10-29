@@ -81,7 +81,9 @@ function assertSynthesisOutput(value) {
   array(profile.competitors,'sellerProfile.competitors',0,30).forEach((item,index)=>organization(item,`sellerProfile.competitors[${index}]`));
 
   const config=value.icpConfig;
-  exactKeys(config,['segments','personas','signalDefinitions','triggerMapping','killPatterns','painSources','pitch','objectionTemplates'],'icpConfig');
+  exactKeys(config,['segments','personas','signalDefinitions','triggerMapping','killPatterns','painSources','pitch','objectionTemplates',...['outreach','targetCompanySizeDescription'].filter(key=>Object.hasOwn(config,key))],'icpConfig');
+  if(config.outreach){exactKeys(config.outreach,['framingLibrary','closingQuestions'],'icpConfig.outreach');stringList(config.outreach.framingLibrary,'icpConfig.outreach.framingLibrary',3,3,500);stringList(config.outreach.closingQuestions,'icpConfig.outreach.closingQuestions',3,3,500);if(config.outreach.framingLibrary.some(row=>!/[.!]$/.test(row))||config.outreach.closingQuestions.some(row=>!row.endsWith('?'))||new Set(config.outreach.closingQuestions).size!==3)throw new SynthesisValidationError('INVALID_OUTPUT','Messaging proposals need three complete framing sentences and three different questions.');}
+  if(config.targetCompanySizeDescription!==undefined)string(config.targetCompanySizeDescription,'icpConfig.targetCompanySizeDescription',500,{empty:false});
   const labels=new Set();
   array(config.segments,'icpConfig.segments',3,10).forEach((segment,index)=>{
     const name=`icpConfig.segments[${index}]`;
@@ -224,11 +226,8 @@ function workspaceQualityFindings(value) {
   // Accept config-style identifiers without rewriting the reviewed/model output.
   const size=config.killPatterns?.sizeMetric||{},sizeLabel=normalizeWhitespace(String(size.label||'').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]+/g,' ')),targetSize=normalizeWhitespace(profile.targetCompanySize);
   if(!MEASURABLE_SIZE_PATTERN.test(sizeLabel))findings.push(finding('SIZE_METRIC_UNMEASURABLE','icpConfig.killPatterns.sizeMetric.label','sizeLabel','The minimum-size label must name a measurable unit such as employees, engineering headcount or revenue.'));
-  const labelLower=sizeLabel.toLowerCase(),floor=Number(size.floor);
-  if(/\benterprise\b/i.test(targetSize)&&!/\b(?:small|startup|all sizes?|any size)\b/i.test(targetSize)) {
-    const minimum=/revenue|\barr\b/.test(labelLower)?50_000_000:/engineer/.test(labelLower)?50:250;
-    if(Number.isFinite(floor)&&floor<minimum)findings.push(finding('SIZE_FLOOR_CONTRADICTS_TARGET','icpConfig.killPatterns.sizeMetric.floor','sizeFloor',`The proposed floor of ${floor} conflicts with an enterprise target for this measurement.`));
-  }
+  const floor=Number(size.floor);
+  if(require('./size-rule.cjs').sizeFloorContradictsTarget(targetSize,sizeLabel,floor))findings.push(finding('SIZE_FLOOR_CONTRADICTS_TARGET','icpConfig.killPatterns.sizeMetric.floor','sizeFloor',`The minimum of ${floor} exceeds the target's explicit maximum for this measurement.`));
   if(!(config.personas?.buyerTitles||[]).length)findings.push(finding('MISSING_BUYER_PERSONAS','icpConfig.personas.buyerTitles','buyerTitles','At least one buyer title is required before approval.'));
   if(!(config.personas?.championTitles||[]).length)findings.push(finding('MISSING_CHAMPION_PERSONAS','icpConfig.personas.championTitles','championTitles','At least one champion title is required before approval.'));
   for(const key of ['category','productOneLiner','pricingModel'])if(profile[key]&&sloganLike(profile[key]))findings.push(finding('SLOGAN_LIKE_FACT',`sellerProfile.${key}`,key,'This reads like a headline or marketing slogan rather than a precise seller fact.','advisory'));
@@ -395,6 +394,7 @@ function materializeGeneratedDraft(state,workspace,output,{organizationReview,no
     const value=clean(output.sellerProfile[key].value), item=evidenceFor(state,workspace,output.sellerProfile[key],value,context);
     profile[key]=value;evidence[key]=item;if(value)count(item);
   }
+  if(!profile.targetCompanySize&&output.icpConfig.targetCompanySizeDescription){profile.targetCompanySize=clean(output.icpConfig.targetCompanySizeDescription,500);evidence.targetCompanySize={value:profile.targetCompanySize,inferred:true,verification:'icp_proposal',sourceUrl:null,sourceId:null,evidenceQuote:'',reason:'Editable targeting proposal, not a researched seller claim. Confirm or edit before approval.'};}
   for(const key of LIST_FACT_KEYS) {
     profile[key]=[];const seen=new Set();
     for(const raw of output.sellerProfile[key]) {
@@ -459,7 +459,7 @@ function materializeGeneratedDraft(state,workspace,output,{organizationReview,no
     triggerMapping:{pain_event:dedupeStrings(rawConfig.triggerMapping.pain_event),buying_intent:dedupeStrings(rawConfig.triggerMapping.buying_intent),function_roles:dedupeStrings(rawConfig.triggerMapping.function_roles),tech_adoption:dedupeStrings(rawConfig.triggerMapping.tech_adoption),competitor_names:profile.competitors.map(item=>item.name)},
     killPatterns:{solvingInHouse:dedupeStrings(rawConfig.killPatterns.solvingInHouse),buildCulture:dedupeStrings(rawConfig.killPatterns.buildCulture),sizeMetric:{label:clean(rawConfig.killPatterns.sizeMetric.label,100),floor:rawConfig.killPatterns.sizeMetric.floor}},
     painSources:{...rawConfig.painSources},pitch:{receiptOpenerStyle:clean(rawConfig.pitch.receiptOpenerStyle,500),oneSentenceProduct:profile.productOneLiner,credentialLine:clean(rawConfig.pitch.credentialLine,500),ctaStyle:clean(rawConfig.pitch.ctaStyle,500)},
-    objectionTemplates:dedupeStrings(rawConfig.objectionTemplates,3,500),weights:{...WEIGHTS},slaDays:{...SLAS},tierRules:structuredClone(DEFAULT_TIER_RULES),defaultsReviewRequired:true};
+    objectionTemplates:dedupeStrings(rawConfig.objectionTemplates,3,500),...(rawConfig.outreach?{outreach:structuredClone(rawConfig.outreach)}:{}),weights:{...WEIGHTS},slaDays:{...SLAS},tierRules:structuredClone(DEFAULT_TIER_RULES),defaultsReviewRequired:true};
   if(config.objectionTemplates.length!==3)throw new SynthesisValidationError('INVALID_OUTPUT','Three different objection templates are required.');
   const report={schemaVersion:1,attemptedClaims,acceptedClaims,receiptedClaims,receiptCoverage:attemptedClaims?receiptedClaims/attemptedClaims:0,warnings,droppedCustomers,droppedCompetitors,
     qualityFindings:workspaceQualityFindings({sellerProfile:profile,icpConfig:config})};

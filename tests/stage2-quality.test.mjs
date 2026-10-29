@@ -82,7 +82,8 @@ describe('ICP quality guards',()=>{
 
   it('flags the real Vercel revision 1 failures without rewriting the fixture',()=>{
     const vercel=vercelRevision1,before=JSON.stringify(vercel),findings=workspaceQualityFindings(vercel),codes=new Set(findings.map(item=>item.code));
-    for(const code of ['EMPTY_CUSTOMERS','EMPTY_COMPETITORS','RECEIPT_NAVIGATION_BOILERPLATE','RECEIPT_QUOTE_TOO_SHORT','RECEIPT_NO_CLAIM_OVERLAP','RECEIPT_PARTNER_SOURCE','SIZE_METRIC_UNMEASURABLE','SIZE_FLOOR_CONTRADICTS_TARGET','SLOGAN_LIKE_FACT','VENDOR_SEEKING_QUERY','KILL_LOOKS_LIKE_BUYING_PAIN'])expect(codes.has(code),code).toBe(true);
+    for(const code of ['EMPTY_CUSTOMERS','EMPTY_COMPETITORS','RECEIPT_NAVIGATION_BOILERPLATE','RECEIPT_QUOTE_TOO_SHORT','RECEIPT_NO_CLAIM_OVERLAP','RECEIPT_PARTNER_SOURCE','SIZE_METRIC_UNMEASURABLE','SLOGAN_LIKE_FACT','VENDOR_SEEKING_QUERY','KILL_LOOKS_LIKE_BUYING_PAIN'])expect(codes.has(code),code).toBe(true);
+    expect(codes.has('SIZE_FLOOR_CONTRADICTS_TARGET')).toBe(false); // Qualitative Enterprise is not an explicit maximum.
     expect(Object.values(vercel.sellerProfile.evidence).some(item=>item.sourceUrl?.includes('/customers'))).toBe(false);
     expect(JSON.stringify(vercel)).toBe(before);
   });

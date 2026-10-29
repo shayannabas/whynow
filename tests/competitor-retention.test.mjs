@@ -80,7 +80,7 @@ it('recognizes measurable size identifiers, keeps blank target size editable/mis
     expect(workspaceQualityFindings(workspace).filter(row=>row.code.startsWith('SIZE_')),label).toEqual([]);
   }
   expect(approvalProblems(workspace)).toContain('Describe the target company size.');expect(profilePage(state)).toContain('a blank value is not a size contradiction');
-  workspace.sellerProfile.targetCompanySize='Enterprise';workspace.icpConfig.killPatterns.sizeMetric={label:'minEmployees',floor:10};
+  workspace.sellerProfile.targetCompanySize='Startups under 50 employees';workspace.icpConfig.killPatterns.sizeMetric={label:'minEmployees',floor:100};
   expect(workspaceQualityFindings(workspace).map(row=>row.code)).toContain('SIZE_FLOOR_CONTRADICTS_TARGET');
   workspace.icpConfig.killPatterns.sizeMetric.label='Small businesses';expect(workspaceQualityFindings(workspace).map(row=>row.code)).toContain('SIZE_METRIC_UNMEASURABLE');
 });
