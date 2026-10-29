@@ -1,0 +1,2 @@
+import {createRequire} from 'node:module';import {it,expect} from 'vitest';const require=createRequire(import.meta.url),{customerNameFromPage}=require('../scripts/onboarding/extract-organizations.cjs'),fixture=require('./fixtures/onboarding/gong-story-titles-oct28.json');
+it('extracts organizations, not benefit headlines, from independently recorded Gong titles',()=>{for(const row of fixture.pages)expect(customerNameFromPage(row.url,row.title,''),row.url).toBe(row.expectedName);});

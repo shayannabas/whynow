@@ -66,10 +66,12 @@ function customerNameFromPage(url,titleValue,html) {
   else if(segments[0]==='blog'&&segments[1]?.startsWith('case-study-'))slug=segments[1].slice('case-study-'.length);
   const title=text(titleValue||htmlTitle(html)),heading=headings(html)[0]||'';
   for(const value of [title,heading]) {
-    const possessive=value.match(/^(.+?)[’']s\s+\d+(?:%|\b)/i)?.[1],uses=value.match(/^The future of [^:]+:\s*(.+?)\s+uses\b/i)?.[1];
+    const possessive=value.match(/^(?:How\s+)?(.+?)[’']s\s+/i)?.[1],uses=value.match(/^The future of [^:]+:\s*(.+?)\s+uses\b/i)?.[1];
     if(possessive||uses)return meaningfulName(possessive||uses);
     const team=value.match(/^How an? (.+?) (?:sales|revenue|marketing|support) team (?:got|saved|gained)\b/i)?.[1];if(team)return meaningfulName(team);
-    let found=meaningfulName(value.match(/^How (.+?) (?:ships|shipped|serves|went|uses|built|moved|scaled|grew|runs|powers|transformed|wins)\b/i)?.[1]);
+    const watched=value.match(/^Watch (.+?) use\b/i)?.[1];if(watched)return meaningfulName(watched);
+    const benefited=value.match(/^.+?\bbrings\s+([A-Z][A-Za-z0-9&.-]+)\s+(?:a|an|the|\d)/)?.[1];if(benefited)return meaningfulName(benefited);
+    let found=meaningfulName(value.match(/^(?:How )?(.+?) (?:ships|shipped|serves|went|uses|used|built|moved|scaled|grew|runs|powers|transformed|wins|unified|accelerates|sees|leaves)\b/i)?.[1]);
     if(found){if(/^the\s/.test(found))found=`T${found.slice(1)}`;return found;}
   }
   if(slug) {
@@ -133,7 +135,7 @@ function extractOrganizationCandidates({state,workspace,rawPages}) {
     if(isStory) {
       const name=customerNameFromPage(ref.source.url,titleValue,html||ref.source.text),receipt=receiptFor(receiptMap,ref.sourceId,name),domain=page?outboundDomain(page,name,sellerDomain):'';
       add(customers,candidate({kind:'customer',name,domain,sourceUrl:ref.source.url,quote:receipt?.evidenceQuote||titleValue,quoteOrigin:'saved_page_title',sourceId:ref.sourceId,receipt,
-        status:receipt?'confirmed_candidate':'uncertain_candidate',foundBy:['customer_story_url','page_title',...(domain?['outbound_company_link']:[])]}));
+        status:receipt&&name.split(/\s+/).length<=5?'confirmed_candidate':'uncertain_candidate',foundBy:['customer_story_url','page_title',...(domain?['outbound_company_link']:[])]}));
     }
     if(page&&/^\/(?:customers?(?:\/case-studies)?|case-studies)\/?$/i.test(pathname)) {
       for(const anchor of anchors(page.text,page.url)) {

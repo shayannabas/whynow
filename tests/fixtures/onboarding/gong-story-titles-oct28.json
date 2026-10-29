@@ -1,0 +1,13 @@
+{
+  "capturedOn": "2026-10-28",
+  "method": "Titles read directly from robots-aware Gong page responses, not extractor output.",
+  "pages": [
+    {"url":"https://www.gong.io/customers/case-studies/atlassian-build-vs-buy-boost-meddpicc-use","title":"How Atlassian’s build vs buy decision drove an 820% boost in MEDDPICC use","expectedName":"Atlassian"},
+    {"url":"https://www.gong.io/customers/case-studies/yotpo-unified-revenue-teams","title":"How Yotpo unified its revenue teams in one operating system","expectedName":"Yotpo"},
+    {"url":"https://www.gong.io/customers/case-studies/gong-for-cs-appen-wants-it-loves-it-needs-it","title":"Watch Appen use Gong to onboard CSMs 4 months faster - Gong","expectedName":"Appen"},
+    {"url":"https://www.gong.io/customers/case-studies/element451-accelerates-sales-performance-driving-a-131-increase-in-arr-with-gong-ai","title":"Element451 accelerates sales performance, driving a 131% increase in ARR with Gong AI","expectedName":"Element451"},
+    {"url":"https://www.gong.io/customers/case-studies/absorb-software-sees-30-revenue-boost-by-adopting-gen-ai-for-productivity-gains-and-improving-buyer-experience","title":"Absorb Software sees 30% revenue boost by adopting gen AI for productivity gains and improving buyer experience - Gong","expectedName":"Absorb Software"},
+    {"url":"https://www.gong.io/customers/case-studies/how-softserve-used-gong-to-adapt-and-align-their-teams","title":"How SoftServe Used Gong to Adapt and Align Their Teams - Gong","expectedName":"SoftServe"},
+    {"url":"https://www.gong.io/customers/case-studies/thoughtspot-leaves-telephone-game","title":"ThoughtSpot Leaves Behind \"The Telephone Game\" with Gong - Gong","expectedName":"ThoughtSpot"}
+  ]
+}
