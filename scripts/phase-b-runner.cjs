@@ -73,7 +73,7 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
     const merged=mergeCollectorResult(workspace.accounts[index],result,runId),config=phaseAConfigForWorkspace(workspace),sanitized=sanitizeWhyNow(merged,config,now());workspace.accounts[index]=scoreAccount(sanitized,config,now());
     const run=findRun(workspace,runId);run.collectors.push({collectorId,status:'complete',signals:(result.signals||[]).length,events:(result.events||[]).length,killHints:(result.killHints||[]).length,itemsFound:Number(result.itemsFound||0)});persistRuntime(workspace,runtime);return state;
   });
-  const fail=async(workspaceId,runId,collectorId,error,runtime)=>updateRun(workspaceId,runId,(run,workspace)=>{run.collectors.push({collectorId,status:'error',signals:0,events:0,killHints:0,itemsFound:0});run.errors.push({collectorId,...safeError(error)});persistRuntime(workspace,runtime);});
+  const fail=async(workspaceId,runId,collectorId,error,runtime)=>updateRun(workspaceId,runId,(run,workspace)=>{run.collectors.push({collectorId,status:error.sourceStatus==='temporarily_unavailable'?'temporarily_unavailable':'error',signals:0,events:0,killHints:0,itemsFound:0});run.errors.push({collectorId,...safeError(error)});persistRuntime(workspace,runtime);});
   async function execute(workspaceId,accountId,runId){
     await updateRun(workspaceId,runId,run=>{run.status='running';});
     const state=read(),workspace=state.workspaces[workspaceId],account=workspace?.accounts.find(row=>row.id===accountId),collectorConfig=collectorConfigForWorkspace(workspace),target=collectorTargetForAccount(account,collectorConfig),runtime=runtimeFactory({env});

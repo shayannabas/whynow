@@ -6,7 +6,7 @@ const ACCOUNT_STATUSES=['new','working','skipped'];
 const GOOD_FIT_THRESHOLD=40;
 function latestTrigger(account={},now=new Date()){return activeTriggers(account,now).sort((a,b)=>(Date.parse(b.occurredAt||b.detectedAt||'')||0)-(Date.parse(a.occurredAt||a.detectedAt||'')||0))[0]||null;}
 function whyNow(account={},now=new Date()){
-  const trigger=latestTrigger(account,now);if(trigger)return {line:String(trigger.title||trigger.evidenceText||trigger.type||'Fresh public signal.'),receipt:String(trigger.evidenceUrl||''),kind:String(trigger.type||trigger.triggerType||'signal')};
+  const trigger=latestTrigger(account,now);if(trigger){const receipt=require('./collectors/ats-receipts.cjs').primaryTriggerReceipt(trigger);return {line:String(trigger.title||trigger.evidenceText||trigger.type||'Fresh public signal.'),receipt:receipt.url,receiptLabel:receipt.label,originalReceipt:receipt.originalUrl,kind:String(trigger.type||trigger.triggerType||'signal')};}
   return {line:'No active why-now signal yet — refresh this account.',receipt:String(account.sourceUrl||account.discoveryQuality?.sourceUrl||''),kind:'none'};
 }
 function queueSort(left,right){
