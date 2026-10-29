@@ -29,6 +29,7 @@ function claimHasVerbatimReceipt(claim={},key='value'){const value=clean(claim?.
 function includesAccountName(text='',account={}){const name=String(account.discoveryQuality?.targetAccountName||account.name||'').trim();return Boolean(name&&new RegExp(`\\b${escaped(name)}\\b`,'i').test(String(text)));}
 function triggerRelevantToAccount(trigger={},account={}){
   if(!publicHttps(trigger.evidenceUrl)||trigger.citable===false||trigger.metadata?.citable===false)return false;
+  if(require('./collectors/ats-receipts.cjs').atsReceiptMatchesAccount(trigger,account))return true;
   const sourceDomain=rootDomain(trigger.evidenceUrl),accountDomain=rootDomain(account.domain||account.website);if(sourceDomain&&accountDomain&&(sourceDomain===accountDomain||sourceDomain.endsWith(`.${accountDomain}`)))return true;
   const text=`${trigger.title||''} ${trigger.evidenceText||''}`,name=String(account.discoveryQuality?.targetAccountName||account.name||'').trim();
   if(name.split(/\s+/).length>1)return includesAccountName(text,account);
