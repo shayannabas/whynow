@@ -240,7 +240,7 @@ async function discoverAts(target, runtime) {
     if (!candidate.url) continue;
     try {
       const { value } = await runtime.requestJson(candidate.url, candidate.provider);
-      const jobs = normalizeJobs(candidate.provider, value);
+      const jobs = normalizeJobs(candidate.provider, value).map(job=>require('./ats-receipts.cjs').normalizeJobReceipt(candidate.provider,candidate.slug,job));
       if (jobs.length || target.ats?.provider === candidate.provider) return { ...candidate, jobs };
     } catch {
       // Probe the next public ATS endpoint; failures remain visible in source usage.
@@ -253,6 +253,7 @@ async function collectHiring(target, context) {
   const match = await discoverAts(target, context.runtime);
   if (!match) return { collectorId: "hiring", signals: [], events: [], targetPatch: {}, itemsFound: 0 };
   const output = jobSignals(target, match.provider, match.jobs, context.now || new Date(), context.painThemeConfig || {}, context.slaConfig || {});
+  for(const item of [...output.events,...output.signals]){const job=match.jobs.find(job=>String(job.id)===String(item.metadata?.jobId));if(job?.companyCareersUrl)item.metadata={...item.metadata,companyCareersUrl:job.companyCareersUrl};}
   const now = context.now || new Date();
   const velocityEvents = atsVelocityEvents(target, match.provider, match.jobs, now, context.slaConfig || {});
   const snapshot = hiringSnapshot(match.provider, match.jobs, now);
