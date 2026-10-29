@@ -1,6 +1,6 @@
 {
   "capturedOn": "2026-10-28",
-  "method": "Titles read directly from robots-aware Gong page responses, not extractor output.",
+  "method": "Titles read directly from robots-aware Gong page responses, not extractor output. This is a title-parser fixture, not a complete onboarding scenario.",
   "pages": [
     {"url":"https://www.gong.io/customers/case-studies/atlassian-build-vs-buy-boost-meddpicc-use","title":"How Atlassian’s build vs buy decision drove an 820% boost in MEDDPICC use","expectedName":"Atlassian"},
     {"url":"https://www.gong.io/customers/case-studies/yotpo-unified-revenue-teams","title":"How Yotpo unified its revenue teams in one operating system","expectedName":"Yotpo"},
