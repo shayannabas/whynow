@@ -1,5 +1,27 @@
 # WhyNow — build checklist
 
+Latest checkpoint, October 28, 2026: **offline new-seller discovery is implemented; live Vercel rerun awaits owner OK.** 74 files, 365 passed/1 intentional skip (366 total). Zero research-provider calls in this checkpoint. Local port 3000 is running, OpenAI false/zero. No seller approval changed.
+
+## New-seller discovery — offline checkpoint
+
+- [x] Read approved workspace buyer/champion/function roles and technologies; build up to 18 Greenhouse/Lever/Ashby queries without Resolve-only search constants.
+- [x] Verify the actual ATS job ID and date; reject early-career/missing/future/expired/closed jobs. Senior jobs mentioning mentorship of juniors still pass.
+- [x] Require a first-party operating-company identity/domain; ambiguous names need review. Reject docs/blogs/job boards/frameworks/projects/seller properties.
+- [x] Reject all seven saved Vercel candidates in offline tests, with synthetic operating-employer positives through all three ATS providers. No domain blacklist.
+- [x] First-party-confirmed adjacent vendors become specific retained Kill Log records; snippet-only vendor candidates are not asserted as facts. Exclude known customers/competitors before buyer promotion.
+- [x] Classify employer, collect free size evidence, score/tier/kill and queue. Unknown/ambiguous/stale size or segment remains Needs review. Empty enrichment cannot erase valid unexpired size receipts.
+- [x] Prepare demo uses the shared new-seller hard cap 100; refresh at most ten verified buyers and exclude prior unverified page records. Persist every reserved query, rejection and source.
+- [x] Coalition's primary Today/account link opens saved job text, with original ATS link retained. Browser verified locally, no source calls.
+- [x] GDELT exponential backoff/Retry-After, exactly one retry on 429, five API attempts maximum/check, explicit temporarily unavailable status. Recorded/fake-clock tests only.
+- [x] Saved Resolve hiring replay: Okta/Coalition remain valid role/window examples. Altana's role matches but its 2019 corporate size receipt is unsafe; view now puts it in Needs review. SecurityScorecard stays closed/historical.
+- [x] Full suite: 365 passed, one intentional skip across 74 files. Discovery pipeline f0b85f5 passed CI; query-preview wording is aa3c5e8. No approval or live research.
+- [ ] Owner OK, then one Vercel Prepare demo: 18 ATS + up to 10 identity + 10 size + 50 refresh = 88 planned queries, hard stop 100. Goal 3–5 genuine Act now; report fewer honestly.
+- [ ] Separate existing issue: legacy executive_departure uses the default 90-day window instead of exec_change/30. CrowdStrike is not a 30-day freshness proof; this checkpoint does not claim that alias/history migration is fixed.
+
+Exact queries, gates, limits and evidence: [proposed discovery plan](DISCOVERY-TRIGGER-FIRST-PLAN.md). The existing Drive Demo Script/checklist are updated once at close-out, retaining their same IDs.
+
+## Earlier October 28 live-research close-out
+
 Updated: October 28, 2026. Local, send-free portfolio demo. Vercel is owner-approved at revision 5, with owner messaging preserved; its one Prepare demo run used 60/150 Serper queries but produced 0 Act now, 0 Worth researching and 7 Needs review candidates. Discovery quality is still insufficient for this seller. Gong's authorized three-call rerun cost $0.375920 under the raised $1.20 cap; it remains needs_review with 10 customers/0 competitors and 2 blocking/0 advisory. Full regression: 72 files, 340 passed, one intentional skip (341 total). OpenAI is disabled/zero. No agent approval, sending or deployment occurred.
 
 ## October 28 — review gaps, live preparation and Gong quality

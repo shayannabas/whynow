@@ -1,5 +1,21 @@
 # WhyNow traceability
 
+## Any-seller ATS discovery — offline checkpoint, 2026-10-28
+
+`workspace-hiring.cjs` derives buyer/champion/function-role batches and technology filters from the approved workspace. `trigger-first-discovery.cjs` verifies provider job IDs/dates, uses guarded first-party employer pages and requires unambiguous domain identity. Live-only normalization preserves frozen pure provider outputs; seniority variations do not change researched facts. Early-career title checks avoid rejecting senior mentorship descriptions.
+
+`company-identity.cjs` rejects page headlines, docs/resources, job boards, frameworks/projects and seller properties. It distinguishes product vendors from buyers using the same technology and requires first-party evidence for a final vendor kill. `kills.cjs` retains those sourced exclusions with account-specific reasons. Search snippets from the seven prior Vercel records are explicitly labeled; all seven fail offline, but the two vendor candidates are not mislabeled as first-party-confirmed facts.
+
+`trigger-first-runner.cjs` persists query reservations/rejections, saved ATS text, company sources and retained vendor accounts. `discovery-runner.cjs` selects this path for sellers without curated seeds. `prepare-demo.cjs` shares a maximum 100-query budget, and `refresh-all-runner.cjs` refreshes only the admitted buyer IDs. A changed approved revision blocks later queries/promotion. Previous broad candidates are quarantined on the eventual authorized run, never deleted.
+
+`account-lifecycle.cjs` keeps ambiguous segments, rejected identities and outdated corporate-report size under Needs review. The Altana saved hiring text describes trusted trade, while its 6,476-person size receipt points to a 2019 corporate report; it is not a valid complete Resolve proof. `phase-b-runner.cjs` preserves unexpired receipted firmographics when another collector returns unknown.
+
+Primary saved ATS receipts are shared across Today/account views, with external originals secondary. GDELT has one 429 retry, Retry-After/exponential cooldown, a five-attempt check limit and explicit temporarily unavailable status. Tests use recorded failures and injected clocks; no live success is claimed.
+
+New tests cover seven real negative candidates, synthetic positive employer flows through Greenhouse/Lever/Ashby, saved Resolve role replay, domain ambiguity, vendor/buyer distinction, exclusions, source dates, zero-result handling, budgets, revision changes and receipt rendering. Full suite: 74 files, 365 passed/1 skip. Pipeline code f0b85f5 passed CI; UI preview wording aa3c5e8 is also locally green.
+
+Live research remains unrun and requires owner OK to [the exact 18-query plan](DISCOVERY-TRIGGER-FIRST-PLAN.md). Existing legacy executive-departure/default-SLA alias behavior is separately recorded, not presented as a fixed 30-day event window. No profile approval, paid generation or external collection occurred.
+
 ## Review gaps and bounded live checks — 2026-10-28
 
 Owner-approved Vercel revision 5 and its manually entered messaging remain unchanged. The one-use Prepare demo runner used the normal background discovery/refresh/rank path and persistent budgets: 60 queries, seven candidates, zero Act now/Worth researching, seven Needs review, zero kills. The report explicitly flags project/job-board/title/adjacent-vendor noise; this is not a successful usable-prospect result.

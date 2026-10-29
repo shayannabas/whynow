@@ -1,5 +1,17 @@
 # WhyNow SignalScout port notes
 
+## New-seller discovery — October 28 offline checkpoint
+
+**What it does:** `workspace-hiring.cjs` and the shared trigger-first runner start with a job opening instead of a broad company-page search. **How it decides:** use approved personas/functions/technologies, verify the actual ATS job/date, identify its operating employer from a first-party page, classify it, then apply free sizing, exclusions, scorecard, tiers and kills. **What changed from SignalScout:** Resolve's fixed SRE search phrases become workspace data; strict WhyNow robots/network/budget guards remain. **Example:** a synthetic commerce company hiring a Staff Frontend Engineer with Next.js passes Vercel targeting across all three ATS formats. A graduate role or missing posting does not.
+
+**What the company gate does:** `company-identity.cjs` separates a company from a page, project or vendor. **How it decides:** a domain/name keyword alone is insufficient; same-name domains require disambiguation, and final vendor status needs a first-party product statement tied to the seller's approved capabilities. **What changed:** no page-title promotion or domain blacklist, and the seven saved Vercel failures have explicit negative fixtures. **Example:** Approximated's saved snippet makes it a vendor candidate; only a fetched first-party product receipt can produce its final vendor kill. An ecommerce company merely using custom domains still passes.
+
+**What the coordinator does:** persist each query, source, rejection and admitted account, then refresh only verified buyers under one 100-query hard ceiling. **How it decides:** current Vercel plan budgets 18 ATS searches, up to ten identity/ten size searches and fifty refresh queries; stale profile revisions stop promotion. **What changed:** unknown enrichment cannot erase valid size receipts, old broad candidates remain quarantined history, and zero verified buyers produces an honest zero result. **Example:** a prior Next.js documentation result cannot be refreshed into a buyer merely because it has a saved account ID.
+
+**What receipt/backoff helpers do:** lead with saved ATS job text and bound GDELT 429 retries. **How they decide:** keep original URL/capture date; respect Retry-After/exponential delays, retry once, max five API attempts/check, then temporarily unavailable. **What changed:** WhyNow exposes readable receipt alternatives and failure state rather than assuming a redirect works or unavailable news means no event. **Example:** Coalition's Today receipt opens saved job text; no source request is needed during an interview.
+
+Saved Resolve replay remains honest: Okta/Coalition are valid ATS examples; Altana's role matches but its 2019 corporate sizing needs review. The separate legacy executive-departure SLA alias issue is tracked in the discovery plan, not silently treated as verified freshness.
+
 ## October 28 — review quality and source availability
 
 ### Targeting proposals, size bounds and measurement
