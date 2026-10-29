@@ -49,7 +49,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
     json(res,200,{schemaVersion:1,workspaceId:workspace.id,workspaceStatus:workspace.status,research:workspace.research,providers});return true;
   }
 
-  const allowed=new Set(['/onboarding/start','/onboarding/resolve','/onboarding/confirm','/onboarding/profile/save','/onboarding/profile/approve','/onboarding/profile/restore-competitor','/onboarding/research/confirm','/onboarding/research/retry','/onboarding/research/generate','/onboarding/refresh/approve','/onboarding/refresh/reject']);
+  const allowed=new Set(['/onboarding/start','/onboarding/resolve','/onboarding/confirm','/onboarding/profile/save','/onboarding/profile/approve','/onboarding/profile/restore-competitor','/onboarding/profile/confirm-domain','/onboarding/research/confirm','/onboarding/research/retry','/onboarding/research/generate','/onboarding/refresh/approve','/onboarding/refresh/reject']);
   if(req.method!=='POST'||!allowed.has(pathname)){json(res,404,{error:'Page not found'});return true;}
   if(req.headers.origin!==`http://${req.headers.host}`){json(res,403,{error:'Use the local page form'});return true;}
   let form;
@@ -91,6 +91,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
         if(current.activeWorkspaceId!==id)throw new Error('Workspace changed. Refresh and try again.');
         const qualityReasons=Object.fromEntries([...form].filter(([key])=>key.startsWith('qualityReason.')).map(([key,value])=>[key.slice('qualityReason.'.length),value]));
         if(pathname.endsWith('/restore-competitor'))return restoreCompetitor(current,id,{candidateId:form.get('candidateId'),revision:form.get('revision')});
+        if(pathname.endsWith('/confirm-domain'))return require('./domain-suggestions.cjs').confirmDomain(current,id,{suggestionId:form.get('suggestionId'),revision:form.get('revision')});
         return pathname.endsWith('/save')?saveManualProfile(current,id,form):approveManualProfile(current,id,{revision:form.get('revision'),acknowledged:form.has('acknowledged'),qualityReasons});
       });
       redirect('/onboarding/profile');

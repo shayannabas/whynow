@@ -86,9 +86,11 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
       if(group==='customers'||group==='competitors') {
         if(!item.sourceUrl)throw new Error(`${COLLECTIONS[group]} require a source link for every entry.`);
         let domain=text(row.domain,253).toLowerCase().replace(/^www\./,'');
+        const savedOrganization=workspace.sellerProfile[group]?.find(item=>item.name===value),suggestion=require('./domain-suggestions.cjs').pendingDomain(workspace,group,value);
+        if(!savedOrganization?.domain&&suggestion?.domain===domain)domain=''; // A normal Save must not silently confirm a prefill.
         if(domain && !/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/.test(domain))throw new Error('Enter a domain such as company.com, without a path.');
         if(group==='competitors'&&!domain)throw new Error('Each competitor needs its domain.');
-        profile[group].push({name:value,domain:domain||null,...item});
+        profile[group].push({name:value,domain:domain||null,...(savedOrganization?.domain===domain&&savedOrganization.domainEvidence?{domainEvidence:structuredClone(savedOrganization.domainEvidence),domainStatus:savedOrganization.domainStatus}:{}),...item});
       } else if(group==='proofPoints') profile[group].push({claim:value,...item});
       else profile[group].push(value);
     });
