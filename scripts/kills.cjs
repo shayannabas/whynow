@@ -26,6 +26,8 @@ function evaluateKills(account={},config={}) {
   const competitor=(config.competitors||[]).find(row=>organizationMatch(account,row));
   if((sellerMatch||competitor)&&(sellerMatch?config.seller?.domain:competitor?.sourceUrl||competitor?.domain))add('KILL_SELLER_OR_COMPETITOR',sellerMatch?`${account.name} is the seller, not a prospect.`:`${account.name} is a configured competitor, not a prospect.`,sellerMatch?`https://${config.seller.domain}`:(competitor.sourceUrl||`https://${competitor.domain}`),sellerMatch?'Seller identity from the active workspace.':'Competitor identity from the active workspace.');
   const vendor=adjacentVendorEvidence(account,config);
+  const discoveryVendor=account.discoveryVendorEvidence;
+  if(discoveryVendor?.verifiedFirstParty&&require('./entity-rules.cjs').rootDomain(discoveryVendor.evidenceUrl)===require('./entity-rules.cjs').rootDomain(account.domain)&&require('./company-identity.cjs').adjacentOffering(discoveryVendor.evidenceText,config))add('KILL_SELLER_OR_COMPETITOR',`${account.name} sells ${discoveryVendor.category}, overlapping ${config.seller?.label||'the seller'}'s approved capabilities; adjacent vendor, not a buyer prospect.`,discoveryVendor.evidenceUrl,discoveryVendor.evidenceText);
   if(vendor)add('KILL_SELLER_OR_COMPETITOR',`${account.name} is an adjacent ${vendor.category} vendor, not a buyer prospect for ${config.seller?.label||config.seller?.name||'this seller'}. Saved evidence: ${vendor.evidenceText}`,vendor.evidenceUrl,vendor.evidenceText);
   if(!vendor)for(const row of evidenceRows(account).filter(row=>internalToolEvidence(account,row))){
     for(const [code,patterns,label] of [

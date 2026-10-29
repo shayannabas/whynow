@@ -29,6 +29,7 @@ function phaseAConfigForWorkspace(workspace={}) {
     competitors:competitors.map(row=>({name:row.name,domain:rootDomain(row.domain),sourceUrl:row.sourceUrl||''})),
     entityRules:icpConfig.entityRules||[],
     signalDefinitions:icpConfig.signalDefinitions||{},
+    sellerOwnedDomains:icpConfig.exclusions?.sellerOwnedDomains||sellerProfile.ownedProperties||[],
     personas:icpConfig.personas||{},
     triggerMapping:icpConfig.triggerMapping||{},
     segments:icpConfig.segments||[],

@@ -25,6 +25,7 @@ function termsForSegment(segment={}){
 function taskId(segment,kind,query){return `discovery_${crypto.createHash('sha256').update(`${segment}:${kind}:${query}`).digest('hex').slice(0,12)}`;}
 function buildDiscoveryTasks(workspace={},options={}){
   const config=phaseAConfigForWorkspace(workspace),limit=Math.min(MAX_DISCOVERY_QUERIES,Math.max(1,Number(options.maxQueries)||MAX_DISCOVERY_QUERIES));
+  if(!(workspace.universeSeeds||[]).length&&options.strategy!=='icp_queries')return require('./workspace-hiring.cjs').buildWorkspaceHiringTasks(workspace).slice(0,limit).map(task=>({...task,id:taskId('',task.kind,task.query),segment:'',terms:[]}));
   const enabled=config.segments.filter(segment=>segment.enabled!==false),tasks=[],add=(segment,kind,query)=>{if(tasks.length>=limit||!query)return;tasks.push({id:taskId(segment.key,kind,query),segment:segment.key,segmentLabel:segment.label,kind,query,terms:termsForSegment(segment)});};
   const templateDepth=Math.max(0,...enabled.map(segment=>(segment.queryTemplates||segment.searchQueryTemplates||[]).length));for(let index=0;index<templateDepth;index++)for(const segment of enabled)add(segment,'icp_query_template',String((segment.queryTemplates||segment.searchQueryTemplates||[])[index]||''));
   const personaTitles=[...(config.personas?.buyerTitles||[]),...(config.personas?.championTitles||[])].slice(0,8);for(const title of personaTitles)for(const segment of enabled)add(segment,'persona_hiring',`"${title}" hiring "${segment.label}"`);

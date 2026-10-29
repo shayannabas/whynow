@@ -1,0 +1,776 @@
+{
+  "capturedOn": "2026-10-28",
+  "provenance": "Saved Vercel owner-approved revision 5; selected public fields and sources only. Not an approval action.",
+  "workspace": {
+    "name": "Vercel",
+    "status": "active",
+    "sellerProfile": {
+      "domain": "vercel.com",
+      "approvedAt": "2026-10-29T00:06:51.311Z",
+      "category": "Agentic infrastructure and developer platform for building, deploying, scaling, and securing web apps, AI apps, agents, and platforms.",
+      "valueProps": [
+        "Fully managed infrastructure designed to scale dynamically with traffic and a global edge for fast site delivery to customers.",
+        "Enterprise governance manages, monitors, and governs every app, agent, and workflow from a single enterprise control plane.",
+        "Enterprise security includes centralized spend and access controls, RBAC across teams, projects, users, and agents, deployment protection, secure networking, BYOC, and audit trails.",
+        "Platform engineering teams can automate infrastructure provisioning, deployment, and monitoring to reduce manual errors.",
+        "Preview deployments let teams share live, production-grade environments for faster collaboration and delivery.",
+        "Design engineering teams can use live preview environments, preview comments, Vercel Toolbar checks, feature flags, and instant rollbacks to iterate and ship safely.",
+        "Multi-tenant SaaS teams can build hosted products that create, deploy, and operate web applications for customers or teams.",
+        "Vercel supports AI features with AI Gateway, AI SDK, Sandbox, durable workflows, Fluid Compute, and hundreds of models."
+      ],
+      "customers": [
+        {
+          "name": "Avalara",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Code And Theory",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Fern",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Klaviyo",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Openevidence",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Ramp",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Rogo",
+          "domain": "rogo.ai",
+          "sourceUrl": "https://vercel.com/customers/how-rogo-ships-agent-written-code-to-production-in-5-minutes-on-vercel"
+        },
+        {
+          "name": "Searchable",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Sensay",
+          "domain": "sensay.io",
+          "sourceUrl": "https://vercel.com/customers/how-sensay-went-from-zero-to-product-in-six-weeks"
+        },
+        {
+          "name": "Stably",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "Stripe",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers"
+        },
+        {
+          "name": "The Weather Company",
+          "domain": null,
+          "sourceUrl": "https://vercel.com/customers/how-the-weather-company-serves-real-time-forecasts-to-350-million-daily-active-users-on-vercel"
+        }
+      ],
+      "competitors": [
+        {
+          "name": "Cloudflare",
+          "domain": "cloudflare.com",
+          "schemaVersion": 1,
+          "value": "Cloudflare",
+          "sourceUrl": "https://domains.vercel.com/kb/comparisons",
+          "sourceId": "f7806f33198b0cff8f0ed2ca",
+          "evidenceQuote": "TanStack Start on Vercel vs Cloudflare Compare running TanStack Start on Vercel Functions with Fluid compute against Cloudflare Workers.",
+          "inferred": false,
+          "verification": "matched_saved_quote",
+          "reason": "Quote matched saved source text and passed contextual quality checks."
+        },
+        {
+          "name": "Netlify",
+          "domain": "netlify.com",
+          "schemaVersion": 1,
+          "value": "Netlify",
+          "sourceUrl": "https://domains.vercel.com/kb/comparisons",
+          "sourceId": "f7806f33198b0cff8f0ed2ca",
+          "evidenceQuote": "TanStack Start on Vercel vs Netlify Compare running TanStack Start on Vercel Functions with Fluid compute against Netlify Functions.",
+          "inferred": false,
+          "verification": "matched_saved_quote",
+          "reason": "Quote matched saved source text and passed contextual quality checks."
+        },
+        {
+          "name": "Webflow",
+          "domain": "webflow.com",
+          "schemaVersion": 1,
+          "value": "Webflow",
+          "sourceUrl": "https://domains.vercel.com/kb/comparisons",
+          "sourceId": "f7806f33198b0cff8f0ed2ca",
+          "evidenceQuote": "Astro on Vercel vs Webflow Cloud Compare running Astro on Vercel Functions with Fluid compute against Webflow Cloud on Cloudflare Workers.",
+          "inferred": false,
+          "verification": "matched_saved_quote",
+          "reason": "Quote matched saved source text and passed contextual quality checks."
+        }
+      ]
+    },
+    "icpConfig": {
+      "schemaVersion": 1,
+      "segments": [
+        {
+          "key": "168a381dea4ba7939b2ed718",
+          "label": "AI-native product teams shipping agent workflows",
+          "enabled": true,
+          "subIndustries": [
+            "AI applications",
+            "Financial AI",
+            "Healthcare AI",
+            "Knowledge-management AI",
+            "Developer AI"
+          ],
+          "queryTemplates": [
+            "\"AI agents\" \"production\" \"Next.js\" hiring",
+            "\"agent-written code\" \"production\" engineering",
+            "\"AI agents\" \"preview environments\"",
+            "\"AI agents\" \"feature flags\" engineering",
+            "\"LLM\" \"rollbacks\" \"production\""
+          ],
+          "revenueSensitivityBase": 4,
+          "wedgeCustomers": [
+            "Rogo",
+            "Sensay",
+            "OpenEvidence",
+            "Stably"
+          ],
+          "exampleTargets": []
+        },
+        {
+          "key": "708f06779ac433d3550909d5",
+          "label": "High-traffic consumer web properties with traffic spikes",
+          "enabled": true,
+          "subIndustries": [
+            "Weather and media",
+            "News and publishing",
+            "Travel booking",
+            "Consumer finance",
+            "Sports and live events"
+          ],
+          "queryTemplates": [
+            "\"Core Web Vitals\" \"traffic spike\"",
+            "\"100 million monthly visits\" engineering",
+            "\"traffic surges\" \"uptime\" engineering",
+            "\"site performance\" \"conversion rates\" \"engineering\"",
+            "\"global audience\" \"page speed\" \"engineering\""
+          ],
+          "revenueSensitivityBase": 5,
+          "wedgeCustomers": [
+            "The Weather Company",
+            "Ramp"
+          ],
+          "exampleTargets": []
+        },
+        {
+          "key": "d200cd5b5042844fc8b87ba3",
+          "label": "Commerce and retail teams modernizing storefront performance",
+          "enabled": true,
+          "subIndustries": [
+            "Ecommerce",
+            "Retail",
+            "DTC brands",
+            "Marketplace commerce",
+            "Enterprise storefronts"
+          ],
+          "queryTemplates": [
+            "\"Next.js\" \"storefront\" hiring",
+            "\"Hydrogen\" \"storefront\" engineering",
+            "\"headless commerce\" \"Core Web Vitals\"",
+            "\"conversion rate\" \"site speed\" ecommerce engineering",
+            "\"Black Friday\" \"traffic spike\" \"frontend\""
+          ],
+          "revenueSensitivityBase": 5,
+          "wedgeCustomers": [],
+          "exampleTargets": []
+        },
+        {
+          "key": "d0d5c10d2a984d55a52a81f7",
+          "label": "Multi-tenant SaaS companies managing customer domains and hosted experiences",
+          "enabled": true,
+          "subIndustries": [
+            "B2B SaaS",
+            "Developer documentation",
+            "Website builders",
+            "Vertical SaaS",
+            "Customer portals"
+          ],
+          "queryTemplates": [
+            "\"custom domains\" \"multi-tenant\" engineering",
+            "\"SSL certificates\" \"custom domains\" SaaS",
+            "\"subdomains\" \"customer domains\" engineering",
+            "\"tenant isolation\" \"custom domains\"",
+            "\"customer portals\" \"Next.js\" hiring"
+          ],
+          "revenueSensitivityBase": 4,
+          "wedgeCustomers": [
+            "Fern"
+          ],
+          "exampleTargets": []
+        },
+        {
+          "key": "7d39cc038d2d1ccfef5707a9",
+          "label": "Enterprise engineering orgs decentralizing app delivery",
+          "enabled": true,
+          "subIndustries": [
+            "Financial services",
+            "Healthcare",
+            "Business services",
+            "Enterprise SaaS",
+            "Insurance"
+          ],
+          "queryTemplates": [
+            "\"internal apps\" \"two weeks\" engineering",
+            "\"preview deployments\" \"enterprise\" engineering",
+            "\"developer velocity\" \"platform engineering\" hiring",
+            "\"monorepo\" \"build times\" hiring",
+            "\"design to production\" \"hours\" engineering"
+          ],
+          "revenueSensitivityBase": 5,
+          "wedgeCustomers": [
+            "Klaviyo",
+            "Avalara",
+            "Stripe"
+          ],
+          "exampleTargets": []
+        },
+        {
+          "key": "90e0263419650f7ef7ea0321",
+          "label": "Design-led digital teams with heavy preview and stakeholder review cycles",
+          "enabled": true,
+          "subIndustries": [
+            "Digital agencies",
+            "Product design teams",
+            "Marketing engineering",
+            "Brand websites",
+            "Experience design"
+          ],
+          "queryTemplates": [
+            "\"design engineering\" hiring \"Next.js\"",
+            "\"preview deployments\" \"design review\"",
+            "\"prototype\" \"production\" \"Next.js\"",
+            "\"accessibility audit\" \"frontend\" hiring",
+            "\"visual QA\" \"frontend\" engineering"
+          ],
+          "revenueSensitivityBase": 3,
+          "wedgeCustomers": [
+            "Code and Theory"
+          ],
+          "exampleTargets": []
+        }
+      ],
+      "personas": {
+        "buyerTitles": [
+          "Chief Technology Officer",
+          "Chief Product Officer",
+          "VP Engineering",
+          "SVP Engineering",
+          "VP Product",
+          "Chief Digital Officer",
+          "VP Ecommerce",
+          "VP Infrastructure"
+        ],
+        "championTitles": [
+          "Head of Platform Engineering",
+          "Director of Platform Engineering",
+          "Director of Frontend Engineering",
+          "Head of Web Engineering",
+          "Director of Developer Experience",
+          "Engineering Manager, Web",
+          "Staff Frontend Engineer",
+          "Design Engineering Lead",
+          "Head of Ecommerce Engineering",
+          "AI Engineering Lead"
+        ],
+        "wrongOrgTitles": [
+          "IT Help Desk Manager",
+          "Desktop Support Manager",
+          "Data Center Facilities Manager",
+          "Procurement Analyst",
+          "Ad Operations Manager",
+          "Social Media Manager"
+        ]
+      },
+      "signalDefinitions": {
+        "techStack": {
+          "enabled": true,
+          "label": "Modern web and AI build stack",
+          "description": "Company shows adoption of frameworks, monorepos, AI coding workflows, or frontend architecture patterns that map to Vercel’s strengths.",
+          "evidenceKeywords": [
+            "Next.js",
+            "React",
+            "Turborepo",
+            "monorepo",
+            "FastAPI",
+            "Nuxt",
+            "SvelteKit",
+            "TanStack Start",
+            "AI SDK",
+            "Claude Code",
+            "Codex",
+            "v0",
+            "LLM",
+            "AI agents",
+            "feature flags",
+            "preview deployments"
+          ],
+          "negativeKeywords": [
+            "WordPress-only",
+            "Shopify theme-only",
+            "Squarespace-only",
+            "Wix-only",
+            "static brochure site",
+            "no engineering team"
+          ],
+          "preferredSources": [
+            "engineering blogs",
+            "job postings",
+            "GitHub repositories",
+            "technical talks",
+            "case studies",
+            "developer documentation"
+          ],
+          "rubric": {
+            "1": "Little evidence of modern frontend, AI, or product engineering stack.",
+            "3": "Uses React/Next.js or similar frameworks in parts of the business, with some public engineering evidence.",
+            "5": "Actively hiring or publishing around Next.js, AI agents, monorepos, preview workflows, or high-velocity frontend delivery."
+          }
+        },
+        "activePain": {
+          "enabled": true,
+          "label": "Shipping speed, performance, scaling, or governance pain",
+          "description": "Observable signs that teams need to ship faster, reduce infrastructure drag, handle traffic spikes, govern deployments, or improve web performance.",
+          "evidenceKeywords": [
+            "slow build times",
+            "Core Web Vitals",
+            "traffic spike",
+            "downtime",
+            "rollbacks",
+            "preview environments",
+            "developer velocity",
+            "infrastructure overhead",
+            "custom domains",
+            "SSL certificates",
+            "DDoS",
+            "bot traffic",
+            "spend management",
+            "SAML SSO",
+            "audit logs",
+            "governance",
+            "production launch",
+            "MVP launch"
+          ],
+          "negativeKeywords": [
+            "no active product development",
+            "maintenance mode",
+            "outsourced website only",
+            "single marketing site",
+            "hobby project"
+          ],
+          "preferredSources": [
+            "job postings",
+            "status pages",
+            "engineering blogs",
+            "conference talks",
+            "product launch posts",
+            "news articles"
+          ],
+          "rubric": {
+            "1": "No visible urgency around shipping speed, performance, traffic, or deployment governance.",
+            "3": "Some evidence of web performance, launch velocity, or scaling initiatives.",
+            "5": "Clear current initiative or pain: traffic spikes, performance targets, rapid product launches, internal app sprawl, custom-domain scaling, or deployment governance."
+          }
+        },
+        "revenueSensitivity": {
+          "enabled": true,
+          "label": "Revenue tied to digital experience",
+          "description": "Degree to which faster pages, reliable releases, or rapid web iteration directly affects revenue, conversion, user retention, or enterprise productivity.",
+          "evidenceKeywords": [
+            "conversion rate",
+            "checkout",
+            "monthly active users",
+            "daily active users",
+            "traffic surges",
+            "customer-requested features",
+            "revenue",
+            "bookings",
+            "subscriptions",
+            "storefront",
+            "self-serve signup",
+            "lead generation",
+            "product-led growth"
+          ],
+          "negativeKeywords": [
+            "non-commercial",
+            "internal-only small team",
+            "grant-funded static content",
+            "low-traffic informational site"
+          ],
+          "preferredSources": [
+            "annual reports",
+            "earnings calls",
+            "case studies",
+            "web analytics claims",
+            "commerce hiring posts",
+            "growth team postings"
+          ],
+          "rubric": {
+            "1": "Website or app is not materially tied to revenue or user engagement.",
+            "3": "Digital experience supports acquisition, support, or retention but is not the main monetization path.",
+            "5": "Web app/storefront is central to revenue, conversion, usage, or mission-critical customer workflows."
+          }
+        },
+        "observabilityScale": {
+          "enabled": true,
+          "label": "Scale requiring visibility and control",
+          "description": "Evidence that the prospect has enough traffic, deployments, teams, or usage-based spend to need observability, spend controls, security controls, and enterprise support.",
+          "evidenceKeywords": [
+            "millions of visits",
+            "monthly active users",
+            "daily active users",
+            "deployments per day",
+            "deployments per month",
+            "global audience",
+            "distributed teams",
+            "usage alerts",
+            "audit logs",
+            "SLA",
+            "99.99% uptime",
+            "SOC 2",
+            "ISO 27001",
+            "PCI DSS",
+            "HIPAA",
+            "enterprise support"
+          ],
+          "negativeKeywords": [
+            "pre-seed with no production users",
+            "single developer",
+            "local business website",
+            "no production workload"
+          ],
+          "preferredSources": [
+            "company metrics pages",
+            "customer stories",
+            "status pages",
+            "security pages",
+            "job postings",
+            "press releases"
+          ],
+          "rubric": {
+            "1": "Small or low-traffic web presence with little need for controls.",
+            "3": "Growing product team with meaningful traffic, multiple environments, or compliance needs.",
+            "5": "Large-scale usage, frequent deployments, global traffic, regulated requirements, or explicit SLA/security needs."
+          }
+        },
+        "aiCompatibility": {
+          "enabled": true,
+          "label": "AI-assisted software delivery readiness",
+          "description": "Signals that the company is building AI features or using AI coding agents where sandboxing, model access, governed deployment, and rapid iteration matter.",
+          "evidenceKeywords": [
+            "AI agents",
+            "coding agents",
+            "agent workflows",
+            "LLM features",
+            "model gateway",
+            "sandboxed environments",
+            "agent-written code",
+            "Claude Code",
+            "Codex",
+            "v0",
+            "AI product",
+            "RAG",
+            "grounded agents",
+            "AI-generated UI"
+          ],
+          "negativeKeywords": [
+            "AI policy prohibits all AI tools",
+            "no AI roadmap",
+            "static content only",
+            "manual release process only"
+          ],
+          "preferredSources": [
+            "AI product launches",
+            "engineering blogs",
+            "job descriptions",
+            "product changelogs",
+            "developer documentation"
+          ],
+          "rubric": {
+            "1": "No sign of AI product development or AI-assisted engineering.",
+            "3": "Experimenting with AI features or coding assistants in isolated teams.",
+            "5": "Shipping AI features, agent workflows, or AI-generated code into production with governance or scale needs."
+          }
+        },
+        "competitiveWedge": {
+          "enabled": true,
+          "label": "Desire to avoid infrastructure buildout",
+          "description": "Company expresses need to reduce custom DevOps work, avoid building internal deployment tooling, or move faster without adding infrastructure headcount.",
+          "evidenceKeywords": [
+            "no DevOps team",
+            "infrastructure overhead",
+            "platform work becomes a second product",
+            "build vs buy",
+            "millions building infrastructure",
+            "preview deployments",
+            "instant rollbacks",
+            "automated provisioning",
+            "custom staging",
+            "developer experience",
+            "dedicated headcount",
+            "ongoing maintenance"
+          ],
+          "negativeKeywords": [
+            "built internal deployment system as core differentiator",
+            "large dedicated infra product team",
+            "publicly committed to self-hosting",
+            "cloud cost optimization by moving off managed services"
+          ],
+          "preferredSources": [
+            "founder interviews",
+            "engineering blogs",
+            "job posts",
+            "case studies",
+            "podcasts",
+            "technical migration posts"
+          ],
+          "rubric": {
+            "1": "Strong preference for owning infrastructure or no stated infrastructure burden.",
+            "3": "Some signs of DevOps burden or desire for improved developer experience.",
+            "5": "Explicit pain around infrastructure drag, internal tooling cost, staging complexity, or lack of DevOps capacity."
+          }
+        }
+      },
+      "triggerMapping": {
+        "pain_event": [
+          "traffic spike",
+          "Core Web Vitals regression",
+          "slow build times",
+          "long release cycles",
+          "custom domain scaling",
+          "SSL certificate operations",
+          "bot traffic",
+          "DDoS attack",
+          "runaway cloud spend",
+          "deployment governance",
+          "internal app sprawl",
+          "preview environment bottleneck",
+          "manual staging workflow",
+          "AI agent production launch",
+          "MVP deadline"
+        ],
+        "buying_intent": [
+          "hiring platform engineering",
+          "hiring frontend infrastructure",
+          "hiring developer experience",
+          "hiring web performance",
+          "hiring AI engineering",
+          "launching headless commerce",
+          "migrating to Next.js",
+          "scaling custom domains",
+          "implementing SSO for engineering workflows",
+          "adding spend controls"
+        ],
+        "function_roles": [
+          "platform engineering",
+          "frontend engineering",
+          "developer experience",
+          "web engineering",
+          "design engineering",
+          "ecommerce engineering",
+          "AI engineering",
+          "security engineering",
+          "SRE"
+        ],
+        "tech_adoption": [
+          "Next.js adoption",
+          "React modernization",
+          "Turborepo adoption",
+          "monorepo migration",
+          "AI coding agents",
+          "LLM product features",
+          "feature flags",
+          "preview deployments",
+          "headless commerce",
+          "custom domains",
+          "SAML SSO",
+          "SOC 2",
+          "PCI DSS",
+          "HIPAA"
+        ],
+        "competitor_names": [
+          "Cloudflare",
+          "Netlify",
+          "Webflow"
+        ]
+      },
+      "killPatterns": {
+        "solvingInHouse": [
+          "built an internal deployment system that is positioned as a strategic differentiator",
+          "maintains a dedicated internal preview-environment service with broad adoption",
+          "publicly states it is moving deployment and hosting fully in-house",
+          "operates its own edge delivery layer as a core product capability"
+        ],
+        "buildCulture": [
+          "infrastructure team is branded as a product organization for internal web hosting",
+          "engineering posts emphasize self-hosting as a company principle",
+          "large team dedicated to custom CI/CD, release orchestration, and web runtime operations",
+          "open sourced an internal deployment or edge runtime framework and continues to invest in it"
+        ],
+        "sizeMetric": {
+          "label": "minEmployees",
+          "floor": 100
+        }
+      },
+      "painSources": {
+        "statuspage": true,
+        "hn": true,
+        "news": true,
+        "filings": true
+      },
+      "pitch": {
+        "receiptOpenerStyle": "Open with a specific observable trigger: a launch deadline, Next.js hiring, Core Web Vitals initiative, traffic spike, custom-domain scaling project, AI-agent production push, or internal-app delivery program.",
+        "oneSentenceProduct": "Vercel provides fully managed infrastructure with dynamic scaling, global edge delivery, enterprise governance, security, observability, CI/CD, Fluid Compute, workflows, AI SDK, AI Gateway, Sandbox, and agent tooling.",
+        "credentialLine": "Vercel cites customers shipping 73,000+ deployments in a month, serving 350M monthly users, launching MVPs in six weeks, and running over 92B requests per day across its global edge.",
+        "ctaStyle": "Offer a focused technical review: identify one high-friction release, performance, AI-agent, or custom-domain workflow and map what would change on Vercel in 30 minutes."
+      },
+      "outreach": {
+        "framingLibrary": [
+          "Teams shipping AI features often find release speed is limited by infrastructure work.",
+          "Traffic spikes tend to expose performance and scaling gaps at the worst moment.",
+          "Growing frontend teams often spend more time on build and preview setup than on product work."
+        ],
+        "closingQuestions": [
+          "Worth a quick look at where this could shorten your release cycle?",
+          "Open to comparing how your team handles previews and rollbacks today?",
+          "Would a short technical review of one release workflow be useful?"
+        ]
+      },
+      "objectionTemplates": [
+        "If the team already has CI/CD, position around reducing custom staging, preview, rollback, governance, and web-performance work rather than replacing every pipeline.",
+        "If they worry about usage-based costs, lead with spend management, usage alerts, Flat Rate CDN options, and enterprise contract controls.",
+        "If security is the blocker, anchor on SSO, audit logs, protected deployments, firewall, compliance programs, and private networking options for enterprise teams."
+      ],
+      "weights": {
+        "techStack": 1.3,
+        "activePain": 1.2,
+        "revenueSensitivity": 1.1,
+        "observabilityScale": 1,
+        "aiCompatibility": 0.9,
+        "competitiveWedge": 0.8
+      },
+      "slaDays": {
+        "form_d_filing": 14,
+        "funding": 30,
+        "exec_change": 30,
+        "executive_departure": 30,
+        "new_account_with_warm_champion": 30,
+        "old_account_inherited_pain": 30,
+        "hiring_surge": 45,
+        "first_function_hire": 45,
+        "headcount_surge": 45,
+        "risk_factor_added": 120,
+        "pain_event": 30,
+        "public_postmortem": 30,
+        "public_pain_writeup": 30,
+        "buying_intent_hiring": 60,
+        "function_hiring": 90,
+        "internal_tool_maintenance": 90,
+        "tech_adoption": 90,
+        "competitor_adoption": 120,
+        "conference_talk": 120
+      },
+      "tierRules": {
+        "tier1": {
+          "public": true,
+          "revenue": 500000000,
+          "employees": 2000,
+          "valuation": 5000000000
+        },
+        "tier2": {
+          "revenue": 25000000,
+          "employees": 150,
+          "fundingStages": [
+            "Series A",
+            "Series B",
+            "Series C",
+            "Series D",
+            "growth",
+            "PE"
+          ]
+        },
+        "tier3": {
+          "maxEmployees": 149,
+          "minRaised": 2000000
+        },
+        "unclassified": "parked"
+      },
+      "defaultsReviewRequired": false
+    },
+    "accounts": [],
+    "runs": [],
+    "budgets": {}
+  },
+  "rejected": [
+    {
+      "name": "How Next.js supports AI coding agents",
+      "domain": "nextjs.org",
+      "sourceUrl": "https://nextjs.org/docs/app/guides/ai-agents",
+      "sourceTitle": "",
+      "savedText": "To help agents use current APIs and verify their work, Next.js ... Production builds minify server code and stop after a route fails. Use ..."
+    },
+    {
+      "name": "Organic Growth for the Next Stage",
+      "domain": "pikegrowth.com",
+      "sourceUrl": "https://www.pikegrowth.com/about",
+      "sourceTitle": "",
+      "savedText": "Matt built Zillow's SEO program from the ground up, scaling it to over 100 million monthly visits, and later led Zapier's program, achieving a 6x traffic ..."
+    },
+    {
+      "name": "Hydrogen: Shopify commerce in your framework",
+      "domain": "hydrogen.shopify.dev",
+      "sourceUrl": "https://hydrogen.shopify.dev/",
+      "sourceTitle": "",
+      "savedText": "... storefront is within 50ms of 95% of the internet. Previews, caching, logs, and rollbacks at no extra cost. Deploying elsewhere? Hydrogen also runs on Vercel ..."
+    },
+    {
+      "name": "Custom domains and white-labelling for SaaS",
+      "domain": "saascustomdomains.com",
+      "sourceUrl": "https://saascustomdomains.com/",
+      "sourceTitle": "",
+      "savedText": "Set up custom domains for your customers with just a few clicks. No complex infrastructure to manage. Enterprise Security. Automatic SSL certificates, DDoS ..."
+    },
+    {
+      "name": "Design Engineer Jobs",
+      "domain": "designengineer.io",
+      "sourceUrl": "https://designengineer.io/",
+      "sourceTitle": "",
+      "savedText": "Find a design engineering job in a next generation software company ... Next.js 14. UI. Radix & Sonner. DB. Supabase. COL. Latest news & jobs."
+    },
+    {
+      "name": "The best headless commerce blog",
+      "domain": "front-commerce.com",
+      "sourceUrl": "https://www.front-commerce.com/resources/",
+      "sourceTitle": "",
+      "savedText": "Embrace the latest e-commerce trends. Use our blog to learn about headless commerce, e-commerce platforms, PWAs, composable commerce ... Core Web Vitals: How Site ..."
+    },
+    {
+      "name": "Approximated",
+      "domain": "approximated.app",
+      "sourceUrl": "https://approximated.app/",
+      "sourceTitle": "",
+      "savedText": "Reliably automate custom domains and their SSL certificates at scale. Connect user custom domains to your app, automated with one easy API."
+    }
+  ]
+}

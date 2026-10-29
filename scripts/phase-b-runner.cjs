@@ -45,6 +45,7 @@ function sanitizeWhyNow(account={},config={},now=new Date()){
 }
 function mergeCollectorResult(account={},result={},runId=''){
   const next={...structuredClone(account),...(result.targetPatch||{})},signals={...(next.signals||{})};
+  if(account.firmographics&&result.targetPatch?.firmographics){const prior=account.firmographics,domain=require('./entity-rules.cjs').rootDomain;if((!prior.expiresAt||Date.parse(prior.expiresAt)>Date.now())&&(!prior.domain||domain(prior.domain)===domain(account.domain))){next.firmographics=require('./firmographics.cjs').mergeProfiles(prior,result.targetPatch.firmographics);next.firmographicsConfidence=next.firmographics.confidenceLabel;}}
   for(const incoming of result.signals||[]){if(incoming?.key&&(!signals[incoming.key]||signalWins(signals[incoming.key],incoming)))signals[incoming.key]=incoming;}
   next.signals=signals;
   next.signalHistory=uniq([...(next.signalHistory||[]),...(result.signals||[])],row=>row.id||`${row.key}:${row.evidenceUrl}:${row.observedAt}`);

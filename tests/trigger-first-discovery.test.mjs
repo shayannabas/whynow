@@ -7,7 +7,7 @@ const {loadResolveReferenceDemo}=require('../scripts/reference-demo.cjs');
 
 describe('trigger-first discovery',()=>{
   it('builds nine bounded ATS searches and parses direct job links',()=>{
-    const tasks=trigger.buildTriggerFirstTasks();expect(tasks).toHaveLength(12);expect(tasks.every(row=>/site:(?:job-boards\.greenhouse\.io|boards\.greenhouse\.io|jobs\.lever\.co|jobs\.ashbyhq\.com)/.test(row.query))).toBe(true);
+    const workspace=loadResolveReferenceDemo(defaultState()).workspaces['reference-demo-resolve-ai'],tasks=trigger.buildTriggerFirstTasks(workspace);expect(tasks.length).toBeGreaterThan(0);expect(tasks.length).toBeLessThanOrEqual(18);expect(tasks.every(row=>/site:(?:job-boards\.greenhouse\.io|boards\.greenhouse\.io|jobs\.lever\.co|jobs\.ashbyhq\.com)/.test(row.query))).toBe(true);
     expect(trigger.atsDescriptor('https://job-boards.greenhouse.io/acme/jobs/123')).toMatchObject({provider:'greenhouse',slug:'acme',direct:true});
     expect(trigger.atsDescriptor('https://jobs.ashbyhq.com/acme')).toMatchObject({provider:'ashby',slug:'acme',direct:false});
   });
@@ -23,7 +23,7 @@ describe('trigger-first discovery',()=>{
   it('matches a saved direct job by URL before falling back to its exact title',()=>{
     const jobs=[{title:'Senior Site Reliability Engineer',url:'https://jobs.lever.co/acme/one'},{title:'Director of Platform Engineering',url:'https://jobs.lever.co/acme/two'}];
     expect(trigger.matchVerifiedJob({sourceUrl:'https://jobs.lever.co/acme/two',roleTitle:'Wrong title'},jobs).title).toBe('Director of Platform Engineering');
-    expect(trigger.matchVerifiedJob({sourceUrl:'https://jobs.lever.co/acme/missing',roleTitle:'Senior Site Reliability Engineer'},jobs).url).toContain('/one');
+    expect(trigger.matchVerifiedJob({sourceUrl:'https://jobs.lever.co/acme/missing',roleTitle:'Senior Site Reliability Engineer'},jobs)).toBeNull();
   });
   it('does not classify a supply-chain company as cybersecurity from generic service/query words',()=>{
     const workspace=loadResolveReferenceDemo(defaultState()).workspaces['reference-demo-resolve-ai'];

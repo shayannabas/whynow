@@ -44,7 +44,7 @@ function hiringTriggerType(value = "") {
 }
 
 function isEarlyCareerPosting(value = {}) {
-  return EARLY_CAREER_ROLE.test(`${value.title || value.metadata?.jobTitle || ""} ${value.text || value.evidenceText || ""}`);
+  const title=String(value.title||value.metadata?.jobTitle||'');return EARLY_CAREER_ROLE.test(title)||(!SENIOR_ROLE.test(title)&&/\b(?:this (?:role|position|internship)|we are hiring)\b[^.!?]{0,80}\b(?:intern|graduate|new grad|junior)\b/i.test(value.text||value.evidenceText||''));
 }
 
 function jobTargetingMatch(job = {}, target = {}) {
@@ -53,6 +53,8 @@ function jobTargetingMatch(job = {}, target = {}) {
   const titleAndDescription = `${title} ${description}`;
   if (isEarlyCareerPosting(job)) return { relevant: false, source: "early_career", matched: title.match(EARLY_CAREER_ROLE)?.[0] || "early-career posting" };
   const phrases = configuredTargetingPhrases(target);
+  const legacyReliability=(target.triggerMapping?.function_roles||[]).includes('reliability_hiring');
+  if(!legacyReliability&&(target.buyerTitles?.length||target.championTitles?.length||target.triggerMapping?.function_roles?.length))return require('../workspace-hiring.cjs').matchingWorkspaceRole(job,target);
   const personaMatch = [...(target.buyerTitles || []), ...(target.championTitles || [])].find((value) => phrasePattern(value)?.test(title));
   if (personaMatch) return { relevant: true, source: "persona_title", matched: personaMatch };
   if (RELIABILITY_ROLE.test(title)) return { relevant: true, source: "function_title", matched: title.match(RELIABILITY_ROLE)?.[0] || "reliability role" };
@@ -116,6 +118,11 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
     if (!job.url) continue;
     if (isEarlyCareerPosting(job)) continue;
     const targeting = jobTargetingMatch(job, target);
+    if(targeting.relevant&&!RELIABILITY_ROLE.test(job.title||'')&&job.updatedAt&&withinDays(job.updatedAt,90,now)){
+      const evidenceText=`${job.title}. ${job.text||''}`;
+      events.push(stage3Signals.decorateTrigger(event({type:'function_hiring',title:job.title,evidenceUrl:job.url,evidenceText,occurredAt:job.updatedAt,sourceId:provider,metadata:{provider,jobId:job.id,jobTitle:job.title,targeting}}),slaConfig));
+      for(const [key,definition] of Object.entries(target.signalDefinitions||{})){if(definition.enabled===false)continue;const matches=(definition.evidenceKeywords||[]).filter(word=>text.toLowerCase().includes(String(word).toLowerCase()));if(matches.length)signals.push(signal({key,score:Math.min(5,2+matches.length),evidenceUrl:job.url,evidenceText:job.text||job.title,observedAt:job.updatedAt,sourceId:provider,metadata:{jobId:job.id,matchedWorkspaceKeywords:matches}}));}
+    }
     if (AI_RCA_HIRING.test(text) && targeting.relevant) {
       const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${String(job.text || "").slice(0, 420)}`;
       const aiRcaEvent = themedHiringEvent({
@@ -160,7 +167,7 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
       }, painThemeConfig));
       quoteReceipts.push({ kind: "internal_tool_maintenance", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, postingDate: job.updatedAt || now.toISOString() });
     }
-    if (!RELIABILITY_ROLE.test(job.title || "")) continue;
+    if (!RELIABILITY_ROLE.test(job.title || "") || !targeting.relevant) continue;
     const tools = toolsIn(text);
     const senior = SENIOR_ROLE.test(job.title || "");
     const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${tools.length ? `Named stack: ${tools.join(", ")}. ` : ""}${String(job.text || "").slice(0, 360)}`;

@@ -16,7 +16,7 @@ it('runs the saved non-Resolve Vercel strategy through discovery, collection, sc
   state.activeWorkspaceId=workspaceId;
   state.workspaces[workspaceId]={id:workspaceId,name:'Vercel offline fixture',status:'active',sellerProfile:{...structuredClone(snapshot.sellerProfile),approvedAt:'2026-10-21T00:00:00.000Z'},icpConfig:structuredClone(snapshot.icpConfig),accounts:[],runs:[],budgets:{},createdAt:'2026-10-21T00:00:00.000Z',updatedAt:'2026-10-21T00:00:00.000Z'};
   state.workspaces[workspaceId].icpConfig.signalDefinitions.competitiveWedge.enabled=false;
-  const workspace=state.workspaces[workspaceId],tasks=buildDiscoveryTasks(workspace,{maxQueries:60});
+  const workspace=state.workspaces[workspaceId],tasks=buildDiscoveryTasks(workspace,{maxQueries:60,strategy:'icp_queries'});
   expect(tasks.length).toBeLessThanOrEqual(60);expect(tasks[0]).toMatchObject({kind:'icp_query_template',query:snapshot.icpConfig.segments[0].queryTemplates[0]});
   expect(tasks.some(row=>row.kind==='persona_hiring'&&row.query.includes('CTO'))).toBe(true);
   const candidate=candidateFromResult(tasks[0],recorded.searchResult);expect(candidate).toMatchObject({domain:'largeventurelabs.example',segment:snapshot.icpConfig.segments[0].key});

@@ -21,6 +21,11 @@ function timestampInsideWindow(row={},now=new Date()){
   return Number.isFinite(start)&&now.getTime()>=start&&now.getTime()-start<90*86400000;
 }
 function needsReviewReason(account={},now=new Date()){
+  if(account.identityReviewReason)return account.identityReviewReason;
+  const sizeReceipt=account.firmographics?.fields?.employeeCount?.sourceUrl||account.tierEvidenceReceipt||'',reportYear=Number(sizeReceipt.match(/(?:corporate|annual)[-_]report[-_/](20\d{2})/i)?.[1]);
+  if(reportYear&&reportYear<now.getUTCFullYear()-2)return 'Size receipt is an outdated corporate report; verify the employer identity and current size before queueing.';
+  if(account.discoveryQuality?.isValidTargetAccount===false)return account.discoveryQuality.reason||'Company identity failed discovery review.';
+  if(account.segmentClassification?.requiresReview)return 'Segment is not supported by unambiguous company evidence; review before ranking.';
   const rejected=[...(account.triggers||[]),...(account.triggerHistory||[])].filter(row=>row?.evidenceUrl&&timestampInsideWindow(row,now)&&(row.citable===false||row.metadata?.citable===false));
   if(!rejected.length||activeTriggers(account,now).length)return '';
   const reason=rejected[0].metadata?.notCitableReason||'The current evidence does not clearly belong to this account.';
