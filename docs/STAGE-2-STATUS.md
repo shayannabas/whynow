@@ -1,4 +1,12 @@
-# Seller research status — latest checkpoint October 27, 2026
+# Seller research status — latest checkpoint October 28, 2026
+
+The owner approved Vercel in the browser; revision 5 remains active with 12 customers/3 competitors and 0 blocking/0 advisory warnings after the minimum-floor fix. Owner-entered messaging and approval are unchanged. Five sourced customer-domain suggestions remain unconfirmed; confirming one will create a fresh review revision. The single authorized Prepare demo used 60 queries but yielded no usable queue (0 Act now/0 Worth researching/7 Needs review), exposing discovery/entity noise and missing firmographics. Profile approval does not establish prospect quality.
+
+Gong's newly authorized three focused GPT-5.5 calls completed for **$0.375920** under the owner-raised $1.20 cap. Free preparation used 2 Serper queries, 22 fetches and 20 selected sources; generation used saved pages only, zero retries/fetches/Serper. Current needs_review revision 4: **10 customers, 0 competitors, 6 GTM segments, minRevenueTeamHeadcount/50, 2 blocking and 0 advisory warnings**. Google has a dedicated clean Gong-owned customer story. Three P856 domain suggestions remain unconfirmed; all ten actual customer domains are blank. The departmental size proposal is consistent but cannot be filled from total-company employee counts. No approval or Gong Prepare demo occurred.
+
+Targeting now proposes editable framing/closing questions and target-size text. The size validator treats floors as minimums and requires an explicit conflicting maximum. Full offline regression: 72 files, 340 passed/1 intentional skip. OpenAI is false/zero; the paid authorization is exhausted. See [October 28 report](OCT28-DEMO-QUALITY-REPORT.md) for all customer receipts, query warnings and per-call tokens/cost.
+
+## Historical October 27 checkpoint — superseded by the owner approval and run above
 
 Vercel is unapproved in `needs_review`: 12 customers and three first-party comparison competitors (Cloudflare, Netlify, Webflow). Offline re-materialization of saved focused outputs retained those names instead of silently losing them. Their domains are not established by saved outbound links, so all three remain blank with explicit blocking warnings. There are three blocking quality findings and zero advisories. The missing target-company-size description is a separate required editable field; `minEmployees`/100 is measurable and does not contradict an absent description. See `VERCEL-REVIEW-FIXES.md`.
 

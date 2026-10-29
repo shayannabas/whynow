@@ -1,5 +1,27 @@
 # WhyNow SignalScout port notes
 
+## October 28 — review quality and source availability
+
+### Targeting proposals, size bounds and measurement
+
+**What they do:** `draft-icp-targeting.cjs` proposes three framing lines, three questions and target-size text; `messaging-proposals.cjs` gives legacy profiles editable review defaults; `size-rule.cjs` and `size-measurement.cjs` interpret minimums and units. **How they decide:** preserve owner lines, compare a floor only with an explicit smaller maximum, and never substitute total employees for a departmental count. **What changed from SignalScout:** generalized seller configuration replaces Resolve assumptions and missing defaults; human review remains required. **Example:** “100+ employees” accepts floor 100, whereas “under 50 employees” conflicts; Gong's 50-person revenue-team rule cannot be satisfied by 50 engineers.
+
+### Domain suggestions
+
+**What it does:** `domain-suggestions.cjs` proposes sourced organization domains and adds an explicit Confirm action. **How it decides:** use official links/P856 or conservative matching search results; reject short ambiguous names, contradictory businesses and URL-protection wrappers. Follow a real article's Wikidata link when its search API is robots-disallowed. Save cannot silently verify a suggestion. **What changed:** WhyNow records suggestion/confirmation provenance and resets profile approval on confirmation. **Example:** Google's P856 says about.google; it remains Suggested until the owner confirms, while Fern's forest nonprofit and Stably's unrelated stablecoin business are retracted.
+
+### ATS receipt helpers
+
+**What they do:** `ats-receipts.cjs` builds canonical job pages and checks board/job identity; `job-receipt-links.cjs` links readable captures/API fallbacks; `clean-saved-ats-text.cjs` strips encoded markup offline. **How they decide:** actual provider identifiers and original capture dates are retained; closed jobs cannot create current triggers. **What changed:** redirects are exposed honestly, with local content-addressed receipts rather than assuming every provider page renders. **Example:** Coalition's valid SRE job remains eligible via its matching board/job ID and saved API text; SecurityScorecard's 404 is retained as history and drops out of Act now.
+
+### GDELT news
+
+**What it does:** `gdelt-news.cjs` adds a free optional news index beside Serper. **How it decides:** guarded robots/pacing/budgets, fetched publication dates, the same relevance/windows and canonical dedupe; a 429 sets shared cooldown. **What changed:** this is an additional source, not a SignalScout parity replacement, and index observation time alone is not a trigger. **Example:** October 28's one timeout/four rate limits yield unavailable zeros, not negative evidence. Successful live ingestion is still unverified.
+
+### Bounded local research and preparation helpers
+
+**What they do:** one-use Vercel/Gong runners persist progress/caps and safe outputs; `finalize-oct28-receipts.cjs` strengthens saved customer relationship quotes offline. **How they decide:** preflight before spend, mark batches before execution, never repeat a started batch or approve a profile, preserve original outputs/history. **What changed:** this adds durable owner-budget and audit boundaries around workspace-driven ported logic. **Example:** Gong's $1.162665 maximum fits the owner's explicit $1.20 authorization; actual cost is $0.375920, but missing competitors still block approval. Vercel's completed job produces zero usable queue accounts and is reported as a discovery-quality gap, not a successful demo.
+
 Updated October 21, 2026. SignalScout by Isa Iqbal is the read-only behavioral reference and is used with permission. WhyNow keeps its own isolated workspaces, atomic JSON state, receipts, human approval and send-free Demo mode. Phases A and B, Chunk 2, Refresh-all and Chunk 3's validated outreach checkpoint are complete. After the first GPT-5.5 request stopped incomplete, the corrected three-account batch completed with three validator-passing Demo drafts and no send or application-state mutation. No further paid call is authorized.
 
 ## `scripts/prepare-demo.cjs`

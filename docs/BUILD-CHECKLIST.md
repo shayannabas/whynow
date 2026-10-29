@@ -1,6 +1,27 @@
 # WhyNow — build checklist
 
-Updated: October 27, 2026. Current direction: local, send-free portfolio demo. Desktop review fixes are verified: two active adjacent-vendor kills with three retired weak decisions preserved, correct Altana segment, full-height/descriptive-receipt draft UI, three local copy-only drafts, deduplicated Okta job, readable dates and honest unknown Metrics. Reference v8 records the kill-policy change. Full regression: 62 files, 317 passed, one intentional skip. Vercel remains needs_review with 12 customers/3 competitors, 3 missing-domain blocking warnings and 0 advisories; target-size description is owner-fill. Gong completed its authorized three GPT-5.5 calls for $0.222170 under $0.90, with 0 Serper/fetches/retries; it remains needs_review with 3 customers/0 competitors and 11 blocking/0 advisory. No approval, send or Prepare demo. OpenAI remains disabled/zero.
+Updated: October 28, 2026. Local, send-free portfolio demo. Vercel is owner-approved at revision 5, with owner messaging preserved; its one Prepare demo run used 60/150 Serper queries but produced 0 Act now, 0 Worth researching and 7 Needs review candidates. Discovery quality is still insufficient for this seller. Gong's authorized three-call rerun cost $0.375920 under the raised $1.20 cap; it remains needs_review with 10 customers/0 competitors and 2 blocking/0 advisory. Full regression: 72 files, 340 passed, one intentional skip (341 total). OpenAI is disabled/zero. No agent approval, sending or deployment occurred.
+
+## October 28 — review gaps, live preparation and Gong quality
+
+- [x] Preserve the owner's Vercel revision 5 approval and manually entered framing/questions. Run Prepare demo exactly once: discovery 25 + refresh 35 = 60 Serper queries.
+- [x] Report the honest 0/0/7 result and all seven candidates/receipts. Flag Next.js as seller-related, job-board/project/title noise and adjacent vendors.
+- [ ] Vercel discovery produces a usable buyer queue. This run did not meet that outcome; all seven candidates have unknown tier/size and no current why-now receipt.
+- [x] Focused targeting requires three editable general framing sentences, three closing questions and a consistent target-size description; legacy view-only suggestions do not overwrite owner text.
+- [x] Fix minimum-floor semantics: 100 employees fits “100+ employees”; only an explicit maximum below the floor contradicts it. Match headcount/revenue units before using size evidence.
+- [x] Run combined domain suggestions within 10 Serper queries. Leave five Vercel and three Gong suggestions sourced/unconfirmed. Save cannot verify a suggestion silently; explicit confirmation resets approval and acknowledgments.
+- [x] Retract wrong Fern/Stably businesses and ambiguous Ramp; reject a Proofpoint security-wrapper customer domain. Never guess replacements.
+- [x] Canonical ATS job receipts, secondary company links, readable saved text/API alternatives and verified board/job matching. Browser: Okta/Altana expose job detail, Coalition redirects to generic careers, SecurityScorecard job is 404/closed.
+- [x] Mark SecurityScorecard historical/non-current. Resolve Today now has four Act now accounts: Okta, Coalition, Altana, CrowdStrike; three Worth researching, thirteen Needs review, two kills.
+- [x] GDELT guarded collector, publication-date requirement, freshness/relevance, cross-source dedupe and rate-limit cooldown; offline tests pass.
+- [ ] Successful live GDELT ingestion: five-account check yielded 0 signals/events each, one timeout and four HTTP 429s. These are unavailable-source results, not no-news evidence.
+- [x] Fresh Gong first-party research: 2 Serper queries, 22 free fetches, 20 selected sources. Ten clear extracted customers plus one uncertain headline, zero competitors.
+- [x] Owner-raised $1.20 authorization: exactly 3 GPT-5.5 calls, low reasoning/8,000-token allowances, zero retries; actual $0.375920. No fetches/Serper during generation. OpenAI returned false/zero immediately.
+- [x] Strengthen saved relationship receipts offline; Google's dedicated Gong story supports keeping it. Gong remains needs_review, with six GTM segments, minRevenueTeamHeadcount/50, 2 blocking/0 advisory.
+- [x] Grafana active vendor kill cites its own Grafana Cloud product page. Old decisions/receipts remain retained.
+- [x] Full suite and desktop browser checks; code 8a65f35 passed CI. Existing Drive Demo Script and live checklist updated once at close-out; local server remains on port 3000.
+
+Full results, receipts, tokens, warning text and limitations: [October 28 report](OCT28-DEMO-QUALITY-REPORT.md). Combined Serper use: 72 (60 + 10 + 2), respecting each separate cap. Remaining owner review and discovery/source gaps are not marked complete.
 
 This is the working checklist, updated only after verification. The original acceptance did not persist its profiles, so a bounded recovery run later saved three public-data snapshots and separate `needs_review` state. That recovery made four provider attempts because Shopify used the existing transient retry. Shopify and Vercel reported $0.005177 combined; Resolve AI's usage record was lost with the first stopped process, and the conservative total reservation was $0.038686 under the $0.05 cap.
 
