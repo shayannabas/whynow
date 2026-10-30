@@ -1,0 +1,95 @@
+
+> whynow@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /Users/shayanabbas/.codex/.chatgpt-projects/g-p-6aa9b40b5e4881919e22cf8c9b68f792/whynow
+
+ ✓ tests/foundation.test.mjs (7 tests) 587ms
+ ✓ tests/collectors.test.mjs (17 tests) 876ms
+ ✓ tests/research.test.mjs (17 tests) 138ms
+ ✓ tests/synthesis.test.mjs (11 tests) 1116ms
+   ✓ keeps OpenAI disabled when a key exists but the explicit enable switch is off  1062ms
+ ✓ tests/gong-live-research.test.mjs (2 tests) 1119ms
+   ✓ stops on an incomplete first response, keeps token/cost diagnostics, and never calls the next purpose or saves a profile  1097ms
+ ✓ tests/onboarding-research-routes.test.mjs (1 test) 1134ms
+   ✓ connects name entry, explicit confirmation and bounded evidence collection without OpenAI  1133ms
+ ✓ tests/workspaces.test.mjs (5 tests) 166ms
+ ✓ tests/discovery-runner.test.mjs (4 tests) 368ms
+ ✓ tests/openai-structured-output-limits.test.mjs (1 test) 1416ms
+   ✓ keeps every saved Stage 2 packet schema inside documented Structured Outputs limits  1414ms
+ ✓ tests/collector-routes.test.mjs (1 test) 152ms
+ ✓ tests/manual-profile.test.mjs (12 tests) 178ms
+ ✓ tests/synthesis-runner.test.mjs (3 tests) 1562ms
+   ✓ records a safe, retryable failure when paid OpenAI drafting is disabled  1122ms
+   ✓ records only the HTTP status for provider request failures  439ms
+ ✓ tests/ui-route-integration.test.mjs (2 tests) 235ms
+ ✓ tests/phase-a-browser.test.mjs (1 test) 160ms
+ ✓ tests/name-first.test.mjs (4 tests) 101ms
+ ✓ tests/evidence-packet-priority.test.mjs (3 tests) 309ms
+ ✓ tests/phase-b-browser.test.mjs (1 test) 57ms
+ ✓ tests/competitor-retention.test.mjs (5 tests) 136ms
+ ✓ tests/chunk2-browser.test.mjs (1 test) 143ms
+ ✓ tests/chunk3-browser.test.mjs (1 test) 111ms
+ ✓ tests/stage2-recovery-acceptance.test.mjs (5 tests) 46ms
+ ✓ tests/new-seller-discovery.test.mjs (19 tests) 58ms
+ ✓ tests/llm.test.mjs (10 tests) 78ms
+ ✓ tests/refresh-routes.test.mjs (1 test) 79ms
+ ✓ tests/phase-b-quality.test.mjs (7 tests) 13ms
+ ✓ tests/discovery.test.mjs (6 tests) 42ms
+ ✓ tests/ui-core-pages.test.mjs (9 tests) 52ms
+ ✓ tests/organization-extraction.test.mjs (6 tests) 24ms
+ ✓ tests/phase-b-adapters.test.mjs (4 tests) 27ms
+ ✓ tests/refresh-all-runner.test.mjs (4 tests) 12ms
+ ✓ tests/phase-a-parity.test.mjs (11 tests) 40ms
+ ✓ tests/phase-b-runner.test.mjs (3 tests) 51ms
+ ✓ tests/outreach-drafts.test.mjs (18 tests) 65ms
+ ✓ tests/phase-b-parity.test.mjs (20 tests) 43ms
+ ✓ tests/trigger-first-runner.test.mjs (4 tests) 51ms
+ ✓ tests/phase-b-config.test.mjs (4 tests) 12ms
+ ✓ tests/stage2-quality.test.mjs (8 tests) 20ms
+ ✓ tests/onboarding-fixtures.test.mjs (1 test) 24ms
+ ✓ tests/reference-demo-refresh.test.mjs (1 test) 4ms
+ ✓ tests/job-receipt-links.test.mjs (2 tests) 73ms
+ ✓ tests/ui-shell.test.mjs (6 tests) 21ms
+ ✓ tests/demo-polish.test.mjs (4 tests) 33ms
+ ✓ tests/executive-window.test.mjs (3 tests) 10ms
+ ✓ tests/outreach-live.test.mjs (7 tests) 31ms
+ ✓ tests/focused-synthesis.test.mjs (1 test) 33ms
+ ✓ tests/account-lifecycle.test.mjs (4 tests) 12ms
+ ✓ tests/any-seller-e2e.test.mjs (1 test) 32ms
+ ✓ tests/ats-receipts.test.mjs (4 tests) 10ms
+ ✓ tests/phase-a-core.test.mjs (8 tests) 40ms
+ ✓ tests/reference-profile.test.mjs (3 tests) 5ms
+ ✓ tests/trigger-first-discovery.test.mjs (5 tests) 14ms
+ ✓ tests/refresh.test.mjs (7 tests) 12ms
+ ✓ tests/any-seller-live-research.test.mjs (3 tests) 12ms
+ ✓ tests/prepare-demo.test.mjs (3 tests) 6ms
+ ✓ tests/hiring-relevance.test.mjs (14 tests) 7ms
+ ✓ tests/gdelt-news.test.mjs (4 tests) 12ms
+ ✓ tests/onboarding-selection.test.mjs (5 tests) 9ms
+ ✓ tests/size-rule.test.mjs (2 tests) 8ms
+ ✓ tests/domain-suggestions.test.mjs (5 tests) 7ms
+ ✓ tests/refresh-runner.test.mjs (2 tests) 9ms
+ ✓ tests/research-quality-eval.test.mjs (3 tests) 5ms
+ ✓ tests/kill-evidence-quality.test.mjs (4 tests) 11ms
+ ✓ tests/firmographics.test.mjs (6 tests) 12ms
+ ✓ tests/seller-fixtures.test.mjs (1 test) 3ms
+ ✓ tests/golden-set-stage3.test.mjs (2 tests | 1 skipped) 3ms
+ ✓ tests/messaging-proposals.test.mjs (2 tests) 2ms
+ ✓ tests/model-routing.test.mjs (3 tests) 9ms
+ ✓ tests/gong-extraction.test.mjs (2 tests) 7ms
+ ✓ tests/wikidata-universe.test.mjs (3 tests) 4ms
+ ✓ tests/size-measurement.test.mjs (1 test) 2ms
+ ✓ tests/message-targeting.test.mjs (4 tests) 3ms
+ ✓ tests/gong-oct28-budget.test.mjs (1 test) 6ms
+ ✓ tests/vercel-prepare-authorization.test.mjs (1 test) 3ms
+ ✓ tests/vercel-live-research-rerun.test.mjs (2 tests) 2ms
+ ✓ tests/railway-readiness.test.mjs (1 test) 2ms
+
+ Test Files  75 passed (75)
+      Tests  368 passed | 1 skipped (369)
+   Start at  21:32:55
+   Duration  4.08s (transform 425ms, setup 0ms, collect 2.29s, tests 11.27s, environment 12ms, prepare 3.44s)
+
+

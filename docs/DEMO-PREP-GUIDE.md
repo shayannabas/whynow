@@ -1,5 +1,7 @@
 # WhyNow — night-before interview demo guide
 
+October 29 update: use **Okta and Coalition** as the current Resolve Act now examples. CrowdStrike's executive-departure alias is fixed to30 days; its old receipts are expired and it is now Unranked (fit35/Tier1 unchanged). Vercel's authorized new-seller run used34 queries but did not produce qualified buyers: Canonical was flagged for review, leaving0/0/8. Do not present it as a successful prepared seller queue or rerun without new authorization. Full findings: docs/OCT29-PREPARE-DEMO-REPORT.md. Keep the app's terminal open throughout the interview.
+
 Updated October 28, 2026. WhyNow is designed to be prepared locally the day before an interview. The owner reviews and approves the seller profile; the software never approves one automatically. The demo stays copy-only and has no sending path. Start the app and keep its terminal open before and throughout the interview.
 
 ## What the workflow does

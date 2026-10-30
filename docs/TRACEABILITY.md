@@ -1,5 +1,17 @@
 # WhyNow traceability
 
+## October 29 — bounded Vercel run and offline executive-window correction
+
+`run-vercel-prepare-oct29.cjs` used a new durable one-use marker, approved revision checks, no OpenAI and a shared 100-query ceiling. Owner separately authorized process-only monthly ceiling170 because persistent50 was already below saved70; counter ends104, .env unchanged. Actual 34 queries: discovery29 (18 ATS/10 identity/1 size), refresh5.
+
+The run's raw Canonical Act now result failed offline quality review: 2022 original web-manager publication, unrelated Legal Counsel top trigger, 225 active events driven by shared “AI, engineering” boilerplate, generic AI-native segment and weak revenue provenance. `finalize-oct29-offline.cjs` records an explicit review flag/audit actor and preserves all raw evidence; final Vercel0/0/8, zero kills. The 3–5 qualified-buyer outcome is not complete.
+
+`collector-triggers.cjs` maps executive_departure to exec_change and fixes legacy cached 90-day metadata using the event date; `decisioning.cjs` protects reads of old records too. `repair-executive-windows.cjs` updates ten active/history rows and recomputes priority without deleting receipts or touching approval. Tests cover the 30-day boundary, configured overrides, saved CrowdStrike receipts, idempotence and retained evidence. The frozen SignalScout capture is unchanged; its departure comparison explicitly documents the three corrected SLA fields while asserting the rest exactly.
+
+Resolve changes from3 to2 Act now (Okta/Coalition). Worth researching3, Needs review14, kills2 unchanged. CrowdStrike remains fit35/Tier1, loses freshness boost (.140→.112), zero active triggers; its five trigger records and six history rows remain.
+
+Full offline suite75 files/368 passed/1 skip, code238aefe CI green. Browser verifies queue changes; no live research call follows completion of the Vercel run. Public report: [October 29 results](OCT29-PREPARE-DEMO-REPORT.md).
+
 ## Any-seller ATS discovery — offline checkpoint, 2026-10-28
 
 `workspace-hiring.cjs` derives buyer/champion/function-role batches and technology filters from the approved workspace. `trigger-first-discovery.cjs` verifies provider job IDs/dates, uses guarded first-party employer pages and requires unambiguous domain identity. Live-only normalization preserves frozen pure provider outputs; seniority variations do not change researched facts. Early-career title checks avoid rejecting senior mentorship descriptions.

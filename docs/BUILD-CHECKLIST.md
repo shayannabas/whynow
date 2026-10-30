@@ -1,5 +1,23 @@
 # WhyNow — build checklist
 
+Latest checkpoint — October 29, 2026: **the one approved Vercel run finished but failed the buyer-quality goal.** 34/100 Serper queries, no OpenAI. Canonical's raw Act now result was flagged offline for boilerplate-driven roles, uncertain category/segment and tier provenance. Final: **0 Act now / 0 Worth researching / 8 Needs review / 0 kills**. Vercel owner approval revision 5 and Gong needs_review revision 4 remain unchanged.
+
+## October 29 — authorized run and executive-window close-out
+
+- [x] Record explicit owner permission for one 100-query run and the temporary process-only monthly ceiling 170; preserve the existing counter (70→104), persistent .env unchanged.
+- [x] Execute Prepare demo once: 18 ATS searches + 10 employer searches + 1 size search + 5 refresh = **34**. No OpenAI/GDELT; no duplicate run.
+- [x] Report all ranked lists, true first-published versus updated dates, candidate/collector errors and zero kills. Retain all seven earlier rejected page records.
+- [x] Explicitly flag Canonical, a possible adjacent infrastructure vendor. Its web-manager ad was first published December 2022; refresh's top Legal Counsel trigger and 225 active triggers came from company boilerplate. Fit66/Tier2 are raw, not qualified-buyer proof.
+- [ ] Discovery reliably produces genuine Act now buyers for new sellers. **Not met**. Remaining: job-function/boilerplate filtering, evergreen dates, employer/title and /apply parsing, segment evidence, vendor and revenue-source quality.
+- [x] Offline-only departure alias fix: exec_change/30 days, cached default/90 rejected, event date preserved, configured overrides respected.
+- [x] Repair ten trigger/history rows through saveState, retain evidence/approval and recalculate priority. Resolve now 2 Act now (Okta/Coalition), 3 Worth researching, 14 Needs review; CrowdStrike Unranked at fit35/Tier1, priority .112, zero active departures.
+- [x] Full suite **75 files, 368 pass/1 intentional skip (369 total)**; code 238aefe passed CI. Browser checked Vercel 0/0/8 and Resolve's two Act now accounts without source/provider calls.
+- [x] Update the same Drive checklist/demo script once; keep the local server running on port3000, OpenAI false/zero and live collectors disabled process-only.
+
+Full ranked rows, job dates, receipts and failure analysis: [October 29 report](OCT29-PREPARE-DEMO-REPORT.md). The run authorization is exhausted; no additional live research, model call or approval follows this close-out.
+
+## Earlier October 28 offline checkpoint
+
 Latest checkpoint, October 28, 2026: **offline new-seller discovery is implemented; live Vercel rerun awaits owner OK.** 74 files, 365 passed/1 intentional skip (366 total). Zero research-provider calls in this checkpoint. Local port 3000 is running, OpenAI false/zero. No seller approval changed.
 
 ## New-seller discovery — offline checkpoint
@@ -16,7 +34,7 @@ Latest checkpoint, October 28, 2026: **offline new-seller discovery is implement
 - [x] Saved Resolve hiring replay: Okta/Coalition remain valid role/window examples. Altana's role matches but its 2019 corporate size receipt is unsafe; view now puts it in Needs review. SecurityScorecard stays closed/historical.
 - [x] Full suite: 365 passed, one intentional skip across 74 files. Discovery pipeline f0b85f5 passed CI; query-preview wording is aa3c5e8. No approval or live research.
 - [ ] Owner OK, then one Vercel Prepare demo: 18 ATS + up to 10 identity + 10 size + 50 refresh = 88 planned queries, hard stop 100. Goal 3–5 genuine Act now; report fewer honestly.
-- [ ] Separate existing issue: legacy executive_departure uses the default 90-day window instead of exec_change/30. CrowdStrike is not a 30-day freshness proof; this checkpoint does not claim that alias/history migration is fixed.
+- [x] The executive_departure alias/history issue was resolved in the October 29 offline fix above. CrowdStrike's old receipts now expire under exec_change/30 and no longer place it in Act now.
 
 Exact queries, gates, limits and evidence: [proposed discovery plan](DISCOVERY-TRIGGER-FIRST-PLAN.md). The existing Drive Demo Script/checklist are updated once at close-out, retaining their same IDs.
 

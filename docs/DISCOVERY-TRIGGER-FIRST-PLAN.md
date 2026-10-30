@@ -1,6 +1,6 @@
 # New-seller discovery — offline checkpoint and proposed live plan
 
-October 28, 2026. **Awaiting owner OK for live research.** No Serper, OpenAI, ATS, Wikidata, GDELT or external-page research call was made in this checkpoint. GitHub verification and the explicitly requested Google Docs updates are separate from research.
+Historical offline plan, October 28, 2026. **Executed once with owner authorization on October 29:** 34/100 Serper queries, zero OpenAI, final 0 Act now/0 Worth researching/8 Needs review after Canonical's quality flag. Authorization is exhausted. The separate executive-window bug is fixed offline. See [actual results](OCT29-PREPARE-DEMO-REPORT.md). The remaining content preserves the original reviewed plan and its offline checkpoint; statements below about awaiting OK or the then-unfixed alias are historical.
 
 ## What changed
 

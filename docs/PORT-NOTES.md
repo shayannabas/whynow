@@ -1,5 +1,13 @@
 # WhyNow SignalScout port notes
 
+## October 29 — live discovery result and executive-window repair
+
+**What the run does:** one marked Vercel preparation under100 queries, with no model. **How it decides:** existing shared gates/collectors; persist every query/account and keep review history. **What changed from SignalScout:** explicit owner/run/monthly budget boundaries and no fabricated success. **Example:**34 queries returned Canonical, but its Legal Counsel “why now” matched boilerplate and its infrastructure-vendor status was ambiguous. It is flagged Needs review; zero genuine Act now is reported.
+
+**What the window fix does:** `collector-triggers.cjs`, `decisioning.cjs` and `repair-executive-windows.cjs` expire departures after the configured executive-change window. **How it decides:** map executive_departure to exec_change/30, override incorrect legacy default/90 metadata, use the reported event date and preserve source receipts. **What changed:** the immutable SignalScout departure capture has a documented metadata-only parity deviation; no factual event text/date/type is rewritten. **Example:** CrowdStrike's September4 receipt expired October4. All five departure records remain, but Today drops it and priority becomes .112.
+
+The live run exposed remaining defects rather than proving general discovery quality: company-boilerplate role matches, original publication versus bulk update dates, /apply and employer parsing, broad segment words and opaque revenue receipts. The report preserves these findings for the next owner-authorized task. No extra provider iteration occurred.
+
 ## New-seller discovery — October 28 offline checkpoint
 
 **What it does:** `workspace-hiring.cjs` and the shared trigger-first runner start with a job opening instead of a broad company-page search. **How it decides:** use approved personas/functions/technologies, verify the actual ATS job/date, identify its operating employer from a first-party page, classify it, then apply free sizing, exclusions, scorecard, tiers and kills. **What changed from SignalScout:** Resolve's fixed SRE search phrases become workspace data; strict WhyNow robots/network/budget guards remain. **Example:** a synthetic commerce company hiring a Staff Frontend Engineer with Next.js passes Vercel targeting across all three ATS formats. A graduate role or missing posting does not.
