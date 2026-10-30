@@ -12,6 +12,8 @@
 
 Saved Resolve replay remains honest: Okta/Coalition are valid ATS examples; Altana's role matches but its 2019 corporate sizing needs review. The separate legacy executive-departure SLA alias issue is tracked in the discovery plan, not silently treated as verified freshness.
 
+Final vendor-gate review: approved seller category/offer text constrains category matching; infrastructure-component terms apply only to infrastructure sellers. Targeting technologies alone never establish a vendor. The synthetic AI-application company remains a Vercel buyer candidate even when it sells AI agents through an API, while a first-party custom-domain infrastructure offering is excluded.
+
 ## October 28 — review quality and source availability
 
 ### Targeting proposals, size bounds and measurement

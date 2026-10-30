@@ -18,7 +18,7 @@ function phaseAConfigForWorkspace(workspace={}) {
   const sellerName=String(sellerProfile.sellerName||sellerProfile.name||reference.sellerName||workspace.name||'Seller').trim();
   return {
     configSource,
-    seller:{name:sellerName,label:String(reference.sellerLabel||icpConfig.exclusions?.sellerLabel||sellerName),domain:rootDomain(sellerProfile.domain||reference.sellerDomain)},
+    seller:{name:sellerName,category:String(sellerProfile.category||''),productOneLiner:String(sellerProfile.productOneLiner||''),label:String(reference.sellerLabel||icpConfig.exclusions?.sellerLabel||sellerName),domain:rootDomain(sellerProfile.domain||reference.sellerDomain)},
     scoring:{version:icpConfig.scoring?.version||'resolve-scoring-priority-v2',weights:icpConfig.weights||icpConfig.scoring?.weights||{},liveTriggerDays:icpConfig.scoring?.liveTriggerDays||90},
     tierRules:icpConfig.tierRules||{},
     decisionRules:icpConfig.decisionRules||{},
