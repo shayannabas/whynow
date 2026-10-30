@@ -58,7 +58,12 @@ describe('SignalScout Phase B frozen pure-output parity',()=>{
         vi.useFakeTimers();
         vi.setSystemTime((row.output.signals||row.output)[0].observedAt);
       }
-      expect(run(row)).toEqual(row.output);
+      if(row.id==='executive-departure'){
+        // Owner-directed bug fix: retain the source capture, but correct only its SLA metadata.
+        const actual=run(row),strip=items=>items.map(({slaDays,slaKey,decaysAt,...rest})=>rest);
+        expect(strip(actual)).toEqual(strip(row.output));expect(actual.every(t=>t.slaDays===30&&t.slaKey==='exec_change')).toBe(true);
+        for(const t of actual)expect(t.decaysAt).toBe(new Date(Date.parse(t.occurredAt)+30*86400000).toISOString());
+      }else expect(run(row)).toEqual(row.output);
     });
   }
 

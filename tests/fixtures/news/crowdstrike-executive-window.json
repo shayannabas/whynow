@@ -1,0 +1,215 @@
+{
+  "capturedOn": "2026-10-29",
+  "source": "Saved Resolve reference workspace before the offline executive-window repair; public trigger data only.",
+  "now": "2026-10-30T04:30:01.254Z",
+  "slaConfig": {
+    "default": 90,
+    "form_d_filing": 14,
+    "outage": 30,
+    "exec_change": 30,
+    "hiring_surge": 45,
+    "first_infra_hire": 45,
+    "headcount_surge": 45,
+    "otel_adoption": 90,
+    "otel_contributor": 180,
+    "risk_factor_added": 120,
+    "conference_talk": 120,
+    "public_postmortem": 30,
+    "reliability_hiring": 90,
+    "ai_rca_hiring": 60,
+    "funding": 30
+  },
+  "account": {
+    "id": "c6341487-ab92-46df-901e-bcd8d29f24fa",
+    "name": "CrowdStrike",
+    "domain": "crowdstrike.com",
+    "tier": 1,
+    "fitScore": 35,
+    "priority": 0.14,
+    "signals": {
+      "techStack": {
+        "id": "sig_474ccdb3fcc4c14c",
+        "key": "techStack",
+        "score": 3,
+        "evidenceUrl": "https://crowdstrike.wd5.myworkdayjobs.com/en-US/crowdstrikecareers/job/Sr-Infrastructure-Engineer---Kubernetes--Remote-_R29056",
+        "evidenceText": "Sr. Platform Engineer - Kubernetes (Remote). Production stack evidence: Kubernetes.",
+        "observedAt": "2026-10-21T00:12:22.790Z",
+        "sourceId": "serper",
+        "inferred": false,
+        "metadata": {
+          "terms": [
+            "Kubernetes"
+          ]
+        }
+      },
+      "revenueSensitivity": {
+        "id": "sig_bc0c7b58eaa4b226",
+        "key": "revenueSensitivity",
+        "score": 4,
+        "evidenceUrl": "",
+        "evidenceText": "Cybersecurity platforms base score. No unverified seasonal boost applied. No configured time-bound or returnable transaction pattern was verified.",
+        "observedAt": "2026-10-21T00:12:22.875Z",
+        "sourceId": "segment_model",
+        "inferred": true,
+        "metadata": {
+          "baseScore": 4,
+          "seasonalBoost": 0,
+          "transactionalUrgency": "non_transactional",
+          "transactionalUrgencyReason": "No configured time-bound or returnable transaction pattern was verified.",
+          "transactionalUrgencySource": "conservative_default"
+        }
+      },
+      "observabilityScale": {
+        "id": "sig_4e33d95a63510dee",
+        "key": "observabilityScale",
+        "score": 4,
+        "evidenceUrl": "https://www.linkedin.com/jobs/view/manager-engineering-dev-ops-sre-hybrid-at-crowdstrike-4422724357",
+        "evidenceText": "Manager, Engineering - Dev Ops/SRE (Hybrid). Reliability practice evidence: site reliability, SRE.",
+        "observedAt": "2026-10-21T00:12:22.790Z",
+        "sourceId": "serper",
+        "inferred": false,
+        "metadata": {
+          "terms": [
+            "site reliability",
+            "SRE"
+          ]
+        }
+      },
+      "aiCompatibility": {
+        "score": 1,
+        "evidenceUrl": "",
+        "evidenceText": "Signal not collected.",
+        "inferred": true,
+        "metadata": {}
+      },
+      "competitiveWedge": {
+        "id": "sig_76b36473f3d92c00",
+        "key": "competitiveWedge",
+        "score": 5,
+        "evidenceUrl": "https://resolve.ai/customers",
+        "evidenceText": "Zscaler is verified on Resolve's customer page. Nearest relationship for CrowdStrike: direct rival or category peer.",
+        "observedAt": "2026-10-21T00:12:22.843Z",
+        "sourceId": "resolve_customers",
+        "inferred": false,
+        "metadata": {
+          "wedgeCustomers": [
+            "Zscaler"
+          ],
+          "relationship": "direct rival or category peer"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "id": "evt_72228268ab253202",
+        "type": "executive_departure",
+        "title": "CrowdStrike's CTO is leaving to launch an AI-cyber fund",
+        "evidenceUrl": "https://finance.yahoo.com/technology/ai/articles/exclusive-crowdstrikes-cto-leaving-launch-102507811.html",
+        "evidenceText": "CrowdStrike's CTO is leaving to launch an AI-cyber fund. Update: CrowdStrike CTO Steps Down, Launches New Venture Capital Fund.",
+        "occurredAt": "2026-08-20T07:00:00.000Z",
+        "sourceId": "serper",
+        "painThemes": [],
+        "metadata": {
+          "role": "CTO",
+          "route": "news",
+          "action": "departure",
+          "eventDateReported": true,
+          "followUp": "find_successor"
+        },
+        "triggerType": "executive_departure",
+        "detectedAt": "2026-08-20T07:00:00.000Z",
+        "decaysAt": "2026-11-18T07:00:00.000Z",
+        "slaDays": 90,
+        "slaKey": "default"
+      },
+      {
+        "id": "evt_1ca47d287f6d6be6",
+        "type": "executive_departure",
+        "title": "CrowdStrike stock falls as CTO leaves to launch AI fund",
+        "evidenceUrl": "https://www.tradingview.com/news/invezz:1d9b75321094b:0-crowdstrike-stock-falls-as-cto-leaves-to-launch-ai-fund/",
+        "evidenceText": "CrowdStrike stock falls as CTO leaves to launch AI fund. CrowdStrike stock falls as CTO leaves to launch AI fund. Aug 20, 2026, 11:02 GMT-7 2 min read.",
+        "occurredAt": "2026-08-20T07:00:00.000Z",
+        "sourceId": "serper",
+        "painThemes": [],
+        "metadata": {
+          "role": "CTO",
+          "route": "news",
+          "action": "departure",
+          "eventDateReported": true,
+          "followUp": "find_successor"
+        },
+        "triggerType": "executive_departure",
+        "detectedAt": "2026-08-20T07:00:00.000Z",
+        "decaysAt": "2026-11-18T07:00:00.000Z",
+        "slaDays": 90,
+        "slaKey": "default"
+      },
+      {
+        "id": "evt_44cd5797bb58e84a",
+        "type": "executive_departure",
+        "title": "CrowdStrike CTO departs to launch AI fund",
+        "evidenceUrl": "https://www.investing.com/news/stock-market-news/crowdstrike-stock-falls-as-cto-departs-to-launch-ai-fund-93CH-4869210",
+        "evidenceText": "CrowdStrike CTO departs to launch AI fund. The CTO's decision to leave CrowdStrike to establish a fund focused on artificial intelligence and cybersecurity represents a notable leadership ...",
+        "occurredAt": "2026-08-20T07:00:00.000Z",
+        "sourceId": "serper",
+        "painThemes": [],
+        "metadata": {
+          "role": "CTO",
+          "route": "news",
+          "action": "departure",
+          "eventDateReported": true,
+          "followUp": "find_successor"
+        },
+        "triggerType": "executive_departure",
+        "detectedAt": "2026-08-20T07:00:00.000Z",
+        "decaysAt": "2026-11-18T07:00:00.000Z",
+        "slaDays": 90,
+        "slaKey": "default"
+      },
+      {
+        "id": "evt_a2ff0594759620ad",
+        "type": "executive_departure",
+        "title": "CrowdStrike CTO Elia Zaitsev Leaves After 13 Years to ...",
+        "evidenceUrl": "https://www.thekeyexecutives.com/2026/09/04/crowdstrike-cto-elia-zaitsev-leaves-after-13-years-to-launch-170-million-ai-security-fund/",
+        "evidenceText": "CrowdStrike CTO Elia Zaitsev Leaves After 13 Years to .... CrowdStrike CTO Elia Zaitsev Leaves After 13 Years to Launch $170 Million AI Security Fund. CrowdStrike Global Chief Technology Officer Elia ...",
+        "occurredAt": "2026-09-04T07:00:00.000Z",
+        "sourceId": "serper",
+        "painThemes": [],
+        "metadata": {
+          "role": "CTO",
+          "route": "news",
+          "action": "departure",
+          "eventDateReported": true,
+          "followUp": "find_successor"
+        },
+        "triggerType": "executive_departure",
+        "detectedAt": "2026-09-04T07:00:00.000Z",
+        "decaysAt": "2026-12-03T07:00:00.000Z",
+        "slaDays": 90,
+        "slaKey": "default"
+      },
+      {
+        "id": "evt_52cd7563f4eb4813",
+        "type": "executive_departure",
+        "title": "CrowdStrike CTO Elia Zaitsev Departs After 13 Years",
+        "evidenceUrl": "https://www.linkedin.com/posts/technadu_technaducyberjobmoves-securityleadershipmoves-activity-7491766598228348928-uZVi",
+        "evidenceText": "CrowdStrike CTO Elia Zaitsev Departs After 13 Years. CrowdStrike CTO Elia Zaitsev Departs After 13 Years. View organization page for TechNadu. TechNadu. 7,141 followers. 1mo. Report this post",
+        "occurredAt": "2026-08-22T00:12:22.755Z",
+        "sourceId": "serper",
+        "painThemes": [],
+        "metadata": {
+          "role": "CTO",
+          "route": "news",
+          "action": "departure",
+          "eventDateReported": true,
+          "followUp": "find_successor"
+        },
+        "triggerType": "executive_departure",
+        "detectedAt": "2026-08-22T00:12:22.755Z",
+        "decaysAt": "2026-11-20T00:12:22.755Z",
+        "slaDays": 90,
+        "slaKey": "default"
+      }
+    ]
+  }
+}

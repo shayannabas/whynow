@@ -8,11 +8,11 @@ function triggerType(trigger={}){return String(trigger.triggerType||trigger.type
 function slaKeyForType(value=''){
   const type=String(value).toLowerCase().replace(/[\s-]+/g,'_');
   if(type==='form_d_filing')return 'form_d_filing';if(/outage|incident|downtime|degraded/.test(type))return 'outage';
-  if(type==='exec_change')return type;if(type==='hiring_surge'||type==='first_infra_hire'||type==='headcount_surge'||type==='otel_adoption'||type==='otel_contributor'||type==='risk_factor_added'||type==='conference_talk'||type==='public_postmortem'||type==='ai_rca_hiring')return type;
+  if(type==='exec_change'||type==='executive_departure')return 'exec_change';if(type==='hiring_surge'||type==='first_infra_hire'||type==='headcount_surge'||type==='otel_adoption'||type==='otel_contributor'||type==='risk_factor_added'||type==='conference_talk'||type==='public_postmortem'||type==='ai_rca_hiring')return type;
   if(/reliability_hiring|site_reliability|sre_hiring/.test(type))return 'reliability_hiring';if(/funding|raised|financing|series_[a-z]/.test(type))return 'funding';return 'default';
 }
 function decorateTrigger(trigger={},slaInput={}){
-  const canonicalType=triggerType(trigger),slaKey=slaKeyForType(canonicalType),normalized=normalizeSlaConfig(slaInput),hasConfigured=Object.hasOwn(slaInput||{},slaKey),slaDays=hasConfigured?normalized[slaKey]:boundedDays(trigger.slaDays,normalized[slaKey]),timestamp=Date.parse(trigger.detectedAt||trigger.occurredAt||trigger.observedAt||''),decaysAt=Number.isFinite(timestamp)?new Date(timestamp+slaDays*DAY_MS).toISOString():'';
+  const canonicalType=triggerType(trigger),slaKey=slaKeyForType(canonicalType),normalized=normalizeSlaConfig(slaInput),hasConfigured=Object.hasOwn(slaInput||{},slaKey),legacyDeparture=canonicalType==='executive_departure'&&trigger.slaKey!=='exec_change',slaDays=hasConfigured||legacyDeparture?normalized[slaKey]:boundedDays(trigger.slaDays,normalized[slaKey]),timestamp=Date.parse(canonicalType==='executive_departure'?(trigger.occurredAt||trigger.detectedAt||trigger.observedAt||''):(trigger.detectedAt||trigger.occurredAt||trigger.observedAt||'')),decaysAt=Number.isFinite(timestamp)?new Date(timestamp+slaDays*DAY_MS).toISOString():'';
   return {...trigger,type:trigger.type||canonicalType,triggerType:trigger.triggerType||canonicalType,...(trigger.detectedAt?{}:trigger.occurredAt?{detectedAt:trigger.occurredAt}:{}),decaysAt,slaDays,slaKey};
 }
 module.exports={DAY_MS,DEFAULT_TRIGGER_SLA_DAYS,decorateTrigger,normalizeSlaConfig,slaKeyForType,triggerType};
