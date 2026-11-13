@@ -38,8 +38,7 @@ Every file changed by this close-out is listed below. Renames list their current
 - `scripts/rejected-discovery.cjs` — added
 - `scripts/repair-hiring-evidence.cjs` — added
 - `scripts/server/phase-a-pages.cjs` — updated
-- `scripts/server/reference-styles.cjs` — added
-- `scripts/server/signalscout-styles.cjs` — removed
+- `scripts/server/reference-styles.cjs` — renamed/replaced the retired stylesheet; imports updated
 - `scripts/server/state.cjs` — updated
 - `scripts/server/styles.cjs` — updated
 - `scripts/trigger-first-discovery.cjs` — updated
@@ -60,6 +59,6 @@ Every file changed by this close-out is listed below. Renames list their current
 - `tests/ui-shell.test.mjs` — updated
 - `docs/FINAL-CHANGE-MANIFEST.md` — added (this inventory)
 
-57 tracked files changed, including renamed destinations and four real screenshots.
+57 tracked file changes (56 current paths; the retired stylesheet is represented by its replacement above), including four real screenshots.
 
 The two native Drive documents were also edited in place: the Live Build Checklist and the 3-minute Demo Script. They are external documents, not additional repository files.
