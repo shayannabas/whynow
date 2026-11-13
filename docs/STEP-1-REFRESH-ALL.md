@@ -44,6 +44,6 @@ Minimum: 11. Median: 34. Maximum: 51.
 
 ## How uncollected signals are handled
 
-WhyNow matches SignalScout's conservative prior: an uncollected scorecard signal is assigned the minimum raw score of 1 with 0.4 confidence for the calculation, and it is labeled `Unknown · low confidence` in the browser. It has no receipt and is never described as evidence that the company lacks a problem. A completely uncollected six-signal account therefore has a small 8/100 prior and the `mostly-inferred` confidence band rather than six negative findings.
+WhyNow matches Reference's conservative prior: an uncollected scorecard signal is assigned the minimum raw score of 1 with 0.4 confidence for the calculation, and it is labeled `Unknown · low confidence` in the browser. It has no receipt and is never described as evidence that the company lacks a problem. A completely uncollected six-signal account therefore has a small 8/100 prior and the `mostly-inferred` confidence band rather than six negative findings.
 
 This distinction matters in interviews: **missing evidence means “we do not know,” not “the signal is false.”**

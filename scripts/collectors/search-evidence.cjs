@@ -13,7 +13,7 @@ function serperQueries(target) {
 
 // The live adapter stays within five queries per account: one dated news query,
 // one combined engineering/AI query, leadership, and two firmographic passes.
-// The frozen SignalScout query plan above remains unchanged for parity tests.
+// The frozen Reference query plan above remains unchanged for parity tests.
 function phaseBQueryPlan(target){
   const name=String(target.name||'').replace(/["\n\r]/g,' ').trim();
   const firmographicName=String(target.firmographicTarget?.name||name).replace(/["\n\r]/g,' ').trim();

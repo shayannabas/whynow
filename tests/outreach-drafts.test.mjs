@@ -52,7 +52,7 @@ describe('receipt-backed deterministic outreach',()=>{
   it('blocks killed accounts, stale evidence, mismatched personas and unapproved seller claims',()=>{
     const {workspace,account}=fixture();
     const killed=outreach.buildDraftContext(workspace,{...account,killStatus:'killed',kills:[{code:'KILL_EXISTING_CUSTOMER'}]},fields,new Date(NOW));expect(killed.blockers).toContainEqual(expect.objectContaining({code:'ACCOUNT_KILLED'}));
-    const stale=outreach.buildDraftContext(workspace,{...account,triggers:account.triggers.map(row=>({...row,decaysAt:'2026-10-20T00:00:00.000Z'}))},fields,new Date(NOW));expect(stale.blockers).toContainEqual(expect.objectContaining({code:'NO_LIVE_RECEIPT'}));
+    const stale=outreach.buildDraftContext(workspace,{...account,triggers:account.triggers.map(row=>({...row,occurredAt:'2025-01-01T00:00:00.000Z',detectedAt:'2026-10-20T00:00:00.000Z',decaysAt:'2026-10-20T00:00:00.000Z'}))},fields,new Date(NOW));expect(stale.blockers).toContainEqual(expect.objectContaining({code:'NO_LIVE_RECEIPT'}));
     const wrong=outreach.buildDraftContext(workspace,account,{...fields,title:'Chief Financial Officer'},new Date(NOW));expect(wrong.blockers).toContainEqual(expect.objectContaining({code:'PERSONA_MISMATCH'}));
     const ordinary={...workspace,status:'active',referenceDemo:undefined,icpConfig:{...workspace.icpConfig,outreach:undefined},sellerProfile:{name:'Seller',domain:'seller.example',approvedAt:'2026-10-20T00:00:00.000Z',customers:[],competitors:[],evidence:{}}};expect(outreach.buildDraftContext(ordinary,account,fields,new Date(NOW)).blockers).toContainEqual(expect.objectContaining({code:'NO_APPROVED_SELLER_CLAIM'}));
   });

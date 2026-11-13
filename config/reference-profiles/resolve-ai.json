@@ -10,8 +10,8 @@
     "website": "https://resolve.ai"
   },
   "provenance": {
-    "killEvidencePolicyChange": {"changedOn":"2026-10-27","authority":"Owner's demo review: internal-tooling kills require prospect-owned engineering evidence; observability/incident vendors are adjacent-vendor exclusions, not build-culture kills.","changedFields":["icpConfig.killRules.adjacentVendorCategories"],"note":"Deliberate quality deviation from the unchanged historical SignalScout parity captures; no seller claim or source fixture was invented."},
-    "sourceProject": "flowfire",
+    "killEvidencePolicyChange": {"changedOn":"2026-10-27","authority":"Owner's demo review: internal-tooling kills require prospect-owned engineering evidence; observability/incident vendors are adjacent-vendor exclusions, not build-culture kills.","changedFields":["icpConfig.killRules.adjacentVendorCategories"],"note":"Deliberate quality deviation from the unchanged historical Reference parity captures; no seller claim or source fixture was invented."},
+    "sourceProject": "reference-project",
     "sourceCommit": "130789f1bac1d5e11f5f5154f269155dc17f2d21",
     "sourceModules": [
       "scripts/resolve-gtm.cjs",
@@ -45,7 +45,7 @@
       {"target":"icpConfig.scoring and icpConfig.weights","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"28-49","note":"Six-signal weights, scoring version and live-trigger window moved out of runtime code."},
       {"target":"icpConfig.exclusions.existingCustomers","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"8,243-247","note":"Resolve customer source URL and names moved out of runtime code."},
       {"target":"icpConfig.killPatterns.sizeMetric","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"187","note":"The 200-engineer minimum moved out of runtime code."},
-      {"target":"icpConfig.killRules.precedence","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"195-201","note":"SignalScout's five-code kill precedence moved out of runtime code."},
+      {"target":"icpConfig.killRules.precedence","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"195-201","note":"Reference's five-code kill precedence moved out of runtime code."},
       {"target":"icpConfig.killPatterns.buildCulturePatterns","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"611-612","note":"Build-culture receipt matcher moved out of runtime code."},
       {"target":"icpConfig.killPatterns.solvingInHousePatterns","sourceFile":"scripts/resolve-gtm.cjs","sourceLines":"614-615","note":"In-house production-investigation matcher moved out of runtime code."},
       {"target":"icpConfig.tierRules","sourceFile":"scripts/tiering.cjs","sourceLines":"3-8","note":"Tier thresholds moved out of runtime code."},
@@ -59,11 +59,11 @@
       ,{"target":"icpConfig.outreach.targeting","sourceFile":"scripts/message-targeting.cjs","sourceLines":"3-112","note":"Power-line, awareness, Maslow and CTA vocabularies are declared as reference outreach settings instead of Resolve runtime constants."}
     ],
     "whyNowExtensions": [
-      {"target":"icpConfig.killRules.whyNowExtension","note":"WhyNow additionally excludes the seller and configured competitors. This does not alter SignalScout's five-code precedence fixture."}
+      {"target":"icpConfig.killRules.whyNowExtension","note":"WhyNow additionally excludes the seller and configured competitors. This does not alter Reference's five-code precedence fixture."}
     ],
     "sellerClaimRefresh": {
       "changedOn": "2026-10-21",
-      "reason": "The frozen SignalScout outreach constants had drifted from Resolve AI's current first-party pages. WhyNow re-fetched the approved product and customer pages through its robots-aware public-page runtime and retained only verbatim, currently receipted wording.",
+      "reason": "The frozen Reference outreach constants had drifted from Resolve AI's current first-party pages. WhyNow re-fetched the approved product and customer pages through its robots-aware public-page runtime and retained only verbatim, currently receipted wording.",
       "pages": [
         {"url":"https://resolve.ai/product/ai-sre","fetchedAt":"2026-10-22T00:06:42.060Z"},
         {"url":"https://resolve.ai/product/overview","fetchedAt":"2026-10-22T00:06:43.109Z"},

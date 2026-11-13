@@ -24,7 +24,7 @@ The nine active Binance triggers are dated job-board signals inside their config
 
 ## Binance unsellable-kill explanation
 
-The frozen SignalScout parity case is killed because its input explicitly says the prospecting surface is unavailable and includes a public evidence URL. The live Binance record has no `prospectingSurface`, no receipted `prospectingSurfaceEvidenceUrl`, and no equivalent kill hint. Large size and a high fit score cannot substitute for the missing evidence, so `KILL_UNSELLABLE_ORG` correctly does not fire.
+The frozen Reference parity case is killed because its input explicitly says the prospecting surface is unavailable and includes a public evidence URL. The live Binance record has no `prospectingSurface`, no receipted `prospectingSurfaceEvidenceUrl`, and no equivalent kill hint. Large size and a high fit score cannot substitute for the missing evidence, so `KILL_UNSELLABLE_ORG` correctly does not fire.
 
 ## SEC EDGAR 403 timebox — resolved October 21
 

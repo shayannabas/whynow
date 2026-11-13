@@ -16,7 +16,7 @@ The existing Drive Demo Script was updated in place and walked against the deskt
 
 ## Historical Stage 2.5 pause and port-mode direction
 
-Updated October 20, 2026. The owner preserved the completed offline checkpoint but paused further Stage 2.5 work. Its extractor remains a future improvement. The trimmed roadmap is superseded by a phase-gated SignalScout port; Phase A has not started.
+Updated October 20, 2026. The owner preserved the completed offline checkpoint but paused further Stage 2.5 work. Its extractor remains a future improvement. The trimmed roadmap is superseded by a phase-gated Reference port; Phase A has not started.
 
 ## Current Stage 2.5 checkpoint
 

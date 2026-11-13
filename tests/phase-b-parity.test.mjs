@@ -2,7 +2,7 @@ import {afterEach,describe,expect,it,vi} from 'vitest';
 import {createRequire} from 'node:module';
 import fs from 'node:fs';
 const require=createRequire(import.meta.url);
-const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/parity/signalscout-phase-b.json',import.meta.url),'utf8'));
+const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/parity/reference-phase-b.json',import.meta.url),'utf8'));
 const hiring=require('../scripts/collectors/hiring.cjs');
 const pain=require('../scripts/collectors/active-pain.cjs');
 const search=require('../scripts/collectors/search-evidence.cjs');
@@ -51,14 +51,20 @@ function run(row){
 
 afterEach(()=>vi.useRealTimers());
 
-describe('SignalScout Phase B frozen pure-output parity',()=>{
+describe('Reference Phase B frozen pure-output parity',()=>{
   for(const row of fixture.cases){
     it(`matches ${row.id}`,()=>{
       if(row.id==='tech-culture'||row.id==='ai-compatibility'){
         vi.useFakeTimers();
         vi.setSystemTime((row.output.signals||row.output)[0].observedAt);
       }
-      if(row.id==='executive-departure'){
+      if(row.id.endsWith('-normalization')){
+        const actual=run(row);expect(actual.map(({publishedAt,publicationDateSource,department,...rest})=>rest)).toEqual(row.output);
+        expect(actual.every(job=>Object.hasOwn(job,'publishedAt')&&Object.hasOwn(job,'department'))).toBe(true);
+      }else if(['hiring-signals','hiring-velocity'].includes(row.id)){
+        // Legacy captures have update dates only. They no longer establish current hiring.
+        const actual=run(row);expect(row.id==='hiring-signals'?actual.events:actual).toEqual([]);
+      }else if(row.id==='executive-departure'){
         // Owner-directed bug fix: retain the source capture, but correct only its SLA metadata.
         const actual=run(row),strip=items=>items.map(({slaDays,slaKey,decaysAt,...rest})=>rest);
         expect(strip(actual)).toEqual(strip(row.output));expect(actual.every(t=>t.slaDays===30&&t.slaKey==='exec_change')).toBe(true);
@@ -67,7 +73,7 @@ describe('SignalScout Phase B frozen pure-output parity',()=>{
     });
   }
 
-  it('matches the in-scope SignalScout source budgets behind WhyNow guards',()=>{
+  it('matches the in-scope Reference source budgets behind WhyNow guards',()=>{
     for(const [source,budget] of Object.entries(fixture.sourceBudgets)){
       const local=DEFAULT_BUDGETS[source==='resolve_customers'?'seller_customers':source];
       expect(local,source).toMatchObject({limit:budget.maxRequestsPerRun,minIntervalMs:budget.minIntervalMs,ttlMs:budget.cacheTtlMs,timeoutMs:budget.timeoutMs});
@@ -77,7 +83,7 @@ describe('SignalScout Phase B frozen pure-output parity',()=>{
   });
 
   it('records immutable parity provenance',()=>{
-    expect(fixture.source).toEqual({product:'SignalScout',repository:'https://github.com/isaiqba-cell/flowfire',commit:'130789f1bac1d5e11f5f5154f269155dc17f2d21'});
+    expect(fixture.source).toEqual({product:'Reference',repository:'local-reference',commit:'130789f1bac1d5e11f5f5154f269155dc17f2d21'});
     expect(new Set(fixture.cases.map(row=>row.id)).size).toBe(fixture.cases.length);
     expect(byId('competitive-wedge').output.signal.sourceId).toBe('resolve_customers');
   });

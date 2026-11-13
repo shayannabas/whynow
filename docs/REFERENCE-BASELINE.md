@@ -1,6 +1,6 @@
-# Reference: how the original SignalScout works
+# Reference: how the original Reference works
 
-WhyNow is a generalized rebuild of SignalScout, a prospecting engine built for one seller (Resolve AI). This document explains the original so an implementer understands the intent behind WhyNow's requirements. **It is background, not a spec** — `docs/PRD.md` is the spec. Selected original files may be available read-only in `reference/signalscout/`.
+WhyNow is a generalized rebuild of Reference, a prospecting engine built for one seller (Resolve AI). This document explains the original so an implementer understands the intent behind WhyNow's requirements. **It is background, not a spec** — `docs/PRD.md` is the spec. Selected original files may be available read-only in `reference/reference/`.
 
 ## 1. What it is
 
@@ -132,4 +132,4 @@ Stacking: 0–1 types 1.0×, 2 → 1.5×, 3+ → 2.0×; funding/Form D + exec ch
 
 ## 14. How it was built
 
-SignalScout started as a generic local-business lead scout (plus an unused Next.js tree) and was converted through five staged AI-agent specs: MP1 (Resolve ICP, signals, collectors, scoring, outreach, sustainability, security), MP2 (design system; tier vs fit correction; firmographics; entity resolution; confidence weighting), MP3 (delete dead code, split the monolith, repair data, volume, leading indicators, one SDR queue, delivery, production cutover, metrics), MP4 (lifecycle, live triggers, build-watch, adapters), MP5 (messaging-playbook intelligence). Each stage had a Definition of Done, tests, browser verification, a commit, a deploy, and a review stop; traceability ledgers mapped requirements to code and tests and separated "complete in code" from "owner-gated" production items.
+Reference started as a generic local-business lead scout (plus an unused Next.js tree) and was converted through five staged AI-agent specs: MP1 (Resolve ICP, signals, collectors, scoring, outreach, sustainability, security), MP2 (design system; tier vs fit correction; firmographics; entity resolution; confidence weighting), MP3 (delete dead code, split the monolith, repair data, volume, leading indicators, one SDR queue, delivery, production cutover, metrics), MP4 (lifecycle, live triggers, build-watch, adapters), MP5 (messaging-playbook intelligence). Each stage had a Definition of Done, tests, browser verification, a commit, a deploy, and a review stop; traceability ledgers mapped requirements to code and tests and separated "complete in code" from "owner-gated" production items.

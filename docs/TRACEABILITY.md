@@ -6,7 +6,7 @@
 
 The run's raw Canonical Act now result failed offline quality review: 2022 original web-manager publication, unrelated Legal Counsel top trigger, 225 active events driven by shared “AI, engineering” boilerplate, generic AI-native segment and weak revenue provenance. `finalize-oct29-offline.cjs` records an explicit review flag/audit actor and preserves all raw evidence; final Vercel0/0/8, zero kills. The 3–5 qualified-buyer outcome is not complete.
 
-`collector-triggers.cjs` maps executive_departure to exec_change and fixes legacy cached 90-day metadata using the event date; `decisioning.cjs` protects reads of old records too. `repair-executive-windows.cjs` updates ten active/history rows and recomputes priority without deleting receipts or touching approval. Tests cover the 30-day boundary, configured overrides, saved CrowdStrike receipts, idempotence and retained evidence. The frozen SignalScout capture is unchanged; its departure comparison explicitly documents the three corrected SLA fields while asserting the rest exactly.
+`collector-triggers.cjs` maps executive_departure to exec_change and fixes legacy cached 90-day metadata using the event date; `decisioning.cjs` protects reads of old records too. `repair-executive-windows.cjs` updates ten active/history rows and recomputes priority without deleting receipts or touching approval. Tests cover the 30-day boundary, configured overrides, saved CrowdStrike receipts, idempotence and retained evidence. The frozen Reference capture is unchanged; its departure comparison explicitly documents the three corrected SLA fields while asserting the rest exactly.
 
 Resolve changes from3 to2 Act now (Okta/Coalition). Worth researching3, Needs review14, kills2 unchanged. CrowdStrike remains fit35/Tier1, loses freshness boost (.140→.112), zero active triggers; its five trigger records and six history rows remain.
 
@@ -46,7 +46,7 @@ Verification: 72 files, 340 passed and one intentional skip (341 total); code 8a
 
 ## Desktop review and bounded Gong research — 2026-10-27
 
-`kill-evidence.cjs` checks ownership/internal operation in the same first-party engineering receipt, never by joining an ungrounded hypothesis to an unrelated citation. The live tech-culture adapter and authoritative engine reject product/docs/event/video hints. Category sellers are separately excluded by workspace-configured adjacent-vendor categories and actual vendor evidence (or the owner's explicit classification with a saved receipt). Databricks's unsupported kill is retired; Atlassian/Opsgenie and Grafana Labs are adjacent vendors. `decisioning.cjs` preserves changed decisions in killHistory; the Kill Log now shows them separately. Reference v8 has dated provenance. Frozen SignalScout capture files are unchanged; tests explicitly document why three historical internal-tooling fixture outcomes no longer qualify while preserving scoring/tier parity and unaffected decisions.
+`kill-evidence.cjs` checks ownership/internal operation in the same first-party engineering receipt, never by joining an ungrounded hypothesis to an unrelated citation. The live tech-culture adapter and authoritative engine reject product/docs/event/video hints. Category sellers are separately excluded by workspace-configured adjacent-vendor categories and actual vendor evidence (or the owner's explicit classification with a saved receipt). Databricks's unsupported kill is retired; Atlassian/Opsgenie and Grafana Labs are adjacent vendors. `decisioning.cjs` preserves changed decisions in killHistory; the Kill Log now shows them separately. Reference v8 has dated provenance. Frozen Reference capture files are unchanged; tests explicitly document why three historical internal-tooling fixture outcomes no longer qualify while preserving scoring/tier parity and unaffected decisions.
 
 Industry classification no longer uses broad search-query words as facts; ambiguous isolated matches require review. Owner-directed saved-evidence migration puts Altana under Enterprise platforms · Supply-chain AI. `trigger-identity.cjs` deduplicates the same job across classifier types while preserving distinct job IDs and original history. It prevents the Okta receipt from earning a two-signal boost. `display-date.cjs` uses readable dates and calendar-day age. The desktop renderer shows all five brief accounts, correct SecurityScorecard casing and full workspace names. Draft bodies resize on load/tab switch/resize and receipt links identify their purpose. Existing Okta GPT-5.5 and CrowdStrike template-v2 outputs are currently revalidated, idempotently saved as Demo copy-only records and persisted atomically; no real recipient or new draft generation was introduced. Metrics separates collected/inferred evidence from missing/placeholder unknown slots.
 
@@ -68,19 +68,19 @@ New tests cover the real Vercel comparison excerpt, a synthetic positive, eviden
 
 Gong stopped at free saved-packet preflight: three 8,000-token low-reasoning calls have a $0.875820 maximum estimate, above $0.60; output allowance alone totals $0.72. Zero calls, zero Serper, zero new page fetches and $0 actual cost. The owner must reconcile settings before a batch is started. Neither seller was approved; Prepare demo was not run; persistent OpenAI remains false/zero.
 
-## Local SignalScout UI port — 2026-10-26
+## Local Reference UI port — 2026-10-26
 
-The owner authorized the local UI port with Luna max implementation and GPT-6.1 Sol/Astra review. `scripts/server/signalscout-styles.cjs` preserves the full public design stylesheet from SignalScout commit `130789f1bac1d5e11f5f5154f269155dc17f2d21` (only its trailing newline differs). `styles.cjs` supplies WhyNow workspace/form/responsive adaptations; no reference environment file was read or copied. README credit remains intact.
+The owner authorized the local UI port with Luna max implementation and GPT-6.1 Sol/Astra review. `scripts/server/reference-styles.cjs` preserves the full public design stylesheet from Reference commit `130789f1bac1d5e11f5f5154f269155dc17f2d21` (only its trailing newline differs). `styles.cjs` supplies WhyNow workspace/form/responsive adaptations; no reference environment file was read or copied. README credit remains intact.
 
 `pages.cjs` provides the grouped sidebar and Overview, and `phase-a-pages.cjs` provides distinct Today, Results, Accounts/account work, Discovery, Scorecard and Kill Log screens. Router query parameters drive the real saved-record filters. Account tabs support deep links and Back/Forward, template success/errors stay on Outreach, and new forms carry workspace IDs to reject stale cross-workspace actions. Signal weights, company tier and kill status are separate; unknown placeholders stay unknown. Evidence shows saved signal text/URLs separately from dated trigger history. `activity-pages.cjs` supplies workspace-scoped History, Runs, Funnel and Metrics from actual saved data, including Prepare-demo stage progress. Seller review/setup and Collectors retain their existing actions and approval/receipt gates under the same design system.
 
 New tests: 6 shell/style/script checks, 7 core renderer/receipt/form/drilldown checks and 2 full-route/workspace-isolation checks. The existing foundation restart test now verifies the workspace title plus the new Pipeline overview heading. Full offline suite: 58 files, 296 passed, 1 pre-existing intentional future golden-set skip (297 total). No test calls a live provider. Implementation commit `6051a1b` passed GitHub Actions including the dependency audit and full-history secret scan; `2710e3d` fixes the matrix link's complete click area found in the real browser.
 
-Real browser verification covered 1440/768/390-pixel layouts, mobile Menu, active navigation, workspace switching, Vercel's two blocking warnings and unchecked approval acknowledgment, Results search/selected detail, tabs/Back, tier/fit drilldown, Kill Log receipts, all saved-data routes and Discovery query preview. The stale local Resolve reference v5 was explicitly reloaded through the existing demo action to v7 (accounts retained, no approval). A real Coalition template passed all validators, copied exactly and persisted across restart; an invalid generic recipient was rejected while keeping Outreach visible. No profile was approved or changed, and no provider call, page fetch, send or deployment occurred. Persistent OpenAI settings remain false/zero. See `docs/UI-SIGNALSCOUT-PARITY.md` for limitations.
+Real browser verification covered 1440/768/390-pixel layouts, mobile Menu, active navigation, workspace switching, Vercel's two blocking warnings and unchecked approval acknowledgment, Results search/selected detail, tabs/Back, tier/fit drilldown, Kill Log receipts, all saved-data routes and Discovery query preview. The stale local Resolve reference v5 was explicitly reloaded through the existing demo action to v7 (accounts retained, no approval). A real Coalition template passed all validators, copied exactly and persisted across restart; an invalid generic recipient was rejected while keeping Outreach visible. No profile was approved or changed, and no provider call, page fetch, send or deployment occurred. Persistent OpenAI settings remain false/zero. See `docs/UI-REFERENCE-PARITY.md` for limitations.
 
 ## Port-mode Phase A — 2026-10-20
 
-The owner authorized Phase A after the Stage 2.5 pause. The immutable fixture `tests/fixtures/parity/signalscout-phase-a.json` records full inputs and exact outputs from SignalScout's `scoreSignals`, `evaluateKills`, `tierCompany` and `applyDecisioning` functions at commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. It covers the five named gold-standard shapes, clean Tier 1/2/3 accounts, an existing customer and a simultaneous five-rule precedence case. WhyNow tests load only this saved fixture; SignalScout is never imported at test runtime. All ten cases match exactly.
+The owner authorized Phase A after the Stage 2.5 pause. The immutable fixture `tests/fixtures/parity/reference-phase-a.json` records full inputs and exact outputs from Reference's `scoreSignals`, `evaluateKills`, `tierCompany` and `applyDecisioning` functions at commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. It covers the five named gold-standard shapes, clean Tier 1/2/3 accounts, an existing customer and a simultaneous five-rule precedence case. WhyNow tests load only this saved fixture; Reference is never imported at test runtime. All ten cases match exactly.
 
 Resolve reference profile v2 remains load-only and now records line-level provenance for every moved runtime constant: segments/personas, scoring weights and trigger window, customer exclusions, kill floor/patterns/precedence, tier rules, decision rules and the Uber identity alias. Normal workspaces require owner approval before scoring; the explicit `reference_demo` adapter is a non-approved local parity surface with delivery disabled.
 
@@ -90,7 +90,7 @@ Verification: 31 test files passed, 144 active tests passed and one pre-existing
 
 ## Port-mode direction and Stage 2.5 pause — 2026-10-20
 
-The owner superseded the active Stage 2.5 plan and `docs/IMPLEMENTATION-PLAN-TRIMMED.md` with a six-phase port of the permitted SignalScout functionality. SignalScout (`github.com/isaiqba-cell/flowfire`) by Isa Iqbal is read-only reference material used with permission; its environment files and secrets must never be read or copied. WhyNow retains workspace isolation, atomic JSON persistence, receipts, human approval and send-free Demo mode. Explicitly excluded services are Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway and uptime workflow.
+The owner superseded the active Stage 2.5 plan and `docs/IMPLEMENTATION-PLAN-TRIMMED.md` with a six-phase port of the permitted Reference functionality. Reference (`github.com/reference-author/reference-project`) by Isa Iqbal is read-only reference material used with permission; its environment files and secrets must never be read or copied. WhyNow retains workspace isolation, atomic JSON persistence, receipts, human approval and send-free Demo mode. Explicitly excluded services are Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway and uptime workflow.
 
 The green Stage 2.5 code remains committed at `3cdabaf` as a future research-quality improvement. Its extractor and tests are not removed. This paragraph records the direction-change checkpoint before Phase A was later authorized and completed above.
 
@@ -214,7 +214,7 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 
 | Requirement | Implementation | Verification |
 | --- | --- | --- |
-| SignalScout pure collector parity | `tests/fixtures/parity/signalscout-phase-b.json`; Phase B collector modules | 18 exact frozen input/output cases from source commit `130789f1...`; reference repo is not imported at test time |
+| Reference pure collector parity | `tests/fixtures/parity/reference-phase-b.json`; Phase B collector modules | 18 exact frozen input/output cases from source commit `130789f1...`; reference repo is not imported at test time |
 | Workspace configuration, not Resolve globals | `phase-b-config.cjs`; `resolve-ai.json` collector rules/provenance | Isolation tests plus reference validation; Phase A parity unchanged |
 | Guarded public adapters | `collectors/runtime.cjs`; hiring, active-pain, search, executive, EDGAR, culture, AI, wedge, revenue modules | Recorded-response adapter tests; no test hits a provider |
 | Persistent caps and failure isolation | `phase-b-runner.cjs`; `serper.cjs` | Per-run/monthly cap tests, source errors retained, free collectors continue after Serper failure |
@@ -232,7 +232,7 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 
 | Requirement | Implementation | Verification |
 | --- | --- | --- |
-| Workspace-configured Resolve universe | `config/reference-profiles/resolve-ai-discovery.json`; `discovery-universe.cjs`; `reference-demo.cjs` | 52 SignalScout seeds frozen from source commit `130789f1...`, lines 22–145; active discovery reads `workspace.universeSeeds` |
+| Workspace-configured Resolve universe | `config/reference-profiles/resolve-ai-discovery.json`; `discovery-universe.cjs`; `reference-demo.cjs` | 52 Reference seeds frozen from source commit `130789f1...`, lines 22–145; active discovery reads `workspace.universeSeeds` |
 | Noise gate and exclusions | `company-discovery.cjs` | Recorded tests reject blocked hosts, mismatched name/domain, seller, customers, competitors, duplicates and existing accounts; Fireworks AI/Fireworks alias regression covered |
 | Bounded background discovery | `discovery-runner.cjs`; `chunk2-live-discovery.cjs` | Per-query reservation, separate fail-closed cap, monthly persistence, partial-error isolation and 20–30 target tests |
 | Live Resolve set | `.whynow/chunk2-discovery-report.json`; `docs/CHUNK-2-STATUS.md` | 10 Serper queries, 0 OpenAI, 25 prospects across all 10 segments, 0 errors, 0 forbidden leaks |
@@ -247,7 +247,7 @@ Sources: [Implementation Plan v4](https://docs.google.com/document/d/1zRa4eMng9g
 | --- | --- | --- |
 | One non-duplicated 25-account refresh | Persisted `account_collector_refresh_all` run; `docs/STEP-1-REFRESH-ALL.md` | Original job finished 25/25 with 125 Serper queries, 0 failed accounts and 0 OpenAI calls |
 | Today evidence | `account-lifecycle.cjs`; saved account receipts | 7/25 refreshed discovery accounts have a dated in-window trigger; 8 accounts across the complete Today queue |
-| Unknown is not negative | `scoring.cjs`; Scorecard/account pages | Missing signals retain SignalScout's score-1, confidence-0.4 prior and render `Unknown · low confidence` with no receipt |
+| Unknown is not negative | `scoring.cjs`; Scorecard/account pages | Missing signals retain Reference's score-1, confidence-0.4 prior and render `Unknown · low confidence` with no receipt |
 | Workspace-neutral targeting | `message-targeting.cjs`; `resolve-ai.json` outreach config | Ported title, power-line, awareness, Maslow and CTA tests pass without Resolve runtime constants |
 | Deterministic receipt-backed template | `outreach-drafts.cjs`; account detail route/page | Blocks killed, stale, uncitable, wrong-entity, wrong-persona and unapproved-claim contexts; saves Demo-only drafts and audit events |
 | Validator gates | `validateOutreachDraft` | Five blocks, 60–110 words, <=8-word subject, exact seller wording, named greeting/signature, no links or enum leakage |
@@ -298,7 +298,7 @@ This sentence describes the Stage 0 checkpoint. Stage 1 infrastructure is added 
 - `npm audit --omit=dev --audit-level=high`: found 0 vulnerabilities.
 - The initial sandbox test attempt blocked localhost binding (`EPERM`); rerunning with localhost permission passed.
 - Browser tool refused localhost access because it could not verify an admin-enforced policy. No visual check is claimed. Still required: inspect at 1280px and 768px, create a workspace, switch it, and verify the rendered screen after restart.
-- GitHub Actions and Gitleaks are configured, but have not run remotely. No GitHub remote was created or existing flowfire remote reused. Stage 0 acceptance remains pending browser verification and a green remote CI run.
+- GitHub Actions and Gitleaks are configured, but have not run remotely. No GitHub remote was created or existing reference-project remote reused. Stage 0 acceptance remains pending browser verification and a green remote CI run.
 
 ## Stage 1 traceability
 
@@ -334,3 +334,16 @@ Five new tests cover supplied websites without provider calls, ambiguous/dedupli
 Implemented in `scripts/onboarding/manual-profile.cjs`, `profile-page.cjs`, and `routes.cjs`. Profile and ICP drafts are workspace-scoped and versioned. Source links without exact saved quotes remain unverified; manual approval does not change evidence labels. Customer evidence requires seller-domain saved quotes. Approval requires category, description, target size, industry, 3–10 segments, buyer and champion roles, and explicit review acknowledgement. Save moves to `needs_review`; approval moves to `active`, always in Demo mode with delivery disabled. Later edits revoke approval. Revision checks protect against stale forms. The audit log records approval with workspace ID and unverified count; hash-chain hardening remains Stage 3.
 
 Nine new tests passed: defaults and draft shape, approval acknowledgement and unverified claims, incomplete/reapproval gates, stale forms and workspace isolation, customer receipt rules, exact quote/paraphrase distinction, schema bounds and unsafe links, escaped rendering with error-form preservation, and local HTTP save/review/approve with origin and workspace checks. Total: 33 tests passed on Node 22. Browser verification remains blocked by a connection initialization error, not presented as completed.
+
+## Final offline demo checkpoint — November 12, 2026
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| Original ATS publication, not edits/detection | `collectors/hiring.cjs`, `collector-triggers.cjs`, `decisioning.cjs`, `trigger-first-discovery.cjs` | `hiring-publication.test.mjs`; real Canonical/Okta/Coalition dates; positive departmental match; missing/future dates |
+| Title + department only | `workspace-hiring.cjs`, `collectors/hiring.cjs` | Canonical Legal Counsel and unrelated-description negatives; positive role tests |
+| Offline saved-evidence repair with audit | `repair-hiring-evidence.cjs` | Idempotence and draft/profile preservation test; local JSON fingerprint check |
+| Rejected pages retained outside prospect queues | `rejected-discovery.cjs`, Discovery collapsed list, optional state array validation | `rejected-discovery.test.mjs`; seven saved negatives; escaped hidden receipt list; browser expansion |
+| Neutral published reference labels | Renamed reference fixtures, stylesheet, baseline/UI notes, imports and metadata | Full suite; zero forbidden current-tree content/filename matches; ignored private originals |
+| Accurate interview artifacts | README, four actual browser screenshots, native checklist/script | Requested demo path; no provider calls or approval; `FINAL-DEMO-CLOSEOUT.md` |
+
+Full suite:77 files,378 passed,1 intentional skip. Okta's original June posting expires; Coalition remains Act now with its draft. Vercel remains owner-approved with no qualified buyer queue and one review record. See `FINAL-CHANGE-MANIFEST.md` and `FINAL-TEST-OUTPUT.txt`.

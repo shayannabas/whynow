@@ -1,11 +1,11 @@
 'use strict';
 
-const { designTokensCss, APP_CSS } = require('./signalscout-styles.cjs');
+const { designTokensCss, APP_CSS } = require('./reference-styles.cjs');
 
 const WHY_NOW_CSS = `
 @font-face{font-family:Manrope;src:url('/fonts/manrope-latin-wght-normal.woff2') format('woff2');font-weight:200 800;font-display:swap}
 /* WhyNow shell integration. Base app tokens, page components and final source cascade are
-   preserved from SignalScout styles.cjs (source commit 130789f); these rules adapt its shell
+   preserved from Reference styles.cjs (source commit 130789f); these rules adapt its shell
    to WhyNow's workspace switcher, grouped routes and local route modules. */
 .layout{grid-template-columns:252px minmax(0,1fr)}
 .side{display:flex;flex-direction:column;gap:17px;min-height:0;overflow:hidden;background:var(--sidebar);color:var(--line)}

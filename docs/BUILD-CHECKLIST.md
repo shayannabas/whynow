@@ -1,3 +1,17 @@
+# Final offline demo checkpoint — November 12, 2026
+
+- [x] Original ATS publication dates govern hiring freshness and expiry; title/department only govern role matching. Canonical 2022 Web and Legal Counsel negatives plus positive/missing-date cases are covered.
+- [x] Seven rejected Vercel page records are retained in a collapsed Discovery archive, outside Needs review and refresh batches. Canonical remains the single genuine review record.
+- [x] Resolve now has Coalition alone in Act now (fit37/Tier1), 4 Worth researching, 11 Needs review and 2 kills. Okta's original June15 posting is expired; its GPT-5.5 draft remains saved, with a current-trigger block. Coalition template v2 and CrowdStrike's historical template remain unchanged.
+- [x] Neutral current-tree naming, renamed reference fixtures/style/docs, private ignored reference notes; no history rewrite. No profile approval or recipient data was published.
+- [x] README rebuilt with features, workflow, stack, local instructions, four real screenshots and limitations. Full verification and changed-file inventory are in docs/FINAL-DEMO-CLOSEOUT.md and docs/FINAL-CHANGE-MANIFEST.md.
+- [x] Full offline suite: 77 files; 378 passed, 1 intentional skip (379 total). Browser demo path checked. OpenAI false/zero; no live research/provider calls. Port3000 kept running.
+- [deferred] Technographic discovery for new sellers; Apollo contact lookup behind future fit/kill gates and credit cap. Neither is implemented or authorized here.
+
+Change log — November12: fixed date/title-driven false hiring urgency, archived seven known page rejections, refreshed repository/Drive demo documentation and captured real README screenshots. Okta cannot remain a current hiring trigger under the corrected original-date rule. CI outcome is recorded after push in the delivery report.
+
+## Historical checklist
+
 # WhyNow — build checklist
 
 Latest checkpoint — October 29, 2026: **the one approved Vercel run finished but failed the buyer-quality goal.** 34/100 Serper queries, no OpenAI. Canonical's raw Act now result was flagged offline for boilerplate-driven roles, uncertain category/segment and tier provenance. Final: **0 Act now / 0 Worth researching / 8 Needs review / 0 kills**. Vercel owner approval revision 5 and Gong needs_review revision 4 remain unchanged.
@@ -77,9 +91,9 @@ The request was then reconstructed offline. The old schema duplicated 548/605/48
 
 The owner authorized one fixed-schema saved-pages draft per seller. Preflight passed all schema limits and estimated $0.026104 maximum cost, below the $0.04 stop line. Resolve AI, Shopify and Vercel each completed in one provider attempt with no retry. A local snapshot-path bug then interrupted finalization after all calls; the intact isolated outputs were finalized offline without another call. The exact provider token usage was lost with the interrupted in-memory usage array, so actual cost is unavailable; the persisted conservative reservation is $0.026104. All three remain `needs_review`: Resolve AI has 0 customers/0 competitors and 11 blocking/2 advisory warnings; Shopify has 0 customers/2 sourced competitors and 13/0; Vercel has 0/0 and 8/4. OpenAI is disabled/zero and no further automated draft is authorized.
 
-## SignalScout UI — October 26, 2026
+## Reference UI — October 26, 2026
 
-- [x] Port the complete public source stylesheet from SignalScout commit `130789f`, including its final shell and credibility layers; keep Manrope locally served.
+- [x] Port the complete public source stylesheet from Reference commit `130789f`, including its final shell and credibility layers; keep Manrope locally served.
 - [x] Use the dark grouped sidebar, KPI strips, Daily Brief/queue cards, Overview board and Results master-detail layout. Keep WhyNow branding/workspace controls and omit excluded delivery/contact controls rather than faking them.
 - [x] Connect filters, query parameters, selected Results account, account tabs and browser Back, score-matrix drilldowns, receipt links and saved background-job progress.
 - [x] Give Outreach a persona → receipted template → Demo-only copy flow. No sending or contact lookup exists.
@@ -91,7 +105,7 @@ The owner authorized one fixed-schema saved-pages draft per seller. Preflight pa
 - [x] Full suite: 58 files passed; 296 tests passed; 1 pre-existing future golden-set test skipped (297 total). First UI implementation commit `6051a1b` passed GitHub tests, dependency audit and full-history secret scan; the clickable matrix correction is `2710e3d`.
 - [x] Preserve the provider/approval boundary: zero Serper/OpenAI/page fetches, no profile approval, no sends, no deployment. Persistent OpenAI settings are false/zero; the running verification server additionally disables Serper and scheduling process-only.
 
-See `docs/UI-SIGNALSCOUT-PARITY.md` for the verified scope and deliberate differences.
+See `docs/UI-REFERENCE-PARITY.md` for the verified scope and deliberate differences.
 
 ## October 27 — demo script, Vercel review and Gong preflight
 
@@ -127,11 +141,11 @@ See `docs/UI-SIGNALSCOUT-PARITY.md` for the verified scope and deliberate differ
 - [x] Preserve the green Stage 2.5 baseline at commit `3cdabaf`; 125 active tests pass and one existing scaffold test is intentionally skipped.
 - [x] Pause Stage 2.5. Keep its deterministic organization extractor and evaluation work as a future improvement.
 - [x] Mark the trimmed remaining-stage plan as superseded historical scope.
-- [x] Confirm the SignalScout reference repository and author: read-only `flowfire`, product SignalScout, by Isa Iqbal, used with permission.
+- [x] Confirm the Reference reference repository and author: read-only `reference-project`, product Reference, by Isa Iqbal, used with permission.
 - [x] Record exclusions: no Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway or uptime workflow.
 - [x] Preserve WhyNow workspaces, atomic JSON state, receipts, human approval and send-free Demo mode.
 - [x] Owner approved Phase A before any ported code was written.
-- [x] Freeze SignalScout's exact offline behavior for ten accounts at source commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`; tests never import SignalScout at runtime.
+- [x] Freeze Reference's exact offline behavior for ten accounts at source commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`; tests never import Reference at runtime.
 - [x] Replace Resolve runtime constants with load-only reference/workspace configuration and record every moved value's source file and line range.
 - [x] Port the workspace-configured six-signal scorer, kill engine and precedence, evidence-only tiering, and decision formula.
 - [x] Retain primary and secondary kills in a visible Kill Log; killed accounts keep their fit score and receive zero priority.
@@ -141,8 +155,8 @@ See `docs/UI-SIGNALSCOUT-PARITY.md` for the verified scope and deliberate differ
 - [x] Browser acceptance: load Resolve reference demo, add Coinbase, see its 8/100 scorecard, see its `KILL_EXISTING_CUSTOMER` receipt, restart and confirm persistence.
 - [x] Full offline suite: 31 files, 144 active tests pass and one existing scaffold test remains intentionally skipped.
 - [x] Owner authorized the narrowed Phase B scope: ATS hiring, Statuspage/HN/Google News active pain, Serper search/executive change, SEC Form D, tech culture, AI compatibility, competitive wedge and revenue sensitivity.
-- [x] Freeze 18 SignalScout collector outputs at source commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`; WhyNow reproduces them exactly without importing SignalScout at runtime.
-- [x] Preserve WhyNow's stricter network/robots/budget/atomic-state boundary and match SignalScout's in-scope budgets and cache times.
+- [x] Freeze 18 Reference collector outputs at source commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`; WhyNow reproduces them exactly without importing Reference at runtime.
+- [x] Preserve WhyNow's stricter network/robots/budget/atomic-state boundary and match Reference's in-scope budgets and cache times.
 - [x] Move Resolve transaction rules and EDGAR segment queries into the load-only reference configuration with source-line provenance.
 - [x] Add persistent, background **Refresh account**; collected receipts update the six-signal scorecard, kills and tiers without deleting prior evidence.
 - [x] Keep GitHub, StatusGator API, conference speakers, OTel graph, EDGAR risk factors and Chunk 2 out of scope.
@@ -153,7 +167,7 @@ See `docs/UI-SIGNALSCOUT-PARITY.md` for the verified scope and deliberate differ
 - [x] Re-score the five saved live accounts after rejecting public-company/IPO boilerplate, misattributed metrics, healthy status pages, stale/undated evidence and duplicate triggers. The offline pass made zero provider calls.
 - [x] Keep the remaining SEC 403 visible and isolated; other sources continue and no further Phase B effort is spent on EDGAR.
 - [x] Owner authorized Chunk 2: discover 20–30 Resolve-segment prospects with at most 60 additional Serper queries, exclude customers/competitors, then add Today, account detail and new/working/skipped status.
-- [x] Move SignalScout's Resolve discovery universe into load-only workspace configuration with source commit/line provenance; discovery code contains no Resolve prospect constants.
+- [x] Move Reference's Resolve discovery universe into load-only workspace configuration with source commit/line provenance; discovery code contains no Resolve prospect constants.
 - [x] Add a 60-query-hard-cap background discovery runner, official-domain noise gate, balanced segment selection and atomic promotion.
 - [x] Live Chunk 2 discovery: 10 Serper queries, 0 OpenAI calls, 62 raw config/search candidates, 25 selected prospects, all 10 segments represented, 0 source errors and 0 seller/customer/competitor leaks.
 - [x] Add Today, account detail, clickable why-now/source receipts and explicit `new / working / skipped` state with required typed skip reason and audit event.
@@ -161,12 +175,12 @@ See `docs/UI-SIGNALSCOUT-PARITY.md` for the verified scope and deliberate differ
 - [x] Complete Chunk 2 and stop before the next port phase.
 - [x] Complete the single authorized 25-account Refresh-all background run without a duplicate: 25/25 accounts, exactly 125 Serper queries, zero OpenAI calls.
 - [x] Report the Today evidence set: 7/25 refreshed discovery accounts and 8 total Today accounts have at least one dated, in-window receipt; preserve exact top-10 and fit distribution in `docs/STEP-1-REFRESH-ALL.md`.
-- [x] Keep uncollected signals as SignalScout's score-1, 40%-confidence prior and label them `Unknown · low confidence`, never negative evidence.
+- [x] Keep uncollected signals as Reference's score-1, 40%-confidence prior and label them `Unknown · low confidence`, never negative evidence.
 - [x] Port workspace-neutral message targeting and validator gates, then build the deterministic receipt-backed template first.
 - [x] Add the Demo watermark, manual recipient/sender fields, receipt links and Copy button. Keep every send code path absent.
 - [x] Configure outreach independently as `OPENAI_OUTREACH_MODEL=gpt-5.5`; free `GET /v1/models` returned HTTP 200 and confirmed account access.
 - [x] Confirm from official documentation that `gpt-5.5` supports Responses/Structured Outputs and costs $5/M input plus $30/M output tokens.
-- [x] Match SignalScout's GPT-5.x request budget: reasoning effort `medium`, 4,000 maximum output tokens, and no automatic output-budget escalation retry. A real Binance request is about $0.008515 at 150 output tokens and $0.124015 at the full allowance.
+- [x] Match Reference's GPT-5.x request budget: reasoning effort `medium`, 4,000 maximum output tokens, and no automatic output-budget escalation retry. A real Binance request is about $0.008515 at 150 output tokens and $0.124015 at the full allowance.
 - [x] Run the owner-authorized bounded GPT-5.5 checkpoint safely: Binance stopped with provider status `incomplete` after one logical call/one attempt; Coalition and CrowdStrike were not called; no validated draft was saved or sent; OpenAI returned to disabled/zero.
 - [x] Preserve safe incomplete diagnostics: reason, input/cached-input/output/reasoning tokens, response identity and calculated cost—never prompt or key contents.
 - [x] Complete the corrected owner-authorized batch: exactly three calls/three attempts, no retry, three validator-passing Demo merge-field drafts, $0.072110 actual total cost, no application-state/send mutation, and OpenAI restored to disabled/zero.
@@ -314,7 +328,7 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 ## Deferred — possible later
 
 - Stage 7 scheduler, SEC/EDGAR, executive-change and GitHub collectors, and signal stacking — unnecessary for a deterministic local portfolio demo.
-- Apollo integration — if separately authorized, port only SignalScout's contact lookup behind an off-by-default switch, run it only after fit/kill checks pass, and enforce a strict credit cap. No sending or CRM sync.
+- Apollo integration — if separately authorized, port only Reference's contact lookup behind an off-by-default switch, run it only after fit/kill checks pass, and enforce a strict credit cap. No sending or CRM sync.
 - Railway deploy (backup only, owner OK required) — interview demos run locally with screen sharing; existing `STATE_DIR`/`PORT` support stays, but Railway is not a planned phase and no demo snapshot work is needed.
 - Stage 10 authentication, Postgres and backups — the demo remains local and single-user.
 - Stage 12 advanced integrations — optional expansion after the core portfolio flow works.
@@ -323,7 +337,7 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 
 - **2026-10-27, desktop review close-out:** Tightened kill ownership evidence and separated adjacent vendors; preserved retired decisions visibly. Corrected Altana and ambiguous classification, saved passing Okta/CrowdStrike drafts, fixed full-body/receipt/date/workspace/queue polish and honest Metrics, and retained exact competitor-domain link provenance without guessing Vercel domains. Completed Gong's three GPT-5.5 calls for $0.222170 with 0 Serper/fetches/retries, left needs_review with 11 blocking/0 advisory, and confirmed OpenAI false/zero. Script v4 updated in place. Full suite: 317 passed, 1 skipped across 62 files. Owner review remains the next gate.
 - **2026-10-27:** Refreshed the existing Drive Demo Script after a real UI walkthrough; fixed mobile account-name visibility (`7f761ac`, green CI). Added conservative comparison retention, explicit rejection/restore UI and audit, measurable identifier handling, and offline Vercel recovery (`564b11c`, green CI). Vercel: 12 customers, Cloudflare/Netlify/Webflow retained with domains missing, 3 blocking/0 advisory, target size left for owner input. Full suite: 302 passed, 1 skipped. Gong stopped at free preflight: $0.875820 maximum versus $0.60 cap; zero provider calls, zero Serper, $0 actual. No approval or Prepare demo.
-- **2026-10-26:** Ported the SignalScout UI across the local demo using Luna max implementation and Sol/Astra review. Added 15 offline UI tests, preserved WhyNow review/no-send boundaries, verified desktop/tablet/mobile interactions and corrected the matrix click target. Reloaded the stale local Resolve demo to v7 and created/copied a passing Coalition template without a provider call. Full regression: 58 files, 296 passing tests, one intentional skip. Vercel/Gong remain unapproved.
+- **2026-10-26:** Ported the Reference UI across the local demo using Luna max implementation and Sol/Astra review. Added 15 offline UI tests, preserved WhyNow review/no-send boundaries, verified desktop/tablet/mobile interactions and corrected the matrix click target. Reloaded the stale local Resolve demo to v7 and created/copied a passing Coalition template without a provider call. Full regression: 58 files, 296 passing tests, one intentional skip. Vercel/Gong remain unapproved.
 - **2026-10-21:** Fixed the GPT-5.5 seller-research length failure without weakening evidence gates. All three focused calls now use 8,000 maximum output tokens and low reasoning. The deterministic Vercel packet again exposes Cloudflare, Netlify and Webflow, and canonical-page selection reduced evidence from 94,044 to 82,402 bytes while retaining 14 customer and 3 competitor candidates. The authorized Vercel-only run used exactly three calls/attempts, 0 Serper queries and $0.346560. The unapproved result has 12 customers, 0 retained competitors, 2 blocking warnings and 0 advisories; Gong and Prepare demo were not run, and OpenAI returned to disabled/zero. Full offline regression: 55 files, 281 active tests and one intentional skip.
 - **2026-10-21:** Polished outreach offline and updated the existing Drive Demo Script in place. Template quotes are capped at 15 words without trailing ellipses, one framing sentence is allowed, and three approved closing questions rotate. Okta's saved GPT-5.5 draft passes; Coalition and CrowdStrike saved AI drafts fail honestly while their template-v2 fallbacks pass. The script now uses the five current Act-now accounts, Coalition template v2, the real Databricks build-culture kill, exact local routes/buttons and the night-before Prepare-demo flow.
 - **2026-10-21:** Ran the owner-authorized Vercel/Gong any-seller checkpoint. Research preparation used 7/20 Serper queries and corrected customer-page prioritization before paid calls. Free model listing confirmed GPT-5.5. The exact six-call maximum estimate was $0.923735 under the $1.30 cap. Vercel's first seller-facts call returned `finish_reason=length` after 23,071 input and 2,048 output/reasoning tokens, costing $0.176795. The runner made no retry, made no Gong call, approved nothing, did not run Prepare demo and confirmed persistent OpenAI settings false/zero.
@@ -338,8 +352,8 @@ Pricing checked September 16, 2026: [Serper](https://serper.dev/), [OpenAI GPT-4
 - **2026-10-21:** Ran the owner-authorized GPT-5.5 outreach checkpoint. The first Binance request returned provider status `incomplete`; the safety runner stopped after one logical call and one attempt, made no Coalition or CrowdStrike call, used no transient retry, and saved/sent no draft. Exact billed cost could not be recovered from the incomplete response; the conservative request reservation was $0.022015 under the $0.25 process cap. The normal OpenAI settings remain disabled/zero. Full regression: 49 files passed, 241 tests passed and one future golden-set scaffold stayed intentionally skipped.
 - **2026-10-21:** Fixed the reasoning-token root cause offline. GPT-5.x outreach now uses 4,000 output tokens with medium reasoning and no budget-escalation retry; incomplete responses preserve safe reason/usage/cost metadata. Full regression: 49 files passed, 242 tests passed and one future scaffold stayed intentionally skipped. The corrected three-account batch then completed in exactly three calls/attempts with no retry. All drafts passed validation; total actual cost was $0.072110. OpenAI returned to disabled/zero, and no draft was saved as sent or into application state.
 - **2026-10-21:** Reopened draft demo readiness for accuracy. Four current Resolve pages were fetched through the guarded robots-aware runtime with no Serper/OpenAI use; reference v5 now keeps only verbatim receipted claims. Added exact seller-quote and prospect-detail grounding, early-career exclusion, the banned-tone rule and neutral/corroborated executive-change handling. Full regression passed: 49 files, 252 tests and one intentional future scaffold skip. The saved-evidence rerank produced only Coalition and CrowdStrike in `Act now`, so the exact-three paid regeneration made zero calls; OpenAI stayed disabled/zero.
-- **2026-10-20:** Owner superseded Stage 2.5 and the trimmed remaining-stage plan with port mode using SignalScout by Isa Iqbal as a read-only reference. Stage 2.5 is paused and its extractor retained for future use. No module was ported, no profile approved and no provider called; Phase A awaits explicit owner approval.
-- **2026-10-20:** Completed port-mode Phase A. Captured ten immutable offline SignalScout parity cases at commit `130789f`, moved Resolve constants into reference profile v2 with line-level provenance, added workspace-configured scoring/kills/tiering/decisioning, manual accounts, Scorecard, retained Kill Log and a non-approved Resolve demo loader. Real browser restart persistence passed. Full suite: 144 active tests passed, one intentional skip. No provider call, approval or deployment occurred; Phase B remains blocked.
+- **2026-10-20:** Owner superseded Stage 2.5 and the trimmed remaining-stage plan with port mode using Reference by Isa Iqbal as a read-only reference. Stage 2.5 is paused and its extractor retained for future use. No module was ported, no profile approved and no provider called; Phase A awaits explicit owner approval.
+- **2026-10-20:** Completed port-mode Phase A. Captured ten immutable offline Reference parity cases at commit `130789f`, moved Resolve constants into reference profile v2 with line-level provenance, added workspace-configured scoring/kills/tiering/decisioning, manual accounts, Scorecard, retained Kill Log and a non-approved Resolve demo loader. Real browser restart persistence passed. Full suite: 144 active tests passed, one intentional skip. No provider call, approval or deployment occurred; Phase B remains blocked.
 - **2026-10-20:** Tightened Phase B live quality. Free firmographics now reject adjacent-company/IPO/public boilerplate, current triggers require dated in-window evidence, healthy status pages score zero, and repeated receipts are deduplicated. The five-account correction reused saved evidence and made no provider calls. SEC EDGAR's remaining 403 is recorded and isolated. The owner authorized Chunk 2 with a separate maximum of 60 Serper queries.
 - **2026-10-20:** Completed Chunk 2. Ported the workspace-configured discovery universe/noise gate/background runner and the compact Today/account lifecycle surface. The live Resolve run used 10 Serper queries, saved 25 prospects across all 10 segments, had zero errors and no forbidden seller/customer/competitor accounts, and made no OpenAI calls. Browser restart persistence passed.
 - **2026-10-20:** Reached the Stage 2.5 offline checkpoint. Deterministic saved-page extraction found 7/51/14 customer candidates with 2/3/2 proven domains and 2/2/3 competitors for Resolve AI/Shopify/Vercel. Independent unconfirmed keys produce provisional recall of 7/7 + 2/2, 3/3 + 2/2 and 3/3 + 3/3; confirmed-only scoring remains empty pending owner review. Raw HTML was available, no page/provider call ran, and no profile was approved. A read-only account model listing confirmed the proposed pinned GPT-5.4 mini ID is available; it remains disabled and the conservative focused-call estimate exceeds the old cap. Full verification passed with 125 active tests and one intentional skip across 27 files.

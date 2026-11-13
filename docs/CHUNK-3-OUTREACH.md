@@ -34,7 +34,7 @@ The owner authorized exactly three paid calls for the top three reranked `Act no
 - The account page shows a `Demo · copy only · no send path` watermark, supporting receipts and a Copy button.
 - There is no sending endpoint, contact provider or CRM integration.
 
-## SignalScout behavior retained
+## Reference behavior retained
 
 The port keeps the useful parts of `resolve-outreach.cjs` and `message-targeting.cjs`: buyer/champion gating, above/below-the-power-line framing, awareness-sensitive calls to action, a receipt-led opener, strict subject/body structure, exact seller-claim wording and validator rejection instead of silent rewriting.
 
@@ -46,7 +46,7 @@ WhyNow deliberately narrows the current surface. Apollo/contact selection, candi
 - Free read-only check: `GET /v1/models` returned HTTP 200 and listed `gpt-5.5` for the configured API key.
 - Official model documentation confirms Responses API and Structured Outputs support: <https://developers.openai.com/api/docs/models/gpt-5.5>.
 - Official price checked October 21, 2026: $5 per million input tokens and $30 per million output tokens.
-- The Structured Outputs request uses reasoning effort `medium` and a 4,000-token output budget for GPT-5.x, matching SignalScout's proven default. There is no automatic output-budget escalation retry.
+- The Structured Outputs request uses reasoning effort `medium` and a 4,000-token output budget for GPT-5.x, matching Reference's proven default. There is no automatic output-budget escalation retry.
 - Incomplete responses retain only safe diagnostic metadata: `incomplete_details.reason`, input/cached-input/output/reasoning token counts, response identity and calculated cost. Prompt contents and keys are never copied into the report.
 - No recorded model-output fixture exists yet. A guard requires any future recorded response to name the configured outreach model.
 

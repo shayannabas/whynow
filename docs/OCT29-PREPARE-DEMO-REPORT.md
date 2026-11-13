@@ -89,7 +89,7 @@ Receipts retained include [August report](https://finance.yahoo.com/technology/a
 
 - **75 files passed; 368 tests passed, 1 intentional skip (369 total).** Full console output: `docs/TEST-OUTPUT-OCT29.txt`.
 - New tests cover the alias, the 30-day boundary, positive in-window behavior, configured overrides, the five real CrowdStrike receipts, history/approval preservation, priority and idempotence.
-- The immutable SignalScout departure fixture remains unchanged. Its comparison deliberately differs only in the corrected SLA key/days/expiry; all other captured output is still compared exactly.
+- The immutable Reference departure fixture remains unchanged. Its comparison deliberately differs only in the corrected SLA key/days/expiry; all other captured output is still compared exactly.
 - Code checkpoint `238aefe` [passed CI](https://github.com/shayannabas/whynow/actions/runs/41003606035).
 - Browser verified Vercel 0/0/8 and Resolve's two Act now accounts. No refresh/source link, model generation, approval or sending action was clicked during verification.
 - Port 3000 remains running. OpenAI is false/zero, live Serper/GDELT/scheduling disabled process-only. Persistent environment settings are unchanged.

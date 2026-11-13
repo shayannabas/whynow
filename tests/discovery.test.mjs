@@ -9,7 +9,7 @@ const universe=require('../scripts/discovery-universe.cjs');
 function workspace(){return loadResolveReferenceDemo(defaultState(),{now:()=> '2026-10-20T00:00:00.000Z'}).workspaces[REFERENCE_WORKSPACE_ID];}
 
 describe('Chunk 2 discovery core',()=>{
-  it('loads SignalScout seeds as load-only workspace configuration, not runtime constants',()=>{
+  it('loads Reference seeds as load-only workspace configuration, not runtime constants',()=>{
     const reference=universe.loadResolveDiscoveryReference(),current=workspace();
     expect(reference).toMatchObject({kind:'load_only_discovery_reference',sourceCommit:'130789f1bac1d5e11f5f5154f269155dc17f2d21'});
     expect(current.universeSeeds).toHaveLength(52);

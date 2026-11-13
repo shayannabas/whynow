@@ -9,7 +9,7 @@ const DEFAULT_MAX_PRIORITY_RAW=9.375;
 function ageDays(value,now=new Date()){const timestamp=Date.parse(value||'');return Number.isFinite(timestamp)?(now.getTime()-timestamp)/86400000:Infinity;}
 function activeTriggers(account={},now=new Date()){
   return dedupeTriggers(account.triggers||[]).filter(saved=>{
-    const trigger=(saved.type==='executive_departure'||saved.triggerType==='executive_departure')?require('./collector-triggers.cjs').decorateTrigger(saved):saved;
+    const trigger=(saved.type==='executive_departure'||saved.triggerType==='executive_departure'||hiringTriggerType(saved.type||saved.triggerType))?require('./collector-triggers.cjs').decorateTrigger(saved):saved;
     if(!trigger.evidenceUrl||trigger.weakEvidenceFlag===true||trigger.reviewState==='needs_more_research'||trigger.citable===false||trigger.metadata?.citable===false)return false;
     if(hiringTriggerType(trigger.type||trigger.triggerType||'')&&isEarlyCareerPosting(trigger))return false;
     if(['serper','public_search','google_news_rss'].includes(trigger.sourceId)&&/incident|outage|news|exec|executive/.test(String(trigger.type||trigger.triggerType||''))&&trigger.metadata?.eventDateReported!==true)return false;

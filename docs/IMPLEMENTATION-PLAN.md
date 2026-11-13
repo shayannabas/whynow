@@ -10,9 +10,9 @@ Build order for `docs/PRD.md`. Rules, tech decisions, and the working agreement 
 4. Implement, run `npm test`, verify in a browser, update `docs/TRACEABILITY.md`, commit, and stop.
 5. The owner checks the Definition of Done (DoD) before moving on.
 
-**Order rationale.** The collector runtime comes first (Stage 1) because onboarding must fetch the seller's public pages politely. Onboarding (Stage 2) comes before the scoring engine because every later stage reads the workspace's generated ICP config. Everything after that is the original SignalScout's final architecture, parameterized by workspace. The original was built by converting an older app and then paying for it later (dead code, a 6,300-line monolith, tier/fit confusion, junk accounts, duplicate entities, a data-loss incident, dual auth); this plan builds the final design from day one.
+**Order rationale.** The collector runtime comes first (Stage 1) because onboarding must fetch the seller's public pages politely. Onboarding (Stage 2) comes before the scoring engine because every later stage reads the workspace's generated ICP config. Everything after that is the original Reference's final architecture, parameterized by workspace. The original was built by converting an older app and then paying for it later (dead code, a 6,300-line monolith, tier/fit confusion, junk accounts, duplicate entities, a data-loss incident, dual auth); this plan builds the final design from day one.
 
-Throughout, "the original calls this X" points at the matching file in `reference/signalscout/` (if present) for design intent.
+Throughout, "the original calls this X" points at the matching file in `reference/reference/` (if present) for design intent.
 
 ---
 
@@ -63,7 +63,7 @@ Throughout, "the original calls this X" points at the matching file in `referenc
 - `scripts/onboarding/synthesize.cjs`: versioned prompts producing the Seller Profile (PRD 7.2.1) and ICP config (PRD 7.2.2) from source excerpts only; each factual field returns `{value, sourceId, evidenceQuote}`.
 - `scripts/onboarding/validate.cjs`: schema validation; grounding check on every field (failure → `inferred: true`); customers only from the seller's own domain or first-party case study/press release; competitors need a source; 3–10 segments; 4–8 query templates per segment; de-duplicated, length-capped keyword lists; defaults for weights, SLAs, and tier rules.
 - `scripts/onboarding/manual-profile.cjs`: the same schema as a form when `OPENAI_API_KEY` is absent.
-- `config/reference-profiles/resolve-ai.json`: the original configuration expressed in the new schema — segments, query templates, personas, and keyword lists from `reference/signalscout/resolve-gtm.cjs`; wedge customers with `https://resolve.ai/customers` as the source; trigger mapping per PRD 6.2. Load-only fixture; never a default seller.
+- `config/reference-profiles/resolve-ai.json`: the original configuration expressed in the new schema — segments, query templates, personas, and keyword lists from `reference/reference/resolve-gtm.cjs`; wedge customers with `https://resolve.ai/customers` as the source; trigger mapping per PRD 6.2. Load-only fixture; never a default seller.
 - Pages:
   - **New workspace** — name + optional website → candidate picker → progress view.
   - **Seller Profile review** — every field with its receipt link; inferred fields greyed with a warning; inline edit; add/remove segments, personas, keywords, competitors, customers (URL required); **Approve** → status `active` + audit event.

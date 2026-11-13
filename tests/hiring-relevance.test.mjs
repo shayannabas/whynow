@@ -35,9 +35,9 @@ describe('workspace-targeted hiring relevance',()=>{
     expect(hiring.matchingInfraJobs([job])).toEqual([]);
   });
 
-  it('accepts a generic title only when the description contains explicit workspace buying intent',()=>{
+  it('rejects a generic title when only the description contains workspace buying intent',()=>{
     const row=trigger('Senior Software Engineer','ai_rca_hiring','Build AI-assisted production investigation and root cause analysis for on-call engineers.');
-    expect(hiring.hiringTriggerRelevance(row,target)).toMatchObject({relevant:true,source:'buying_intent'});
+    expect(hiring.hiringTriggerRelevance(row,target)).toMatchObject({relevant:false,source:'outside_workspace_targeting'});
   });
 
   it('removes unrelated saved hiring triggers without deleting them from audit history',()=>{

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "load_only_discovery_reference",
   "seller": "Resolve AI",
-  "sourceProject": "flowfire",
+  "sourceProject": "reference-project",
   "sourceCommit": "130789f1bac1d5e11f5f5154f269155dc17f2d21",
   "sourceFile": "scripts/icp-universe.cjs",
   "sourceLines": "22-145",

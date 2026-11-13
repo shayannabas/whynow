@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "capturedOn": "2026-10-20",
   "source": {
-    "product": "SignalScout",
-    "repository": "https://github.com/isaiqba-cell/flowfire",
+    "product": "Reference",
+    "repository": "local-reference",
     "commit": "130789f1bac1d5e11f5f5154f269155dc17f2d21"
   },
   "sourceBudgets": {

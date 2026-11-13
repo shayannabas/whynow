@@ -2,7 +2,7 @@
 
 **WhyNow — a receipts-first prospecting engine that tells SDRs who to contact, why now, and proves it. For any company.**
 
-This PRD describes a generalized rebuild of SignalScout (see `docs/REFERENCE-SIGNALSCOUT.md`). The original was hard-coded for one seller (Resolve AI). WhyNow keeps the original design — receipts, six-signal fit score, firmographic tiers, evidence-backed kills, trigger stacking, review-gated outreach — and adds seller onboarding so it works for any real company typed on the dashboard.
+This PRD describes a generalized rebuild of Reference (see `docs/REFERENCE-BASELINE.md`). The original was hard-coded for one seller (Resolve AI). WhyNow keeps the original design — receipts, six-signal fit score, firmographic tiers, evidence-backed kills, trigger stacking, review-gated outreach — and adds seller onboarding so it works for any real company typed on the dashboard.
 
 Naming: product `WhyNow`; repo/package `whynow`; data directory `.whynow/`; crawler User-Agent `WhyNow/0.1 (+mailto:<CRAWLER_CONTACT_EMAIL>)`.
 
@@ -53,7 +53,7 @@ The same discipline applies to understanding the seller: the ICP is built from t
 | Workspace | One seller: its profile, ICP config, accounts, runs, contacts, suppression list, drafts, outcomes, metrics. Switched from the header. |
 | Seller Profile | Grounded facts about the seller (what it sells, to whom, proof, customers, competitors), every field with receipts. |
 | ICP config | The seller-specific rules the engine runs on: segments, signal definitions, trigger mapping, kill patterns, personas, weights, SLAs, tier rules. Generated from the Seller Profile, then reviewed. |
-| Reference profile | A built-in Resolve AI profile that reproduces the original SignalScout configuration. Used as a regression fixture and example, never as a default seller. |
+| Reference profile | A built-in Resolve AI profile that reproduces the original Reference configuration. Used as a regression fixture and example, never as a default seller. |
 
 ## 6. The generalized model
 

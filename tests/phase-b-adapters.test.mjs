@@ -6,13 +6,13 @@ const {collectHiring}=require('../scripts/collectors/hiring.cjs');
 const {collectActivePain}=require('../scripts/collectors/active-pain.cjs');
 const {collectSerperEvidence}=require('../scripts/collectors/search-evidence.cjs');
 const {collectEdgarFormDUniverse}=require('../scripts/collectors/edgar-form-d.cjs');
-const parity=JSON.parse(fs.readFileSync(new URL('./fixtures/parity/signalscout-phase-b.json',import.meta.url),'utf8'));
+const parity=JSON.parse(fs.readFileSync(new URL('./fixtures/parity/reference-phase-b.json',import.meta.url),'utf8'));
 const fixture=id=>structuredClone(parity.cases.find(row=>row.id===id).input);
 
 describe('guarded live adapters over recorded responses',()=>{
   it('runs a configured Greenhouse response through hiring normalization and receipts',async()=>{
     const target={id:'a1',name:'Acme',domain:'acme.example',ats:{provider:'greenhouse',slug:'acme'}},calls=[];
-    const runtime={requestJson:async(url,source)=>{calls.push({url,source});return {value:{jobs:[{id:'j1',title:'Director of Site Reliability',content:'<p>Kubernetes, Datadog and PagerDuty.</p>',absolute_url:'https://jobs.example/j1',updated_at:'2026-10-19T00:00:00Z'}]}};}};
+    const runtime={requestJson:async(url,source)=>{calls.push({url,source});return {value:{jobs:[{id:'j1',title:'Director of Site Reliability',content:'<p>Kubernetes, Datadog and PagerDuty.</p>',absolute_url:'https://jobs.example/j1',first_published:'2026-10-19T00:00:00Z',updated_at:'2026-10-19T00:00:00Z'}]}};}};
     const output=await collectHiring(target,{runtime,now:new Date('2026-10-20T00:00:00Z')});
     expect(calls).toHaveLength(1);expect(calls[0].source).toBe('greenhouse');expect(output.signals.map(row=>row.key)).toEqual(['observabilityScale','techStack']);expect(output.events[0].evidenceUrl).toBe('https://jobs.example/j1');
   });

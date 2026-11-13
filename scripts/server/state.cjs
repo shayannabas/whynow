@@ -14,6 +14,7 @@ function validate(state) {
   if (state.activeWorkspaceId !== null && !Object.hasOwn(state.workspaces, state.activeWorkspaceId)) throw new Error('Unknown active workspace');
   for (const [id, w] of Object.entries(state.workspaces)) {
     if (w.id !== id || w.schemaVersion !== 1 || typeof w.name !== 'string' || !w.sellerProfile || !w.icpConfig || !w.budgets || !['accounts','universeSeeds','runs','suppression','drafts','outcomes'].every(key => Array.isArray(w[key]))) throw new Error('Invalid workspace schema');
+    if(w.rejectedDiscovery !== undefined && !Array.isArray(w.rejectedDiscovery)) throw new Error('Invalid rejected discovery archive');
   }
   return state;
 }

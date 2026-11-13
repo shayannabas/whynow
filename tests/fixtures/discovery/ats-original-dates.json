@@ -1,0 +1,66 @@
+{
+  "capturedOn": "2026-11-12",
+  "origin": "Saved public Greenhouse API responses; selected identity, department and date fields only. No refetch.",
+  "jobs": [
+    {
+      "id": 4754075,
+      "title": "Engineering Manager - Web",
+      "first_published": "2022-12-15T10:49:30-05:00",
+      "updated_at": "2026-08-05T18:23:33-04:00",
+      "departments": [
+        {
+          "id": 91185,
+          "name": "Web Engineering",
+          "child_ids": [],
+          "parent_id": null
+        }
+      ],
+      "absolute_url": "https://job-boards.greenhouse.io/canonical/jobs/4754075"
+    },
+    {
+      "id": 8311130,
+      "title": "Legal Counsel \u2013 Commercial & Technology Transactions",
+      "first_published": "2026-10-23T09:41:10-04:00",
+      "updated_at": "2026-10-23T21:34:39-04:00",
+      "departments": [
+        {
+          "id": 82566,
+          "name": "Operations",
+          "child_ids": [],
+          "parent_id": null
+        }
+      ],
+      "absolute_url": "https://job-boards.greenhouse.io/canonical/jobs/8311130"
+    },
+    {
+      "id": 8002576,
+      "title": "Principal Site Reliability Engineer",
+      "first_published": "2026-06-15T01:08:24-04:00",
+      "updated_at": "2026-09-21T12:43:00-04:00",
+      "departments": [
+        {
+          "id": 30138,
+          "name": "Tech Ops-610",
+          "child_ids": [],
+          "parent_id": 396313
+        }
+      ],
+      "absolute_url": "https://www.okta.com/company/careers/opportunity/8002576?gh_jid=8002576"
+    },
+    {
+      "id": 4742193005,
+      "title": "Senior Site Reliability Engineer",
+      "first_published": "2026-10-08T19:33:37-04:00",
+      "updated_at": "2026-10-08T19:47:24-04:00",
+      "departments": [
+        {
+          "id": 4016064005,
+          "name": "Engineering",
+          "child_ids": [],
+          "parent_id": 4016063005
+        }
+      ],
+      "absolute_url": "https://www.coalitioninc.com/job-posting?gh_jid=4742193005"
+    }
+  ]
+}

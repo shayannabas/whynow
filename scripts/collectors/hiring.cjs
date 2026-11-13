@@ -49,8 +49,8 @@ function isEarlyCareerPosting(value = {}) {
 
 function jobTargetingMatch(job = {}, target = {}) {
   const title = String(job.title || job.metadata?.jobTitle || "");
-  const description = String(job.text || job.evidenceText || "");
-  const titleAndDescription = `${title} ${description}`;
+  // Role relevance comes only from the role and its department, never employer copy.
+  const titleAndDescription = `${title} ${job.department || job.metadata?.department || ""}`;
   if (isEarlyCareerPosting(job)) return { relevant: false, source: "early_career", matched: title.match(EARLY_CAREER_ROLE)?.[0] || "early-career posting" };
   const phrases = configuredTargetingPhrases(target);
   const legacyReliability=(target.triggerMapping?.function_roles||[]).includes('reliability_hiring');
@@ -70,8 +70,8 @@ function hiringTriggerRelevance(trigger = {}, target = {}) {
   const type = trigger.triggerType || trigger.type || "";
   if (!hiringTriggerType(type)) return { relevant: true, source: "not_hiring", matched: "" };
   if (isEarlyCareerPosting(trigger)) return { relevant: false, source: "early_career", matched: `${trigger.metadata?.jobTitle || trigger.title || ""}`.match(EARLY_CAREER_ROLE)?.[0] || "early-career posting" };
-  if (normalizedPhrase(type) === "hiring surge" && /\b(?:sre|site reliability|reliability|platform|infrastructure|incident|observability|performance|production)\b/i.test(`${trigger.title || ""} ${trigger.evidenceText || ""}`)) return { relevant: true, source: "qualified_hiring_surge", matched: "reliability/platform" };
-  return jobTargetingMatch({ title: trigger.metadata?.jobTitle || trigger.title, text: trigger.evidenceText, metadata: trigger.metadata }, target);
+  if (normalizedPhrase(type) === "hiring surge" && /\b(?:sre|site reliability|reliability|platform|infrastructure|incident|observability|performance|production)\b/i.test(trigger.title || "")) return { relevant: true, source: "qualified_hiring_surge", matched: "reliability/platform" };
+  return jobTargetingMatch({ title: trigger.metadata?.jobTitle || trigger.title, department: trigger.metadata?.department, metadata: trigger.metadata }, target);
 }
 
 function slugCandidates(target) {
@@ -90,6 +90,15 @@ function providerEndpoints(slug) {
 }
 
 function normalizeJobs(provider, payload) {
+  return normalizeLegacyJobs(provider, payload).map((job, index) => {
+    const raw = (provider === 'lever' ? payload : (payload.jobs || []).filter(row => provider !== 'ashby' || row.isListed !== false))[index];
+    const publishedAt = provider === 'greenhouse' ? raw.first_published : provider === 'lever' ? (raw.createdAt ? new Date(raw.createdAt).toISOString() : undefined) : raw.publishedAt;
+    const department = provider === 'greenhouse' ? (raw.departments || []).map(row => row.name).filter(Boolean).join(' / ') : provider === 'lever' ? raw.categories?.department || raw.categories?.team : [raw.department, raw.team].filter(Boolean).join(' / ');
+    return {...job, publishedAt: publishedAt || null, publicationDateSource: provider === 'greenhouse' ? 'first_published' : provider === 'lever' ? 'createdAt' : 'publishedAt', department: department || ''};
+  });
+}
+
+function normalizeLegacyJobs(provider, payload) {
   if (provider === "greenhouse") return (payload.jobs || []).map((job) => ({ id: job.id, title: job.title, text: stripHtml(job.content), url: job.absolute_url, location: job.location?.name, updatedAt: job.updated_at }));
   if (provider === "lever") return (Array.isArray(payload) ? payload : []).map((job) => ({ id: job.id, title: job.text, text: stripHtml(`${job.descriptionPlain || job.description || ""} ${(job.lists || []).map((list) => `${list.text} ${stripHtml(list.content)}`).join(" ")}`), url: job.hostedUrl || job.applyUrl, location: job.categories?.location, updatedAt: job.createdAt ? new Date(job.createdAt).toISOString() : undefined }));
   if (provider === "ashby") return (payload.jobs || []).filter((job) => job.isListed !== false).map((job) => ({ id: job.id || job.jobUrl, title: job.title, text: stripHtml(`${job.descriptionPlain || job.descriptionHtml || ""} ${job.department || ""} ${job.team || ""}`), url: job.jobUrl || job.applyUrl, location: job.location, updatedAt: job.publishedAt }));
@@ -118,10 +127,11 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
     if (!job.url) continue;
     if (isEarlyCareerPosting(job)) continue;
     const targeting = jobTargetingMatch(job, target);
-    if(targeting.relevant&&!RELIABILITY_ROLE.test(job.title||'')&&job.updatedAt&&withinDays(job.updatedAt,90,now)){
+    if (!job.publishedAt || !withinDays(job.publishedAt, 90, now) || Date.parse(job.publishedAt) > now.getTime()) continue;
+    if(targeting.relevant&&!RELIABILITY_ROLE.test(job.title||'')&&job.publishedAt&&withinDays(job.publishedAt,90,now)){
       const evidenceText=`${job.title}. ${job.text||''}`;
-      events.push(stage3Signals.decorateTrigger(event({type:'function_hiring',title:job.title,evidenceUrl:job.url,evidenceText,occurredAt:job.updatedAt,sourceId:provider,metadata:{provider,jobId:job.id,jobTitle:job.title,targeting}}),slaConfig));
-      for(const [key,definition] of Object.entries(target.signalDefinitions||{})){if(definition.enabled===false)continue;const matches=(definition.evidenceKeywords||[]).filter(word=>text.toLowerCase().includes(String(word).toLowerCase()));if(matches.length)signals.push(signal({key,score:Math.min(5,2+matches.length),evidenceUrl:job.url,evidenceText:job.text||job.title,observedAt:job.updatedAt,sourceId:provider,metadata:{jobId:job.id,matchedWorkspaceKeywords:matches}}));}
+      events.push(stage3Signals.decorateTrigger(event({type:'function_hiring',title:job.title,evidenceUrl:job.url,evidenceText,occurredAt:job.publishedAt,sourceId:provider,metadata:{provider,jobId:job.id,jobTitle:job.title,department:job.department,publicationDateSource:job.publicationDateSource,targeting}}),slaConfig));
+      for(const [key,definition] of Object.entries(target.signalDefinitions||{})){if(definition.enabled===false)continue;const matches=(definition.evidenceKeywords||[]).filter(word=>text.toLowerCase().includes(String(word).toLowerCase()));if(matches.length)signals.push(signal({key,score:Math.min(5,2+matches.length),evidenceUrl:job.url,evidenceText:job.text||job.title,observedAt:job.publishedAt,sourceId:provider,metadata:{jobId:job.id,matchedWorkspaceKeywords:matches}}));}
     }
     if (AI_RCA_HIRING.test(text) && targeting.relevant) {
       const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${String(job.text || "").slice(0, 420)}`;
@@ -130,26 +140,26 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
         title: job.title || `${target.name} AI-assisted RCA role`,
         evidenceUrl: job.url,
         evidenceText,
-        occurredAt: job.updatedAt || now.toISOString(),
+        occurredAt: job.publishedAt,
         sourceId: provider,
         strength: 3,
         metadata: {
           provider,
           jobId: job.id,
-          jobTitle: job.title,
+          jobTitle: job.title, department: job.department, publicationDateSource: job.publicationDateSource,
           hiringForWhatWeSell: true,
           reason: "ai_assisted_production_investigation_hiring",
           targeting,
         },
       }, painThemeConfig);
       events.push(stage3Signals.decorateTrigger(aiRcaEvent, slaConfig));
-      quoteReceipts.push({ kind: "ai_rca_hiring", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, postingDate: job.updatedAt || now.toISOString() });
+      quoteReceipts.push({ kind: "ai_rca_hiring", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, department: job.department, publicationDateSource: job.publicationDateSource, postingDate: job.publishedAt });
       signals.push(signal({
         key: "observabilityScale",
         score: 5,
         evidenceUrl: job.url,
         evidenceText,
-        observedAt: job.updatedAt || now.toISOString(),
+        observedAt: job.publishedAt,
         sourceId: provider,
         metadata: { jobId: job.id, hiringForWhatWeSell: true },
       }));
@@ -161,20 +171,20 @@ function jobSignals(target, provider, jobs, now = new Date(), painThemeConfig = 
         title: job.title || `${target.name} internal tool maintenance role`,
         evidenceUrl: job.url,
         evidenceText,
-        occurredAt: job.updatedAt || now.toISOString(),
+        occurredAt: job.publishedAt,
         sourceId: provider,
-        metadata: { provider, jobId: job.id, jobTitle: job.title, buildWatchEvidence: true, reason: "maintenance_hiring_req", targeting },
+        metadata: { provider, jobId: job.id, jobTitle: job.title, department: job.department, publicationDateSource: job.publicationDateSource, buildWatchEvidence: true, reason: "maintenance_hiring_req", targeting },
       }, painThemeConfig));
-      quoteReceipts.push({ kind: "internal_tool_maintenance", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, postingDate: job.updatedAt || now.toISOString() });
+      quoteReceipts.push({ kind: "internal_tool_maintenance", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, department: job.department, publicationDateSource: job.publicationDateSource, postingDate: job.publishedAt });
     }
     if (!RELIABILITY_ROLE.test(job.title || "") || !targeting.relevant) continue;
     const tools = toolsIn(text);
     const senior = SENIOR_ROLE.test(job.title || "");
     const evidenceText = `${job.title}. ${job.location ? `Location: ${job.location}. ` : ""}${tools.length ? `Named stack: ${tools.join(", ")}. ` : ""}${String(job.text || "").slice(0, 360)}`;
-    events.push(themedHiringEvent({ type: "reliability_hiring", title: job.title, evidenceUrl: job.url, evidenceText, occurredAt: job.updatedAt || now.toISOString(), sourceId: provider, metadata: { provider, jobId: job.id, jobTitle: job.title, senior, tools } }, painThemeConfig));
-    quoteReceipts.push({ kind: "reliability_hiring", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, postingDate: job.updatedAt || now.toISOString() });
-    signals.push(signal({ key: "observabilityScale", score: senior ? 5 : 4, evidenceUrl: job.url, evidenceText, observedAt: job.updatedAt || now.toISOString(), sourceId: provider, metadata: { jobId: job.id, senior, tools } }));
-    if (tools.length) signals.push(signal({ key: "techStack", score: Math.min(5, 2 + tools.length), evidenceUrl: job.url, evidenceText: `Job posting names ${tools.join(", ")}.`, observedAt: job.updatedAt || now.toISOString(), sourceId: provider, metadata: { jobId: job.id, tools } }));
+    events.push(themedHiringEvent({ type: "reliability_hiring", title: job.title, evidenceUrl: job.url, evidenceText, occurredAt: job.publishedAt, sourceId: provider, metadata: { provider, jobId: job.id, jobTitle: job.title, department: job.department, publicationDateSource: job.publicationDateSource, senior, tools } }, painThemeConfig));
+    quoteReceipts.push({ kind: "reliability_hiring", text: job.text || evidenceText, sourceUrl: job.url, jobTitle: job.title, department: job.department, publicationDateSource: job.publicationDateSource, postingDate: job.publishedAt });
+    signals.push(signal({ key: "observabilityScale", score: senior ? 5 : 4, evidenceUrl: job.url, evidenceText, observedAt: job.publishedAt, sourceId: provider, metadata: { jobId: job.id, senior, tools } }));
+    if (tools.length) signals.push(signal({ key: "techStack", score: Math.min(5, 2 + tools.length), evidenceUrl: job.url, evidenceText: `Job posting names ${tools.join(", ")}.`, observedAt: job.publishedAt, sourceId: provider, metadata: { jobId: job.id, tools } }));
   }
   return { signals, events, quotebook: painThemes.quotebookFromReceipts(quoteReceipts, painThemeConfig) };
 }
@@ -208,30 +218,30 @@ function atsVelocityEvents(target, provider, jobs = [], now = new Date(), slaCon
   const matching = matchingInfraJobs(jobs);
   const history = target.hiringHistory || [];
   const previouslySeen = new Set(history.flatMap((snapshot) => snapshot.matchingJobIds || []).map(String));
-  const recentNew = matching.filter((job) => !previouslySeen.has(String(job.id || job.url)) && job.updatedAt && withinDays(job.updatedAt, 30, now));
+  const recentNew = matching.filter((job) => !previouslySeen.has(String(job.id || job.url)) && job.publishedAt && withinDays(job.publishedAt, 30, now));
   const events = [];
   if (recentNew.length >= 3) {
-    const newest = [...recentNew].sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))[0];
+    const newest = [...recentNew].sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt))[0];
     events.push(stage3Signals.decorateTrigger(event({
       type: "hiring_surge",
       title: `${target.name} added ${recentNew.length} reliability/platform roles`,
       evidenceUrl: newest.url,
       evidenceText: `${target.name} has ${recentNew.length} newly observed SRE, platform, reliability, incident, performance, or observability openings inside 30 days.`,
-      occurredAt: newest.updatedAt,
+      occurredAt: newest.publishedAt,
       sourceId: provider,
       metadata: { provider, newReqCount: recentNew.length, jobIds: recentNew.map((job) => job.id), evidenceUrls: recentNew.map((job) => job.url) },
     }), slaConfig));
   }
-  const explicitFirst = matching.filter((job) => /\b(founding|first)\b/i.test(job.title || "") && job.updatedAt && withinDays(job.updatedAt, 30, now));
-  const newlyObservedHead = history.length ? matching.filter((job) => /\bhead of\b/i.test(job.title || "") && !previouslySeen.has(String(job.id || job.url)) && job.updatedAt && withinDays(job.updatedAt, 30, now)) : [];
-  const firstJob = [...explicitFirst, ...newlyObservedHead].sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))[0];
+  const explicitFirst = matching.filter((job) => /\b(founding|first)\b/i.test(job.title || "") && job.publishedAt && withinDays(job.publishedAt, 30, now));
+  const newlyObservedHead = history.length ? matching.filter((job) => /\bhead of\b/i.test(job.title || "") && !previouslySeen.has(String(job.id || job.url)) && job.publishedAt && withinDays(job.publishedAt, 30, now)) : [];
+  const firstJob = [...explicitFirst, ...newlyObservedHead].sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt))[0];
   if (firstJob) {
     events.push(stage3Signals.decorateTrigger(event({
       type: "first_infra_hire",
       title: `${target.name}: ${firstJob.title}`,
       evidenceUrl: firstJob.url,
       evidenceText: `${firstJob.title} is an explicitly founding/first infrastructure role or a newly observed Head of infrastructure role on ${provider}.`,
-      occurredAt: firstJob.updatedAt,
+      occurredAt: firstJob.publishedAt,
       sourceId: provider,
       metadata: { provider, jobId: firstJob.id, title: firstJob.title },
     }), slaConfig));

@@ -12,7 +12,7 @@ function workspaceState(accounts = []) {
   return state;
 }
 
-describe('WhyNow SignalScout UI shell', () => {
+describe('WhyNow Reference UI shell', () => {
   it('renders the grouped route navigation and active Results route', () => {
     const html = shell(defaultState(), '<h1>Results</h1>', 'Results', '/results');
     expect(html).toContain('class="nav-section-label">Work</div>');
@@ -60,7 +60,7 @@ describe('WhyNow SignalScout UI shell', () => {
 
   it('uses the source stylesheet final layers and WhyNow layout adaptations', () => {
     const html = shell(defaultState(), '<h1>Results</h1>', 'Results', '/results');
-    expect(html).toContain('SignalScout');
+    expect(html).toContain('Reference');
     expect(html).toContain('.credibility-signal-grid{');
     expect(html).toContain('grid-template-columns:252px minmax(0,1fr)');
     expect(html).toContain('.brief-body>.brief-main');

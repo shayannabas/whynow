@@ -4,7 +4,7 @@ Completed October 20, 2026 for the frozen Resolve reference demo. No seller prof
 
 ## Outcome
 
-WhyNow now loads SignalScout's curated Resolve prospect universe as read-only workspace configuration, expands it through a capped background Serper job, applies a seller/customer/competitor/duplicate noise gate, and promotes a balanced demo set into WhyNow's atomic state. Today ranks saved accounts and shows a plain why-now line with a clickable receipt. Account detail shows the current tier/size explanation, fit score, active triggers, collector refresh action and explicit `new`, `working` or `skipped` status.
+WhyNow now loads Reference's curated Resolve prospect universe as read-only workspace configuration, expands it through a capped background Serper job, applies a seller/customer/competitor/duplicate noise gate, and promotes a balanced demo set into WhyNow's atomic state. Today ranks saved accounts and shows a plain why-now line with a clickable receipt. Account detail shows the current tier/size explanation, fit score, active triggers, collector refresh action and explicit `new`, `working` or `skipped` status.
 
 The live run used **10 Serper queries** of the authorized extra 60-query ceiling and **0 OpenAI calls**. It considered 62 config/search candidates, selected and saved 25, represented all 10 Resolve segments, reported zero errors and produced zero seller/customer/competitor leaks. Fifty authorized queries were not spent.
 
