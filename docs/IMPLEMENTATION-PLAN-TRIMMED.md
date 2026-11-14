@@ -1,6 +1,6 @@
 # WhyNow — trimmed portfolio implementation plan
 
-**Status: superseded on October 20, 2026 by the owner-directed Reference port plan.** Retain this file as historical scope only. Do not execute its remaining stages unless the owner explicitly restores it.
+**Status: superseded on October 20, 2026 by the owner-directed baseline port plan.** Retain this file as historical scope only. Do not execute its remaining stages unless the owner explicitly restores it.
 
 Updated October 20, 2026. This plan formerly replaced the remaining Stage 3–12 scope for the portfolio build. Stages 0–2 remain governed by the existing PRD, implementation record and traceability documents. Stage 2.5 is paused; no port phase has started.
 

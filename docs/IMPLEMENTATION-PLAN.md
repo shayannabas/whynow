@@ -10,7 +10,7 @@ Build order for `docs/PRD.md`. Rules, tech decisions, and the working agreement 
 4. Implement, run `npm test`, verify in a browser, update `docs/TRACEABILITY.md`, commit, and stop.
 5. The owner checks the Definition of Done (DoD) before moving on.
 
-**Order rationale.** The collector runtime comes first (Stage 1) because onboarding must fetch the seller's public pages politely. Onboarding (Stage 2) comes before the scoring engine because every later stage reads the workspace's generated ICP config. Everything after that is the original Reference's final architecture, parameterized by workspace. The original was built by converting an older app and then paying for it later (dead code, a 6,300-line monolith, tier/fit confusion, junk accounts, duplicate entities, a data-loss incident, dual auth); this plan builds the final design from day one.
+**Order rationale.** The collector runtime comes first (Stage 1) because onboarding must fetch the seller's public pages politely. Onboarding (Stage 2) comes before the scoring engine because every later stage reads the workspace's generated ICP config. Everything after that is the baseline architecture, parameterized by workspace. The original was built by converting an older app and then paying for it later (dead code, a 6,300-line monolith, tier/fit confusion, junk accounts, duplicate entities, a data-loss incident, dual auth); this plan builds the final design from day one.
 
 Throughout, "the original calls this X" points at the matching file in `reference/reference/` (if present) for design intent.
 

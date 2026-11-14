@@ -70,7 +70,7 @@ Gong stopped at free saved-packet preflight: three 8,000-token low-reasoning cal
 
 ## Local Reference UI port — 2026-10-26
 
-The owner authorized the local UI port with Luna max implementation and GPT-6.1 Sol/Astra review. `scripts/server/reference-styles.cjs` preserves the full public design stylesheet from Reference commit `130789f1bac1d5e11f5f5154f269155dc17f2d21` (only its trailing newline differs). `styles.cjs` supplies WhyNow workspace/form/responsive adaptations; no reference environment file was read or copied. README credit remains intact.
+The owner authorized the local UI port with Luna max implementation and GPT-6.1 Sol/Astra review. `scripts/server/reference-styles.cjs` preserves the full public design stylesheet from baseline source commit `130789f1bac1d5e11f5f5154f269155dc17f2d21` (only its trailing newline differs). `styles.cjs` supplies WhyNow workspace/form/responsive adaptations; no reference environment file was read or copied. Private provenance details are retained in ignored local notes.
 
 `pages.cjs` provides the grouped sidebar and Overview, and `phase-a-pages.cjs` provides distinct Today, Results, Accounts/account work, Discovery, Scorecard and Kill Log screens. Router query parameters drive the real saved-record filters. Account tabs support deep links and Back/Forward, template success/errors stay on Outreach, and new forms carry workspace IDs to reject stale cross-workspace actions. Signal weights, company tier and kill status are separate; unknown placeholders stay unknown. Evidence shows saved signal text/URLs separately from dated trigger history. `activity-pages.cjs` supplies workspace-scoped History, Runs, Funnel and Metrics from actual saved data, including Prepare-demo stage progress. Seller review/setup and Collectors retain their existing actions and approval/receipt gates under the same design system.
 
@@ -80,7 +80,7 @@ Real browser verification covered 1440/768/390-pixel layouts, mobile Menu, activ
 
 ## Port-mode Phase A — 2026-10-20
 
-The owner authorized Phase A after the Stage 2.5 pause. The immutable fixture `tests/fixtures/parity/reference-phase-a.json` records full inputs and exact outputs from Reference's `scoreSignals`, `evaluateKills`, `tierCompany` and `applyDecisioning` functions at commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. It covers the five named gold-standard shapes, clean Tier 1/2/3 accounts, an existing customer and a simultaneous five-rule precedence case. WhyNow tests load only this saved fixture; Reference is never imported at test runtime. All ten cases match exactly.
+The owner authorized Phase A after the Stage 2.5 pause. The immutable fixture `tests/fixtures/parity/reference-phase-a.json` records full inputs and exact outputs from the baseline's `scoreSignals`, `evaluateKills`, `tierCompany` and `applyDecisioning` functions at commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. It covers the five named gold-standard shapes, clean Tier 1/2/3 accounts, an existing customer and a simultaneous five-rule precedence case. WhyNow tests load only this saved fixture; baseline source code is never imported at test runtime. All ten cases match exactly.
 
 Resolve reference profile v2 remains load-only and now records line-level provenance for every moved runtime constant: segments/personas, scoring weights and trigger window, customer exclusions, kill floor/patterns/precedence, tier rules, decision rules and the Uber identity alias. Normal workspaces require owner approval before scoring; the explicit `reference_demo` adapter is a non-approved local parity surface with delivery disabled.
 
@@ -90,7 +90,7 @@ Verification: 31 test files passed, 144 active tests passed and one pre-existing
 
 ## Port-mode direction and Stage 2.5 pause — 2026-10-20
 
-The owner superseded the active Stage 2.5 plan and `docs/IMPLEMENTATION-PLAN-TRIMMED.md` with a six-phase port of the permitted Reference functionality. Reference (`github.com/reference-author/reference-project`) by Isa Iqbal is read-only reference material used with permission; its environment files and secrets must never be read or copied. WhyNow retains workspace isolation, atomic JSON persistence, receipts, human approval and send-free Demo mode. Explicitly excluded services are Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway and uptime workflow.
+The owner superseded the active Stage 2.5 plan and `docs/IMPLEMENTATION-PLAN-TRIMMED.md` with a six-phase port of the permitted baseline functionality. The baseline is read-only and used with permission; private provenance stays in ignored local notes, and its environment files and secrets must never be read or copied. WhyNow retains workspace isolation, atomic JSON persistence, receipts, human approval and send-free Demo mode. Explicitly excluded services are Apollo, PhantomBuster, PDL/paid firmographics, StatusGator, Instantly, HubSpot, Clerk, Postgres, backups, Railway and uptime workflow.
 
 The green Stage 2.5 code remains committed at `3cdabaf` as a future research-quality improvement. Its extractor and tests are not removed. This paragraph records the direction-change checkpoint before Phase A was later authorized and completed above.
 
@@ -186,7 +186,7 @@ Implemented the main name-first research path in `scripts/onboarding/research.cj
 
 Implemented source-only drafting in `synthesize.cjs`, `validate.cjs` and `synthesis-runner.cjs`. This historical checkpoint originally sent bounded excerpts and free-text quotes. The October 13 completion replaced free-text quote copying with bounded server-created receipt menus after live testing showed that exact quote transcription was nondeterministic. The server still derives URLs, rechecks quotes, removes unsupported customers/competitors, rejects stale outputs and hands successful drafts to the editable human-review flow.
 
-Added a frozen, load-only Resolve AI comparison in `config/reference-profiles/resolve-ai.json`, transcribed from the friend's `resolve-gtm.cjs`, `stage3-signals.cjs` and tier rules. It contains targeting configuration but no invented seller profile. Official-page excerpt fixtures for Resolve AI, Vercel and Shopify exercise exact-receipt behavior offline. Their source URLs are `https://resolve.ai/product/overview`, `https://vercel.com/docs` and `https://www.shopify.com/about`.
+Added a frozen, load-only Resolve AI comparison in `config/reference-profiles/resolve-ai.json`, transcribed from the baseline scoring, signal and tier rules. It contains targeting configuration but no invented seller profile. Official-page excerpt fixtures for Resolve AI, Vercel and Shopify exercise exact-receipt behavior offline. Their source URLs are `https://resolve.ai/product/overview`, `https://vercel.com/docs` and `https://www.shopify.com/about`.
 
 Added monthly refresh proposal logic and review UI in `refresh.cjs` and `profile-page.cjs`: semantic and receipt-only differences are visible, the active profile is never auto-overwritten, proposals are workspace/revision guarded, approval rechecks saved quotes, rejection preserves the current profile and history is bounded. The automatic monthly provider runner remains paused until paid OpenAI is separately approved.
 
@@ -347,3 +347,7 @@ Nine new tests passed: defaults and draft shape, approval acknowledgement and un
 | Accurate interview artifacts | README, four actual browser screenshots, native checklist/script | Requested demo path; no provider calls or approval; `FINAL-DEMO-CLOSEOUT.md` |
 
 Full suite:77 files,378 passed,1 intentional skip. Okta's original June posting expires; Coalition remains Act now with its draft. Vercel remains owner-approved with no qualified buyer queue and one review record. See `FINAL-CHANGE-MANIFEST.md` and `FINAL-TEST-OUTPUT.txt`.
+
+## Documentation provenance cleanup — November 13, 2026
+
+Removed personal attribution and relationship wording from published documentation, repaired placeholder baseline prose and retained private provenance only in ignored local notes. No runtime code, fixtures, configuration, state or approval behavior changed. Full offline suite: 77 files passed; 378 tests passed and 1 intentional skip. Tracked-file content and filenames contain no author-name matches.

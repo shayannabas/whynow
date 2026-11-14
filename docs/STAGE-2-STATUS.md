@@ -16,7 +16,7 @@ The existing Drive Demo Script was updated in place and walked against the deskt
 
 ## Historical Stage 2.5 pause and port-mode direction
 
-Updated October 20, 2026. The owner preserved the completed offline checkpoint but paused further Stage 2.5 work. Its extractor remains a future improvement. The trimmed roadmap is superseded by a phase-gated Reference port; Phase A has not started.
+Updated October 20, 2026. The owner preserved the completed offline checkpoint but paused further Stage 2.5 work. Its extractor remains a future improvement. The trimmed roadmap is superseded by a phase-gated baseline port; Phase A has not started.
 
 ## Current Stage 2.5 checkpoint
 
@@ -35,7 +35,7 @@ All profiles remain `needs_review`. The full offline suite passes with 27 test f
 | Background public-page research | The research plan prioritizes homepage/sitemap, customers, case studies, enterprise, pricing, comparison/alternatives and about pages inside the 20-page ceiling. Partner, marketplace, template and solution-partner pages rank last and cannot support seller facts. The final bounded run fetched all 29 explicitly allowed first-party pages across three seller workspaces with zero page errors and no Serper queries. Each synthesis source set stayed below 20 pages. |
 | Source-only seller profile and ICP synthesis | Exact substring matching is no longer enough. Receipt candidates remove navigation/footer text and are rejected for insufficient context, navigation boilerplate, weak claim overlap or partner-page sourcing. Rejected receipts become inferred. ICP checks now cover measurable/consistent size, empty organizations, slogans, vendor-seeking queries and kill-rule quality. |
 | Human review and approval | Implemented with two warning levels and no output rewriting. Blocking findings require a fix or individual typed explanation; advisories stay visible beside their fields without blocking. Typed reasons are recorded in the audit log, never prefilled and reset on any profile edit. |
-| Resolve reference and real seller fixtures | Implemented. The friend's Resolve configuration is frozen and load-only. Official-page excerpt fixtures cover Resolve AI, Vercel and Shopify without live test calls. |
+| Resolve reference and real seller fixtures | Implemented. The Resolve configuration is frozen and load-only. Official-page excerpt fixtures cover Resolve AI, Vercel and Shopify without live test calls. |
 | Monthly refresh | A persistent coordinator now detects due approved profiles, runs research and drafting inside a hidden isolated workspace, resumes interrupted runs, creates semantic/evidence diffs and never auto-applies them. Complete factual-field grounding, stale checks, approve/reject UI and bounded history are enforced. It stays dormant while OpenAI is off. |
 | Tests | Offline tests pair synthetic passing cases with the real recovered failures, including warning severity and approval behavior. They use recorded data/local servers and never call Serper or OpenAI. |
 | Browser verification | The real Vercel result showed the confirmed company, completed identification/research, twenty saved sources and the honest paid-AI-off message at desktop and 768-pixel widths. Isolated browser fixtures also showed the complete editable generated-review screen, 100% receipt report and monthly before/after approval screen at desktop and 768-pixel widths. |

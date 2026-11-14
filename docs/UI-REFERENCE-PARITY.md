@@ -1,8 +1,8 @@
-# Reference UI port — local demo
+# UI baseline parity — local demo
 
-Verified October 26, 2026. Public reference: Reference by Isa Iqbal, `reference-project` commit `130789f1bac1d5e11f5f5154f269155dc17f2d21`. Reference files were read-only; no environment file or secret was read/copied.
+Verified October 26, 2026. Baseline source commit: `130789f1bac1d5e11f5f5154f269155dc17f2d21`. Baseline files were read-only; no environment file or secret was read/copied.
 
-This is the source design system and in-scope workflow layout adapted to WhyNow, not a claim that every Reference production feature exists. WhyNow keeps its own branding, workspace switcher, explicit human review, JSON state and send-free Demo mode.
+This is the source design system and in-scope workflow layout adapted to WhyNow, not a claim that every production feature of the baseline exists. WhyNow keeps its own branding, workspace switcher, explicit human review, JSON state and send-free Demo mode.
 
 ## Screen map
 
@@ -34,7 +34,7 @@ This is the source design system and in-scope workflow layout adapted to WhyNow,
 ## Deliberate differences and remaining boundaries
 
 - No Apollo/contact lookup, contact-coverage claims, sending, CRM sync or deployment controls were ported. Outreach shows approved persona titles, a literal Demo merge token and Copy only.
-- Daily Brief uses WhyNow's existing Act now / Worth researching / Needs review sections. Reference's production contact/decay/anti-stranding dashboards are not simulated with invented values.
+- Daily Brief uses WhyNow's existing Act now / Worth researching / Needs review sections. The baseline's production contact/decay/anti-stranding dashboards are not simulated with invented values.
 - Discovery settings remain owned by the reviewed seller ICP; previews are read-only here and link to **Edit ICP**. No fake preview-save action exists.
 - Provider-backed actions retain their existing budget/configuration guards and were not live-run for a UI task. A disabled provider is intentional, not a promise of a working paid integration while off.
 - Vercel still needs owner correction/review. Gong is not a completed research profile. Nothing in this UI port approves either one.

@@ -53,7 +53,7 @@ The same discipline applies to understanding the seller: the ICP is built from t
 | Workspace | One seller: its profile, ICP config, accounts, runs, contacts, suppression list, drafts, outcomes, metrics. Switched from the header. |
 | Seller Profile | Grounded facts about the seller (what it sells, to whom, proof, customers, competitors), every field with receipts. |
 | ICP config | The seller-specific rules the engine runs on: segments, signal definitions, trigger mapping, kill patterns, personas, weights, SLAs, tier rules. Generated from the Seller Profile, then reviewed. |
-| Reference profile | A built-in Resolve AI profile that reproduces the original Reference configuration. Used as a regression fixture and example, never as a default seller. |
+| Reference profile | A built-in Resolve AI profile that reproduces the original baseline configuration. Used as a regression fixture and example, never as a default seller. |
 
 ## 6. The generalized model
 
