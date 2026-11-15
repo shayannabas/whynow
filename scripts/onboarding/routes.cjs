@@ -49,7 +49,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
     json(res,200,{schemaVersion:1,workspaceId:workspace.id,workspaceStatus:workspace.status,research:workspace.research,providers});return true;
   }
 
-  const allowed=new Set(['/onboarding/start','/onboarding/resolve','/onboarding/confirm','/onboarding/profile/save','/onboarding/profile/approve','/onboarding/profile/restore-competitor','/onboarding/profile/confirm-domain','/onboarding/research/confirm','/onboarding/research/retry','/onboarding/research/generate','/onboarding/refresh/approve','/onboarding/refresh/reject']);
+  const allowed=new Set(['/onboarding/playbook/save','/onboarding/playbook/approve','/onboarding/start','/onboarding/resolve','/onboarding/confirm','/onboarding/profile/save','/onboarding/profile/approve','/onboarding/profile/restore-competitor','/onboarding/profile/confirm-domain','/onboarding/research/confirm','/onboarding/research/retry','/onboarding/research/generate','/onboarding/refresh/approve','/onboarding/refresh/reject']);
   if(req.method!=='POST'||!allowed.has(pathname)){json(res,404,{error:'Page not found'});return true;}
   if(req.headers.origin!==`http://${req.headers.host}`){json(res,403,{error:'Use the local page form'});return true;}
   let form;
@@ -70,6 +70,11 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
   const id=form.get('workspaceId');
   if(!state.activeWorkspaceId||id!==state.activeWorkspaceId){json(res,409,{error:'Workspace changed. Refresh and try again.'});return true;}
   const workspace=getWorkspace(state,id);
+
+  if(pathname.startsWith('/onboarding/playbook/')){
+    try{await mutate(current=>{if(current.activeWorkspaceId!==id)throw Error('Workspace changed. Refresh and try again.');return require('../playbook.cjs').reviewPlaybook(current,id,{action:pathname.endsWith('/save')?'save':'approve',revision:form.get('revision'),profileRevision:form.get('profileRevision'),raw:require('./playbook-page.cjs').parsePlaybookForm(form),acknowledged:form.has('acknowledged')});});redirect('/onboarding/profile');}
+    catch(error){html(400,profilePage(state,{error:error.message}));}return true;
+  }
 
   if(pathname.startsWith('/onboarding/refresh/')){
     try{

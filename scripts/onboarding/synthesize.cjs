@@ -93,6 +93,7 @@ function validateKnownReceiptIds(value,receiptIds) {
     if(Array.isArray(node)){node.forEach(visit);return;}
     if(!node||typeof node!=='object')return;
     for(const [key,item] of Object.entries(node)) {
+      if(key==='receiptIds'&&(!Array.isArray(item)||item.some(id=>!allowed.has(id))))throw new SynthesisValidationError('INVALID_OUTPUT','The playbook referenced a receipt outside this request.');
       if(key==='receiptId'&&item&&!allowed.has(item))throw new SynthesisValidationError('INVALID_OUTPUT','The draft referenced a receipt outside this request.');
       visit(item);
     }
@@ -106,7 +107,8 @@ function expandRunLocalReceiptIds(value,receiptIdMap) {
     if(Array.isArray(node)){node.forEach(visit);return;}
     if(!node||typeof node!=='object')return;
     for(const [key,item] of Object.entries(node)) {
-      if(key==='receiptId'&&item) {
+      if(key==='receiptIds'){node[key]=item.map(id=>{if(!receiptIdMap.has(id))throw new SynthesisValidationError('INVALID_OUTPUT','Unknown playbook receipt.');return receiptIdMap.get(id);});}
+      else if(key==='receiptId'&&item) {
         const stableId=receiptIdMap.get(item);
         if(!stableId)throw new SynthesisValidationError('INVALID_OUTPUT','The draft referenced a receipt outside this request.');
         node[key]=stableId;

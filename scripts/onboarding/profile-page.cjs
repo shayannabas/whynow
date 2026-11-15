@@ -45,6 +45,6 @@ function renderProfilePage(state,{error='',submitted=null}={}) {
 function profilePage(state,options) {
   const html=renderProfilePage(state,options),workspace=state.workspaces[state.activeWorkspaceId];
   // Insert separate POST forms before the large profile form (never nested).
-  return workspace?html.replace('<form method="post" action="/onboarding/profile/save">',require('./domain-suggestions.cjs').domainSuggestionReview(workspace)+require('./competitor-review.cjs').competitorReview(workspace)+'<form method="post" action="/onboarding/profile/save">'):html;
+  return workspace?html.replace('<form method="post" action="/onboarding/profile/save">',require('./playbook-page.cjs').playbookSection(state,workspace)+require('./domain-suggestions.cjs').domainSuggestionReview(workspace)+require('./competitor-review.cjs').competitorReview(workspace)+'<form method="post" action="/onboarding/profile/save">'):html;
 }
 module.exports={profilePage};

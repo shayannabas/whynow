@@ -1,0 +1,12 @@
+// Hand-written fictional companies and public-page text. Never recorded from a provider.
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+export function fixture(){
+ const {defaultState,createWorkspace}=require('../../../scripts/server/state.cjs'),{recordSource}=require('../../../scripts/sources.cjs');
+ let state=createWorkspace(defaultState(),{name:'Copper Vale'}),id=state.activeWorkspaceId;
+ const saved=recordSource(state,{url:'https://coppervale.example/product',text:'Copper Vale helps sales operations teams manage revenue workflows. Sales hiring and sales leadership changes create a need to revisit revenue operations. Revenue leaders and sales operations managers review the sales process.',title:'Copper Vale product',fetchedAt:'2026-11-14T00:00:00Z'});state=saved.state;
+ Object.assign(state.workspaces[id],{status:'active',profileRevision:4,onboarding:{selectedCandidate:{name:'Copper Vale',domain:'coppervale.example',website:'https://coppervale.example'}},research:{selectedCandidate:{name:'Copper Vale',domain:'coppervale.example',website:'https://coppervale.example'},sourceIds:[saved.source.id]},sellerProfile:{sellerName:'Copper Vale',domain:'coppervale.example',approvedAt:'2026-11-01T00:00:00Z',customers:[{name:'Juniper Loom',domain:'juniperloom.example',sourceUrl:'https://coppervale.example/customers'}],competitors:[{name:'Moss Ledger',domain:'mossledger.example',sourceUrl:'https://coppervale.example/compare'}]},icpConfig:{schemaVersion:1,segments:[{key:'revenue_teams',label:'Revenue teams',enabled:true,subIndustries:['revenue'],queryTemplates:[]}],personas:{buyerTitles:['VP Sales'],championTitles:['Sales Operations Manager'],wrongOrgTitles:[]},triggerMapping:{function_roles:['sales operations']},weights:{},tierRules:{},slaDays:{},killPatterns:{solvingInHouse:[],buildCulture:[],sizeMetric:{label:'employees',floor:100}}}});
+ const receipts=require('../../../scripts/playbook.cjs').receiptsForWorkspace(state,state.workspaces[id]),receiptIds=[Object.keys(receipts)[0]];
+ const raw={buyerRoles:{economicBuyer:['VP Sales'],champion:['Sales Operations Manager'],endUser:['Account Executive']},triggers:[{id:'sales_hiring',label:'Sales hiring',whyItMatters:'Growing the sales function can prompt a workflow review.',source:'ats_jobs',keywords:['sales operations','account executive'],freshnessDays:30,strength:'strong',messageAngle:'Discuss the verified sales hiring change.',receiptIds}],antiTriggers:[]};
+ return {state,id,workspace:state.workspaces[id],raw,receipts};
+}

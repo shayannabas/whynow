@@ -81,7 +81,7 @@ function assertSynthesisOutput(value) {
   array(profile.competitors,'sellerProfile.competitors',0,30).forEach((item,index)=>organization(item,`sellerProfile.competitors[${index}]`));
 
   const config=value.icpConfig;
-  exactKeys(config,['segments','personas','signalDefinitions','triggerMapping','killPatterns','painSources','pitch','objectionTemplates',...['outreach','targetCompanySizeDescription'].filter(key=>Object.hasOwn(config,key))],'icpConfig');
+  exactKeys(config,['segments','personas','signalDefinitions','triggerMapping','killPatterns','painSources','pitch','objectionTemplates',...['outreach','targetCompanySizeDescription','playbook'].filter(key=>Object.hasOwn(config,key))],'icpConfig');
   if(config.outreach){exactKeys(config.outreach,['framingLibrary','closingQuestions'],'icpConfig.outreach');stringList(config.outreach.framingLibrary,'icpConfig.outreach.framingLibrary',3,3,500);stringList(config.outreach.closingQuestions,'icpConfig.outreach.closingQuestions',3,3,500);if(config.outreach.framingLibrary.some(row=>!/[.!]$/.test(row))||config.outreach.closingQuestions.some(row=>!row.endsWith('?'))||new Set(config.outreach.closingQuestions).size!==3)throw new SynthesisValidationError('INVALID_OUTPUT','Messaging proposals need three complete framing sentences and three different questions.');}
   if(config.targetCompanySizeDescription!==undefined)string(config.targetCompanySizeDescription,'icpConfig.targetCompanySizeDescription',500,{empty:false});
   const labels=new Set();
@@ -410,6 +410,7 @@ function materializeGeneratedDraft(state,workspace,output,{organizationReview,no
     const item=evidenceFor(state,workspace,raw,value,context), index=profile.proofPoints.length;
     profile.proofPoints.push({claim:value,...item});evidence[`proofPoints.${index}`]=item;count(item);
   }
+  if(output.icpConfig.playbook)profile.playbook=require('../playbook.cjs').draftPlaybook(output.icpConfig.playbook,Object.fromEntries([...context].map(([id,r])=>[id,{id,sourceId:r.sourceId,sourceUrl:r.source.url||r.url,evidenceQuote:r.evidenceQuote}])),now());
   profile.customers=[];
   const seenCustomers=new Set();
   for(const raw of output.sellerProfile.customers) {
