@@ -1,5 +1,21 @@
 # WhyNow traceability
 
+## General pipeline v5 Phase 1 — offline, 2026-11-14
+
+The owner-approved [v5 plan](GENERAL-PIPELINE-PLAN.md), including the explicit no-new-fit-gate clarification, governs this checkpoint. [Verification/file inventory](GENERAL-PIPELINE-PHASE-1.md) and [full test output](GENERAL-PIPELINE-PHASE-1-TESTS.txt).
+
+| Acceptance requirement | Implementation | Offline evidence |
+| --- | --- | --- |
+| Playbook schema, grounded generation and independent review | `playbook.cjs`, `onboarding/draft-icp-targeting.cjs`, `onboarding/draft-playbook.cjs`, `onboarding/playbook-page.cjs`, `onboarding/routes.cjs` | `playbook.test.mjs`, `playbook-routes.test.mjs`; receipt arrays remap server-side, missing/unknown receipts block, review acknowledgment starts unchecked, stale versions/receipts reject |
+| Resolve compatibility without approval | `legacyResolvePlaybook`, `phase-a-config.cjs`, `score-account.cjs` | Deterministic pending conversion and exact fallback test; read-only replay of all 33 saved accounts; Coalition Act now at fit37/Tier1; existing frozen Phase A/B fixtures unchanged |
+| Only timing/activePain becomes seller-configured | `playbook-timing.cjs`, `collectors/playbook-news.cjs`, `phase-b-config.cjs`, `phase-b-runner.cjs` | `playbook-timing.test.mjs`: strength/window/ATS exclusions, longer windows, retained permanent kill evidence; no change to existing tier/eligibility formulas |
+| Trigger angle reaches drafts without new facts | `outreach-drafts.cjs`, `outreach-model.cjs` | `playbook-outreach.test.mjs`: non-Resolve executive/news wording and factual receipts; saved drafts are never regenerated |
+| Apollo organizations only with caps and retained exclusions | `collectors/apollo.cjs`, guarded runtime, `lookalike-discovery.cjs`, discovery/prepare background runners | `apollo-lookalike.test.mjs`: fictional fixtures, sanitized estimates, retry/cap/restart/workspace/revision guards, zero people endpoints, retained rejections |
+| Account provenance and review surfaces | `server/phase-a-pages.cjs`, `onboarding/profile-page.cjs` | Found via with dated estimates, matched pattern/customer receipts; browser verifies full Kill Log code/reason and long workspace name |
+| Full offline suite and preservation | All existing and new tests | 82 files,409 pass/1 intentional skip; hash checks preserve Vercel profile/all drafts/Resolve/.env; zero provider calls |
+
+Apollo endpoint/free-plan/filter/credit behavior remains a Phase 2 verification task, not an offline success claim. The standalone one-call playbook request builder is tested without a live request. General pipeline Phase 2 budget is proposed only. No actual approval, contact lookup, sending or deployment occurred.
+
 ## October 29 — bounded Vercel run and offline executive-window correction
 
 `run-vercel-prepare-oct29.cjs` used a new durable one-use marker, approved revision checks, no OpenAI and a shared 100-query ceiling. Owner separately authorized process-only monthly ceiling170 because persistent50 was already below saved70; counter ends104, .env unchanged. Actual 34 queries: discovery29 (18 ATS/10 identity/1 size), refresh5.

@@ -1,3 +1,23 @@
+# General pipeline v5 — Phase 1 offline checkpoint, November 14, 2026
+
+Source of truth: [General Pipeline Plan](GENERAL-PIPELINE-PLAN.md). [Verification and file inventory](GENERAL-PIPELINE-PHASE-1.md).
+
+- [x] Commit the plan and authorization before code, then separately commit the owner's clarification: no new fit gate, tiers and Act now eligibility unchanged for every workspace.
+- [x] Versioned seller playbook schema, grounded targeting output, saved-receipt validation and independent editable review/approval UI. Approval is explicit and unchecked; editing resets playbook approval only. No actual seller or playbook was approved.
+- [x] Approved playbooks supply the why-now/activePain slot, source-specific keywords, strength, windows and outreach angle. Pending/missing/edited playbooks retain exact legacy behavior. Original ATS dates, title/department-only matching, early-career exclusions and executive corroboration remain.
+- [x] Deterministic, unapproved Resolve playbook conversion. All 33 saved Resolve account scores/decisions match the current baseline under fallback; Coalition remains **Act now, fit 37, Tier 1**. Frozen scoring/collector parity tests remain green.
+- [x] Organization-only Apollo client and lookalike strategy: disabled/zero-budget defaults, durable per-workspace monthly and per-run reservations, one capped 429 retry, stop on first other error, organization-only sanitized estimates, domain deduplication and retained exclusions. Fictional responses only.
+- [x] Default lookalike strategy for ordinary sellers; explicit trigger search retained and frozen Resolve discovery unchanged. Account Found via shows the matched pattern and dated Apollo estimate receipts.
+- [x] Full kill codes/reasons and untruncated workspace names checked in browser; fictional playbook controls and source links checked without approval. Local Resolve Today checked read-only.
+- [x] Full offline suite: **82 files passed; 409 tests passed, 1 intentional skipped test (410 total)**. Full output: [test log](GENERAL-PIPELINE-PHASE-1-TESTS.txt).
+- [x] Approved Vercel profile, all saved drafts, complete Resolve workspace and local environment file preserved. Zero provider calls. Port 3000 runs with providers disabled.
+- [ ] Phase 2 live verification: **not authorized**. Proposed: one Apollo organization-enrichment access/credit test first; only after that checkpoint and owner continuation, up to three customer enrichments and one company search (five total Apollo attempts, free-plan credits only). One Gong playbook generation request: offline conservative maximum $0.441675, proposed process cap $0.50. No live action taken.
+- [ ] Phase 3 demo documentation/screenshots after live verification; no sending, contact endpoints, CRM or deployment.
+
+Change log — November 14: added seller playbooks and capped company-lookalike discovery offline. Tiering and Act now rules are unchanged. Live endpoint access, credit behavior and real-seller playbook quality remain unverified; no new usable-prospect claim is made.
+
+## Earlier checkpoint (historical)
+
 # Final offline demo checkpoint — November 12, 2026
 
 - [x] Original ATS publication dates govern hiring freshness and expiry; title/department only govern role matching. Canonical 2022 Web and Legal Counsel negatives plus positive/missing-date cases are covered.

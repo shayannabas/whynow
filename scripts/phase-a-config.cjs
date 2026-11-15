@@ -16,9 +16,10 @@ function phaseAConfigForWorkspace(workspace={}) {
   const customers=referenceCustomers.length?referenceCustomers:organizationRows(sellerProfile.customers);
   const competitors=organizationRows(sellerProfile.competitors||icpConfig.exclusions?.competitors||[]);
   const sellerName=String(sellerProfile.sellerName||sellerProfile.name||reference.sellerName||workspace.name||'Seller').trim();
+  const playbook=require('./playbook.cjs').approvedPlaybook(workspace);
   return {
     configSource,
-    playbook:require('./playbook.cjs').approvedPlaybook(workspace),
+    playbook,
     seller:{name:sellerName,category:String(sellerProfile.category||''),productOneLiner:String(sellerProfile.productOneLiner||''),label:String(reference.sellerLabel||icpConfig.exclusions?.sellerLabel||sellerName),domain:rootDomain(sellerProfile.domain||reference.sellerDomain)},
     scoring:{version:icpConfig.scoring?.version||'resolve-scoring-priority-v2',weights:icpConfig.weights||icpConfig.scoring?.weights||{},liveTriggerDays:icpConfig.scoring?.liveTriggerDays||90},
     tierRules:icpConfig.tierRules||{},
@@ -31,7 +32,7 @@ function phaseAConfigForWorkspace(workspace={}) {
     entityRules:icpConfig.entityRules||[],
     signalDefinitions:icpConfig.signalDefinitions||{},
     sellerOwnedDomains:icpConfig.exclusions?.sellerOwnedDomains||sellerProfile.ownedProperties||[],
-    personas:icpConfig.personas||{},
+    personas:playbook?{...icpConfig.personas,buyerTitles:playbook.buyerRoles.economicBuyer,championTitles:playbook.buyerRoles.champion,endUserTitles:playbook.buyerRoles.endUser}:icpConfig.personas||{},
     triggerMapping:icpConfig.triggerMapping||{},
     segments:icpConfig.segments||[],
     slaDays:icpConfig.slaDays||{},
