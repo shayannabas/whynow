@@ -18,6 +18,7 @@ function phaseBQueryPlan(target){
   const name=String(target.name||'').replace(/["\n\r]/g,' ').trim();
   const firmographicName=String(target.firmographicTarget?.name||name).replace(/["\n\r]/g,' ').trim();
   if(!name)return [];
+  if(target.playbook){const timing=target.playbook.triggers.filter(t=>t.source==='news').slice(0,3).map(t=>({kind:'active_pain_news',query:'"'+name+'" ('+t.keywords.map(k=>'"'+String(k).replace(/["\r\n]/g,' ')+'"').join(' OR ')+')'}));return [...timing,{kind:'firmographics_size',query:'"'+firmographicName+'" employees revenue'},{kind:'firmographics_funding',query:'"'+firmographicName+'" funding valuation'}];}
   return [
     {kind:'active_pain_news',query:`"${name}" outage OR incident OR downtime OR degraded`},
     {kind:'tech_and_ai',query:`"${name}" Kubernetes OR microservices OR observability OR SRE OR LLM OR Copilot OR Cursor engineering`},

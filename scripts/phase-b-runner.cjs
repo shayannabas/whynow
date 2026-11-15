@@ -35,7 +35,8 @@ function signalWins(current={},incoming={}){
 const {dedupeTriggers}=require('./trigger-identity.cjs');
 function sanitizeWhyNow(account={},config={},now=new Date()){
   const all=dedupeTriggers(account.triggers||[]).map(trigger=>trigger.decaysAt?trigger:decorateTrigger(trigger,config.slaDays||{})),history=uniq([...(account.triggerHistory||[]),...all],row=>row.id||`${row.type}:${row.evidenceUrl}:${row.occurredAt}`),targeting={buyerTitles:config.personas?.buyerTitles||[],championTitles:config.personas?.championTitles||[],triggerMapping:config.triggerMapping||{}},eligible=all.filter(trigger=>{
-    if(trigger.citable===false||trigger.metadata?.citable===false||!hiringTriggerRelevance(trigger,targeting).relevant)return false;
+    if(trigger.citable===false||trigger.metadata?.citable===false||(!config.playbook&&!hiringTriggerRelevance(trigger,targeting).relevant))return false;
+    if(config.playbook)return true;
     return !/incident|outage|downtime|degraded/.test(String(trigger.type||trigger.triggerType||''))||operationalPainEvidence(account,{url:trigger.evidenceUrl,title:trigger.evidenceText||trigger.title,date:trigger.occurredAt});
   }),triggers=activeTriggers({...account,triggers:eligible},now);
   const signals={...(account.signals||{})};for(const [key,value] of Object.entries(signals))if(value?.evidenceUrl&&value.sourceId==='serper'&&!evidenceBelongsToTarget(account,value))delete signals[key];const pain=signals.activePain;
@@ -90,6 +91,7 @@ function createPhaseBRefreshCoordinator({read,mutate,env=process.env,runtimeFact
       }catch(error){await fail(workspaceId,runId,'search_evidence',error,runtime);}
     }else await updateRun(workspaceId,runId,run=>run.collectors.push({collectorId:'search_evidence',status:'disabled',signals:0,events:0,killHints:0,itemsFound:0}));
     const steps=[
+      ['playbook_news',()=>require('./collectors/playbook-news.cjs').collectPlaybookNews(target,{searchResults,now:now()})],
       ['firmographics',()=>collectors.collectFirmographics(target,{runtime,now:now(),searchResults})],
       ['hiring',()=>collectors.collectHiring(target,{runtime,now:now(),painThemeConfig:collectorConfig.painThemeConfig,slaConfig:collectorConfig.slaDays})],
       ['active_pain',()=>collectors.collectActivePain(target,{runtime,now:now(),searchResults,painThemeConfig:collectorConfig.painThemeConfig,strictFreshness:true,windowDays:Number(collectorConfig.slaDays?.outage)||30,slaConfig:collectorConfig.slaDays})],

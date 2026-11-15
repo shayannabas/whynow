@@ -11,6 +11,7 @@ function collectorConfigForWorkspace(workspace={}){
   const phaseA=phaseAConfigForWorkspace(workspace),icp=workspace.icpConfig||{},rules=icp.collectorRules||{};
   return {
     configSource:phaseA.configSource,
+    playbook:phaseA.playbook,
     sellerLabel:phaseA.seller.label,
     sellerDomain:phaseA.seller.domain,
     segments:mapSegments(phaseA.segments),
@@ -43,9 +44,10 @@ function collectorTargetForAccount(account={},collectorConfig={}){
     segment,
     icpSegment:segment,
     segmentConfig:structuredClone(collectorConfig.segments?.[segment]||{}),
-    buyerTitles:structuredClone(collectorConfig.personas?.buyerTitles||[]),
-    championTitles:structuredClone(collectorConfig.personas?.championTitles||[]),
-    triggerMapping:structuredClone(collectorConfig.triggerMapping||{}),
+    playbook:collectorConfig.playbook,
+    buyerTitles:structuredClone(collectorConfig.playbook?.buyerRoles.economicBuyer||collectorConfig.personas?.buyerTitles||[]),
+    championTitles:structuredClone(collectorConfig.playbook?.buyerRoles.champion||collectorConfig.personas?.championTitles||[]),
+    triggerMapping:collectorConfig.playbook?{...collectorConfig.triggerMapping,function_roles:collectorConfig.playbook.triggers.filter(t=>t.source==='ats_jobs').flatMap(t=>t.keywords)}:structuredClone(collectorConfig.triggerMapping||{}),
     signalDefinitions:structuredClone(collectorConfig.signalDefinitions||{}),
     competitors:structuredClone(collectorConfig.competitors||[]),
     aliases:Array.from(new Set([...(account.aliases||[]),...(parent?.aliases||[]),parent?.canonicalName].filter(Boolean))),

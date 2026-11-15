@@ -73,6 +73,7 @@ function draftFromForm(state, workspace, form, now=()=>new Date().toISOString())
   if (!selected) throw new Error('Choose a seller company before editing its profile.');
   const evidenceMap={};
   const profile={schemaVersion:1,sellerName:selected.name,domain:selected.domain,deliveryAllowed:false,generatedAt:null,approvedAt:null,updatedAt:now(),sources:[]};
+  if(workspace.sellerProfile.playbook)profile.playbook=require('../playbook.cjs').draftPlaybook(workspace.sellerProfile.playbook,require('../playbook.cjs').receiptsForWorkspace(state,workspace),now(),workspace.sellerProfile.playbook.version+1);
   for(const key of Object.keys(FACT_FIELDS)) {
     const value=text(form.get(key));profile[key]=value;
     evidenceMap[key]=evidence(state,value,form.get(`${key}.url`),form.get(`${key}.quote`),selected.domain);

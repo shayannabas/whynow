@@ -73,6 +73,7 @@ function reviewPlaybook(state,id,{action,revision,profileRevision,raw,acknowledg
   if([...selected].some(key=>JSON.stringify(prior.receipts?.[key])!==JSON.stringify(receipts[key])))throw Error('Seller receipts changed. Save and review the playbook again.');
   w.sellerProfile.playbook={...prior,status:'approved',approvedAt:now,approvedDigest:digest(prior)};
  }else throw Error('Unknown playbook action.');
+ if(action==='approve'&&(w.status==='active'||w.referenceDemo?.loadOnly)){const config=require('./phase-a-config.cjs').phaseAConfigForWorkspace(w);w.accounts=w.accounts.map(a=>require('./score-account.cjs').scoreAccount(a,config,new Date(now)));}
  next.auditLog.push({schemaVersion:1,type:action==='save'?'playbook_saved':'playbook_approved',workspaceId:id,occurredAt:now,playbookVersion:w.sellerProfile.playbook.version,profileRevision:w.profileRevision||0,actor:'owner'});return next;
 }
 module.exports={SOURCES,STRENGTHS,digest,draftSchema,receiptsForWorkspace,validatePlaybook,draftPlaybook,approvedPlaybook,legacyResolvePlaybook,reviewPlaybook};
