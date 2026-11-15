@@ -19,7 +19,7 @@ v4 found new accounts mainly through job-posting searches. That is Resolve-speci
 1. Learn the seller: research produces the seller profile (customers, competitors, size) plus the playbook. A human approves both.
 2. Find accounts: default strategy `lookalike` (Apollo). Optional strategy `trigger_search` (existing ATS job search, kept for sellers whose playbook makes hiring the core trigger). Competitor-customer discovery is a documented next step.
 3. Check timing: run the existing timing collectors on candidates according to the approved playbook triggers.
-4. Rank: existing six-slot scorecard, tiering and kill engine. Tier reflects fit. Act now requires good fit plus a fresh playbook trigger.
+4. Rank: use the existing six-slot scorecard, firmographic tiering, decisioning and kill engine. Tiering and Act now eligibility remain exactly as they are for every workspace, including future playbooks; no new fit gate or threshold is introduced. An approved playbook supplies the why-now / activePain slot's triggers, keywords, freshness windows and strength.
 5. Draft: existing outreach drafting with receipts. The opener uses the matched trigger's message angle.
 
 Contact lookup (Apollo people endpoints) remains deferred and is out of scope for this plan.
@@ -56,7 +56,7 @@ Collector `scripts/collectors/apollo.cjs`, limited to `organizations/enrich` and
 
 ## 6. Scoring
 
-The six-slot scorecard, tiering, decisioning and kill engine are unchanged. Only the why-now / activePain slot changes: it reads triggers, keywords, freshness windows and strength from the approved playbook. Hiring evidence counts only when the playbook includes an `ats_jobs` trigger. Existing freshness rules stay: original ATS publication date, job title/department matching, executive-change corroboration, early-career exclusion.
+The six-slot scorecard, firmographic tiering, decisioning, Act now eligibility and kill engine retain their existing rules for every workspace, including future playbooks. Do not add a fit gate, minimum score or other eligibility threshold. References to fit describe those existing rules, not new thresholds. Only the why-now / activePain slot changes: it reads triggers, keywords, freshness windows and strength from the approved playbook. Until the playbook is approved, current behavior applies. Hiring evidence counts toward why-now / activePain only when the playbook includes an `ats_jobs` trigger. Existing freshness rules stay: original ATS publication date, job title/department matching, executive-change corroboration, early-career exclusion. The Resolve parity test must retain Coalition in Act now even at fit 37.
 
 ## 7. What must not change
 
