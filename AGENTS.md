@@ -1,4 +1,8 @@
-# Current close-out — November 12, 2026
+# Current status — November 14, 2026
+
+Phase 1 of [General Pipeline Plan v5](docs/GENERAL-PIPELINE-PLAN.md) is authorized offline-only and is the source of truth. The owner lifted the offline implementation lock for that phase only on November 14, 2026. Step 0 saves this plan and authorization before code. Check repository compatibility and stop to report any conflict before implementation. No provider calls of any kind, profile/playbook approvals or live verification are authorized. Preserve the approved Vercel profile, all saved drafts and Resolve demo state. Use hand-written fictional-company fixtures for new implementation tests; keep port 3000 running with providers disabled. Phase 2 requires separate authorization.
+
+## Historical close-out restrictions — November 12, 2026
 
 Offline only. No new research, Serper, OpenAI or other provider calls; no approvals, contact lookup, sending or deployment. Previous bounded authorizations below are historical and exhausted. Preserve the owner-approved Vercel profile and all saved drafts. Hiring freshness uses original ATS publication, never last update or collection time; relevance uses job title and department only. Retain rejected discovery pages with receipts outside account queues. Do not alter dates to keep a demo account fresh. Private reference checkout details live only in ignored `.internal/REFERENCE-NOTES.md`. Keep port 3000 running with provider switches disabled. Human approval remains the owner's action.
 
