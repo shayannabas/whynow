@@ -76,7 +76,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       if(req.method==='POST'&&pathname==='/discovery/run'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
-        const current=loadState(stateFile);if(!await actionWorkspaceMatches(req,current,res))return;try{await discoveryCoordinator.start(current.activeWorkspaceId);}catch(error){return html(409,discoveryPage(loadState(stateFile),error.message));}
+        const current=loadState(stateFile);let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192)return json(res,413,{error:'Form too large'});}const fields=new URLSearchParams(body);if(fields.get('workspaceId')!==current.activeWorkspaceId)return json(res,409,{error:'Workspace changed. Refresh and try again.'});try{await discoveryCoordinator.start(current.activeWorkspaceId,{strategy:fields.get('strategy')||undefined});}catch(error){return html(409,discoveryPage(loadState(stateFile),error.message));}
         res.writeHead(303,{Location:'/discovery'});return res.end();
       }
       if(req.method==='GET'&&pathname==='/accounts')return html(200,accountsPage(loadState(stateFile),'',requestUrl.searchParams));

@@ -11,7 +11,7 @@ const minute=60000,hour=60*minute,day=24*hour;
 const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
   ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000,16*1024*1024],['lever',20,500,6*hour,12000,16*1024*1024],['ashby',20,500,6*hour,12000,16*1024*1024],
   ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
-  ['wikidata',60,250,7*day,12000],['gdelt',5,5500,15*minute,20000],
+  ['apollo',20,1000,0,15000],['wikidata',60,250,7*day,12000],['gdelt',5,5500,15*minute,20000],
   ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
   ['engineering_web',20,1500,12*hour,12000],
   ['seller_site',25,1000,day,12000],['seller_customers',2,2000,30*day,12000],['robots',30,500,day,8000]
@@ -105,6 +105,7 @@ class CollectorRuntime {
     this.identity();
     if(!Object.hasOwn(this.budgets,source))throw new CollectorHttpError('UNKNOWN_SOURCE','Unknown collector source');
     if(source==='serper' && !['https://google.serper.dev/search','https://google.serper.dev/news'].includes(new URL(value).href))throw new CollectorHttpError('UNSAFE_URL','Search API destination is fixed');
+    if(source==='apollo'&&(new URL(value).origin!=='https://api.apollo.io'||!['/api/v1/organizations/enrich','/api/v1/mixed_companies/search'].includes(new URL(value).pathname)))throw new CollectorHttpError('UNSAFE_URL','Apollo company destination is fixed');
     const execute=async()=>{
       try {
         const result=await this.perform(source,value,options,0);

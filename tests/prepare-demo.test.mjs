@@ -4,7 +4,7 @@ const require=createRequire(import.meta.url);
 const {createPrepareDemoCoordinator,prepareDemoSettings}=require('../scripts/prepare-demo.cjs');
 
 function harness({approved=true,openai='false'}={}){
-  const workspaceId='vercel-workspace';let state={workspaces:{[workspaceId]:{id:workspaceId,status:approved?'active':'needs_review',sellerProfile:{approvedAt:approved?'2026-10-21T00:00:00.000Z':null},accounts:Array.from({length:25},(_,index)=>({id:`a${index}`,discoveryQuality:{sourceKind:'search'}})),runs:[]}}},writes=Promise.resolve();
+  const workspaceId='vercel-workspace';let state={workspaces:{[workspaceId]:{id:workspaceId,discoveryStrategy:'icp_queries',status:approved?'active':'needs_review',sellerProfile:{approvedAt:approved?'2026-10-21T00:00:00.000Z':null},accounts:Array.from({length:25},(_,index)=>({id:`a${index}`,discoveryQuality:{sourceKind:'search'}})),runs:[]}}},writes=Promise.resolve();
   const read=()=>structuredClone(state),mutate=fn=>{const work=writes.then(()=>{state=fn(structuredClone(state));return structuredClone(state);});writes=work.catch(()=>{});return work;};
   const discoveryCoordinator={start:vi.fn(async(_id,options)=>({id:'discovery',options})),wait:vi.fn(async()=>({id:'discovery',status:'complete',serperQueries:20,errors:[]}))};
   const refreshAllCoordinator={start:vi.fn(async(_id,options)=>({id:'refresh',options})),wait:vi.fn(async()=>({id:'refresh',status:'complete',serperQueries:100,completedAccounts:25,errors:[]}))};
