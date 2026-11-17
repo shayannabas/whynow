@@ -88,6 +88,8 @@ function officialSecDataEndpoint(value) {
     || /^\/Archives\/edgar\/(?:daily-index|data)\//i.test(url.pathname);
 }
 
+const robotsUnavailable=status=>status>=400&&status<500&&status!==429;
+
 class CollectorRuntime {
   constructor({env=process.env,now=Date.now,fetch=publicFetch,lookup=dns.lookup.bind(dns),sleep=ms=>new Promise(r=>setTimeout(r,ms)),cacheDir=path.resolve(__dirname,'../../.whynow/collector-cache'),budgets=DEFAULT_BUDGETS,timeoutMs}={}) {
     Object.assign(this,{env,now,fetch,lookup,sleep,cacheDir,budgets,timeoutMs});
@@ -136,7 +138,8 @@ class CollectorRuntime {
     if(source!=='robots' && source!=='serper' && !secDataRequest) {
       const robotsUrl=new URL('/robots.txt',url).href;
       const response=await this.request('robots',robotsUrl,{...(options.allowedRedirectDomain?{allowedRedirectDomain:options.allowedRedirectDomain}:{}),userAgent:this.identity(source)});
-      const rules=robotsParser(robotsUrl,response.status===404?'':response.text);
+      if(robotsUnavailable(response.status))this.onRobotsUnavailable?.({url:robotsUrl,status:response.status,forUrl:url.href});
+      const rules=robotsParser(robotsUrl,robotsUnavailable(response.status)?'':response.text);
       if(rules.isAllowed(url.href,this.identity(source))===false)throw new CollectorHttpError('ROBOTS_DISALLOWED','This site disallows crawling this page');
       crawlDelay=(rules.getCrawlDelay(this.identity(source))||0)*1000;
     }
@@ -176,12 +179,13 @@ class CollectorRuntime {
         if(options.allowedRedirectDomain&&!redirectStaysInDomain(destination,options.allowedRedirectDomain))throw new CollectorHttpError('REDIRECT_BLOCKED','The request tried to redirect away from the approved company domain');
         return this.perform(source,destination,options,depth+1);
       }
-      if(!(response.status>=200 && response.status<300) && !(source==='robots' && response.status===404)){const error=new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);if(response.status===429){const raw=response.headers.get('retry-after'),seconds=Number(raw);error.retryAfterMs=Number.isFinite(seconds)&&seconds>0?seconds*1000:Math.max(0,Date.parse(raw||'')-this.now())||60000;}throw error;}
+      if(!(response.status>=200 && response.status<300) && !(source==='robots' && robotsUnavailable(response.status))){const error=new CollectorHttpError('HTTP_ERROR',`Public source returned HTTP ${response.status}`,response.status);if(response.status===429){const raw=response.headers.get('retry-after'),seconds=Number(raw);error.retryAfterMs=Number.isFinite(seconds)&&seconds>0?seconds*1000:Math.max(0,Date.parse(raw||'')-this.now())||60000;}throw error;}
       const maxBytes=Number(options.maxBytes)||Number(budget.maxBytes)||2*1024*1024;
       if(Buffer.byteLength(response.text)>maxBytes)throw new CollectorHttpError('TOO_LARGE',`Page exceeds the ${Math.round(maxBytes/1024/1024)} MB limit`);
+      if(source==='robots'&&robotsUnavailable(response.status))response.text='';
       const contentType=response.headers.get('content-type')||'';
       const secPlainText=String(source).startsWith('edgar_')&&url.hostname==='www.sec.gov'&&/application\/(?:octet-stream|x-gzip)/i.test(contentType);
-      if(contentType && !/text\/|json|xml/i.test(contentType)&&!secPlainText)throw new CollectorHttpError('CONTENT_TYPE','Only text pages are supported');
+      if(contentType && !/text\/|json|xml/i.test(contentType)&&!secPlainText&&!(source==='robots'&&robotsUnavailable(response.status)))throw new CollectorHttpError('CONTENT_TYPE','Only text pages are supported');
       const result={schemaVersion:1,url:url.href,status:response.status,text:response.text,contentType,savedAt:this.now(),fetchedAt:new Date(this.now()).toISOString()};
       atomicWrite(cacheFile,JSON.stringify(result));return {...result,fromCache:false};
     } finally {clearTimeout(timer);}

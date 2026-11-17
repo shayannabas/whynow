@@ -1,5 +1,7 @@
 # Current status — November 17, 2026
 
+Owner authorized one news-first Pump Part B run after offline tests and commit, with profile and playbook v6 preserved. Limits are 80 Serper, 150 free requests, 25 candidates, 15 Apollo organization enrichments, and zero OpenAI. News has a 48-query allocation. Keep the persistent Serper monthly cap at the owner-authorized 300. Preserve the rest of .env. Provider errors stop the run. Restore process switches after the run and stop live tuning. Interface v2 begins offline after the run report is committed and its plan is recorded.
+
 Offline default discovery and Today fallback are implemented. Apollo organization enrichment is independent of opt-in company search. Vercel’s HTTP 403 is recorded as a free-plan company-search limitation and the Vercel authorization is exhausted.
 
 Pump Part A rerun `pump-part-a-nov17-2026-priority-rerun` is used and exhausted. Reused 18 pages, spent 15 first-party requests and saved 11 more pages. Zero Serper and Apollo. All three GPT-5.5 requests passed the 40,000 input-token preflight. Actual cost $0.343355 with cached input tokens 0 / 19,200 / 19,200. Pump profile revision 1 and playbook version 1 are needs_review. Saved 15 customers, 14 comparison entries, five segments and six triggers. No approval. See [rerun results](docs/PUMP-PART-A-RERUN.md). Providers disabled and caps zero, .env unchanged. Part A is exhausted. Follow the separate Part B authorization below.

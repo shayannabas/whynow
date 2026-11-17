@@ -6,7 +6,7 @@ import {expect,it,vi} from 'vitest';
 import {fixture} from './fixtures/pipeline/fictional.mjs';
 
 const require=createRequire(import.meta.url);
-const {BATCH,CAPS,RULES,roundRobinCandidates,guardedRuntime,run}=require('../scripts/run-pump-part-b.cjs');
+const {BATCH,CAPS,RULES,roundRobinCandidates,guardedRuntime,newsFirstPlan,officialIdentity,run}=require('../scripts/run-pump-part-b.cjs');
 const {draftPlaybook,digest}=require('../scripts/playbook.cjs');
 const {loadState,saveState}=require('../scripts/server/state.cjs');
 const {CollectorRuntime,CollectorHttpError}=require('../scripts/collectors/runtime.cjs');
@@ -56,7 +56,7 @@ function harness({approved=true,robotsStatus=200,articleStatus=200,providerStatu
     throw Error('Unexpected fictional destination');
   });
   const env={CRAWLER_CONTACT_EMAIL:'crawler@example.invalid',SERPER_API_KEY:'fictional-serper',SERPER_MONTHLY_QUERY_LIMIT:'50',APOLLO_API_KEY:'fictional-apollo'};
-  const runtimeFactory=options=>new CollectorRuntime({...options,lookup:async()=>[{address:'93.184.216.34',family:4}],sleep:async()=>{},fetch});
+  const runtimeFactory=options=>new CollectorRuntime({...options,now:()=>now().getTime(),lookup:async()=>[{address:'93.184.216.34',family:4}],sleep:async()=>{},fetch});
   return {file,id,dir,fetch,run:()=>run({file,env,now,runtimeFactory}),cleanup:()=>fs.rmSync(dir,{recursive:true,force:true})};
 }
 
@@ -91,17 +91,18 @@ it('stops on an API refusal carried in an HTTP 200 response',async()=>{
   }finally{h.cleanup();}
 });
 
-it('skips a robots refusal and a missing alternate, then verifies the same event at a second outlet',async()=>{
-  const h=harness({robotsStatus:403,alternateMode:'verify'});
+it('logs robots 403 without using it as a disallow, then tries two other outlets after an article denial',async()=>{
+  const h=harness({robotsStatus:403,articleStatus:403,alternateMode:'verify'});
   try {
     const r=await h.run();
     expect(r.status).toBe('complete');
     expect(r.skippedPages).toMatchObject([
-      {candidate:'Fir Market',url:newsUrl,reason:'HTTP_ERROR',httpStatus:403,robotsUrl:'https://ledger-news.example/robots.txt'},
+      {candidate:'Fir Market',url:newsUrl,reason:'HTTP_ERROR',httpStatus:403},
       {candidate:'Fir Market',url:alternateUrl,reason:'HTTP_ERROR',httpStatus:404}
     ]);
     expect(r.sections.actNow[0]).toMatchObject({name:'Fir Market',originalReceipt:otherUrl});
-    expect(h.fetch.mock.calls.some(([url])=>url===newsUrl||url===unusedUrl)).toBe(false);
+    expect(r.robotsNotes).toContainEqual({url:'https://ledger-news.example/robots.txt',status:403,interpretation:'no robots rules'});
+    expect(h.fetch.mock.calls.some(([url])=>url===unusedUrl)).toBe(false);
   }finally{h.cleanup();}
 });
 
@@ -133,7 +134,8 @@ it('retains the listing on a rejected lead even when the company domain is unres
     const state=loadState(h.file);
     const [lead]=state.workspaces[h.id].rejectedDiscovery;
     expect(state.sources[lead.newsListing.savedSourceId].text).toContain(newsTitle);
-    expect(state.workspaces[h.id].accounts).toEqual([]);
+    expect(state.workspaces[h.id].accounts[0]).toMatchObject({name:'Fir Market',domain:'',tier:'parked'});
+    expect(r.sections.needsReview[0].reviewReason).toContain('unresolved');
   }finally{h.cleanup();}
 });
 
@@ -158,7 +160,7 @@ it('scores a receipt-backed candidate with a saved Apollo employee estimate and 
   try {
     const r=await h.run();
     expect(r).toMatchObject({status:'complete',apolloAttempts:1,openaiCalls:0,preserved:true,envUnchanged:true,
-      enrichments:[{name:'Fir Market',status:'ESTIMATE_SAVED',employeeCount:275}]});
+      enrichments:[{name:'Fir Market',status:'DOMAIN_CONFIRMED',employeeCount:275}]});
     expect(r.sections.actNow[0]).toMatchObject({name:'Fir Market',tier:2,trigger:newsTitle,originalReceipt:newsUrl});
     expect(r.sections.actNow[0].receipt).toMatch(/^\/sources\//);
     expect(h.fetch.mock.calls.every(([url])=>!/mixed_companies|people|api\.openai/.test(url))).toBe(true);
@@ -171,4 +173,27 @@ it('gives all matching trigger groups a turn within the 25-candidate limit',()=>
   const selected=roundRobinCandidates([...news,{ruleId:'recent-funding'},{ruleId:'migration-or-multicloud'},{provider:'lever'}]);
   expect(selected).toHaveLength(CAPS.candidates);
   expect(selected.slice(0,4)).toMatchObject([{ruleId:'ai-or-gpu-spend'},{ruleId:'recent-funding'},{ruleId:'migration-or-multicloud'},{provider:'lever'}]);
+});
+
+
+it('prioritizes 48 dated news searches over recency-filtered ATS lookups when the policy has enough segment terms',()=>{
+  const h=harness();
+  try{
+    const s=loadState(h.file),w=s.workspaces[h.id];
+    w.sellerProfile.playbook.triggers.filter(row=>row.source==='news').forEach((row,index)=>{row.keywords=index===0?['raises','raised','funding','seed round','series a','series b','series c']:Array.from({length:7},(_,i)=>'keyword '+String.fromCharCode(97+index)+String.fromCharCode(97+i));});
+    w.sellerProfile.playbook.approvedDigest=digest(w.sellerProfile.playbook);
+    w.icpConfig.segments=Array.from({length:5},(_,i)=>({key:'sector-'+i,label:'Sector '+i,subIndustries:['sector '+i,'cloud market '+i]}));
+    const tasks=newsFirstPlan(w,now()),news=tasks.filter(row=>row.kind==='trigger_first_news');
+    expect(news).toHaveLength(48);
+    expect(tasks.slice(0,48)).toEqual(news);
+    expect(news).toEqual(expect.arrayContaining([expect.objectContaining({query:'"sector 0" ("raises" OR "raised")',tbs:'cdr:1,cd_min:10/18/2026,cd_max:11/17/2026',icpId:'sector-0'})]));
+    expect(tasks.slice(48).every(row=>row.tbs==='qdr:m')).toBe(true);
+  }finally{h.cleanup();}
+});
+
+it('prefers a matching official homepage and rejects equally plausible domains',()=>{
+  const lead={name:'Fir Market'};
+  const profile={title:'Fir Market | Official site',url:'https://firmarket.example/'};
+  expect(officialIdentity(lead,[{title:'Fir Market on a directory',url:'https://directory.example/companies/fir-market'},profile]).domain).toBe('firmarket.example');
+  expect(officialIdentity(lead,[profile,{...profile,url:'https://firmarket.io/'}])).toBeNull();
 });

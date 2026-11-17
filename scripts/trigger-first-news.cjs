@@ -23,6 +23,32 @@ function buildNewsTasks(workspace) {
   }).filter(task=>task.query&&task.query.length<=500).slice(0,6);
 }
 
+function newsDateFilter(freshnessDays,now=new Date()) {
+  const format=date=>[date.getUTCMonth()+1,date.getUTCDate(),date.getUTCFullYear()].join('/');
+  return 'cdr:1,cd_min:'+format(new Date(now.getTime()-freshnessDays*DAY_MS))+',cd_max:'+format(now);
+}
+
+function buildSegmentNewsTasks(workspace,{now=new Date(),limit=48}={}) {
+  const segments=(workspace.icpConfig?.segments||[]).filter(segment=>segment.enabled!==false);
+  const tasks=[],seen=new Set();
+  const rules=newsRules(workspace);
+  const quote=word=>'"'+String(word).replace(/["\r\n]/g,' ').trim().slice(0,105)+'"';
+  const buckets=rules.map(rule=>segments.map(segment=>{
+    const terms=[...new Set((segment.subIndustries||[]).filter(Boolean))];
+    if(!terms.length)terms.push(segment.label||segment.key);
+    const keywords=rule.keywords.filter(Boolean);
+    return keywords.map((keyword,index)=>{
+      const query=quote(terms[index%terms.length])+' ('+[keyword,keywords[(index+1)%keywords.length]].filter((value,i,rows)=>rows.indexOf(value)===i).map(quote).join(' OR ')+')';
+      return {kind:NEWS_KIND,ruleId:rule.id,terms:[keyword],icpId:segment.key,icpLabel:segment.label,query,tbs:newsDateFilter(rule.freshnessDays,now)};
+    });
+  }));
+  for(let offset=0;offset<30&&tasks.length<limit;offset++)for(let segment=0;segment<segments.length;segment++)for(const rule of buckets){
+    const task=rule[segment][offset],key=task?.query+'|'+task?.tbs;
+    if(task&&!seen.has(key)&&tasks.length<limit){seen.add(key);tasks.push({...task,id:'news-'+task.ruleId+'-'+task.icpId+'-'+offset});}
+  }
+  return tasks;
+}
+
 function subjectFromHeadline(title='') {
   // Promote clear subject-first company announcements. Ambiguous headlines
   // (investor-first lists, analysis and multi-company roundups) stay out.
@@ -33,12 +59,13 @@ function subjectFromHeadline(title='') {
 
 function candidateFromNewsResult(row,task,workspace,now) {
   const rule=newsRules(workspace).find(item=>item.id===task.ruleId);
-  const name=subjectFromHeadline(row.title),date=parsedPublishedAt(row.date,now),age=now.getTime()-Date.parse(date);
+  const captured=new Date(row.dateCapturedAt||now);
+  const name=subjectFromHeadline(row.title),date=parsedPublishedAt(row.date,captured),age=now.getTime()-Date.parse(date);
   let url;
   try{url=new URL(row.url||row.link);}catch{return null;}
   if(!rule||!name||!date||age<0||age>=rule.freshnessDays*DAY_MS||url.protocol!=='https:'||url.username||url.password||url.pathname==='/')return null;
   url.hash='';
-  return {kind:NEWS_KIND,ruleId:rule.id,name,sourceUrl:url.href,sourceDate:date,title:stripHtml(row.title).slice(0,300),snippet:stripHtml(row.snippet).slice(0,1000)};
+  return {kind:NEWS_KIND,ruleId:rule.id,name,sourceUrl:url.href,sourceDate:date,dateSource:'Serper News listing',matchedIcpId:task.icpId||'',matchedIcpReason:task.icpId?'Matched the approved '+task.icpLabel+' news query.':'',title:stripHtml(row.title).slice(0,300),snippet:stripHtml(row.snippet).slice(0,1000)};
 }
 
 function attr(tag,name) {
@@ -158,10 +185,10 @@ async function verifyNewsCandidate(candidate,context) {
 }
 
 function buildNewsListing(candidate,attempts,fetchedAt) {
-  const listing={label:NEWS_LISTING_LABEL,title:candidate.title,snippet:candidate.snippet,listedAt:candidate.sourceDate,sourceUrl:candidate.sourceUrl,citable:false,attempts};
+  const listing={label:NEWS_LISTING_LABEL,title:candidate.title,snippet:candidate.snippet,listedAt:candidate.sourceDate,dateSource:'Serper News listing',sourceUrl:candidate.sourceUrl,citable:false,attempts};
   const receipt={url:listing.sourceUrl,title:listing.label,
     text:'Serper News listing date: '+listing.listedAt+'\n'+[listing.title,listing.snippet].filter(Boolean).join('\n'),fetchedAt};
   return {listing,receipt};
 }
 
-module.exports={NEWS_KIND,NEWS_LISTING_LABEL,buildNewsTasks,candidateFromNewsResult,sameNewsEvent,alternateNewsCandidates,verifyNewsCandidate,buildNewsListing};
+module.exports={NEWS_KIND,NEWS_LISTING_LABEL,buildNewsTasks,buildSegmentNewsTasks,newsDateFilter,candidateFromNewsResult,sameNewsEvent,alternateNewsCandidates,verifyNewsCandidate,buildNewsListing};

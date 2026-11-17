@@ -35,19 +35,19 @@ function assertSerperReady(config) {
 
 // Search is fail-closed by default. A low-level recorded-response test may opt
 // out explicitly; production callers must satisfy the enable switch and caps.
-async function requestSerper(query,{runtime,env=process.env,num=10,enforceEnabled=true,endpoint=ENDPOINT,resultKey='organic'}={}) {
+async function requestSerper(query,{runtime,env=process.env,num=10,enforceEnabled=true,endpoint=ENDPOINT,resultKey='organic',tbs}={}) {
   if(enforceEnabled)assertSerperReady(serperSettings(env));
   else if(!env.SERPER_API_KEY)throw new SerperError('KEY_MISSING','SERPER_API_KEY is not configured');
   if(typeof query!=='string' || !query.trim() || query.length>500)throw new SerperError('INVALID_QUERY','Enter a search query of 1–500 characters');
   if(!Number.isInteger(num)||num<1||num>10)throw new SerperError('INVALID_LIMIT','Search result count must be from 1 to 10.');
   if(!runtime||typeof runtime.request!=='function')throw new SerperError('RUNTIME_REQUIRED','A guarded collector runtime is required.');
   const response=await runtime.request('serper',endpoint,{
-    method:'POST',headers:{'X-API-KEY':env.SERPER_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({q:query.trim(),num})
+    method:'POST',headers:{'X-API-KEY':env.SERPER_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({q:query.trim(),num,...(tbs?{tbs}:{})})
   });
   let data;
   try {data=JSON.parse(response.text);} catch {throw new SerperError('INVALID_RESPONSE','Serper returned an unreadable search response.');}
   return (Array.isArray(data[resultKey])?data[resultKey]:[]).slice(0,num).map(row=>({
-    title:String(row?.title||'').slice(0,300),url:String(row?.link||'').slice(0,2000),snippet:String(row?.snippet||'').slice(0,1000),date:String(row?.date||'').slice(0,100),source:String(row?.source||'').slice(0,200)
+    title:String(row?.title||'').slice(0,300),url:String(row?.link||'').slice(0,2000),snippet:String(row?.snippet||'').slice(0,1000),date:String(row?.date||'').slice(0,100),...(resultKey==='news'&&response.fetchedAt?{dateCapturedAt:response.fetchedAt}:{}),source:String(row?.source||'').slice(0,200)
   }));
 }
 async function search(query,options={}){return requestSerper(query,{...options,endpoint:ENDPOINT,resultKey:'organic'});}

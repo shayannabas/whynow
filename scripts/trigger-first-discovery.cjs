@@ -63,7 +63,7 @@ function matchVerifiedJob(candidate={},jobs=[]){
   const sourcePath=(()=>{try{return new URL(candidate.sourceUrl).pathname.replace(/\/$/,'');}catch{return '';}})(),direct=jobs.find(job=>{try{return new URL(job.url).pathname.replace(/\/$/,'')===sourcePath;}catch{return false;}}),byTitle=jobs.find(job=>clean(job.title).toLowerCase()===clean(candidate.roleTitle).toLowerCase());return direct||(atsDescriptor(candidate.sourceUrl)?.direct?null:byTitle)||null;
 }
 function mergeSignals(base={},rows=[]){const next={...base};for(const row of rows||[]){if(!row?.key)continue;const current=next[row.key];if(!current||current.inferred===true||Number(row.score||0)>Number(current.score||0))next[row.key]=row;}return next;}
-async function verifyCandidate(candidate,{runtime,workspace,identityResults=[],now=new Date(),firmographicsCollector=collectFirmographics}={}){
+async function verifyCandidate(candidate,{runtime,workspace,identityResults=[],now=new Date(),firmographicsCollector=collectFirmographics,resolveIdentity}={}){
   const endpoint=providerEndpoints(candidate.slug).find(row=>row.provider===candidate.provider);if(!endpoint)return {accepted:false,reason:'unsupported_ats'};
   let response;try{response=await runtime.requestJson(endpoint.url,candidate.provider);}catch(error){return {accepted:false,reason:'ats_unavailable',error:{code:error.code||'ATS_FAILED',status:error.status||null}};}
   const jobs=normalizeJobs(candidate.provider,response.value).map(job=>require('./collectors/ats-receipts.cjs').normalizeJobReceipt(candidate.provider,candidate.slug,{...job,text:require('./collectors/ats-receipts.cjs').readableAtsText(job.text)})),job=matchVerifiedJob(candidate,jobs);
@@ -81,15 +81,15 @@ async function verifyCandidate(candidate,{runtime,workspace,identityResults=[],n
   const fresh=playbook?require('./playbook-timing.cjs').matchPlaybook({triggers:[playbookEvent]},playbook,now).length>0:now.getTime()-Date.parse(job.publishedAt)<=window*86400000;
   if(!fresh)return {accepted:false,reason:'job_outside_window',job};
   const ats={provider:candidate.provider,slug:candidate.slug,endpoint:endpoint.url};
-  const result=await verifyOperatingCandidate(candidate,{runtime,workspace,identityResults,now,firmographicsCollector,ats,job,
+  const result=await verifyOperatingCandidate(candidate,{runtime,workspace,identityResults,resolveIdentity,now,firmographicsCollector,ats,job,
     event:playbookEvent,kind:'trigger_first_hiring',sourceUrl:job.url});
   if(!result.accepted)return result;
   return {...result,atsReceipt:{url:endpoint.url,title:job.title,text:job.title+'\n'+job.text,fetchedAt:response.fetchedAt||now.toISOString()},receiptSurface:'verified_ats_api'};
 }
 
-async function verifyOperatingCandidate(candidate,{runtime,workspace,identityResults,now,firmographicsCollector,ats,job,event,kind,sourceUrl}) {
+async function verifyOperatingCandidate(candidate,{runtime,workspace,identityResults,resolveIdentity,now,firmographicsCollector,ats,job,event,kind,sourceUrl}) {
   const config=phaseAConfigForWorkspace(workspace),collectorConfig=collectorConfigForWorkspace(workspace);
-  const identity=identityFromResults(candidate,identityResults);
+  const identity=resolveIdentity?await resolveIdentity(candidate,identityResults):identityFromResults(candidate,identityResults);
   if(!identity||candidate.nameIsInferred)return {accepted:false,reason:'identity_unresolved',job};
   let page;
   try {
@@ -119,7 +119,7 @@ async function verifyOperatingCandidate(candidate,{runtime,workspace,identityRes
   }
   const target=collectorTargetForAccount(base,collectorConfig);
   const hiring=job?jobSignals(target,candidate.provider,[job],now,collectorConfig.painThemeConfig,collectorConfig.slaDays):{signals:[],events:[]};
-  const firmographics=await firmographicsCollector(target,{runtime,searchResults:identityResults.map(row=>({...row,kind:'firmographics_identity'})),sourcePage:page,verifiedEvent:event,now});
+  const firmographics=await firmographicsCollector(target,{runtime,searchResults:identityResults.map(row=>({...row,kind:'firmographics_identity'})),sourcePage:page,verifiedEvent:event,identity,now});
   const account=scoreAccount({...base,signals:mergeSignals(base.signals,hiring.signals),triggers:event?[event]:hiring.events,...firmographics.targetPatch},config,now);
   const live=activeTriggers(account,now);
   const actNowEligible=!segmentClassification.requiresReview&&!require('./account-lifecycle.cjs').needsReviewReason(account,now)&&live.length>0&&!account.kills?.length&&[1,2,3].includes(Number(account.tier));

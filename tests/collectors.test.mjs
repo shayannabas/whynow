@@ -37,7 +37,7 @@ it('sends identity, pins approved addresses, caches hits and refreshes expired e
   h.advance(DEFAULT_BUDGETS.seller_site.ttlMs+1);await h.runtime.request('seller_site','https://example.org/page');expect(h.calls).toHaveLength(4);
 });
 it('denies robots restrictions and fails closed on robots errors',async()=>{
-  for(const robots of [response('User-agent: *\nDisallow: /private'),response('unavailable',503),response('denied',403)]){
+  for(const robots of [response('User-agent: *\nDisallow: /private'),response('unavailable',503),response('rate limited',429)]){
     let pages=0;const h=harness({fetch:async url=>url.endsWith('/robots.txt')?robots:(pages++,response('page'))});
     await expect(h.runtime.request('seller_site','https://example.org/private')).rejects.toThrow();expect(pages).toBe(0);
   }
@@ -134,5 +134,5 @@ it('search uses the runtime and never puts API keys in cache or health',async()=
 it('uses a five-query collector plan and preserves dated Serper News receipts',async()=>{
   expect(phaseBQueryPlan({name:'Acme'}).map(row=>row.kind)).toEqual(['active_pain_news','tech_and_ai','exec_change','firmographics_size','firmographics_funding']);
   const h=harness({fetch:async(_url,_options)=>response('{"news":[{"title":"Acme incident","link":"https://news.example/acme","snippet":"Acme outage","date":"2 days ago","source":"Example News"}]}',200,{'content-type':'application/json'})});
-  expect(await searchNews('Acme outage',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'},enforceEnabled:false})).toEqual([{title:'Acme incident',url:'https://news.example/acme',snippet:'Acme outage',date:'2 days ago',source:'Example News'}]);
+  expect(await searchNews('Acme outage',{runtime:h.runtime,env:{SERPER_API_KEY:'test-secret'},enforceEnabled:false})).toEqual([{title:'Acme incident',url:'https://news.example/acme',snippet:'Acme outage',date:'2 days ago',dateCapturedAt:'2026-09-16T00:00:00.000Z',source:'Example News'}]);
 });

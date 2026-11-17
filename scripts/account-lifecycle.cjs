@@ -26,6 +26,7 @@ function needsReviewReason(account={},now=new Date()){
   const sizeReceipt=account.firmographics?.fields?.employeeCount?.sourceUrl||account.tierEvidenceReceipt||'',reportYear=Number(sizeReceipt.match(/(?:corporate|annual)[-_]report[-_/](20\d{2})/i)?.[1]);
   if(reportYear&&reportYear<now.getUTCFullYear()-2)return 'Size receipt is an outdated corporate report; verify the employer identity and current size before queueing.';
   if(account.discoveryQuality?.isValidTargetAccount===false)return account.discoveryQuality.reason||'Company identity failed discovery review.';
+  if(account.newsListing&&!activeTriggers(account,now).length&&account.discoveryQuality?.quality==='first_party_operating_company')return NEWS_REVIEW_REASON;
   if(account.segmentClassification?.requiresReview)return 'Segment is not supported by unambiguous company evidence; review before ranking.';
   if(account.newsListing&&!activeTriggers(account,now).length)return NEWS_REVIEW_REASON;
   const rejected=[...(account.triggers||[]),...(account.triggerHistory||[])].filter(row=>row?.evidenceUrl&&timestampInsideWindow(row,now)&&(row.citable===false||row.metadata?.citable===false));

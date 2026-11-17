@@ -11,6 +11,9 @@ const {createApolloClient,publicDomain,assertReady:assertApolloReady}=require('.
 const {search,searchNews,serperSettings,assertSerperReady}=require('./serper.cjs');
 const {executeTriggerFirst}=require('./trigger-first-runner.cjs');
 const {parseSearchResults,emptyProfile,sourceField,mergeProfiles}=require('./firmographics.cjs');
+const {rootDomain,normalizedEntityName}=require('./entity-rules.cjs');
+const {buildSegmentNewsTasks}=require('./trigger-first-news.cjs');
+const {buildWorkspaceHiringTasks}=require('./workspace-hiring.cjs');
 const {stripHtml}=require('./collectors/common.cjs');
 const {scoreAccount}=require('./score-account.cjs');
 const {phaseAConfigForWorkspace}=require('./phase-a-config.cjs');
@@ -18,8 +21,8 @@ const {recordSource}=require('./sources.cjs');
 const {createTemplateDraft}=require('./outreach-drafts.cjs');
 const {todaySections,whyNow,latestTrigger}=require('./account-lifecycle.cjs');
 
-const BATCH='pump-part-b-nov17-2026-page-resilience-rerun';
-const CAPS=Object.freeze({serper:40,free:150,apollo:10,candidates:25,skippedPages:15});
+const BATCH='pump-part-b-nov17-2026-news-first';
+const CAPS=Object.freeze({serper:80,free:150,apollo:15,candidates:25,skippedPages:15});
 const RULES=Object.freeze({'recent-funding':'news','ai-or-gpu-spend':'news','migration-or-multicloud':'news','devops-cloud-hiring':'ats_jobs'});
 const ATS_SOURCES=new Set(['greenhouse','lever','ashby']);
 const FREE_SOURCES=new Set(['robots','engineering_web',...ATS_SOURCES]);
@@ -50,7 +53,7 @@ function assertSavedApprovals(state,workspaceId) {
 }
 
 function roundRobinCandidates(rows) {
-  const groups=new Map();
+  const groups=new Map(),names=new Set();
   for(const row of rows) {
     const key=row.ruleId||'devops-cloud-hiring';
     if(!groups.has(key))groups.set(key,[]);
@@ -60,11 +63,43 @@ function roundRobinCandidates(rows) {
   while(selected.length<CAPS.candidates) {
     let added=0;
     for(const rows of groups.values()) {
-      if(rows.length&&selected.length<CAPS.candidates) { selected.push(rows.shift());added++; }
+      while(rows.length&&rows[0].name&&names.has(normalizedEntityName(rows[0].name)))rows.shift();
+      if(rows.length&&selected.length<CAPS.candidates) { const row=rows.shift();if(row.name)names.add(normalizedEntityName(row.name));selected.push(row);added++; }
     }
     if(!added)break;
   }
   return selected;
+}
+
+function newsFirstPlan(workspace,now) {
+  const news=buildSegmentNewsTasks(workspace,{now,limit:Math.ceil(CAPS.serper*.6)});
+  const ats=buildWorkspaceHiringTasks(workspace).slice(0,CAPS.serper-news.length-CAPS.candidates)
+    .map(task=>({...task,tbs:'qdr:m'}));
+  return [...news,...ats];
+}
+
+function officialIdentity(candidate,results=[]) {
+  if(candidate.nameIsInferred)return null;
+  const wanted=normalizedEntityName(candidate.name).replace(/\s/g,'');
+  if(wanted.length<3)return null;
+  const known=require('./trigger-first-discovery.cjs').identityFromResults(candidate,results);
+  const options=[];
+  for(const result of results){
+    let url;
+    try{url=new URL(result.url||result.link);}catch{continue;}
+    const domain=rootDomain(url.href);
+    if(url.protocol!=='https:'||url.username||url.password||!publicDomain(domain)||url.pathname!=='/'||
+      require('./company-discovery.cjs').blockedHost(domain)||require('./company-identity.cjs').NON_COMPANY_HOST.test(domain))continue;
+    const title=String(result.title||'').split(/[|:–—]| - /)[0].replace(/ official(?: site| website)?$/i,'').trim();
+    const brand=normalizedEntityName(title).replace(/\s/g,'');
+    const domainBrand=domain.split('.')[0].replace(/-/g,'');
+    if(brand!==wanted&&domainBrand!==wanted)continue;
+    const strength=Number(brand===wanted)+2*Number(domainBrand===wanted);
+    options.push({strength,name:candidate.name,domain,website:'https://'+domain,sourceUrl:url.origin+'/',identityReceipt:{title:result.title}});
+  }
+  options.sort((a,b)=>b.strength-a.strength);
+  if(options[0]&&!options.some(row=>row.domain!==options[0].domain&&row.strength===options[0].strength))return options[0];
+  return options.length?null:known;
 }
 
 function guardedRuntime(runtime,{report,checkpoint,assertCurrent,getCandidate=()=>null}) {
@@ -150,13 +185,13 @@ function guardedRuntime(runtime,{report,checkpoint,assertCurrent,getCandidate=()
   return {check,skip};
 }
 
-function sizeFromVerifiedSources(target,{sourcePage,verifiedEvent,now}) {
+function sizeFromVerifiedSources(target,{sourcePage,verifiedEvent,identity,now}) {
   const company={...target,...target.firmographicTarget};
   const rows=[
     ...(sourcePage?[{url:sourcePage.url,title:sourcePage.title,text:stripHtml(sourcePage.text).slice(0,12000)}]:[]),
     ...(verifiedEvent?[{url:verifiedEvent.evidenceUrl,title:verifiedEvent.title,text:verifiedEvent.evidenceText}]:[])
   ];
-  const profile=parseSearchResults(company,rows,now.toISOString());
+  const profile=mergeProfiles(parseSearchResults(company,rows,now.toISOString()),identity?.apolloProfile);
   return {targetPatch:{firmographics:profile,firmographicsConfidence:profile.confidenceLabel,firmographicEntity:{
     name:company.name,domain:company.domain,parentOf:target.firmographicTarget?.parentOf||'',receipt:profile.fields.employeeCount?.sourceUrl||''
   }}};
@@ -166,9 +201,9 @@ function ranked(workspace,now) {
   const sections=todaySections(workspace,now);
   const row=a=>{
     const trigger=latestTrigger(a,now),listing=!trigger?a.newsListing:null,savedSourceId=trigger?.metadata?.savedSourceId||listing?.savedSourceId;
-    return {name:a.name,id:a.id,domain:a.domain,fit:a.fitScore,tier:a.tier,trigger:trigger?.title||listing?.title||null,
-      triggerDate:trigger?.occurredAt||listing?.listedAt||null,receipt:savedSourceId?'/sources/'+savedSourceId:trigger?.evidenceUrl||listing?.sourceUrl||null,
-      receiptStatus:listing?.label||null,originalReceipt:trigger?.evidenceUrl||listing?.sourceUrl||null,reviewReason:a.reviewReason||'',
+    return {name:a.name,id:a.id,domain:a.domain,fit:a.fitScore,tier:a.tier,trigger:trigger?.title||listing?.title||a.reviewEvidence?.title||null,
+      triggerDate:trigger?.occurredAt||listing?.listedAt||a.reviewEvidence?.date||null,receipt:savedSourceId?'/sources/'+savedSourceId:trigger?.evidenceUrl||listing?.sourceUrl||a.reviewEvidence?.url||null,
+      receiptStatus:listing?.label||(a.reviewEvidence?'identity unresolved':null),originalReceipt:trigger?.evidenceUrl||listing?.sourceUrl||a.reviewEvidence?.url||null,reviewReason:a.reviewReason||'',
       researchReceipt:a.researchSignal?.evidenceUrl||(!trigger?a.sourceUrl:null),sizeReceipt:a.firmographics?.fields?.employeeCount?.sourceUrl||null};
   };
   return {
@@ -191,6 +226,7 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
     WORKSPACE_MAX_SERPER_QUERIES_PER_RUN:String(CAPS.serper),APOLLO_ENABLED:'true',
     APOLLO_MAX_CALLS_PER_RUN:String(CAPS.apollo),APOLLO_MONTHLY_CALL_LIMIT:String(priorApollo+CAPS.apollo),APOLLO_RETRY_LIMIT:'0'
   };
+  const searchPlan=newsFirstPlan(w,now());
   const serperConfig=assertSerperReady(serperSettings(live));
   if(priorSerper>=serperConfig.monthlyLimit)throw Object.assign(Error(),{code:'SERPER_MONTHLY_LIMIT'});
   assertApolloReady(live);
@@ -204,13 +240,19 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
   const envHash=envFile?hash(fs.readFileSync(envFile,'utf8')):null;
   const report={batch:BATCH,workspaceId:w.id,startedAt:now().toISOString(),status:'started',stage:'discovery',
     approvals:{profileRevision:w.profileRevision,profileApprovedAt:w.sellerProfile.approvedAt,playbookVersion:policy.version,playbookApprovedAt:policy.approvedAt},
-    serperQueries:0,apolloAttempts:0,freeRequests:0,freeBySource:{},openaiCalls:0,requests:[],enrichments:[],templates:[],draftBlocks:[],skippedPages:[],candidateChecks:0};
+    serperQueries:0,apolloAttempts:0,freeRequests:0,freeBySource:{},openaiCalls:0,requests:[],enrichments:[],templates:[],draftBlocks:[],skippedPages:[],robotsNotes:[],candidateChecks:0,plannedNewsQueries:searchPlan.filter(task=>task.kind==='trigger_first_news').length};
   fs.mkdirSync(artifactDir);
   const checkpoint=()=>atomicWrite(path.join(artifactDir,'report.json'),JSON.stringify(report,null,2));
   const assertCurrent=()=>{
     const current=assertSavedApprovals(read(),w.id);
     if(current.workspace.profileRevision!==w.profileRevision||current.policy.approvedDigest!==policy.approvedDigest) {
       throw Object.assign(Error(),{code:'PUMP_APPROVAL_CHANGED'});
+    }
+  };
+  runtime.onRobotsUnavailable=note=>{
+    const url=new URL(note.url);
+    if(!report.robotsNotes.some(row=>row.url===url.href&&row.status===note.status)){
+      report.robotsNotes.push({url:url.href,status:note.status,interpretation:'no robots rules'});checkpoint();
     }
   };
   let candidate=null;
@@ -234,58 +276,49 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
       run.serperQueries++;
       return state;
     });
+    const client=createApolloClient({read,mutate,env:live,runtime,now}),companyLookups=new Map();
+    const resolveIdentity=async(lead,results)=>{
+      const identity=officialIdentity(lead,results);
+      if(!identity)return null;
+      const domain=identity.domain;
+      if(companyLookups.has(domain)){const saved=companyLookups.get(domain);return saved?.mismatch?null:{...identity,apolloProfile:saved};}
+      if(companyLookups.size>=CAPS.apollo)return identity;
+      companyLookups.set(domain,null);
+      try{
+        const organization=await client.enrich(w.id,BATCH,domain);
+        const expected=normalizedEntityName(lead.name),actual=normalizedEntityName(organization.name);
+        if(actual!==expected){
+          companyLookups.set(domain,{mismatch:true});report.enrichments.push({name:lead.name,domain,status:'APOLLO_NAME_MISMATCH'});checkpoint();return null;
+        }
+        report.enrichments.push({name:lead.name,domain,status:'DOMAIN_CONFIRMED',employeeCount:organization.employeeCount,receipt:organization.receipt.sourceUrl});
+        const {sourceUrl,retrievedAt}=organization.receipt;
+        const text=organization.name+' · '+domain+(organization.employeeCount>0?' · Apollo employee estimate: '+organization.employeeCount:'');
+        await mutate(state=>recordSource(state,{url:sourceUrl,title:'Apollo organization confirmation',text,fetchedAt:retrievedAt}).state);
+        let profile=null;
+        if(organization.employeeCount>0){
+          profile=emptyProfile({domain},retrievedAt);
+          profile.source='apollo';profile.sources=[sourceUrl];
+          profile.fields.employeeCount={...sourceField(organization.employeeCount,.6,sourceUrl,retrievedAt,text,'apollo'),estimated:true};
+        }
+        companyLookups.set(domain,profile);checkpoint();
+        return {...identity,apolloProfile:profile};
+      }catch(error){
+        check();
+        if(['APOLLO_NOT_FOUND','APOLLO_DOMAIN_MISMATCH','APOLLO_ROBOTS_UNAVAILABLE'].includes(error.code)){
+          report.enrichments.push({name:lead.name,domain,status:error.code});checkpoint();
+          if(error.code==='APOLLO_DOMAIN_MISMATCH'){companyLookups.set(domain,{mismatch:true});return null;}
+          return identity;
+        }
+        throw error;
+      }
+    };
     const discovery=await executeTriggerFirst({read,mutate,workspaceId:w.id,runId:BATCH,runtime,searchProvider:search,newsSearchProvider:searchNews,
       reserveQuery,settings:{maxQueries:CAPS.serper},env:live,now,checkRun:check,sizeCandidate:sizeFromVerifiedSources,allowNewsFallback:true,
-      onCandidate:row=>{candidate=row;},onPaywall:url=>skip(url,{code:'PAYWALL'}),
+      searchPlan,resolveIdentity,keepUnresolved:true,onCandidate:row=>{candidate=row;},onPaywall:url=>skip(url,{code:'PAYWALL'}),
       selectCandidates:rows=>{const selected=roundRobinCandidates(rows);report.candidateChecks=selected.length;checkpoint();return selected;}});
     check();
     report.rejections=discovery.rejections;
     const ids=discovery.newAccountIds;
-    report.stage='employee_counts';
-    await mutate(state=>{runFor(state).status='running';return state;});
-    const client=createApolloClient({read,mutate,env:live,runtime,now});
-    const queried=new Set();
-    for(const id of ids) {
-      check();
-      if(queried.size>=CAPS.apollo)break;
-      const account=read().workspaces[w.id].accounts.find(row=>row.id===id);
-      const domain=publicDomain(account?.firmographicEntity?.domain||account?.domain);
-      if(!account||account.kills?.length||account.firmographics?.fields?.employeeCount?.value>0||!domain||queried.has(domain))continue;
-      candidate={name:account.name,sourceUrl:account.sourceUrl};
-      queried.add(domain);
-      let organization;
-      try { organization=await client.enrich(w.id,BATCH,domain); }
-      catch(error) {
-        check();
-        if(!['APOLLO_NOT_FOUND','APOLLO_DOMAIN_MISMATCH','APOLLO_ROBOTS_UNAVAILABLE'].includes(error.code))throw error;
-        report.enrichments.push({name:account.name,domain,status:error.code});
-        checkpoint();
-        if(error.code==='APOLLO_ROBOTS_UNAVAILABLE')break;
-        continue;
-      }
-      if(!Number.isFinite(organization.employeeCount)||organization.employeeCount<1) {
-        report.enrichments.push({name:account.name,domain,status:'NO_EMPLOYEE_ESTIMATE'});
-        checkpoint();
-        continue;
-      }
-      const {sourceUrl,retrievedAt}=organization.receipt;
-      await mutate(state=>{
-        check();
-        const evidenceText='Apollo estimates '+organization.employeeCount+' employees for '+organization.name+' ('+domain+').';
-        const saved=recordSource(state,{url:sourceUrl,text:evidenceText,title:'Apollo employee estimate',fetchedAt:retrievedAt});
-        const workspace=saved.state.workspaces[w.id],index=workspace.accounts.findIndex(row=>row.id===id),current=workspace.accounts[index];
-        const estimate=emptyProfile({id,domain},retrievedAt);
-        estimate.source='apollo';
-        estimate.sources=[sourceUrl];
-        estimate.fields.employeeCount={...sourceField(organization.employeeCount,.6,sourceUrl,retrievedAt,evidenceText,'apollo'),savedSourceId:saved.source.id,estimated:true,retrievedAt};
-        const firmographics=mergeProfiles(current.firmographics,estimate);
-        workspace.accounts[index]=scoreAccount({...current,firmographics,firmographicsConfidence:firmographics.confidenceLabel},phaseAConfigForWorkspace(workspace),now());
-        return saved.state;
-      });
-      report.enrichments.push({name:account.name,domain,status:'ESTIMATE_SAVED',employeeCount:organization.employeeCount,receipt:sourceUrl});
-      checkpoint();
-    }
-    check();
     report.stage='templates';
     const workspace=read().workspaces[w.id];
     for(const account of todaySections(workspace,now()).actNow.filter(row=>ids.includes(row.id))) {
@@ -305,6 +338,9 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
     report.sections=ranked(current,now());
     report.serperMonthlyRemaining=Math.max(0,serperConfig.monthlyLimit-(current.budgets.serperQueries?.queries||0));
     report.newAccountIds=run?.newAccountIds||[];
+    report.reviewAccountIds=run?.reviewAccountIds||[];
+    report.newsQueries=report.requests.filter(row=>row.source==='serper'&&row.url.endsWith('/news')).length;
+    report.newsReserved=(run?.tasks||[]).filter(row=>row.kind==='trigger_first_news').length;
     report.apolloDiagnostics=run?.apolloDiagnostics||[];
     report.serperReserved=run?.serperQueries||0;
     report.apolloReserved=run?.apolloCalls||0;
@@ -342,4 +378,4 @@ if(require.main===module) {
   }else throw Error('Use --verify or --run.');
 }
 
-module.exports={BATCH,CAPS,RULES,assertSavedApprovals,roundRobinCandidates,guardedRuntime,sizeFromVerifiedSources,ranked,run};
+module.exports={BATCH,CAPS,RULES,assertSavedApprovals,roundRobinCandidates,guardedRuntime,newsFirstPlan,officialIdentity,sizeFromVerifiedSources,ranked,run};
