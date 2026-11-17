@@ -1,3 +1,15 @@
+# November 17 — Pump Part A rerun saved for review
+
+- [x] Prioritize core pages and comparisons and cap new customer stories at eight. Reuse all 18 Pump pages from the original run.
+- [x] Trim supplemental story text first and preserve exact customer and comparison receipts. Use one shared evidence prefix and response schema across the three requests.
+- [x] Feed approved playbook news rules into trigger search. Verify the company, article and original publication date before promotion. No live discovery.
+- [x] Pump rerun saved 11 additional pages in 15 attempts. Three GPT-5.5 calls with no retry cost $0.343355. Cached input tokens were 0 / 19,200 / 19,200. Serper and Apollo used zero requests.
+- [x] Pump profile and playbook both needs_review. 15 customers, 14 comparison entries, five segments and six triggers. Verified in the local browser. [Results and receipts](PUMP-PART-A-RERUN.md)
+- [x] 446 offline tests passed with one existing skip. CI passed on 277ca8f.
+- [ ] Owner review: 16 profile blockers and four playbook blockers. Four other-source triggers have no collector. Pump Part B remains proposal-only.
+
+## Prior checkpoint
+
 # November 17 — playbook discovery default and Pump research evidence
 
 - [x] Default new seller discovery to the approved playbook’s ATS rules. Keep the frozen Resolve strategy and make Apollo company search an explicit opt-in independent of enrichment.

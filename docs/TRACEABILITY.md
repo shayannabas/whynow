@@ -408,3 +408,8 @@ Removed personal attribution and relationship wording from published documentati
 | New sellers default to playbook trigger search | Discovery and Prepare demo share the strategy selector. ATS terms and original posting freshness come from an approved playbook. The runner stops if the saved approval changes. Fictional recordings cover the default, unapproved gate, and optional Apollo search switch. |
 | Today fallback | The account lifecycle builds a display-only Top prospects list from fit and recent receipts. The fallback excludes killed and identity-review accounts. Act now, tiering and Resolve parity tests remain unchanged. |
 | Bounded Pump Part A | Transport tests cover first-party redirects, robots, request ceilings, one-use persistence, incomplete response handling and preflight. The live run saved 18 pages and stopped with zero model calls when two request estimates exceeded 40,000 tokens. See [Pump results](PUMP-PART-A-RESULTS.md). |
+
+
+## Priority research, prompt caching and news discovery — November 17, 2026
+
+The research planner prioritizes product context and comparisons before supplemental stories. Shared-schema model requests use one byte-identical evidence prefix. The offline tests verify compaction preserves each source's best quote and organization receipts, and the Pump run observed 19,200 cached input tokens on each follow-up call. Trigger search now routes approved news rules through Serper News and checks article publication, attribution and company identity. Recorded-response tests cover fresh funding discovery and stale-date rejection. [Pump run report](PUMP-PART-A-RERUN.md).

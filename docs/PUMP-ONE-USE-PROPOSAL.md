@@ -2,7 +2,9 @@
 
 Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. Part A saved first-party evidence and stopped before generation. Part B remains proposal-only. Hold README/Phase3 close-out until after this proposed verification.
 
-## Part A rerun — authorized once
+## Part A rerun — used and exhausted
+
+[Saved rerun results](PUMP-PART-A-RERUN.md). The allowance ended after three calls and the profile and playbook were saved for review.
 
 Reuse all 18 saved pages and spend at most 15 new first-party HTTP requests, respecting robots and counting redirects. Homepage, about, pricing, how-it-works, security and comparison pages take priority. The eight-story quota applies to new collection, with the saved stories retained for receipts. Up to five Serper queries are available solely for competitor leads. Saved first-party comparison links take precedence and every proposed competitor still needs a receipt and the owner's approval.
 
