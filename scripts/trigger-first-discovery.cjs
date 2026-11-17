@@ -20,7 +20,9 @@ const ATS_SEARCH_HOSTS=[{provider:'greenhouse',host:'job-boards.greenhouse.io'},
 const SEGMENT_STOP=new Set(['and','company','enterprise','hiring','incident','management','platform','platforms','reliability','site','software','the']);
 
 function clean(value='',max=300){const text=String(value).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();return text.length<=max?text:text.slice(0,max).trim();}
-function buildTriggerFirstTasks(workspace){return require('./workspace-hiring.cjs').buildWorkspaceHiringTasks(workspace);}
+function buildTriggerFirstTasks(workspace){
+  return [...require('./trigger-first-news.cjs').buildNewsTasks(workspace),...require('./workspace-hiring.cjs').buildWorkspaceHiringTasks(workspace)];
+}
 function atsDescriptor(value=''){
   let url;try{url=new URL(value);}catch{return null;}const provider=ATS_HOSTS[url.hostname.toLowerCase()];if(!provider||url.protocol!=='https:'||url.username||url.password)return null;
   const parts=url.pathname.split('/').filter(Boolean),slug=parts[0]||'';if(!/^[a-z0-9_-]+$/i.test(slug))return null;
@@ -40,7 +42,7 @@ function candidateFromJobResult(result={},workspace){
   const name=parsed.company||clean(ats.slug.replace(/[-_]+/g,' ').replace(/\b\w/g,char=>char.toUpperCase()));
   return {schemaVersion:1,name,nameIsInferred:!parsed.company,roleTitle:parsed.role,sourceUrl,sourceSnippet:clean(result.snippet||'',1000),sourceDate:String(result.date||''),...ats};
 }
-function dedupeJobCandidates(rows=[]){const seen=new Set();return rows.filter(row=>{if(!row)return false;const key=`${row.provider}:${row.slug}:${row.sourceUrl.replace(/[?#].*$/,'')}`;if(seen.has(key))return false;seen.add(key);return true;});}
+function dedupeJobCandidates(rows=[]){const seen=new Set();return rows.filter(row=>{if(!row)return false;const key=`${row.provider||row.kind}:${row.slug||row.ruleId}:${row.sourceUrl.replace(/[?#].*$/,'')}`;if(seen.has(key))return false;seen.add(key);return true;});}
 function identityFromResults(candidate={},results=[]){
   const wanted=normalizedEntityName(candidate.name).replace(/\s/g,''),rows=[];
   for(const result of results){const sourceUrl=String(result.url||result.link||'');let url;try{url=new URL(sourceUrl);}catch{continue;}const domain=rootDomain(sourceUrl),title=clean(result.title||''),nameText=normalizedEntityName(title).replace(/\s/g,'');if(url.protocol!=='https:'||!domain||blockedHost(domain)||ATS_HOSTS[url.hostname.toLowerCase()]||require('./company-identity.cjs').NON_COMPANY_PATH.test(url.pathname)||require('./company-identity.cjs').NON_COMPANY_HOST.test(domain))continue;if(wanted.length>=4&&nameText.includes(wanted))rows.push({domain,sourceUrl,title,snippet:clean(result.snippet,1000)});}
@@ -66,7 +68,7 @@ async function verifyCandidate(candidate,{runtime,workspace,identityResults=[],n
   let response;try{response=await runtime.requestJson(endpoint.url,candidate.provider);}catch(error){return {accepted:false,reason:'ats_unavailable',error:{code:error.code||'ATS_FAILED',status:error.status||null}};}
   const jobs=normalizeJobs(candidate.provider,response.value).map(job=>require('./collectors/ats-receipts.cjs').normalizeJobReceipt(candidate.provider,candidate.slug,{...job,text:require('./collectors/ats-receipts.cjs').readableAtsText(job.text)})),job=matchVerifiedJob(candidate,jobs);
   if(!job)return {accepted:false,reason:'job_not_found'};
-  const config=phaseAConfigForWorkspace(workspace),collectorConfig=collectorConfigForWorkspace(workspace),targeting=require('./workspace-hiring.cjs').matchingWorkspaceRole(job,require('./workspace-hiring.cjs').targetForWorkspace(workspace));
+  const config=phaseAConfigForWorkspace(workspace),targeting=require('./workspace-hiring.cjs').matchingWorkspaceRole(job,require('./workspace-hiring.cjs').targetForWorkspace(workspace));
   if(!targeting.relevant)return {accepted:false,reason:targeting.reason||'role_not_targeted',job};
   if(!job.publishedAt||!Number.isFinite(Date.parse(job.publishedAt))||Date.parse(job.publishedAt)>now.getTime())return {accepted:false,reason:'job_date_missing_or_future',job};
   const playbook=workspace.referenceDemo?.loadOnly?null:config.playbook;
@@ -78,13 +80,50 @@ async function verifyCandidate(candidate,{runtime,workspace,identityResults=[],n
   const window=Number(config.slaDays?.reliability_hiring||config.slaDays?.default)||90;
   const fresh=playbook?require('./playbook-timing.cjs').matchPlaybook({triggers:[playbookEvent]},playbook,now).length>0:now.getTime()-Date.parse(job.publishedAt)<=window*86400000;
   if(!fresh)return {accepted:false,reason:'job_outside_window',job};
-  const identity=identityFromResults(candidate,identityResults);if(!identity||candidate.nameIsInferred)return {accepted:false,reason:'identity_unresolved',job};
-  let page;try{const result=await runtime.requestText(identity.sourceUrl,'engineering_web');page={url:result.url||identity.sourceUrl,text:result.value,title:identity.identityReceipt.title,sourceKind:'first_party_page',fetchedAt:result.fetchedAt||now.toISOString()};}catch(error){return {accepted:false,reason:'official_page_unavailable',error:{code:error.code||'FETCH_FAILED'},job,identity};}
-  const gate=require('./company-identity.cjs').assessOperatingCompany(identity,config,page),segmentClassification=classifySegment(workspace,identity,[{title:identity.name,text:gate.evidenceText||page.text}]),createdAt=now.toISOString(),base={schemaVersion:1,id:randomUUID(),name:identity.name,domain:identity.domain,website:identity.website,ats:{provider:candidate.provider,slug:candidate.slug,endpoint:endpoint.url},icpSegment:segmentClassification.segment,segmentClassification,sourceUrl:job.url,discoveryQuality:{sourceUrl:job.url,isValidTargetAccount:gate.accepted,targetAccountName:identity.name,targetDomain:identity.domain,sourceKind:'trigger_first_hiring',quality:gate.reason,reason:gate.reason},signals:blankSignals(),triggers:[],createdAt,updatedAt:createdAt,status:'new',statusReason:'',discovery:{kind:'trigger_first_hiring',queryReceipt:candidate.sourceUrl,identityReceipt:page.url,identityEvidence:gate.evidenceText,provider:candidate.provider,slug:candidate.slug}};
-  if(!gate.accepted){if(gate.reason==='adjacent_vendor')return {accepted:false,reason:gate.reason,vendorAccount:scoreAccount({...base,discoveryVendorEvidence:gate},config,now),identity,job,page};return {accepted:false,reason:gate.reason,identity,job};}
-  const excluded=exclusionReason(base,workspace,config);if(excluded){if(['seller','competitor'].includes(excluded))return {accepted:false,reason:excluded,vendorAccount:scoreAccount(base,config,now),identity,job,page};return {accepted:false,reason:excluded,identity,job};}
-  const target=collectorTargetForAccount(base,collectorConfig),hiring=jobSignals(target,candidate.provider,[job],now,collectorConfig.painThemeConfig,collectorConfig.slaDays),firmographics=await firmographicsCollector(target,{runtime,searchResults:identityResults.map(row=>({...row,kind:'firmographics_identity'})),now}),account=scoreAccount({...base,signals:mergeSignals(base.signals,hiring.signals),triggers:playbookEvent?[playbookEvent]:hiring.events,...firmographics.targetPatch},config,now),live=activeTriggers(account,now);
-  return {accepted:true,account,job,identity,page,atsReceipt:{url:endpoint.url,title:job.title,text:job.title+'\n'+job.text,fetchedAt:response.fetchedAt||now.toISOString()},receiptSurface:'verified_ats_api',activeTriggerCount:live.length,actNowEligible:!segmentClassification.requiresReview&&!require('./account-lifecycle.cjs').needsReviewReason(account,now)&&live.length>0&&!account.kills?.length&&[1,2,3].includes(Number(account.tier))};
+  const ats={provider:candidate.provider,slug:candidate.slug,endpoint:endpoint.url};
+  const result=await verifyOperatingCandidate(candidate,{runtime,workspace,identityResults,now,firmographicsCollector,ats,job,
+    event:playbookEvent,kind:'trigger_first_hiring',sourceUrl:job.url});
+  if(!result.accepted)return result;
+  return {...result,atsReceipt:{url:endpoint.url,title:job.title,text:job.title+'\n'+job.text,fetchedAt:response.fetchedAt||now.toISOString()},receiptSurface:'verified_ats_api'};
 }
 
-module.exports={ATS_HOSTS,TRIGGER_FIRST_QUERY_CAP,atsDescriptor,buildTriggerFirstTasks,candidateFromJobResult,classifySegment,dedupeJobCandidates,identityFromResults,matchVerifiedJob,segmentTerms,verifyCandidate};
+async function verifyOperatingCandidate(candidate,{runtime,workspace,identityResults,now,firmographicsCollector,ats,job,event,kind,sourceUrl}) {
+  const config=phaseAConfigForWorkspace(workspace),collectorConfig=collectorConfigForWorkspace(workspace);
+  const identity=identityFromResults(candidate,identityResults);
+  if(!identity||candidate.nameIsInferred)return {accepted:false,reason:'identity_unresolved',job};
+  let page;
+  try {
+    const result=await runtime.requestText(identity.sourceUrl,'engineering_web',{allowedRedirectDomain:identity.domain});
+    page={url:result.url||identity.sourceUrl,text:result.value,title:identity.identityReceipt.title,sourceKind:'first_party_page',fetchedAt:result.fetchedAt||now.toISOString()};
+  } catch(error) {
+    return {accepted:false,reason:'official_page_unavailable',error:{code:error.code||'FETCH_FAILED'},job,identity};
+  }
+  const gate=require('./company-identity.cjs').assessOperatingCompany(identity,config,page);
+  const segmentClassification=classifySegment(workspace,identity,[{title:identity.name,text:gate.evidenceText||page.text}]);
+  const createdAt=now.toISOString();
+  const base={
+    schemaVersion:1,id:randomUUID(),name:identity.name,domain:identity.domain,website:identity.website,...(ats?{ats}:{}),
+    icpSegment:segmentClassification.segment,segmentClassification,sourceUrl,
+    discoveryQuality:{sourceUrl,isValidTargetAccount:gate.accepted,targetAccountName:identity.name,targetDomain:identity.domain,sourceKind:kind,quality:gate.reason,reason:gate.reason},
+    signals:blankSignals(),triggers:[],createdAt,updatedAt:createdAt,status:'new',statusReason:'',
+    discovery:{kind,queryReceipt:candidate.sourceUrl,identityReceipt:page.url,identityEvidence:gate.evidenceText,...(ats?{provider:ats.provider,slug:ats.slug}:{})}
+  };
+  if(!gate.accepted) {
+    if(gate.reason==='adjacent_vendor')return {accepted:false,reason:gate.reason,vendorAccount:scoreAccount({...base,discoveryVendorEvidence:gate},config,now),identity,job,page};
+    return {accepted:false,reason:gate.reason,identity,job};
+  }
+  const excluded=exclusionReason(base,workspace,config);
+  if(excluded) {
+    if(['seller','competitor'].includes(excluded))return {accepted:false,reason:excluded,vendorAccount:scoreAccount(base,config,now),identity,job,page};
+    return {accepted:false,reason:excluded,identity,job};
+  }
+  const target=collectorTargetForAccount(base,collectorConfig);
+  const hiring=job?jobSignals(target,candidate.provider,[job],now,collectorConfig.painThemeConfig,collectorConfig.slaDays):{signals:[],events:[]};
+  const firmographics=await firmographicsCollector(target,{runtime,searchResults:identityResults.map(row=>({...row,kind:'firmographics_identity'})),now});
+  const account=scoreAccount({...base,signals:mergeSignals(base.signals,hiring.signals),triggers:event?[event]:hiring.events,...firmographics.targetPatch},config,now);
+  const live=activeTriggers(account,now);
+  const actNowEligible=!segmentClassification.requiresReview&&!require('./account-lifecycle.cjs').needsReviewReason(account,now)&&live.length>0&&!account.kills?.length&&[1,2,3].includes(Number(account.tier));
+  return {accepted:true,account,job,identity,page,activeTriggerCount:live.length,actNowEligible};
+}
+
+module.exports={ATS_HOSTS,TRIGGER_FIRST_QUERY_CAP,atsDescriptor,buildTriggerFirstTasks,candidateFromJobResult,classifySegment,dedupeJobCandidates,identityFromResults,matchVerifiedJob,segmentTerms,verifyCandidate,verifyOperatingCandidate};

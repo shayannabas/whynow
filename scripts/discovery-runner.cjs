@@ -2,7 +2,7 @@
 
 const {randomUUID}=require('node:crypto');
 const {CollectorRuntime}=require('./collectors/runtime.cjs');
-const {search,serperSettings,assertSerperReady}=require('./serper.cjs');
+const {search,searchNews,serperSettings,assertSerperReady}=require('./serper.cjs');
 const {buildDiscoveryTasks,candidateFromResult,promoteDiscoveryCandidates,seedCandidates,selectBalancedCandidates}=require('./company-discovery.cjs');
 const {phaseAConfigForWorkspace}=require('./phase-a-config.cjs');
 
@@ -13,7 +13,7 @@ function discoveryStrategy(workspace,options={}){const strategy=options.strategy
 function findRun(workspace,id){return workspace.runs.find(row=>row.type==='company_discovery'&&row.id===id);}
 function safeError(error){return {code:String(error?.code||'DISCOVERY_FAILED'),message:String(error?.message||'Discovery failed.').slice(0,300),status:Number.isInteger(error?.status)?error.status:null};}
 
-function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),searchProvider=(query,options)=>search(query,options),triggerVerifier,now=()=>new Date(),id=()=>randomUUID()}={}){
+function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),searchProvider=(query,options)=>search(query,options),newsSearchProvider=(query,options)=>searchNews(query,options),triggerVerifier,now=()=>new Date(),id=()=>randomUUID()}={}){
   const pending=new Map();
   const updateRun=(workspaceId,runId,fn)=>mutate(state=>{const workspace=state.workspaces[workspaceId],run=findRun(workspace,runId);if(!run)throw new Error('Discovery run disappeared.');fn(run,workspace);return state;});
   const reserveQuery=(workspaceId,runId,settings)=>updateRun(workspaceId,runId,(run,workspace)=>{
@@ -26,7 +26,7 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     const lookup=findRun(read().workspaces[workspaceId],runId);if(lookup.strategy==='lookalike'){const runtime=runtimeFactory({env});const client=require('./collectors/apollo.cjs').createApolloClient({read,mutate,env,runtime,now});await updateRun(workspaceId,runId,r=>{r.status='running';});return require('./lookalike-discovery.cjs').runLookalike({read,mutate,workspaceId,runId,client,env,now});}
     assertSerperReady(serperSettings(env));const saved=findRun(read().workspaces[workspaceId],runId),settings={...discoverySettings(env),maxQueries:saved.queryCap};await updateRun(workspaceId,runId,run=>{run.status='running';});
     const initial=read(),workspace=initial.workspaces[workspaceId];phaseAConfigForWorkspace(workspace);const runtime=runtimeFactory({env});runtime.identity();
-    if(saved.strategy==='trigger_first')return require('./trigger-first-runner.cjs').executeTriggerFirst({read,mutate,workspaceId,runId,runtime,searchProvider,reserveQuery,settings,env,now,verify:triggerVerifier});
+    if(saved.strategy==='trigger_first')return require('./trigger-first-runner.cjs').executeTriggerFirst({read,mutate,workspaceId,runId,runtime,searchProvider,newsSearchProvider,reserveQuery,settings,env,now,verify:triggerVerifier});
     const tasks=buildDiscoveryTasks(workspace,{maxQueries:settings.maxQueries}),seeded=seedCandidates(workspace),live=[],reports=[],minimumQueries=phaseAConfigForWorkspace(workspace).segments.filter(row=>row.enabled!==false).length;
     for(const task of tasks){
       try{
@@ -42,7 +42,7 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     const workspace=read().workspaces[workspaceId];if(!workspace)throw new Error('Workspace not found.');const config=phaseAConfigForWorkspace(workspace),strategy=discoveryStrategy(workspace,options);
     if(strategy==='trigger_first'&&!workspace.referenceDemo?.loadOnly){
       if(!config.playbook)throw Error('Approve the seller playbook before running trigger search.');
-      if(!require('./trigger-first-discovery.cjs').buildTriggerFirstTasks(workspace).length)throw Error('No supported discovery queries. Trigger search currently needs an approved ATS jobs trigger with keywords.');
+      if(!require('./trigger-first-discovery.cjs').buildTriggerFirstTasks(workspace).length)throw Error('No supported discovery queries. Trigger search needs an approved ATS jobs or news trigger with keywords.');
     }
     if(strategy==='lookalike')require('./collectors/apollo.cjs').assertSearchReady(env);else assertSerperReady(serperSettings(env));const settings=discoverySettings(env),requested=positiveInteger(options.queryCap,60),queryCap=strategy==='lookalike'?0:requested||settings.maxQueries;if(strategy!=='lookalike'&&!queryCap)throw new Error('Set DISCOVERY_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 60.');
     if(workspace.runs.some(row=>row.type==='company_discovery'&&['queued','running'].includes(row.status)))throw new Error('A discovery run is already active.');

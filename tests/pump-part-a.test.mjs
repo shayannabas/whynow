@@ -5,7 +5,7 @@ import {createRequire} from 'node:module';
 import {expect,it,vi} from 'vitest';
 
 const require=createRequire(import.meta.url);
-const {run,createResearchRuntime,collectPages,verifyEstimate,LIMITS}=require('../scripts/run-pump-part-a.cjs');
+const {run,createResearchRuntime,collectPages,verifyEstimate,addResearch,LIMITS,RUN_ID,RERUN_ID,RERUN_TOTAL}=require('../scripts/run-pump-part-a.cjs');
 const {createWorkspace,defaultState,loadState,saveState}=require('../scripts/server/state.cjs');
 const env={CRAWLER_CONTACT_EMAIL:'crawler@example.invalid',OPENAI_API_KEY:'fictional-test-only',OPENAI_ENABLED:'false',OPENAI_MONTHLY_LIMIT_USD:'0'};
 const response=(status,body,headers={})=>({status,headers:new Headers(headers),text:async()=>body});
@@ -27,7 +27,10 @@ it('counts redirects and robots, blocks robots exclusions and off-domain hops, a
     const errors=[];
     const pages=await collectPages(runtime,{onError:error=>errors.push(error)});
     expect(errors.some(error=>error.code==='REDIRECT_BLOCKED')).toBe(true);
-    expect(runtime.usage.seller_site.requests).toBe(LIMITS.seller_site);
+    expect(runtime.usage.seller_site.requests).toBeLessThanOrEqual(LIMITS.seller_site);
+    const urls=fetch.mock.calls.map(([url])=>new URL(url).pathname);
+    expect(urls.filter(url=>/^\/case-studies\//.test(url)).length).toBeLessThanOrEqual(8);
+    for(const core of ['/about','/pricing','/how-it-works','/security'])expect(urls.indexOf(core)).toBeLessThan(urls.indexOf('/case-studies/company-0'));
     expect(runtime.usage.seller_sitemap.requests).toBe(1);
     expect(runtime.usage.robots.requests).toBe(2);
     expect(pages.some(page=>page.url.includes('case-studies'))).toBe(true);
@@ -69,4 +72,26 @@ it('blocks an oversized serialized request even when aggregate estimated cost fi
   const good={model:'gpt-5.5',reasoningEffort:'low',maxOutputTokens:8000,estimatedInputTokens:40000};
   expect(()=>verifyEstimate({calls:[good,good,good],totalMaximumCostUsd:1.32})).not.toThrow();
   expect(()=>verifyEstimate({calls:[good,{...good,estimatedInputTokens:40001},good],totalMaximumCostUsd:1.321})).toThrow('approved request bounds');
+});
+
+
+it('reuses the original pages and counts new requests against the distinct rerun marker',async()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-pump-rerun-'));
+  try{
+    const file=path.join(dir,'local-state.json'),now='2026-11-17T12:00:00Z';
+    const saved=[{url:'https://www.pump.co/',kind:'seller_site',title:'Fictional cloud platform',text:'Fictional cloud optimization helps software companies manage infrastructure budgets.',fetchedAt:now},
+      ...Array.from({length:17},(_,i)=>({url:'https://www.pump.co/customers/elm-'+i,kind:'seller_customer_page',title:'Elm '+i+' uses fictional cloud tooling',text:'Elm '+i+' uses fictional cloud tooling for planning cloud resources and monitoring usage.',fetchedAt:now}))];
+    saveState(addResearch(defaultState(),saved,{seller_site:20},[],now).state,file);
+    const cache=path.join(dir,RUN_ID,'cache');
+    fs.mkdirSync(cache,{recursive:true});
+    fs.writeFileSync(path.join(cache,'sitemap.json'),JSON.stringify({url:'https://www.pump.co/sitemap.xml',text:'<urlset>'+Array.from({length:30},(_,i)=>'<url><loc>https://www.pump.co/vs/rival-'+i+'</loc></url>').join('')+'</urlset>'}));
+    const pageFetch=vi.fn(async url=>url.endsWith('/robots.txt')?response(404,''):response(200,html('Fictional cloud infrastructure spend comparison with enough text to retain a source receipt.')));
+    const fetchImpl=vi.fn(async()=>new Response('',{status:503}));
+    const report=await run({file,env,rerun:true,runtimeOptions:runtimeOptions(pageFetch),fetchImpl});
+    expect(report).toMatchObject({runId:RERUN_ID,reusedPages:18,openaiAttempts:1,serperQueries:0,status:'stopped',failure:{httpStatus:503}});
+    expect(pageFetch).toHaveBeenCalledTimes(RERUN_TOTAL);
+    expect(pageFetch.mock.calls.every(([url])=>!saved.some(page=>page.url===url))).toBe(true);
+    expect(loadState(file).workspaces[report.workspaceId].research.sources.length).toBeGreaterThan(18);
+    expect(fetchImpl).toHaveBeenCalledOnce();
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });

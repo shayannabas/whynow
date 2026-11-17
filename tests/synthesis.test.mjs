@@ -184,11 +184,11 @@ it('uses an injected LLM interface and performs no network access in synthesis t
   };
   const result=await generateSynthesis({state:f.state,workspaceId:f.id,rawPages:new Map(),llm:{generate:async request=>{seen.push(request);const value=values[request.name];expect(request.validate(value)).toBe(true);return {value,cached:false,model:request.model};}}});
   expect(seen.map(item=>item.name)).toEqual(['whynow_seller_facts','whynow_organization_review','whynow_icp_targeting']);
-  expect(seen[0].messages[0].content).toContain('seller facts');
-  expect(seen[1].messages[0].content).toContain('may not invent');
-  expect(seen[2].messages[0].content).toContain('prospective buyer companies');
-  expect(seen[2].messages[0].content).toContain('Explicitly forbidden');
-  expect(JSON.parse(seen[2].messages[1].content).resolveWorkedExample.segments.length).toBeGreaterThanOrEqual(3);
+  expect(seen[0].messages[2].content).toContain('seller facts');
+  expect(seen[1].messages[2].content).toContain('may not invent');
+  expect(seen[2].messages[2].content).toContain('prospective buyer companies');
+  expect(seen[2].messages[2].content).toContain('Explicitly forbidden');
+  expect(JSON.parse(seen[2].messages[2].content.split("\n").at(-1)).resolveWorkedExample.segments.length).toBeGreaterThanOrEqual(3);
   const expected=structuredClone(raw);expected.sellerProfile.customers=[];expected.sellerProfile.competitors=[];
   expect(result).toMatchObject({output:expected,cached:false,promptVersion:FOCUSED_PROMPT_VERSION,guard:{expectedResearchRevision:4},model:{sellerFacts:'gpt-5.5',organizationReview:'gpt-5.5',icpTargeting:'gpt-5.5'},actualCostUsd:0,calls:[{purpose:'sellerFacts'},{purpose:'organizationReview'},{purpose:'icpTargeting'}]});
   const invalid=structuredClone(values.whynow_seller_facts);invalid.sellerProfile.category.receiptId='R999';

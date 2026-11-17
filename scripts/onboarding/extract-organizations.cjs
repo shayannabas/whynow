@@ -71,7 +71,7 @@ function customerNameFromPage(url,titleValue,html) {
     const team=value.match(/^How an? (.+?) (?:sales|revenue|marketing|support) team (?:got|saved|gained)\b/i)?.[1];if(team)return meaningfulName(team);
     const watched=value.match(/^Watch (.+?) use\b/i)?.[1];if(watched)return meaningfulName(watched);
     const benefited=value.match(/^.+?\bbrings\s+([A-Z][A-Za-z0-9&.-]+)\s+(?:a|an|the|\d)/)?.[1];if(benefited)return meaningfulName(benefited);
-    let found=meaningfulName(value.match(/^(?:How )?(.+?) (?:ships|shipped|serves|went|uses|used|built|moved|scaled|grew|runs|powers|transformed|wins|unified|accelerates|sees|leaves)\b/i)?.[1]);
+    let found=meaningfulName(value.match(/^(?:How )?(.+?) (?:ships|shipped|serves|went|uses|used|built|moved|scaled|grew|runs|powers|transformed|wins|unified|accelerates|sees|leaves|saves|saved|cuts|cut|gets|got|migrates|eliminates|unifies|consolidates)\b/i)?.[1]);
     if(found){if(/^the\s/.test(found))found=`T${found.slice(1)}`;return found;}
   }
   if(slug) {
@@ -124,10 +124,10 @@ function candidate({kind,name,domain='',sourceUrl,storyUrl='',quote,quoteOrigin,
     domainStatus:normalizedDomain?'verified':'domain_missing',status,sourceUrl,storyUrl:storyUrl||sourceUrl,sourceId,receiptId:receipt?.receiptId||'',evidenceQuote:receipt?.evidenceQuote||quote,
     quoteOrigin:receipt?'saved_source_receipt':quoteOrigin,foundBy:[...new Set(foundBy)]};
 }
-function extractOrganizationCandidates({state,workspace,rawPages}) {
+function extractOrganizationCandidates({state,workspace,rawPages,receiptMap=buildReceiptEvidence(state,workspace).receiptMap}) {
   const company=workspace.research?.selectedCandidate||workspace.onboarding?.selectedCandidate||{},sellerDomain=normalizeDomain(company.domain),sellerName=String(workspace.name||company.name||'').trim();
   const refs=[...researchSourceContext(state,workspace).values()].filter(ref=>hostMatches(ref.host,sellerDomain));
-  const raw=rawPages instanceof Map?rawPages:new Map(),receiptMap=buildReceiptEvidence(state,workspace).receiptMap,customers=[],competitors=[];
+  const raw=rawPages instanceof Map?rawPages:new Map(),customers=[],competitors=[];
   const byUrl=new Map(refs.map(ref=>[ref.source.url,ref]));
   function add(target,row){if(!row.name)return;const existing=target.find(item=>item.name.toLowerCase()===row.name.toLowerCase());if(!existing)target.push(row);else if(!existing.domain&&row.domain){existing.domain=row.domain;existing.domainStatus='verified';existing.foundBy=[...new Set([...existing.foundBy,...row.foundBy])];}}
   for(const ref of refs) {

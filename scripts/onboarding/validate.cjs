@@ -7,7 +7,8 @@ const { WEIGHTS, LABELS, SLAS } = require('./manual-profile.cjs');
 const FACT_KEYS = ['category', 'productOneLiner', 'pricingModel', 'targetCompanySize'];
 const LIST_FACT_KEYS = ['valueProps', 'credentials', 'targetIndustries'];
 const SIGNAL_KEYS = Object.keys(WEIGHTS);
-const MAX_SYNTHESIS_SOURCES = 20;
+// A follow-up can reuse the initial twenty-page bundle and add up to fifteen pages.
+const MAX_SYNTHESIS_SOURCES = 35;
 const MAX_EVIDENCE_PACKET_BYTES = 120000;
 const MAX_SOURCE_EXCERPT_BYTES = 20000;
 const MIN_SOURCE_EXCERPT_BYTES = 1500;

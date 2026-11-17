@@ -2,6 +2,10 @@
 
 Offline default discovery and Today fallback are implemented. Apollo organization enrichment is independent of opt-in company search. Vercel’s HTTP 403 is recorded as a free-plan company-search limitation and the Vercel authorization is exhausted.
 
+The owner authorized a separate one-use Pump Part A rerun after offline tests, commit and push. Reuse the original 18 pages. Up to 15 new first-party pump.co HTTP requests including robots and redirects, up to five Serper queries for competitor leads only, zero Apollo. Three GPT-5.5 calls with a shared evidence prefix, low reasoning, up to 8,000 output tokens, zero retries and a $1.35 process cap. Target 40,000 estimated input tokens per call and allow up to 50,000 only if retaining required receipts prevents reaching the target. Save Pump profile and playbook for owner review. Restore providers disabled/zero. Pump Part B remains proposal-only.
+
+## Original Pump Part A checkpoint (historical)
+
 Pump Part A’s one-use marker `pump-part-a-nov17-2026-one-use` was consumed. Exactly 25 first-party HTTP attempts saved 18 pages. Preflight estimates were 40,548 input tokens for facts and 45,770 for ICP/playbook against the approved 40,000 per-call limit, so there were zero GPT-5.5 calls and $0 actual cost. Pump remains draft with evidence ready. Apollo and Serper usage were zero. See [the Pump report](docs/PUMP-PART-A-RESULTS.md). No generation, repeat collection, discovery or approvals are authorized. Pump Part B remains proposal-only. The local server runs with providers disabled and zero caps. Preserve .env, approved profiles and existing drafts. README/Phase 3 close-out stays on hold.
 
 ## November 16 checkpoint (historical)

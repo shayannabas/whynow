@@ -12,9 +12,10 @@ const MAX_FETCHED_PAGES=20;
 const MAX_STORED_TEXT_PER_PAGE=50000;
 const MAX_STORED_TEXT_PER_RUN=500000;
 const MAX_PROGRESS_EVENTS=50;
-const COMMON_SELLER_PATHS=Object.freeze(['/customers','/case-studies','/enterprise','/pricing','/about','/compare','/alternatives']);
+const COMMON_SELLER_PATHS=Object.freeze(['/customers','/case-studies','/enterprise','/pricing','/about','/how-it-works','/security','/compare','/alternatives']);
+const MAX_CUSTOMER_STORIES=8;
 const LOW_PRIORITY_PATH_PATTERN=/(?:^|\/)(?:partners?|marketplace|templates?|solution-partners?)(?:\/|$)/i;
-const RESEARCH_PATH_PATTERN=/(?:^|[-_/])(?:products?|platform|solutions?|pricing|customers?|case-stud(?:y|ies)|stories|enterprise|about|company|careers?|jobs?|industr(?:y|ies)|security|docs?|resources?|alternatives?|compare|comparison|vs|partners?|marketplace|templates?)(?:[-_/]|$)/i;
+const RESEARCH_PATH_PATTERN=/(?:^|[-_/])(?:products?|platform|solutions?|pricing|customers?|case-stud(?:y|ies)|stories|enterprise|about|company|careers?|jobs?|industr(?:y|ies)|security|how-it-works|docs?|resources?|alternatives?|compare|comparison|vs|partners?|marketplace|templates?)(?:[-_/]|$)/i;
 const BLOCKED_PAGE_EXTENSION=/\.(?:avif|bmp|css|gif|ico|jpe?g|js|map|mp3|mp4|mov|pdf|png|svg|webm|webp|woff2?|zip)$/i;
 const EXTERNAL_RESEARCH_HOSTS=new Map([
   ['boards.greenhouse.io',{source:'greenhouse',kind:'greenhouse_jobs'}],
@@ -96,20 +97,29 @@ function discoveryQueries(candidate) {
   ];
 }
 
+function isCustomerStory(value) {
+  const pathname=new URL(value).pathname;
+  return /\/(?:customers?|case-stud(?:y|ies)|customer-stories|stories)\/(?!case-studies\/?$)[^/]+|\/blog\/case-study-/i.test(pathname);
+}
+function isComparisonPath(value) {
+  return /(?:^|[-/])(?:compare|comparisons?|alternatives?|vs)(?:[-/]|$)/i.test(new URL(value).pathname);
+}
 function rankUrl(url,candidate) {
-  const parsed=new URL(url),path=parsed.pathname.toLowerCase();
-  if(parsed.origin===new URL(candidate.website).origin&&path==='/')return 0;
-  if(/sitemap[^/]*\.xml$/.test(path))return 1;
-  if(LOW_PRIORITY_PATH_PATTERN.test(path))return 50;
-  if(/(?:^|\/)(?:customers?|case-stud(?:y|ies)|customer-stories|stories)(?:\/|$)/.test(path))return 2;
-  if(/(?:^|\/)enterprise(?:\/|$)/.test(path))return 3;
-  if(/pricing/.test(path))return 4;
-  if(/alternative|compare|comparison|(?:^|[-_/])vs(?:[-_/]|$)/.test(path))return 5;
-  if(/about|company/.test(path))return 6;
-  if(/product|platform|solution/.test(path))return 7;
-  if(/industr|security/.test(path))return 8;
-  if(/career|jobs?/.test(path))return 9;
+  const parsed=new URL(url),pathname=parsed.pathname.toLowerCase();
+  if(pathname==='/'&&(!candidate||parsed.hostname.replace(/^www\./,'')===candidate.domain))return 0;
+  if(/sitemap[^/]*\.xml$/.test(pathname))return 1;
+  if(LOW_PRIORITY_PATH_PATTERN.test(pathname))return 50;
+  if(isCustomerStory(url))return 8;
+  if(isComparisonPath(url)&&(!/^\/blog\//.test(pathname)||!candidate||pathname.includes(candidate.domain.split('.')[0])))return 3;
+  if(!/^\/(?:blog|resources|docs)\//.test(pathname)&&/(?:^|\/)(?:about(?:-us)?|company|pricing|how-it-works|security|trust)(?:\/|$)/.test(pathname))return 2;
+  if(/(?:^|\/)(?:customers?|case-stud(?:y|ies)|customer-stories|stories|enterprise)(?:\/|$)/.test(pathname))return 4;
+  if(/product|platform|solution/.test(pathname))return 7;
+  if(/career|jobs?/.test(pathname))return 9;
   return 10;
+}
+function limitStoryTargets(completed,pending) {
+  let stories=completed.filter(target=>isCustomerStory(target.url)).length;
+  return pending.filter(target=>!isCustomerStory(target.url)||stories++<MAX_CUSTOMER_STORIES);
 }
 
 function compactIdentity(value) {return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
@@ -171,7 +181,7 @@ function mergeTargets(candidate,current,added,visited=[]) {
   const visitedSet=new Set(visited),values=[...unique.values()];
   const completed=values.filter(target=>visitedSet.has(target.url));
   const pending=values.filter(target=>!visitedSet.has(target.url)).sort((a,b)=>targetRank(a,candidate)-targetRank(b,candidate)||a.url.localeCompare(b.url));
-  return [...completed,...pending].slice(0,MAX_FETCHED_PAGES);
+  return [...completed,...limitStoryTargets(completed,pending)].slice(0,MAX_FETCHED_PAGES);
 }
 function selectResearchTargets(candidate,rows) {
   const homepage=internalTarget(candidate,candidate.website);
@@ -199,8 +209,9 @@ function relevantInternalTarget(candidate,value,baseUrl,{allowSitemap=false}={})
   return path==='/'||RESEARCH_PATH_PATTERN.test(path)||(allowSitemap&&/sitemap[^/]*\.xml$/i.test(path))?target:null;
 }
 function homepageTargets(candidate,html,baseUrl) {
-  const targets=[],pattern=/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;let match;
-  while((match=pattern.exec(String(html||'')))&&targets.length<5000) {
+  const markup=String(html||'').replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi,'');
+  const targets=[],pattern=/<(?:a|link)\b[^>]*?\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;let match;
+  while((match=pattern.exec(markup))&&targets.length<5000) {
     const target=relevantInternalTarget(candidate,match[1]??match[2]??match[3],baseUrl,{allowSitemap:true});
     if(target)targets.push(target);
   }
@@ -533,6 +544,6 @@ function createResearchCoordinator({
 
 module.exports={
   createResearchCoordinator,ResearchError,safeError,normalizeResearchUrl,selectResearchTargets,selectResearchUrls,discoveryQueries,
-  homepageTargets,sitemapTargets,externalTargetForRow,rankUrl,titleFromHtml,truncateUtf8,
+  homepageTargets,sitemapTargets,externalTargetForRow,rankUrl,titleFromHtml,truncateUtf8,internalTarget,isComparisonPath,isCustomerStory,MAX_CUSTOMER_STORIES,
   COMMON_SELLER_PATHS,LOW_PRIORITY_PATH_PATTERN,MAX_CANDIDATES,MAX_SERPER_QUERIES,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN
 };

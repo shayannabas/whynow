@@ -6,15 +6,19 @@ const {createHash}=require('node:crypto');
 const {loadEnv}=require('./env.cjs');
 const {statePath,loadState,saveState,createWorkspace,updateWorkspace,atomicWrite}=require('./server/state.cjs');
 const {CollectorRuntime,DEFAULT_BUDGETS}=require('./collectors/runtime.cjs');
+const {rawPageMap}=require('./onboarding/extract-organizations.cjs');
 const {stripHtml}=require('./collectors/common.cjs');
 const {recordSource}=require('./sources.cjs');
-const {homepageTargets,sitemapTargets,normalizeResearchUrl,rankUrl,titleFromHtml,truncateUtf8,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN}=require('./onboarding/research.cjs');
+const {homepageTargets,sitemapTargets,normalizeResearchUrl,rankUrl,titleFromHtml,truncateUtf8,internalTarget,isCustomerStory,MAX_CUSTOMER_STORIES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN}=require('./onboarding/research.cjs');
 const {estimateFocusedSynthesisCost,generateSynthesis}=require('./onboarding/synthesize.cjs');
 const {saveGeneratedProfile}=require('./onboarding/validate.cjs');
 const {createLlm}=require('./llm.cjs');
 const {publicResult}=require('./run-any-seller-live-research.cjs');
 
 const RUN_ID='pump-part-a-nov17-2026-one-use';
+const RERUN_ID='pump-part-a-nov17-2026-priority-rerun';
+const RERUN_TOTAL=15;
+const RERUN_LIMITS=Object.freeze({seller_site:15,seller_sitemap:2,robots:3});
 const COMPANY=Object.freeze({name:'Pump',domain:'pump.co',website:'https://pump.co/'});
 const LIMITS=Object.freeze({seller_site:20,seller_sitemap:2,robots:3});
 const CAP_USD=1.35;
@@ -35,43 +39,55 @@ function safeFailure(error) {
   };
 }
 
-function createResearchRuntime({env,cacheDir,beforeRequest=()=>{},options={}}) {
-  const budgets=Object.fromEntries(Object.entries(LIMITS).map(([source,limit])=>[
+function createResearchRuntime({env,cacheDir,beforeRequest=()=>{},options={},limits=LIMITS,totalLimit=25}) {
+  const budgets=Object.fromEntries(Object.entries(limits).map(([source,limit])=>[
     source,{...DEFAULT_BUDGETS[source==='seller_sitemap'?'seller_site':source],limit}
   ]));
   const runtime=new CollectorRuntime({...options,env,cacheDir,budgets});
   const transport=runtime.fetch;
   runtime.fetch=(url,request)=>{
     if(!normalizeResearchUrl(url,COMPANY.domain)||request.method!=='GET')throw new Error('Only first-party Pump GET requests are authorized.');
-    const counts=Object.fromEntries(Object.keys(LIMITS).map(key=>[key,runtime.usage[key].requests]));
+    const counts=Object.fromEntries(Object.keys(limits).map(key=>[key,runtime.usage[key].requests]));
+    if(Object.values(counts).reduce((sum,count)=>sum+count,0)>totalLimit)throw Error('The authorized first-party request limit was reached.');
     beforeRequest(url,counts);
     return transport(url,request);
   };
   return runtime;
 }
 
-async function collectPages(runtime,{onPage=()=>{},onError=()=>{}}={}) {
-  const pending=new Map(),visited=new Set(),pages=new Map();
-  let storedBytes=0;
+async function collectPages(runtime,{onPage=()=>{},onError=()=>{},saved=[],seeds=[],totalLimit=25}={}) {
+  const pending=new Map(),pages=new Map(saved.map(page=>[page.url,page]));
+  const key=value=>{const parsed=new URL(value);parsed.hostname=parsed.hostname.replace(/^www\./,'');return parsed.toString().replace(/\/$/,'');};
+  const visited=new Set(saved.map(page=>key(page.url)));
+  let storedBytes=saved.reduce((total,page)=>total+Buffer.byteLength(page.text),0);
+  let stories=saved.filter(page=>isCustomerStory(page.url)).length;
+  const requestCount=()=>Object.values(runtime.usage).reduce((sum,row)=>sum+row.requests,0);
   function enqueue(target) {
-    if(target.kind!=='seller_partner_page'&&!visited.has(target.url))pending.set(target.url,target);
+    const url=target?.url;
+    if(url&&target.kind!=='seller_partner_page'&&!visited.has(key(url)))pending.set(key(url),target);
   }
-  enqueue({url:COMPANY.website,kind:'seller_site'});
-  enqueue({url:new URL('/sitemap.xml',COMPANY.website).href,kind:'seller_sitemap'});
-  while(pending.size) {
+  const origin=saved.find(page=>new URL(page.url).pathname==='/')?.url||COMPANY.website;
+  const company={...COMPANY,website:origin};
+  enqueue({url:origin,kind:'seller_site'});
+  if(!saved.length)enqueue({url:new URL('/sitemap.xml',COMPANY.website).href,kind:'seller_sitemap'});
+  for(const pathname of ['/about','/pricing','/how-it-works','/security'])enqueue(internalTarget(company,new URL(pathname,origin).href));
+  for(const target of seeds)enqueue(target);
+  while(pending.size&&requestCount()<totalLimit) {
     const available=[...pending.values()].filter(target=>{
       const source=target.kind==='seller_sitemap'?'seller_sitemap':'seller_site';
-      return runtime.usage[source].requests<LIMITS[source]&&!visited.has(target.url);
+      return runtime.usage[source].requests<runtime.budgets[source].limit&&!visited.has(key(target.url))&&
+        (!isCustomerStory(target.url)||stories<MAX_CUSTOMER_STORIES);
     });
     if(!available.length)break;
-    const target=available.sort((a,b)=>rankUrl(a.url,COMPANY)-rankUrl(b.url,COMPANY)||a.url.localeCompare(b.url))[0];
-    pending.delete(target.url);visited.add(target.url);
+    const target=available.sort((a,b)=>rankUrl(a.url,company)-rankUrl(b.url,company))[0];
+    pending.delete(key(target.url));visited.add(key(target.url));
+    if(isCustomerStory(target.url))stories++;
     const sitemap=target.kind==='seller_sitemap';
     try {
       const page=await runtime.request(sitemap?'seller_sitemap':'seller_site',target.url,{allowedRedirectDomain:COMPANY.domain});
       const url=normalizeResearchUrl(page.url,COMPANY.domain);
       if(!url)throw new Error('The page left the approved seller domain.');
-      visited.add(url);
+      visited.add(key(url));
       const linked=sitemap?sitemapTargets(COMPANY,page.text,url):homepageTargets(COMPANY,page.text,url);
       for(const row of linked)enqueue(row);
       if(sitemap||pages.has(url))continue;
@@ -88,6 +104,27 @@ async function collectPages(runtime,{onPage=()=>{},onError=()=>{}}={}) {
   return [...pages.values()];
 }
 
+function previousResearch(state,cacheDir) {
+  const workspace=Object.values(state.workspaces).find(w=>w.name==='Pump'&&w.research?.runId===RUN_ID);
+  if(!workspace||workspace.status!=='draft'||workspace.research.status!=='evidence_ready'||workspace.profileRevision||
+      workspace.sellerProfile.approvedAt||workspace.budgets.openai||workspace.research.sources.length!==18) {
+    throw Object.assign(Error('The original Pump evidence checkpoint is required.'),{code:'PUMP_SAVED_EVIDENCE_REQUIRED'});
+  }
+  const raw=rawPageMap([cacheDir]);
+  const pages=workspace.research.sources.map(ref=>{
+    const source=state.sources[ref.sourceId];
+    if(!source?.text||!normalizeResearchUrl(source.url,COMPANY.domain))throw Error('Saved Pump evidence could not be verified.');
+    return {url:source.url,text:source.text,title:source.title,fetchedAt:source.fetchedAt,kind:ref.kind,rawHtml:raw.get(source.url)?.text||''};
+  });
+  const seeds=pages.flatMap(page=>homepageTargets(COMPANY,page.rawHtml,page.url));
+  for(const entry of fs.readdirSync(cacheDir)) {
+    if(!entry.endsWith('.json'))continue;
+    const cached=JSON.parse(fs.readFileSync(path.join(cacheDir,entry),'utf8'));
+    if(normalizeResearchUrl(cached.url,COMPANY.domain)&&new URL(cached.url).pathname.endsWith('sitemap.xml'))seeds.push(...sitemapTargets(COMPANY,cached.text,cached.url));
+  }
+  return {workspace,pages,seeds};
+}
+
 function emptyPumpDraft(state) {
   const matches=Object.values(state.workspaces).filter(w=>/^pump$/i.test(w.name.trim())||w.research?.selectedCandidate?.domain===COMPANY.domain);
   if(!matches.length)return null;
@@ -101,8 +138,7 @@ function emptyPumpDraft(state) {
   return workspace;
 }
 
-function addResearch(state,pages,requests,pageErrors,now) {
-  const existing=emptyPumpDraft(state);
+function addResearch(state,pages,requests,pageErrors,now,{existing=emptyPumpDraft(state),runId=RUN_ID}={}) {
   let next=existing?structuredClone(state):createWorkspace(state,{name:COMPANY.name});
   const id=existing?.id||next.activeWorkspaceId;
   next.activeWorkspaceId=state.activeWorkspaceId;
@@ -114,13 +150,13 @@ function addResearch(state,pages,requests,pageErrors,now) {
   }
   next=updateWorkspace(next,id,w=>{
     w.research={
-      schemaVersion:1,revision:1,status:'evidence_ready',runId:RUN_ID,
+      schemaVersion:1,revision:(w.research?.revision||0)+1,status:'evidence_ready',runId,
       companyName:COMPANY.name,selectedCandidate:{...COMPANY},sources,pageErrors,
       completedAt:now,updatedAt:now,
       usage:{queriesReserved:0,pagesAttempted:requests.seller_site,pagesSaved:sources.length,storedBytes:sources.reduce((sum,row)=>sum+row.bytes,0)}
     };
   });
-  next.auditLog.push({schemaVersion:1,type:'bounded_seller_research_saved',workspaceId:id,runId:RUN_ID,occurredAt:now});
+  next.auditLog.push({schemaVersion:1,type:'bounded_seller_research_saved',workspaceId:id,runId,occurredAt:now});
   return {state:next,id};
 }
 
@@ -140,26 +176,28 @@ function paidEnvironment(state,env,now) {
   };
 }
 
-function verifyEstimate(estimate) {
+function verifyEstimate(estimate,maxInputTokens=40000) {
   if(estimate.calls.length!==3||estimate.totalMaximumCostUsd>CAP_USD||estimate.calls.some(call=>
-    call.model!=='gpt-5.5'||call.reasoningEffort!=='low'||call.maxOutputTokens!==8000||call.estimatedInputTokens>40000
+    call.model!=='gpt-5.5'||call.reasoningEffort!=='low'||call.maxOutputTokens!==8000||call.estimatedInputTokens>maxInputTokens
   ))throw Object.assign(Error('The saved evidence exceeds the approved request bounds.'),{code:'PUMP_PREFLIGHT_LIMIT'});
 }
 
-async function run({file,env,envFile,artifactDir=path.join(path.dirname(file),RUN_ID),runtimeOptions,fetchImpl=fetch,now=()=>new Date().toISOString(),onPreflight=()=>{}}) {
+async function run({file,env,envFile,rerun=false,artifactDir=path.join(path.dirname(file),rerun?RERUN_ID:RUN_ID),runtimeOptions,fetchImpl=fetch,now=()=>new Date().toISOString(),onPreflight=()=>{}}) {
   if(env.OPENAI_ENABLED!=='false'||Number(env.OPENAI_MONTHLY_LIMIT_USD)!==0)throw Object.assign(Error('OpenAI defaults must be disabled/zero.'),{code:'OPENAI_DEFAULTS_NOT_OFF'});
   if(!env.OPENAI_API_KEY?.trim())throw Object.assign(Error('OpenAI configuration is missing.'),{code:'OPENAI_KEY_MISSING'});
   const read=()=>loadState(file),mutate=async change=>{const next=change(read());saveState(next,file);return next;};
   const before=read();
-  const existing=emptyPumpDraft(before);
+  const prior=rerun?previousResearch(before,path.join(path.dirname(file),RUN_ID,'cache')):null;
+  const existing=prior?.workspace||emptyPumpDraft(before);
+  const runId=rerun?RERUN_ID:RUN_ID,totalLimit=rerun?RERUN_TOTAL:25;
   const digest=value=>createHash('sha256').update(value).digest('hex');
   const envHash=envFile?digest(fs.readFileSync(envFile)):null;
   const off={...env,...BASE_DISABLED},report={
-    runId:RUN_ID,status:'started',startedAt:now(),capUsd:CAP_USD,requests:{seller_site:0,seller_sitemap:0,robots:0},
+    runId,status:'started',reusedPages:prior?.pages.length||0,startedAt:now(),capUsd:CAP_USD,requests:{seller_site:0,seller_sitemap:0,robots:0},
     requestUrls:[],savedSources:[],pageErrors:[],apolloAttempts:0,serperQueries:0,openaiAttempts:0,calls:[]
   };
   const checkpoint=()=>atomicWrite(path.join(artifactDir,'report.json'),JSON.stringify(report,null,2));
-  const runtime=createResearchRuntime({env:off,cacheDir:path.join(artifactDir,'cache'),options:runtimeOptions,
+  const runtime=createResearchRuntime({env:off,cacheDir:path.join(artifactDir,'cache'),options:runtimeOptions,totalLimit,limits:rerun?RERUN_LIMITS:LIMITS,
     beforeRequest:(url,counts)=>{report.requests=counts;report.requestUrls.push(url);checkpoint();}
   });
   runtime.identity();
@@ -168,13 +206,15 @@ async function run({file,env,envFile,artifactDir=path.join(path.dirname(file),RU
   try {
     checkpoint();
     const pages=await collectPages(runtime,{
+      saved:prior?.pages||[],seeds:prior?.seeds||[],totalLimit,
       onPage:page=>{report.savedSources.push({url:page.url,kind:page.kind});checkpoint();},
       onError:error=>{report.pageErrors.push(error);checkpoint();}
     });
     if(!pages.length)throw Object.assign(Error('No readable first-party pages.'),{code:'NO_SOURCES'});
     await mutate(current=>{
-      if(emptyPumpDraft(current)?.id!==existing?.id)throw Object.assign(Error('The Pump workspace changed during research.'),{code:'PUMP_WORKSPACE_CHANGED'});
-      const research=addResearch(current,pages,report.requests,report.pageErrors,now());
+      const saved=prior?current.workspaces[existing.id]:emptyPumpDraft(current);
+      if(saved?.id!==existing?.id||(prior&&JSON.stringify(saved)!==JSON.stringify(existing)))throw Object.assign(Error('The Pump workspace changed during research.'),{code:'PUMP_WORKSPACE_CHANGED'});
+      const research=addResearch(current,pages,report.requests,report.pageErrors,now(),{existing,runId});
       report.workspaceId=research.id;
       return research.state;
     });
@@ -182,7 +222,7 @@ async function run({file,env,envFile,artifactDir=path.join(path.dirname(file),RU
     paidEnv=paidEnvironment(state,off,now());
     const generationOptions={env:paidEnv,rawPages};
     report.estimate=estimateFocusedSynthesisCost(state,report.workspaceId,generationOptions);
-    verifyEstimate(report.estimate);
+    verifyEstimate(report.estimate,rerun?50000:40000);
     checkpoint();
     onPreflight(report.estimate);
     const llm=createLlm({read,mutate,env:paidEnv,now,fetchImpl:async(url,request)=>{
@@ -231,11 +271,11 @@ async function run({file,env,envFile,artifactDir=path.join(path.dirname(file),RU
 if(require.main===module) {
   const env={},envFile=path.resolve(__dirname,'../.env');
   loadEnv(envFile,env);
-  if(process.argv[2]!=='--run')throw Error('Use --run only with owner authorization.');
-  run({file:statePath(env),env,envFile,onPreflight:estimate=>console.log(JSON.stringify({preflight:estimate}))})
+  if(!['--run','--rerun'].includes(process.argv[2]))throw Error('Use a run command only with owner authorization.');
+  run({file:statePath(env),env,envFile,rerun:process.argv[2]==='--rerun',onPreflight:estimate=>console.log(JSON.stringify({preflight:estimate}))})
     .then(report=>{
       console.log(JSON.stringify({status:report.status,workspaceId:report.workspaceId,requests:report.requests,openaiAttempts:report.openaiAttempts,actualCostUsd:report.actualCostUsd,failure:report.failure,preserved:report.preserved,envUnchanged:report.envUnchanged}));
       if(report.status!=='saved_needs_review')process.exitCode=1;
     }).catch(error=>{console.error(JSON.stringify(safeFailure(error)));process.exitCode=1;});
 }
-module.exports={run,createResearchRuntime,collectPages,verifyEstimate,addResearch,LIMITS,RUN_ID};
+module.exports={run,createResearchRuntime,collectPages,verifyEstimate,addResearch,LIMITS,RUN_ID,RERUN_ID,RERUN_TOTAL};

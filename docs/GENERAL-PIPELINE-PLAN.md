@@ -17,7 +17,7 @@ v4 found new accounts mainly through job-posting searches. That is Resolve-speci
 ## 3. End-to-end flow
 
 1. Learn the seller: research produces the seller profile (customers, competitors, size) plus the playbook. A human approves both.
-2. Find accounts: default strategy `trigger_search` uses the seller’s approved playbook. The current discovery adapter verifies ATS postings. News-based discovery is proposed for Pump Part B. Optional `lookalike` requires the separate Apollo company-search switch. Competitor-customer discovery is a documented next step.
+2. Find accounts: default strategy `trigger_search` uses the seller’s approved playbook. The discovery adapters verify ATS postings and dated news articles from the approved playbook. Pump Part B still requires separate authorization. Optional `lookalike` requires the separate Apollo company-search switch. Competitor-customer discovery is a documented next step.
 3. Check timing: run the existing timing collectors on candidates according to the approved playbook triggers.
 4. Rank: use the existing six-slot scorecard, firmographic tiering, decisioning and kill engine. Tiering and Act now eligibility remain exactly as they are for every workspace, including future playbooks; no new fit gate or threshold is introduced. An approved playbook supplies the why-now / activePain slot's triggers, keywords, freshness windows and strength. When Act now is empty, Today shows a research-only Top prospects list ranked by fit and recent receipted signals.
 5. Draft: existing outreach drafting with receipts. The opener uses the matched trigger's message angle.
