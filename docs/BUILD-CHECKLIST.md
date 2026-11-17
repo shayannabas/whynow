@@ -1,3 +1,11 @@
+# November 17 — Pump Part B stopped on HTTP 403
+
+- [x] Verify Pump seller revision 4 and playbook v6 owner approvals before consuming the batch.
+- [x] Run the bounded trigger search once and stop on the first HTTP error. Twelve live Serper requests, eight free requests, zero Apollo and OpenAI.
+- [x] Record zero saved prospects and templates. Keep providers disabled and .env unchanged. [Pump Part B results](PUMP-PART-B-RESULTS.md)
+
+## Part A checkpoint
+
 # November 17 — Pump Part A rerun saved for review
 
 - [x] Prioritize core pages and comparisons and cap new customer stories at eight. Reuse all 18 Pump pages from the original run.

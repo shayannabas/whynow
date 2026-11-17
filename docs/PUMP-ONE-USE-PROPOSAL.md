@@ -23,7 +23,9 @@ Authorized once by the owner on November 17, 2026. The fetch allowance has been 
 - Configured GPT-5.5 rates: $5 per million uncached input tokens and $30 per million output tokens. At the limits:3 × ($0.20 input + $0.24 output) = **$1.32 conservative maximum**. Propose **$1.35 process-only cap**. This is a bounded estimate, not a quote from unread Pump pages or a new pricing/API check; actual returned usage may cost less.
 - Save seller profile and playbook needs_review, then **STOP for owner review/confirmation/approval**. No automatic approvals. Restore providers disabled/zero; .env unchanged.
 
-## Part B — one-use authorization
+## Part B — used and exhausted
+
+[Results](PUMP-PART-B-RESULTS.md) record the first-HTTP-error stop and actual usage. The authorization below is historical.
 
 The owner authorized one run on November 17, 2026 after both owner approvals persist. Verify the saved profile revision and playbook v6 with `node scripts/run-pump-part-b.cjs --verify`. The runner verifies the corresponding approval audit events before consuming the marker.
 
