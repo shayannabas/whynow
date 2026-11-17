@@ -6,9 +6,9 @@ const {collectFirmographics}=require('./collectors/firmographics.cjs');
 function icpMatch(candidate) {
  return candidate.matchedIcpId?{matchedIcpId:candidate.matchedIcpId,matchedIcpReason:candidate.matchedIcpReason||'Matched an approved discovery query.'}:{};
 }
-function triggerFirstPlan(workspace){const searches=buildTriggerFirstTasks(workspace);return {strategy:'trigger_first',searches,maxVerificationCandidates:10,identityQueries:10,firmographicQueries:10,maxDiscoveryQueries:Math.min(40,searches.length+20),refreshAccounts:10,maxRefreshQueries:50,hardTotalCap:100};}
+function triggerFirstPlan(workspace,now){const searches=buildTriggerFirstTasks(workspace,now);return {strategy:'trigger_first',searches,maxVerificationCandidates:10,identityQueries:10,firmographicQueries:10,maxDiscoveryQueries:Math.min(40,searches.length+20),refreshAccounts:10,maxRefreshQueries:50,hardTotalCap:100};}
 async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,searchProvider,newsSearchProvider,reserveQuery,settings,env,now=()=>new Date(),verify=verifyCandidate,selectCandidates,checkRun=()=>{},sizeCandidate,allowNewsFallback=false,onCandidate=()=>{},onPaywall,searchPlan,resolveIdentity,keepUnresolved=false}){
- const workspace=read().workspaces[workspaceId],plan=triggerFirstPlan(workspace),candidates=[],tasks=[],rejected=[],errors=[],added=[],vendors=[];
+ const workspace=read().workspaces[workspaceId],plan=triggerFirstPlan(workspace,now()),candidates=[],tasks=[],rejected=[],errors=[],added=[],vendors=[];
  await mutate(state=>{const w=state.workspaces[workspaceId],changed=require('./company-identity.cjs').quarantineLegacyCandidates(w,require('./phase-a-config.cjs').phaseAConfigForWorkspace(w));if(changed.length)state.auditLog.push({schemaVersion:1,type:'legacy_discovery_quarantined',workspaceId,occurredAt:now().toISOString(),accounts:changed});return state;});
  const checkRevision=()=>{checkRun();const w=read().workspaces[workspaceId],r=w.runs.find(r=>r.id===runId);if((w.profileRevision||0)!==(r.profileRevision||0)||w.status!=='active'&&!w.referenceDemo?.loadOnly||(r.playbookDigest&&require('./playbook.cjs').approvedPlaybook(w)?.approvedDigest!==r.playbookDigest))throw Object.assign(Error('Approved profile changed during discovery.'),{code:'PROFILE_CHANGED'});};
  checkRevision();
@@ -79,7 +79,7 @@ async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,search
      return state;
    });
  }catch(e){errors.push({name:candidate.name,code:e.code||'VERIFICATION_FAILED',status:e.status||null});checkRun();if(e.code==='PROFILE_CHANGED')throw e;if(/LIMIT/.test(e.code||''))break;}}
- await mutate(state=>{const w=state.workspaces[workspaceId],run=w.runs.find(r=>r.id===runId);Object.assign(run,{status:errors.length?'complete_with_errors':'complete',finishedAt:now().toISOString(),tasks,rawFound:candidates.length,candidateChecks:selected.length,passedNoiseGate:added.length,newAccounts:added.length,newAccountIds:added,vendorAccountIds:vendors,rejectedCount:rejected.length,rejections:rejected,errors});w.budgets.discoveryCollector={day:now().toISOString().slice(0,10),...runtime.snapshot()};return state;});
+ await mutate(state=>{const w=state.workspaces[workspaceId],run=w.runs.find(r=>r.id===runId);Object.assign(run,{status:errors.length?'complete_with_errors':'complete',finishedAt:now().toISOString(),tasks,plannedQueries:searchPlan||plan.searches,rawFound:candidates.length,candidateChecks:selected.length,passedNoiseGate:added.length,newAccounts:added.length,newAccountIds:added,vendorAccountIds:vendors,rejectedCount:rejected.length,rejections:rejected,errors});w.budgets.discoveryCollector={day:now().toISOString().slice(0,10),...runtime.snapshot()};return state;});
  return read().workspaces[workspaceId].runs.find(r=>r.id===runId);
 }
 module.exports={triggerFirstPlan,executeTriggerFirst};

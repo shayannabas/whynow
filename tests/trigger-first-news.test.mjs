@@ -36,7 +36,7 @@ function harness(published='2026-11-15T09:00:00Z') {
 it('uses Serper News for a news-only playbook and persists a verified funding article with its original date',async()=>{
   const h=harness(),run=await h.coordinator.start(h.id),done=await h.coordinator.wait(run.id);
   expect(h.newsSearchProvider).toHaveBeenCalledOnce();
-  expect(h.newsSearchProvider.mock.calls[0][0]).toBe('"raises" OR "series a"');
+  expect(h.newsSearchProvider.mock.calls[0][0]).toBe('("revenue") ("raises" OR "series a")');
   expect(done).toMatchObject({newAccounts:1,serperQueries:3});
   const state=h.read(),account=state.workspaces[h.id].accounts[0],trigger=account.triggers[0];
   expect(account.discovery.kind).toBe('trigger_first_news');

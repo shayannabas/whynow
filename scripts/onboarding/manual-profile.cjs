@@ -222,6 +222,7 @@ function saveManualProfile(state,id,form,{now=()=>new Date().toISOString()}={}) 
   const {profile,config}=draftFromForm(state,workspace,form,now);
   return updateWorkspace(state,id,w=>{
     w.sellerProfile=profile;w.icpConfig=config;w.status='needs_review';w.profileRevision=(w.profileRevision||0)+1;w.deliveryMode='demo';
+    require('../icps.cjs').reseedIcps(w);
     delete w.reviewAcknowledgments;
     if(w.research&&['review_required','approved'].includes(w.research.status)){
       w.research.status='review_required';w.research.revision=(w.research.revision||0)+1;
@@ -241,6 +242,7 @@ function approveManualProfile(state,id,{revision,acknowledged=false,qualityReaso
   });
   const next=updateWorkspace(state,id,w=>{
     w.status='active';w.sellerProfile.approvedAt=now();w.sellerProfile.deliveryAllowed=false;
+    require('../icps.cjs').approveIcps(w,w.sellerProfile.approvedAt);
     w.icpConfig.defaultsReviewRequired=false;w.deliveryMode='demo';w.profileRevision+=1;
     if(w.research?.status==='review_required'){
       w.research.status='approved';w.research.revision=(w.research.revision||0)+1;w.research.completedAt=w.sellerProfile.approvedAt;

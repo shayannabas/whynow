@@ -14,6 +14,7 @@ function validate(state) {
   if (state.activeWorkspaceId !== null && !Object.hasOwn(state.workspaces, state.activeWorkspaceId)) throw new Error('Unknown active workspace');
   for (const [id, w] of Object.entries(state.workspaces)) {
     if (w.id !== id || w.schemaVersion !== 1 || typeof w.name !== 'string' || !w.sellerProfile || !w.icpConfig || !w.budgets || !['accounts','universeSeeds','runs','suppression','drafts','outcomes'].every(key => Array.isArray(w[key]))) throw new Error('Invalid workspace schema');
+    if(w.icps!==undefined&&!Array.isArray(w.icps))throw new Error('Invalid workspace ICPs');
     if(w.rejectedDiscovery !== undefined && !Array.isArray(w.rejectedDiscovery)) throw new Error('Invalid rejected discovery archive');
   }
   return state;
@@ -64,7 +65,7 @@ function updateWorkspace(state, id, fn) {
 function createWorkspace(state, {name}) {
   if (typeof name !== 'string' || !name.trim() || name.trim().length > 120) throw new Error('Enter a workspace name of 1–120 characters');
   const next = structuredClone(state); const id = randomUUID();
-  next.workspaces[id] = {schemaVersion:1, id, name:name.trim(), createdAt:nowIso(), status:'draft', deliveryMode:'demo', sellerProfile:{schemaVersion:1, deliveryAllowed:false}, icpConfig:{schemaVersion:1}, accounts:[], universeSeeds:[], runs:[], suppression:[], drafts:[], outcomes:[], budgets:{}};
+  next.workspaces[id] = {schemaVersion:1, id, name:name.trim(), createdAt:nowIso(), status:'draft', deliveryMode:'demo', sellerProfile:{schemaVersion:1, deliveryAllowed:false}, icpConfig:{schemaVersion:1}, icps:[], accounts:[], universeSeeds:[], runs:[], suppression:[], drafts:[], outcomes:[], budgets:{}};
   next.activeWorkspaceId = id; return next;
 }
 module.exports = { STATE_FILE, defaultState, loadState, saveState, getWorkspace, updateWorkspace, createWorkspace, atomicWrite, statePath };

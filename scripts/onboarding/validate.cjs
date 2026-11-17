@@ -479,6 +479,7 @@ function saveGeneratedProfile(state,id,{output,organizationReview,expectedResear
     const candidate=selectedCandidate(w);
     w.onboarding={...(w.onboarding||{schemaVersion:1}),status:'selected',selectedCandidate:candidate};
     w.sellerProfile=profile;w.icpConfig=config;w.status='needs_review';w.deliveryMode='demo';w.profileRevision=(w.profileRevision||0)+1;
+    require('../icps.cjs').reseedIcps(w);
     delete w.reviewAcknowledgments;
     const steps=(w.research.steps||[]).map(step=>({...step,status:step.key==='review'?'pending':'complete'}));
     w.research={...w.research,status:'review_required',revision:(w.research.revision||0)+1,steps,synthesis:{schemaVersion:1,promptVersion,model,generatedAt,sourceSetHash:expectedSourceSetHash,report,...(organizationReview?{organizationReview:structuredClone(organizationReview)}:{})}};

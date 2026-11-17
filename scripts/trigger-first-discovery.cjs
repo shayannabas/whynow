@@ -20,7 +20,9 @@ const ATS_SEARCH_HOSTS=[{provider:'greenhouse',host:'job-boards.greenhouse.io'},
 const SEGMENT_STOP=new Set(['and','company','enterprise','hiring','incident','management','platform','platforms','reliability','site','software','the']);
 
 function clean(value='',max=300){const text=String(value).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();return text.length<=max?text:text.slice(0,max).trim();}
-function buildTriggerFirstTasks(workspace){
+function buildTriggerFirstTasks(workspace,now){
+  const scoped=require('./icps.cjs').buildIcpDiscoveryTasks(workspace,now);
+  if(scoped)return scoped;
   return [...require('./trigger-first-news.cjs').buildNewsTasks(workspace),...require('./workspace-hiring.cjs').buildWorkspaceHiringTasks(workspace)];
 }
 function atsDescriptor(value=''){
