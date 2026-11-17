@@ -159,7 +159,7 @@ class CollectorRuntime {
         (async()=>{
           const method=options.method||(source==='serper'?'POST':'GET');
           const maxBytes=Number(options.maxBytes)||Number(budget.maxBytes)||2*1024*1024,sec=String(source).startsWith('edgar_');
-          const response=await this.fetch(url.href,{...checked,method,body:options.body,maxBytes,headers:{...(options.headers||{}),'User-Agent':options.userAgent||this.identity(source),'Accept':sec?'application/json, text/plain, application/octet-stream, application/x-gzip;q=0.9':'text/html, application/json, text/plain, application/xml;q=0.9','Accept-Encoding':'identity'},signal:controller.signal});
+          const response=await this.fetch(url.href,{...checked,source,method,body:options.body,maxBytes,headers:{...(options.headers||{}),'User-Agent':options.userAgent||this.identity(source),'Accept':sec?'application/json, text/plain, application/octet-stream, application/x-gzip;q=0.9':'text/html, application/json, text/plain, application/xml;q=0.9','Accept-Encoding':'identity'},signal:controller.signal});
           let text=await response.text();
           if(typeof options.transformValue==='function'){
             try{text=JSON.stringify(options.transformValue(JSON.parse(text),{headers:response.headers,status:response.status}));}catch{throw new CollectorHttpError('INVALID_JSON',`${source} returned unreadable JSON`,response.status);}

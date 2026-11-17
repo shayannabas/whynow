@@ -2,7 +2,11 @@
 
 Offline default discovery and Today fallback are implemented. Apollo organization enrichment is independent of opt-in company search. Vercel’s HTTP 403 is recorded as a free-plan company-search limitation and the Vercel authorization is exhausted.
 
-Pump Part A rerun `pump-part-a-nov17-2026-priority-rerun` is used and exhausted. Reused 18 pages, spent 15 first-party requests and saved 11 more pages. Zero Serper and Apollo. All three GPT-5.5 requests passed the 40,000 input-token preflight. Actual cost $0.343355 with cached input tokens 0 / 19,200 / 19,200. Pump profile revision 1 and playbook version 1 are needs_review. Saved 15 customers, 14 comparison entries, five segments and six triggers. No approval. See [rerun results](docs/PUMP-PART-A-RERUN.md). Providers disabled and caps zero, .env unchanged. Pump Part B remains proposal-only. Do not fetch, generate, approve or discover without separate owner authorization.
+Pump Part A rerun `pump-part-a-nov17-2026-priority-rerun` is used and exhausted. Reused 18 pages, spent 15 first-party requests and saved 11 more pages. Zero Serper and Apollo. All three GPT-5.5 requests passed the 40,000 input-token preflight. Actual cost $0.343355 with cached input tokens 0 / 19,200 / 19,200. Pump profile revision 1 and playbook version 1 are needs_review. Saved 15 customers, 14 comparison entries, five segments and six triggers. No approval. See [rerun results](docs/PUMP-PART-A-RERUN.md). Providers disabled and caps zero, .env unchanged. Part A is exhausted. Follow the separate Part B authorization below.
+
+## Pump Part B — one-use authorization
+
+The owner authorized one Pump Part B batch on November 17, 2026. Check saved profile approval and approved playbook v6 before consuming the marker; never approve on the owner's behalf. Use only the approved recent-funding, AI/GPU spend, cloud migration and DevOps/cloud hiring triggers. Caps: 40 Serper queries, 150 free collector requests including robots and redirects, 25 candidates, and 10 Apollo organization enrich attempts for missing employee counts. No company search, contacts or OpenAI. Stop on the first HTTP error, including robots responses. Templates only for Act now. Restore providers to disabled/zero and preserve .env. Runner: `scripts/run-pump-part-b.cjs`.
 
 ## Original Pump Part A checkpoint (historical)
 

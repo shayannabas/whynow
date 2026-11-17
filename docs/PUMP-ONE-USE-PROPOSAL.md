@@ -1,6 +1,6 @@
 # Pump one-use research and discovery plan
 
-Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. Part A saved first-party evidence and stopped before generation. Part B remains proposal-only. Hold README/Phase3 close-out until after this proposed verification.
+Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. Part A saved first-party evidence and stopped before generation. Part B has a separate bounded authorization below. Hold README/Phase3 close-out until after this proposed verification.
 
 ## Part A rerun — used and exhausted
 
@@ -23,13 +23,11 @@ Authorized once by the owner on November 17, 2026. The fetch allowance has been 
 - Configured GPT-5.5 rates: $5 per million uncached input tokens and $30 per million output tokens. At the limits:3 × ($0.20 input + $0.24 output) = **$1.32 conservative maximum**. Propose **$1.35 process-only cap**. This is a bounded estimate, not a quote from unread Pump pages or a new pricing/API check; actual returned usage may cost less.
 - Save seller profile and playbook needs_review, then **STOP for owner review/confirmation/approval**. No automatic approvals. Restore providers disabled/zero; .env unchanged.
 
-## Part B — separate one-use pipeline after approval and owner OK
+## Part B — one-use authorization
 
-Proposal only. Requires the saved seller profile, the saved playbook and separate owner authorization. Use a distinct durable one-use marker.
+The owner authorized one run on November 17, 2026 after both owner approvals persist. Verify the saved profile revision and playbook v6 with `node scripts/run-pump-part-b.cjs --verify`. The runner verifies the corresponding approval audit events before consuming the marker.
 
-- **Serper max 40 total.** Prioritize current funding announcements, DevOps/platform/cloud infrastructure hiring, and evidence that an AI startup is scaling cloud infrastructure. Use the approved Pump playbook’s terms and freshness windows. Verify ATS posts at the source and verify dated funding and expansion announcements against original reporting before using them for timing. News-based candidate discovery and publication-date verification are covered by recorded-response tests.
-- **Up to 25 companies.** Verify operating-company identity, dedupe by domain, exclude the seller, customers, competitors and retained kills, and retain rejected candidates with reasons and receipts.
-- **Free collectors max 150 HTTP requests**, including redirects and robots. Respect per-source and persisted budgets.
-- **Apollo organizations/enrich max 10 API attempts**, no company search and no paid plan upgrade. Use enrichment only for verified domains and display estimates as estimates. Any required Apollo robots check comes from the free HTTP allowance.
-- **At most 25 copy-only templates** for Act now, subject to the existing validation gates. Zero OpenAI. Existing scoring, tiering, kills and Act now eligibility apply.
-- Restore providers disabled/zero and report counts, receipts, attempts, credits, rejections and errors. No contact lookup or sending. The exhausted Vercel company-search batch will not be retried.
+- Discover with the approved recent-funding, AI/GPU spend and migration news rules plus the approved DevOps/cloud hiring rule. Verify publication date and company identity before promotion. Up to **40 Serper queries**, **150 free HTTP requests** including robots and redirects, and **25 candidate checks**.
+- Use up to **10 Apollo organizations/enrich attempts** for missing employee counts on promoted accounts. Keep the estimate and receipt. Company search and people endpoints are outside the authorization.
+- Use the existing scorecard, tiering and kills. Save deterministic Demo drafts only for Act now. Zero OpenAI.
+- The first HTTP error stops the entire batch. Robots HTTP errors count. Restore all providers to disabled with zero caps. Retain the existing approved profile, playbook, .env, active workspace and other saved state.

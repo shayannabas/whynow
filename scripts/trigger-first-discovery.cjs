@@ -119,7 +119,7 @@ async function verifyOperatingCandidate(candidate,{runtime,workspace,identityRes
   }
   const target=collectorTargetForAccount(base,collectorConfig);
   const hiring=job?jobSignals(target,candidate.provider,[job],now,collectorConfig.painThemeConfig,collectorConfig.slaDays):{signals:[],events:[]};
-  const firmographics=await firmographicsCollector(target,{runtime,searchResults:identityResults.map(row=>({...row,kind:'firmographics_identity'})),now});
+  const firmographics=await firmographicsCollector(target,{runtime,searchResults:identityResults.map(row=>({...row,kind:'firmographics_identity'})),sourcePage:page,verifiedEvent:event,now});
   const account=scoreAccount({...base,signals:mergeSignals(base.signals,hiring.signals),triggers:event?[event]:hiring.events,...firmographics.targetPatch},config,now);
   const live=activeTriggers(account,now);
   const actNowEligible=!segmentClassification.requiresReview&&!require('./account-lifecycle.cjs').needsReviewReason(account,now)&&live.length>0&&!account.kills?.length&&[1,2,3].includes(Number(account.tier));
