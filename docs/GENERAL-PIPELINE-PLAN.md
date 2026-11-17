@@ -22,7 +22,7 @@ v4 found new accounts mainly through job-posting searches. That is Resolve-speci
 4. Rank: use the existing six-slot scorecard, firmographic tiering, decisioning and kill engine. Tiering and Act now eligibility remain exactly as they are for every workspace, including future playbooks; no new fit gate or threshold is introduced. An approved playbook supplies the why-now / activePain slot's triggers, keywords, freshness windows and strength. When Act now is empty, Today shows a research-only Top prospects list ranked by fit and recent receipted signals.
 5. Draft: existing outreach drafting with receipts. The opener uses the matched trigger's message angle.
 
-Contact lookup (Apollo people endpoints) remains deferred and is out of scope for this plan.
+Company-scoped persona search is covered by Interface v2 in section 12. Contact-detail lookup remains out of scope.
 
 ## 4. Playbook specification
 
@@ -52,7 +52,7 @@ Collector `scripts/collectors/apollo.cjs`, limited to `organizations/enrich` and
 - `APOLLO_ENABLED=false` by default. Company search also requires `APOLLO_COMPANY_SEARCH_ENABLED=true`. Vercel’s HTTP 403 is recorded as a free-plan limitation and was not retried. Persistent per-workspace monthly call counter and a per-run cap. Stop on the first error. On HTTP 429, one retry with backoff.
 - Strategy: enrich the approved customers → derive the common pattern (industry, employee range, country, technologies) and show it as receipts → company search with that pattern → exclude the seller's customers, competitors and existing kills → dedupe by domain → keep rejected candidates with reasons.
 - Apollo firmographic values are receipts labeled "Apollo" with the retrieval date. They are estimates and must be shown as sourced, not as facts.
-- No people or contact endpoints in this plan.
+- Company discovery uses only these organization endpoints. Section 12 specifies the separate persona search.
 
 ## 6. Scoring
 
@@ -76,7 +76,7 @@ Receipts for every claim; ungrounded claims stay inferred. Human approval of pro
 
 ## 10. Out of scope
 
-Contact lookup and enrichment, sending, CRM sync, deployment, paid firmographics beyond the Apollo free plan, and competitor-customer discovery (documented next step only).
+Contact-detail lookup and enrichment, sending, CRM sync, deployment, paid firmographics beyond the Apollo free plan, and competitor-customer discovery (documented next step only).
 
 ## 11. Acceptance criteria (Phase 1)
 
@@ -87,3 +87,86 @@ Contact lookup and enrichment, sending, CRM sync, deployment, paid firmographics
 - Account page shows "Found via" and the matched pattern.
 - Kill Log shows full kill code and reason; sidebar workspace name is not truncated.
 - Full test suite and CI green; BUILD-CHECKLIST and TRACEABILITY updated.
+
+## 12. Interface v2 + ICPs
+
+**Offline only.** no provider calls of any kind. Hand-written fictional fixtures only. Do not change Act
+now eligibility, the scorecard, tiering or kill rules.
+
+The owner authorized offline implementation on November 17, 2026. Apollo people search
+(`mixed_people/api_search`) is in scope for personas. PhantomBuster, LinkedIn scraping,
+email and phone reveal, sending and CRM stay out of scope. This section is committed before implementation.
+
+Use WhyNow’s own design, branding and copy.
+
+### A. First-class ICPs
+1. Every workspace gets icps[] objects: id, name, description, firmographics (industries,
+   employee range, geographies, funding stages, tech-stack keywords), buyer personas (titles,
+   from the playbook buyer roles), linked playbook trigger ids, exclusions, query rules
+   (sources, freshness days), receipts and a version.
+2. They're generated automatically when a company name is entered, from the existing research
+   output (ideal-customer segments + targeting + playbook). No extra model call. For existing
+   workspaces (Pump, Vercel, Resolve reference), derive them deterministically from saved
+   output.
+3. ICPs are reviewed and approved with the seller profile (never auto-approved), and
+   editable/versioned in a new "ICP Studio" page.
+4. Discovery builds its queries per ICP x playbook trigger, and every query is visible (the
+   "Queries" tab). Every candidate stores matchedIcpId plus the reason it matched. Matched ICP
+   is a label and filter only. It is not a new fit gate.
+
+### B. Results
+1. Header: title, subtitle, actions "Save search", "Export" (local CSV download) and
+   "Find missing contacts" (Part C). No CRM button.
+2. Tabs: Companies, Contacts, Signals, Sources, Queries, Runs.
+3. Filter chip bar, each chip removable with "+" to add: ICPs, Funding, Hiring, Tech stack,
+   Geography, Sources, Query rules (freshness), Exclusions (with count). Signal-type chips
+   (Funding, Hiring, etc.) are generated from the seller's approved playbook, so each seller
+   only sees chips that apply to it. Nothing Resolve-specific.
+4. Search box; discovery-session pills (All sessions / Latest / each run date with counts);
+   status pills (All, Tier 1, Tier 2, Tier 3, Needs review, Approved, Blocked, Archived).
+5. Table columns: checkbox, Company (initials badge + domain), Matched ICP, Top signal, Score
+   badge, Tier, Evidence (N sources), Contact (Ready / Missing), Status.
+6. Saved searches are stored per workspace.
+
+### C. Priority leads and personas
+1. Left panel "Priority leads": sorted by urgency, fit and review status, with tier tabs and
+   counts. Each card shows the signal category label (small caps, e.g. RECENT FUNDING),
+   company, matched ICP and tier, a status chip (Contact path / Needs enrichment / Review
+   required) and the score.
+2. Right panel, account detail: "Find personas" uses Apollo mixed_people/api_search, filtered by
+   the playbook buyer roles and the matched ICP personas, max 10 people per account. Show name,
+   title and a LinkedIn link that opens externally. No email or phone reveal, no people/match,
+   no LinkedIn scraping.
+3. Fallback that always works and costs nothing: for each buyer role, a "Search on LinkedIn"
+   link (LinkedIn people-search URL built from title + company). The user clicks it; nothing is
+   fetched.
+4. Contact column = "Ready" when at least one persona with a LinkedIn link exists.
+5. Drafts: deterministic template drafts per persona, personalized by role + trigger, using the
+   existing validators and merge fields. Copy-only, no send path.
+6. Privacy: person data lives only in local app state (.whynow). Never in Git, fixtures, docs,
+   logs, committed screenshots, or caches beyond local state. Apollo key only from .env, never
+   logged. People search stays off by default with per-workspace call caps; its live check
+   needs my separate OK.
+
+### D. Interface and navigation
+1. One consistent design system: spacing, type scale, chips, badges, tables, cards, empty
+   states. No truncated labels (kill codes, workspace names, chips).
+2. Sidebar groups:
+   - Workspace switcher at the top.
+   - PIPELINE: Overview, New discovery, Results, Review queue.
+   - DATA: History, Runs, Funnel, Scorecard, Kill log, Exports, Metrics.
+   - SETUP: ICP Studio, Seller profile & playbook, Settings.
+   Keep the existing History, Runs, Funnel, Scorecard, Kill log and workspaces features.
+3. Remove clutter: merge duplicate pages, hide internal or debug text from main views, keep
+   receipts one click away.
+
+### Tests and verification
+- Full suite green. New tests for ICP derivation, query building per ICP x trigger, filters,
+  saved searches, people-search caps/privacy (fictional fixtures) and the LinkedIn fallback URL.
+- Browser-check every changed page at desktop width with fictional data.
+- Update BUILD-CHECKLIST and TRACEABILITY. Small commits, push, CI green.
+- Keep port 3000 running with providers disabled.
+
+Report the changes, show fictional screenshots of Results, Priority leads, ICP Studio and
+an account with personas, and propose one Apollo people search followed by at most ten
+requests per top Pump account. The proposal confers no live authorization.

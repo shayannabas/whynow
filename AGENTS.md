@@ -1,6 +1,6 @@
 # Current status — November 17, 2026
 
-The one-use Pump news-first run is exhausted. It used 80 Serper (55 News), 34 free HTTP and 10 Apollo organization requests, with zero OpenAI. After saved-evidence identity review, Pump has two Act now, 13 Needs review and one killed. No drafts passed. See [the batch report](docs/PUMP-PART-B-NEWS-FIRST.md). Preserve approvals, drafts and the active workspace. The persistent Serper monthly cap remains 300. Interface v2 is offline after the plan is committed. No provider calls or approvals are authorized.
+The one-use Pump news-first run is exhausted. It used 80 Serper (55 News), 34 free HTTP and 10 Apollo organization requests, with zero OpenAI. After saved-evidence identity review, Pump has two Act now, 13 Needs review and one killed. No drafts passed. See [the batch report](docs/PUMP-PART-B-NEWS-FIRST.md). Preserve approvals, drafts and the active workspace. The persistent Serper monthly cap remains 300. Interface v2 is authorized offline under [General Pipeline Plan §12](docs/GENERAL-PIPELINE-PLAN.md#12-interface-v2--icps). Apollo persona search is in scope for offline implementation and disabled by default. No provider calls or approvals are authorized.
 
 Offline default discovery and Today fallback are implemented. Apollo organization enrichment is independent of opt-in company search. Vercel’s HTTP 403 is recorded as a free-plan company-search limitation and the Vercel authorization is exhausted.
 
