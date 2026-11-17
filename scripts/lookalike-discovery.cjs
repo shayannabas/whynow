@@ -14,10 +14,23 @@ function derivePattern(customers=[]){
  if(!pattern.industries.length&&!pattern.countries.length&&!pattern.technologies.length&&!pattern.employeeRange)throw Error('Customer enrichment returned no usable pattern.');return pattern;
 }
 function classify(row,config){const text=[row.industry,...row.technologies].join(' ').toLowerCase(),ranked=config.segments.filter(s=>s.enabled!==false).map(s=>({key:s.key,count:[s.label,...s.subIndustries||[]].filter(x=>String(x).split(/\s+/).some(t=>t.length>=4&&text.includes(t.toLowerCase()))).length})).sort((a,b)=>b.count-a.count);return ranked[0]?.count&&ranked[0].count>(ranked[1]?.count||0)?{segment:ranked[0].key,confidence:.7,requiresReview:false,reason:'apollo_pattern_estimate'}:{segment:'unclassified',confidence:0,requiresReview:true,reason:'review_apollo_segment_estimate'};}
-async function runLookalike({read,mutate,workspaceId,runId,client,env={},now=()=>new Date(),id=()=>randomUUID()}){
- const initial=read().workspaces[workspaceId],config=phaseAConfigForWorkspace(initial),revision=initial.profileRevision,limits=apollo.settings(env),customers=config.customers.filter(c=>apollo.publicDomain(c.domain)).slice(0,limits.customerLimit);
+async function runLookalike({read,mutate,workspaceId,runId,client,env={},now=()=>new Date(),id=()=>randomUUID(),customerDomains=[],maxEnrichedCustomers}){
+ const initial=read().workspaces[workspaceId],config=phaseAConfigForWorkspace(initial),revision=initial.profileRevision,limits=apollo.settings(env),eligible=config.customers.filter(c=>apollo.publicDomain(c.domain));
+ const selected=customerDomains.length?customerDomains.map(domain=>{const row=eligible.find(c=>c.domain===domain);if(!row)throw Error('Every requested customer domain must already be confirmed in the approved profile.');return row;}):eligible;
+ const customers=[...new Map(selected.map(c=>[c.domain,c])).values()].slice(0,limits.customerLimit),target=Math.min(limits.customerLimit,Number.isInteger(maxEnrichedCustomers)&&maxEnrichedCustomers>0?maxEnrichedCustomers:limits.customerLimit);
  if(!customers.length)throw Error('Lookalike discovery needs approved customers with confirmed domains.');
- const enriched=[];for(const c of customers){const row=await client.enrich(workspaceId,runId,c.domain);if(row)enriched.push(row);}
+ const enriched=[];
+ const lookup=async(c,outcome,extra={})=>mutate(s=>{const run=s.workspaces[workspaceId].runs.find(r=>r.id===runId);run.customerLookups=[...(run.customerLookups||[]),{name:c.name,domain:c.domain,outcome,checkedAt:now().toISOString(),...extra}];return s;});
+ for(const c of customers){
+  try{const row=await client.enrich(workspaceId,runId,c.domain);if(row){enriched.push(row);await lookup(c,'found');}}
+  catch(error){
+   const notFound=error.code==='APOLLO_NOT_FOUND'&&error.status===200,mismatch=error.code==='APOLLO_DOMAIN_MISMATCH'&&error.status===200;
+   await lookup(c,notFound?'not_found':mismatch?'needs_domain_confirmation':'failed',{code:error.code||'APOLLO_FAILED',httpStatus:error.status||null,reason:notFound?'Not found in Apollo under this domain.':mismatch?'Apollo returned a different primary domain; owner confirmation is required.':'Apollo request failed or was refused.',...(mismatch&&sameEntity({name:c.name},{name:error.returnedName},config.entityRules)?{suggestedDomain:error.suggestedDomain,confirmed:false}:{})});
+   if(env.APOLLO_CONTINUE_NOT_FOUND!=='true'||(!notFound&&!mismatch))throw error;
+  }
+  if(enriched.length>=target)break;
+ }
+
  const pattern=derivePattern(enriched);
  await mutate(s=>{const run=s.workspaces[workspaceId].runs.find(r=>r.id===runId);run.pattern=pattern;return s;});
  const found=await client.search(workspaceId,runId,pattern);

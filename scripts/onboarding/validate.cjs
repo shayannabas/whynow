@@ -410,7 +410,7 @@ function materializeGeneratedDraft(state,workspace,output,{organizationReview,no
     const item=evidenceFor(state,workspace,raw,value,context), index=profile.proofPoints.length;
     profile.proofPoints.push({claim:value,...item});evidence[`proofPoints.${index}`]=item;count(item);
   }
-  if(output.icpConfig.playbook)profile.playbook=require('../playbook.cjs').draftPlaybook(output.icpConfig.playbook,Object.fromEntries([...context].map(([id,r])=>[id,{id,sourceId:r.sourceId,sourceUrl:r.source.url||r.url,evidenceQuote:r.evidenceQuote}])),now());
+  if(output.icpConfig.playbook)profile.playbook=require('../playbook.cjs').draftPlaybook(output.icpConfig.playbook,Object.fromEntries([...context].map(([id,r])=>[id,{id,sourceId:r.sourceId,sourceUrl:r.source.url||r.url,evidenceQuote:r.evidenceQuote}])),now(),1,{sellerProfile:profile});
   profile.customers=[];
   const seenCustomers=new Set();
   for(const raw of output.sellerProfile.customers) {

@@ -4,6 +4,24 @@ const SOURCES=['ats_jobs','news','apollo_firmographic','statuspage','sec','other
 const STRENGTHS=['strong','medium','weak'];
 const digest=p=>crypto.createHash('sha256').update(JSON.stringify({buyerRoles:p.buyerRoles,triggers:p.triggers,antiTriggers:p.antiTriggers,receipts:p.receipts})).digest('hex');
 const list=value=>Array.isArray(value)&&value.every(x=>typeof x==='string'&&x.trim()&&x.length<=300);
+function allowedPolicyNames(workspace={}){
+ const p=workspace.sellerProfile||{},names=[p.sellerName,p.name,p.sellerName?.split(':')[0]];
+ if(p.approvedAt){
+  names.push(...(p.competitors||[]).map(c=>typeof c==='string'?c:c.name));
+  names.push(...(p.productNames||[]),...(p.products||[]).map(x=>typeof x==='string'?x:x.name));
+  // Named products from the owner's approved product description only.
+  names.push(...(p.productOneLiner||'').match(/\b[A-Z][A-Za-z0-9.]*(?:[ \t]+[A-Z][A-Za-z0-9.]*)*/g)||[]);
+ }
+ return [...new Set(names.filter(name=>typeof name==='string'&&name.trim()&&/^[\p{L}\p{N} .:+/'-]+$/u.test(name)).map(name=>name.trim()))].sort((a,b)=>b.length-a.length);
+}
+function withoutAllowedNames(text,workspace){
+ let result=text;
+ for(const name of allowedPolicyNames(workspace)){
+  const escaped=name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+');
+  result=result.replace(new RegExp(`(?<![A-Za-z0-9])${escaped}(?![A-Za-z0-9])`,'gi'),' allowedname ');
+ }
+ return result.replace(/(?<![A-Za-z0-9])(?:SOC\s*2|ISO\s*27001|PCI\s+DSS|HIPAA|GDPR)(?![A-Za-z0-9])/gi,' standard ');
+}
 function draftSchema(){
  const strings={type:'array',items:{type:'string',minLength:1,maxLength:300},maxItems:40};
  const object=properties=>({type:'object',additionalProperties:false,properties,required:Object.keys(properties)});
@@ -14,7 +32,7 @@ function receiptsForWorkspace(state,workspace){
  if(workspace.referenceDemo?.loadOnly&&!workspace.research){const domain=workspace.sellerProfile?.domain;workspace={...workspace,research:{sourceIds:Object.values(state.sources||{}).filter(source=>{try{return new URL(source.url).hostname.replace(/^www\./,'')===domain;}catch{return false;}}).map(source=>source.id)}};}
  try{return Object.fromEntries([...require('./onboarding/validate.cjs').buildReceiptEvidence(state,workspace).receiptMap].map(([id,r])=>[id,{id,sourceId:r.sourceId,sourceUrl:r.source.url||r.url,evidenceQuote:r.evidenceQuote}]));}catch{return {};}
 }
-function validatePlaybook(p={},receipts=p.receipts||{}){
+function validatePlaybook(p={},receipts=p.receipts||{},workspace={}){
  const warnings=[],add=(path,code,message)=>warnings.push({path,code,message,severity:'blocking'});
  if(!p.buyerRoles||!['economicBuyer','champion','endUser'].every(k=>Array.isArray(p.buyerRoles[k])&&(p.buyerRoles[k].length===0||list(p.buyerRoles[k]))))add('buyerRoles','BUYER_ROLES','Enter buyer, champion and end-user title lists.');
  if(!p.buyerRoles?.economicBuyer?.length||!p.buyerRoles?.champion?.length)add('buyerRoles','MISSING_BUYERS','At least one economic buyer and champion title is required.');
@@ -36,7 +54,7 @@ function validatePlaybook(p={},receipts=p.receipts||{}){
  for(const [group,rows] of [['triggers',p.triggers],['antiTriggers',p.antiTriggers]])for(const [i,t] of (Array.isArray(rows)?rows:[]).entries()){
   if(!list(t.receiptIds)||!t.receiptIds.length)add(`${group}.${i}.receiptIds`,'RECEIPT_REQUIRED','Choose at least one saved seller receipt.');
   for(const id of t.receiptIds||[]){const r=receipts[id];if(!r?.sourceUrl||!r?.evidenceQuote||!r.sourceId)add(`${group}.${i}.receiptIds`,'UNKNOWN_RECEIPT','This receipt is not in the saved seller evidence.');}
-  const prose=[t.label,t.whyItMatters,t.messageAngle,t.rule,...(Array.isArray(t.keywords)?t.keywords:[])].filter(Boolean).join(' ');
+  const prose=withoutAllowedNames([t.label,t.whyItMatters,t.messageAngle,t.rule,...(Array.isArray(t.keywords)?t.keywords:[])].filter(Boolean).join(' '),workspace);
   // Targeting policies may not smuggle in metrics, contacts or named prospect facts.
   if(/\d|[%$€£@]|https?:\/\//.test(prose))add(`${group}.${i}`,'FACTUAL_PLAYBOOK_CLAIM','Keep policy explanations free of metrics, contact details and external claims; use saved receipts.');
   const allowed=(t.receiptIds||[]).map(id=>receipts[id]?.evidenceQuote||'').join(' ').toLowerCase();
@@ -48,11 +66,11 @@ function validatePlaybook(p={},receipts=p.receipts||{}){
  }
  return warnings;
 }
-function draftPlaybook(raw,receipts={},now=new Date().toISOString(),revision=1){
+function draftPlaybook(raw,receipts={},now=new Date().toISOString(),revision=1,workspace={}){
  const p={schemaVersion:1,version:revision,status:'needs_review',approvedAt:null,updatedAt:now,buyerRoles:structuredClone(raw?.buyerRoles||{economicBuyer:[],champion:[],endUser:[]}),triggers:structuredClone(raw?.triggers||[]),antiTriggers:structuredClone(raw?.antiTriggers||[]),receipts:structuredClone(receipts)};
- p.warnings=validatePlaybook(p);return p;
+ p.warnings=validatePlaybook(p,p.receipts,workspace);return p;
 }
-function approvedPlaybook(workspace={}){const p=workspace.sellerProfile?.playbook;return p?.status==='approved'&&p.approvedAt&&p.approvedDigest===digest(p)&&!validatePlaybook(p).length?p:null;}
+function approvedPlaybook(workspace={}){const p=workspace.sellerProfile?.playbook;return p?.status==='approved'&&p.approvedAt&&p.approvedDigest===digest(p)&&!validatePlaybook(p,p.receipts,workspace).length?p:null;}
 function legacyResolvePlaybook(workspace={},receipts={}){
  if(!workspace.referenceDemo?.loadOnly)return null;
  const c=workspace.icpConfig||{},roles=c.personas||{},mapping=c.triggerMapping||{},sla=c.slaDays||{};
@@ -66,11 +84,11 @@ function reviewPlaybook(state,id,{action,revision,profileRevision,raw,acknowledg
  if(Number(profileRevision)!==Number(w.profileRevision||0))throw Error('The seller profile changed. Refresh before reviewing its playbook.');
  const prior=w.sellerProfile.playbook;if(Number(revision)!==Number(prior?.version||0))throw Error('The playbook changed. Refresh and try again.');
  const receipts=receiptsForWorkspace(state,w);
- if(action==='save')w.sellerProfile.playbook=draftPlaybook(raw,receipts,now,(prior?.version||0)+1);
+ if(action==='save')w.sellerProfile.playbook=draftPlaybook(raw,receipts,now,(prior?.version||0)+1,w);
  else if(action==='approve'){
   if(!acknowledged)throw Error('Confirm that you reviewed this saved playbook and its receipts.');
   if(!prior)throw Error('Save the playbook before approving it.');
-  const warnings=validatePlaybook(prior,receipts);if(warnings.length)throw Error('Fix the blocking playbook warnings before approval.');
+  const warnings=validatePlaybook(prior,receipts,w);if(warnings.length)throw Error('Fix the blocking playbook warnings before approval.');
   const selected=new Set([...(prior.triggers||[]),...(prior.antiTriggers||[])].flatMap(t=>t.receiptIds||[]));
   if([...selected].some(key=>JSON.stringify(prior.receipts?.[key])!==JSON.stringify(receipts[key])))throw Error('Seller receipts changed. Save and review the playbook again.');
   w.sellerProfile.playbook={...prior,status:'approved',approvedAt:now,approvedDigest:digest(prior)};
@@ -78,4 +96,4 @@ function reviewPlaybook(state,id,{action,revision,profileRevision,raw,acknowledg
  if(action==='approve'&&(w.status==='active'||w.referenceDemo?.loadOnly)){const config=require('./phase-a-config.cjs').phaseAConfigForWorkspace(w);w.accounts=w.accounts.map(a=>require('./score-account.cjs').scoreAccount(a,config,new Date(now)));}
  next.auditLog.push({schemaVersion:1,type:action==='save'?'playbook_saved':'playbook_approved',workspaceId:id,occurredAt:now,playbookVersion:w.sellerProfile.playbook.version,profileRevision:w.profileRevision||0,actor:'owner'});return next;
 }
-module.exports={SOURCES,STRENGTHS,digest,draftSchema,receiptsForWorkspace,validatePlaybook,draftPlaybook,approvedPlaybook,legacyResolvePlaybook,reviewPlaybook};
+module.exports={SOURCES,STRENGTHS,digest,draftSchema,receiptsForWorkspace,validatePlaybook,draftPlaybook,approvedPlaybook,legacyResolvePlaybook,reviewPlaybook,allowedPolicyNames};
