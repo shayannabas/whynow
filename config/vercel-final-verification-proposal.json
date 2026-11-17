@@ -1,17 +1,75 @@
 {
-  "status": "proposal_only_not_authorized",
+  "status": "owner_authorized_saved_approvals_verified",
   "batchId": "vercel-final-verification-one-use",
   "sellerDomain": "vercel.com",
   "customerOrder": [
-    {"name": "The Weather Company", "domain": "weathercompany.com", "basis": "Owner checked Apollo primary domain; requires confirmation in the seller profile"},
-    {"name": "Rogo", "domain": "rogo.com", "basis": "Owner checked Apollo primary domain; suggest replacing rogo.ai only after owner confirmation"},
-    {"name": "Sensay", "domain": "sensay.io", "basis": "Domain already saved in the approved seller profile; Apollo matching unverified"},
-    {"optional": true, "name": "Stripe", "domain": "stripe.com", "basis": "Existing saved name-matched domain suggestion; optional fallback after owner confirmation"}
+    {
+      "name": "The Weather Company",
+      "domain": "weathercompany.com",
+      "basis": "Owner checked Apollo primary domain; requires confirmation in the seller profile"
+    },
+    {
+      "name": "Rogo",
+      "domain": "rogo.ai",
+      "basis": "Owner explicitly retained the approved rogo.ai domain for the final run; never substitute rogo.com automatically"
+    },
+    {
+      "name": "Sensay",
+      "domain": "sensay.io",
+      "basis": "Domain already saved in the approved seller profile; Apollo matching unverified"
+    },
+    {
+      "optional": true,
+      "name": "Stripe",
+      "domain": "stripe.com",
+      "basis": "Existing saved name-matched domain suggestion; optional fallback after owner confirmation"
+    }
   ],
   "targetUsableCustomers": 3,
-  "caps": {"apolloAttempts": 5, "enrichmentAttempts": 4, "searchAttempts": 1, "searchPages": 1, "perPage": 25, "apolloRetries": 0, "apolloRobotsChecks": 1, "serperQueries": 30, "candidateChecks": 25, "serperQueriesPerCandidate": 1, "followupQueries": 5, "openaiCalls": 0, "openaiUsd": 0, "templateDrafts": 25},
-  "freeSourceCaps": {"greenhouse": 20, "lever": 20, "ashby": 20, "hn": 40, "engineering_web": 20, "robots": 30},
-  "stopOn": ["any HTTP error including 429", "API refusal even with HTTP 200", "unexpected paid credits", "changed profile or playbook approval", "hard budget limit"],
-  "continueOn": ["HTTP 200 with no organization: save not-found reason and try next approved confirmed customer", "different returned primary domain: save suggestion only; do not use it without owner confirmation"],
-  "excluded": ["OpenAI", "people/contact endpoints", "paid credits or upgrades", "GDELT", "SEC", "Wikidata", "Statuspage", "sending", "automatic approval"]
+  "caps": {
+    "apolloAttempts": 5,
+    "enrichmentAttempts": 4,
+    "searchAttempts": 1,
+    "searchPages": 1,
+    "perPage": 25,
+    "apolloRetries": 0,
+    "apolloRobotsChecks": 1,
+    "serperQueries": 30,
+    "candidateChecks": 25,
+    "serperQueriesPerCandidate": 1,
+    "followupQueries": 5,
+    "openaiCalls": 0,
+    "openaiUsd": 0,
+    "templateDrafts": 25
+  },
+  "freeSourceCaps": {
+    "greenhouse": 20,
+    "lever": 20,
+    "ashby": 20,
+    "hn": 40,
+    "engineering_web": 20,
+    "robots": 30
+  },
+  "stopOn": [
+    "any HTTP error including 429",
+    "API refusal even with HTTP 200",
+    "unexpected paid credits",
+    "changed profile or playbook approval",
+    "hard budget limit"
+  ],
+  "continueOn": [
+    "HTTP 200 with no organization: save not-found reason and try next approved confirmed customer",
+    "different returned primary domain: save suggestion only; do not use it without owner confirmation"
+  ],
+  "excluded": [
+    "OpenAI",
+    "people/contact endpoints",
+    "paid credits or upgrades",
+    "GDELT",
+    "SEC",
+    "Wikidata",
+    "Statuspage",
+    "sending",
+    "automatic approval"
+  ]
 }

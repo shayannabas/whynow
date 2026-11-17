@@ -1,6 +1,6 @@
 # Vercel final verification — proposal only
 
-Date: November 16, 2026. **Not authorized, not run.** The earlier Phase2 batch remains used/exhausted. No provider call or approval was made during this offline follow-up.
+Date: November 16, 2026. The owner has now authorized this one final run, retaining Rogo/rogo.ai. Execution still requires the actual saved seller/playbook approvals; no batch marker is consumed before that preflight succeeds. The proposal below records its original review checkpoint. **Not run yet.** The earlier Phase2 batch remains used/exhausted. No provider call or approval was made during this offline follow-up.
 
 ## Offline fixes and current review state
 
@@ -36,7 +36,7 @@ No approved customer domain changes automatically. An optional bounded fallback 
 | Order | Customer | Proposed domain | Before execution |
 | --- | --- | --- | --- |
 | 1 | The Weather Company | weathercompany.com | Owner confirms domain and profile approval; saved domain currently blank |
-| 2 | Rogo | rogo.com | Owner confirms correction; existing rogo.ai remains unchanged |
+| 2 | Rogo | rogo.ai | Owner explicitly retained this saved domain for the authorized run; record not-found if it misses, never substitute rogo.com |
 | 3 | Sensay | sensay.io | Already in the approved profile; Apollo matching not yet tested |
 | 4, optional fallback | Stripe | stripe.com | Existing saved suggestion only; skip unless owner confirms it |
 
