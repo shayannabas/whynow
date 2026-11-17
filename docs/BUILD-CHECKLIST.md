@@ -1,3 +1,12 @@
+# November 17 — Interface v2
+
+- [x] Commit the [Interface v2 specification](GENERAL-PIPELINE-PLAN.md#12-interface-v2--icps) before writing code.
+- [x] Derive ICPs from saved segments, targeting and playbooks. Review and version them in ICP Studio. Use linked ICP and trigger rules to build and label discovery queries.
+- [x] Results tabs, filters, discovery sessions, saved searches and company-only CSV. Priority leads uses existing queues and scores.
+- [x] Personas in the account brief, including the LinkedIn role-search fallback and local, copy-only drafts. Apollo people search implemented offline and disabled with a zero monthly cap.
+- [x] Desktop verification at 1440 × 1000 with fictional companies and people. Four screenshots saved under the ignored `.internal/interface-v2/` directory.
+- [x] Full suite: 92 files, 468 tests passed, one existing skip. CI passed on `8da8014`. Local port 3000 serves the new interface with providers disabled. [Verification and live-test proposal](INTERFACE-V2-VERIFICATION.md)
+
 # November 17 — Pump news-first discovery
 
 - [x] Date-filter News and ATS searches, prioritize News and retain identity and access failures.

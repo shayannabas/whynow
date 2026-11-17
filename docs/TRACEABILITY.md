@@ -1,5 +1,18 @@
 # WhyNow traceability
 
+
+## Interface v2 and ICPs — November 17
+
+| Requirement | Implementation | Verification |
+| --- | --- | --- |
+| Versioned ICPs and existing-workspace compatibility | `scripts/icps.cjs`, onboarding profile and playbook save paths, `/icp-studio` | `tests/icps.test.mjs` verifies deterministic derivation, pending edits, approved fallback and clearance by owner action |
+| ICP × playbook trigger discovery and query history | `scripts/trigger-first-discovery.cjs`, `scripts/trigger-first-runner.cjs`, `scripts/discovery-runner.cjs` | Fictional News and ATS query coverage and query windows. Resolve parity tests still pass. Match metadata is descriptive. |
+| Results, local export and review queue | `scripts/server/results.cjs`, `scripts/server/targeting-pages.cjs`, `/results`, `/review-queue`, `/exports` | `tests/interface-v2.test.mjs` and route integration cover multi-filter selection, workspace saved searches, CSV formula escaping, safe company-only export and planned queries |
+| Company personas and copy-only drafts | `scripts/collectors/apollo-people.cjs`, guarded runtime, `scripts/server/personas-page.cjs` | Fictional API payload exercises one page, ten rows, local-only retained fields, no response cache, approved role intersection, cap exhaustion, disabled lookup, LinkedIn URL safety and a validator-passing merge-field draft |
+| Desktop UI and providers disabled | Sidebar, existing account detail, `/settings` | Fictional 1440 × 1000 browser check. Existing routes checked. Port 3000 confirmed serving the current app with all provider switches disabled. |
+
+Full suite: 92 files, 468 passed and one existing skip. [Verification and proposal](INTERFACE-V2-VERIFICATION.md). [Pump news-first results](PUMP-PART-B-NEWS-FIRST.md) are a separate, exhausted authorization.
+
 ## Final Vercel verification — November16, one-use exhausted
 
 `run-final-vercel-verification.cjs` adds saved-approval/digest guards before consuming a marker, per-workspace persistent counter reservations, one shared transport cap/fatal latch, no retries and explicit refusal handling even onHTTP200. It combines approved news keywords within Serper's500-character limit; uses first-party ATS board links, existing classification/scoring and template validators; preserves prior data and never changes activeWorkspaceId. Seven fictional-response tests include missing-approval/non-consumption, single-use, exact search shape, strict HTTP/JSON refusal stops and blocked templates.
