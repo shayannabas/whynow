@@ -24,10 +24,10 @@ function responseDiagnostics(payload,{headers,status,key=''}={}){
   if(Object.keys(keptHeaders).length>=30)break;keptHeaders[name]=(!key||!value.includes(key))&&/^[0-9.,;:= +\-]+$/.test(value)?value.slice(0,400):safeText(value,key);
  }
  const fields=errorFields(payload,key),rawText=[];
- const collect=(obj,depth=0)=>{if(!obj||typeof obj!=='object'||depth>3)return;for(const[name,value]of Object.entries(obj).slice(0,100)){if(!/error|message|^(?:code|reason|description)$/i.test(name))continue;if(typeof value==='string')rawText.push(value);else if(value&&typeof value==='object')collect(value,depth+1);}};collect(payload);
+ const collect=(obj,depth=0)=>{if(!obj||typeof obj!=='object'||depth>3)return;if(Array.isArray(obj)){for(const value of obj.slice(0,5)){if(typeof value==='string')rawText.push(value);else collect(value,depth+1);}return;}for(const[name,value]of Object.entries(obj).slice(0,100)){if(!/error|message|^(?:code|reason|description)$/i.test(name))continue;if(typeof value==='string')rawText.push(value);else if(value&&typeof value==='object')collect(value,depth+1);}};collect(payload);
  const text=rawText.join(' ').toLowerCase(),notFound=/not[ _-]?found|no (?:matching )?organization|could not find/.test(text);
  const hasError=!!(payload?.error||payload?.error_code||(Array.isArray(payload?.errors)&&payload.errors.length)||payload?.status==='error');
- const refusal=/access.*denied|not.*accessible|forbidden|unauthorized|invalid.*key|work.*email|upgrade|insufficient|permission.*required/.test(text)||Boolean((text.trim()||hasError)&&!notFound);
+ const refusal=/access.*denied|not.*accessible|forbidden|unauthorized|invalid.*key|work.*email|upgrade|insufficient|permission.*required/.test(text)||Boolean((hasError||(!payload?.organization&&!Array.isArray(payload?.organizations)&&text.trim()))&&!notFound);
  const creditUsage={};for(const field of ['credits_used','credits_consumed','paid_credits_used','cost_usd']){const value=payload?.[field]??payload?.usage?.[field];if(typeof value==='number'&&Number.isFinite(value)&&value>=0)creditUsage[field]=value;}
  return {httpStatus:Number.isInteger(status)?status:null,topLevelKeys:payload&&typeof payload==='object'&&!Array.isArray(payload)?Object.keys(payload).slice(0,100).map(name=>(!key||!name.includes(key))&&/^[A-Za-z_][A-Za-z0-9_]{0,79}$/.test(name)?name:'[redacted key]'):[],errorFields:fields,headers:keptHeaders,refusal,notFound,creditUsage};
 }

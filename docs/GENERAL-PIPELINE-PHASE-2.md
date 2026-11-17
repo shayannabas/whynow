@@ -2,6 +2,10 @@
 
 Status: authorization used and exhausted. Do not repeat this batch, including its unused allowance. No profile or playbook was approved.
 
+## Owner follow-up and offline correction
+
+The owner subsequently checked Apollo's web app: Rogo's primary domain is rogo.com, the Weather Company's is weathercompany.com; the failed lookup consumed0 credits and the balance stayed95/95. This identifies the miss as a domain mismatch, not evidence of an access problem. Those domains are suggestions requiring owner confirmation, not automatic profile changes. Offline revalidation later reduces the playbook warnings4→2. See [offline fixes and final proposal](VERCEL-FINAL-VERIFICATION-PLAN.md). The original one-use run observations below are retained as historical records; no call was repeated.
+
 ## Apollo access result
 
 - Exactly one api.apollo.io robots.txt check returned HTTP200 and allowed both authorized API paths. Existing DNS/private-address, robots, redirect, pacing and response guards remained active.

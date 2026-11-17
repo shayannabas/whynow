@@ -1,3 +1,18 @@
+# November 16 — offline corrections and final-run proposal
+
+- [x] Narrow playbook name/compliance exceptions with positive/negative fictional tests; preserve every other rule. Saved Vercel v1 revalidated without regeneration or content/version/approval changes:4→2 blocking warnings, t6/t7 unsupported-name sequences remain.
+- [x] Missing timing collectors show a non-blocking note and never contribute evidence. Vercel t7/other has one advisory; Apollo firmographic snapshots also cannot become timing events.
+- [x] Safe Apollo diagnostics: top-level keys, redacted error/message fields, rate/credit headers, company-only cache sanitation; empty200, refusal, format variants and secret/contact redaction tested.
+- [x] Owner-supplied diagnosis recorded: Rogo/rogo.com, Weather Company/weathercompany.com; failed lookup0 credits,95/95 remaining. No new API verification or domain change.
+- [x] Bounded not-found fallback retains per-customer reasons; any HTTP error/refusal stops. Corrected domains are suggestions only, never applied automatically.
+- [x] Provider-free [final proposal](VERCEL-FINAL-VERIFICATION-PLAN.md): Weather Company first, max5 Apollo attempts (4 enrich+1 search/page1/per_page25),0 retries,30 Serper queries,150 maximum free-source requests within existing budgets,0 OpenAI, templates only. Optional Stripe fallback requires confirmation.
+- [ ] Future execution: NOT AUTHORIZED. Requires owner OK, confirmed Weather Company/Rogo domains and fresh approved seller/playbook. Previous Phase2 remains exhausted.
+- [x] Full offline suite86 files:429 passed/1 existing skip. [Full output](NOV16-OFFLINE-FIXES-TESTS.txt). Vercel seller/Resolve/drafts/.env preserved, local port3000 kept providers-disabled.
+
+Change log — Nov16 offline follow-up: corrected validator exceptions and diagnostics, retained unmatched-domain outcomes, prepared a guarded proposal. No provider call or approval.
+
+## Earlier one-use batch (historical)
+
 # Vercel Phase 2 — one-use checkpoint, November 16, 2026
 
 - [x] Record owner authorization and commit offline-tested one-use controls before network access (`14c42d1`).

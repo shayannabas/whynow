@@ -1,5 +1,17 @@
 # WhyNow traceability
 
+## November16 offline follow-up — no provider calls
+
+`playbook.cjs` adds workspace-derived seller/approved-product/competitor vocabulary and the five named compliance standards. Generation, save, review and approved-policy reads pass the same context. Other receipt, role, numeric, entity, freshness and strength rules remain. `revalidate-playbook.cjs` updates derived metadata only: Vercel v1 policy digest, version and needs_review status unchanged; four blockers reduce to two existing combined-name warnings (t6/t7). No approval.
+
+`playbook-sources.cjs` distinguishes implemented event collectors from absent ones. Profile fields show advisory notes for other/apollo_firmographic, and `playbook-timing.cjs` rejects those source rules rather than counting manual/history receipts. Approval remains independent from this non-blocking source note.
+
+`collectors/apollo-diagnostics.cjs` retains safe structural/error/rate/credit metadata and sanitized company-only responses; runtime transformation gets HTTP/header context before cache writes. Company client persists run diagnostics, distinguishes not-found/domain correction/refusal/unusable search and supports zero-retry final-run settings. `lookalike-discovery.cjs` optionally continues only200 not-found/mismatch outcomes, records lookup reasons and unconfirmed correction suggestions, and otherwise stops. It never changes customer domains.
+
+`prepare-vercel-final-verification.cjs` and its proposal config are provider-free and require a new owner OK, approved playbook and confirmed approved-profile seed domains. Weather Company/weathercompany.com first (owner checked Apollo), then proposed corrected Rogo, existing Sensay and optional confirmed Stripe. Exact proposal:5 Apollo attempts,1 search/page1/per_page25,0 retries,30 Serper,150 free-source maximum,0 OpenAI, existing scoring/tiers/eligibility and template-only drafts. No run started; old batch remains exhausted. [Plan, remaining warnings and limits](VERCEL-FINAL-VERIFICATION-PLAN.md).
+
+Three new test files cover fictional positive/negative cases, unsupported-source exclusion, empty200 diagnostics, privacy, refusals, domain fallback/suggestions and authorization/approval guards. Full suite86 files,429 pass/1 existing skip. [Output](NOV16-OFFLINE-FIXES-TESTS.txt). Owner's0-credit/domain diagnosis is attributed; it is not fabricated API telemetry. Vercel seller fields/approval/revision5, Resolve, drafts and .env are preserved; port3000 providers-disabled.
+
 ## General pipeline v5 Phase 2 — one-use Vercel verification, 2026-11-16
 
 `run-phase2-vercel-nov16.cjs` commits explicit owner limits, consumes an exclusive marker and durable audit/run record before requests, applies a fixed destination/attempt guard over the existing guarded runtime, sanitizes organization response fields before caching, and restores child-process flags in finally. `phase2-vercel-batch.test.mjs` adds seven offline fictional-response tests for robots denial, refused StepA, no duplicate enrichment, page1/per_page25, 429 counting, reported paid-cost stop, one-use replay rejection and incomplete OpenAI usage/no retry. Whole suite:83 files,416 pass/1 intentional skip.
