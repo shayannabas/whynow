@@ -108,4 +108,44 @@ const WHY_NOW_CSS = `
 @media(max-width:760px){.ss-page .ss-table td:first-child{display:block}}
 `;
 
-module.exports = `${designTokensCss()}${APP_CSS}${WHY_NOW_CSS}`;
+const INTERFACE_CSS = `
+.v2-page{display:grid;gap:18px}
+.v2-page .ss-header{margin:0;align-items:flex-start;gap:18px}
+.v2-actions,.v2-tabs,.v2-chips,.v2-filterbar,.v2-search,.v2-review-form{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.v2-surface{display:grid;gap:14px;min-width:0}
+.v2-tabs{padding-bottom:12px;border-bottom:1px solid var(--line)}
+.v2-tabs .v2-chip{font-size:13px;font-weight:750}
+.v2-chip{display:inline-block;min-height:30px;padding:6px 11px;border:1px solid var(--line);border-radius:20px;color:var(--ink-2);font-size:12px;font-weight:700;overflow-wrap:anywhere;text-decoration:none;background:var(--surface)}
+.v2-chip:hover,.v2-chip.selected{border-color:var(--accent-border);background:var(--accent-soft);color:var(--accent-strong)}
+.v2-filterbar{align-items:flex-start;justify-content:space-between}
+.v2-search input{min-width:min(265px,100%);max-width:100%}
+.v2-pop{position:relative}
+.v2-pop summary{cursor:pointer;list-style:none}
+.v2-pop form{position:absolute;inset-inline-end:0;z-index:8;min-width:225px;padding:12px;display:grid;gap:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow-md)}
+.v2-pop label,.v2-fields label,.v2-persona-form label{display:grid;gap:4px;font-size:12px;color:var(--ink-2);font-weight:700}
+.v2-company{display:flex;gap:9px;align-items:center;min-width:135px;color:var(--ink);text-decoration:none}
+.v2-company small,.v2-lead small{display:block;color:var(--ink-2);font-size:11px}
+.v2-initials{display:grid;place-items:center;width:33px;height:33px;flex:0 0 33px;background:var(--accent-soft);color:var(--accent-strong);border-radius:9px;font-size:12px;font-weight:750}
+.v2-table a{overflow-wrap:anywhere}
+.v2-page .ss-badge,.v2-page .tier-chip{white-space:normal;overflow-wrap:anywhere;max-width:100%}
+.v2-lead-list{display:grid;gap:8px;margin-top:12px}
+.v2-lead{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px;border:1px solid var(--line);border-radius:10px;color:var(--ink);text-decoration:none}
+.v2-lead>span{display:grid;gap:4px;justify-items:start;overflow-wrap:anywhere}
+.v2-lead small{color:var(--accent-strong);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.v2-lead.selected,.v2-lead:hover{border-color:var(--accent-border);background:var(--accent-soft)}
+.v2-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:12px}
+.v2-fields textarea{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;resize:vertical}
+.v2-icp form{display:grid;gap:14px;margin-top:12px}
+.v2-rules{display:grid;gap:8px;border:1px solid var(--line);border-radius:10px}
+.v2-trigger-rule{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:5px;border-bottom:1px solid var(--line)}
+.v2-trigger-rule input[type=number]{width:85px}
+.v2-icp details{margin-top:12px}
+.v2-personas .work-persona p{margin:0}
+.v2-persona-form{display:grid;gap:7px;margin-top:8px}
+.v2-role-list{display:grid;gap:8px}
+.v2-role-list li{display:flex;gap:10px;flex-wrap:wrap}
+.v2-settings{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;max-width:450px}
+.nav a,.workspace-full-name,.sidebar-footer span,.kill-item,.ss-badge{white-space:normal;overflow-wrap:anywhere}
+`;
+
+module.exports = `${designTokensCss()}${APP_CSS}${WHY_NOW_CSS}${INTERFACE_CSS}`;

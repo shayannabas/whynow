@@ -15,7 +15,7 @@ function workspaceState(accounts = []) {
 describe('WhyNow Reference UI shell', () => {
   it('renders the grouped route navigation and active Results route', () => {
     const html = shell(defaultState(), '<h1>Results</h1>', 'Results', '/results');
-    expect(html).toContain('class="nav-section-label">Work</div>');
+    expect(html).toContain('class="nav-section-label">Data</div>');
     expect(html).toContain('class="nav-section-label">Pipeline</div>');
     expect(html).toContain('href="/results" class="active" aria-current="page"');
     expect(html).toContain('href="/history"');
@@ -25,9 +25,9 @@ describe('WhyNow Reference UI shell', () => {
     expect(html).toContain('data-mobile-nav-toggle');
   });
 
-  it('marks account detail as active under Accounts', () => {
+  it('marks account detail as active under Results', () => {
     const html = shell(defaultState(), '<span class="eyebrow">Chunk 3 · account detail</span>', 'Acme');
-    expect(html).toContain('href="/accounts" class="active" aria-current="page"');
+    expect(html).toContain('href="/results" class="active" aria-current="page"');
   });
 
   it('shows overview metrics from saved workspace accounts only', () => {

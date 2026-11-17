@@ -11,7 +11,7 @@ const minute=60000,hour=60*minute,day=24*hour;
 const DEFAULT_BUDGETS=Object.freeze(Object.fromEntries([
   ['statuspage',30,350,15*minute,10000],['greenhouse',20,500,6*hour,12000,16*1024*1024],['lever',20,500,6*hour,12000,16*1024*1024],['ashby',20,500,6*hour,12000,16*1024*1024],
   ['hn',40,400,hour,10000],['google_news_rss',20,750,30*minute,12000],['serper',150,500,6*hour,15000],
-  ['apollo',20,1000,0,15000],['wikidata',60,250,7*day,12000],['gdelt',5,5500,15*minute,20000],
+  ['apollo',20,1000,0,15000],['apollo_people',1,1000,0,15000],['wikidata',60,250,7*day,12000],['gdelt',5,5500,15*minute,20000],
   ['edgar_index',4,400,6*hour,15000],['edgar_search',12,400,6*hour,15000],['edgar_filing',8,400,30*day,15000],
   ['engineering_web',20,1500,12*hour,12000],
   ['seller_site',25,1000,day,12000],['seller_customers',2,2000,30*day,12000],['robots',30,500,day,8000]
@@ -108,6 +108,7 @@ class CollectorRuntime {
     if(!Object.hasOwn(this.budgets,source))throw new CollectorHttpError('UNKNOWN_SOURCE','Unknown collector source');
     if(source==='serper' && !['https://google.serper.dev/search','https://google.serper.dev/news'].includes(new URL(value).href))throw new CollectorHttpError('UNSAFE_URL','Search API destination is fixed');
     if(source==='apollo'&&(new URL(value).origin!=='https://api.apollo.io'||!['/api/v1/organizations/enrich','/api/v1/mixed_companies/search'].includes(new URL(value).pathname)))throw new CollectorHttpError('UNSAFE_URL','Apollo company destination is fixed');
+    if(source==='apollo_people'&&value!=='https://api.apollo.io/api/v1/mixed_people/api_search')throw new CollectorHttpError('UNSAFE_URL','Apollo persona destination is fixed');
     const execute=async()=>{
       try {
         const result=await this.perform(source,value,options,0);
@@ -145,7 +146,7 @@ class CollectorRuntime {
     }
     const budget=this.budgets[source], usage=this.usage[source];
     const cacheFile=path.join(this.cacheDir,`${stableId(JSON.stringify([source,url.href,options.method||'GET',options.body||'']))}.json`),ttlMs=Number(options.cacheTtlMs)||budget.ttlMs;
-    try {
+    if(source!=='apollo_people')try {
       const cached=JSON.parse(fs.readFileSync(cacheFile,'utf8'));
       if(cached.schemaVersion===1 && cached.url===url.href && typeof cached.text==='string' && this.now()>=cached.savedAt && this.now()-cached.savedAt<ttlMs) {usage.cacheHits++;return {...cached,fromCache:true};}
     } catch(error) {if(error.code!=='ENOENT' && !(error instanceof SyntaxError))throw error;}
@@ -172,7 +173,7 @@ class CollectorRuntime {
         new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new CollectorHttpError('TIMEOUT','The page request timed out'));},Number(options.timeoutMs)||Number(this.timeoutMs)||budget.timeoutMs||8000);})
       ]);
       if([301,302,303,307,308].includes(response.status)) {
-        if(source==='serper')throw new CollectorHttpError('REDIRECT_BLOCKED','Search API redirects are not allowed');
+        if(source==='serper'||source==='apollo_people')throw new CollectorHttpError('REDIRECT_BLOCKED','Search API redirects are not allowed');
         const location=response.headers.get('location');
         if(!location)throw new CollectorHttpError('BAD_REDIRECT','Redirect has no destination');
         const destination=new URL(location,url).href;
@@ -187,7 +188,8 @@ class CollectorRuntime {
       const secPlainText=String(source).startsWith('edgar_')&&url.hostname==='www.sec.gov'&&/application\/(?:octet-stream|x-gzip)/i.test(contentType);
       if(contentType && !/text\/|json|xml/i.test(contentType)&&!secPlainText&&!(source==='robots'&&robotsUnavailable(response.status)))throw new CollectorHttpError('CONTENT_TYPE','Only text pages are supported');
       const result={schemaVersion:1,url:url.href,status:response.status,text:response.text,contentType,savedAt:this.now(),fetchedAt:new Date(this.now()).toISOString()};
-      atomicWrite(cacheFile,JSON.stringify(result));return {...result,fromCache:false};
+      if(source!=='apollo_people')atomicWrite(cacheFile,JSON.stringify(result));
+      return {...result,fromCache:false};
     } finally {clearTimeout(timer);}
   }
 }

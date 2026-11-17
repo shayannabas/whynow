@@ -27,6 +27,20 @@ const {createPrepareDemoCoordinator}=require('../prepare-demo.cjs');
 const {updateAccountStatus}=require('../account-lifecycle.cjs');
 const {createTemplateDraft}=require('../outreach-drafts.cjs');
 const {historyPage,runsPage,funnelPage,metricsPage}=require('./activity-pages.cjs');
+const {resultsPageV2,resultsFilters,exportCompanies,saveSearch,resultHref}=require('./results.cjs');
+const {icpStudio,priorityLeads,settingsPage,exportsPage}=require('./targeting-pages.cjs');
+const {editIcp,updateIcpApproval}=require('../icps.cjs');
+const {findPersonas,peopleSettings,accountForSearch,personaTitles,savedPersonas}=require('../collectors/apollo-people.cjs');
+
+async function readSmallForm(req){
+  let body='';
+  for await(const chunk of req){
+    body+=chunk;
+    if(Buffer.byteLength(body)>32768)throw Error('Form too large.');
+  }
+  return new URLSearchParams(body);
+}
+
 async function actionWorkspaceMatches(req,state,res){let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>8192){json(res,413,{error:'Form too large'});return false;}}const workspaceId=new URLSearchParams(body).get('workspaceId');if(workspaceId&&workspaceId!==state.activeWorkspaceId){json(res,409,{error:'Workspace changed. Refresh and try again.'});return false;}return true;}
 function checkActionWorkspace(state,fields){if(fields.workspaceId&&fields.workspaceId!==state.activeWorkspaceId)throw Error('Workspace changed. Refresh and try again.');return state;}
 function createRouter({stateFile,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),researchCoordinator:providedResearch,synthesisCoordinator:providedSynthesis,refreshCoordinator:providedRefresh,phaseBRefreshCoordinator:providedPhaseBRefresh,phaseBRefreshAllCoordinator:providedPhaseBRefreshAll,discoveryCoordinator:providedDiscovery,prepareDemoCoordinator:providedPrepareDemo,llm:providedLlm} = {}) {
@@ -34,6 +48,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   loadState(stateFile);
   let writes = Promise.resolve();
   const jobs=new Map();
+  const personaJobs=new Map();
   const mutate=fn=>{
     const work=writes.then(()=>{const next=fn(loadState(stateFile));saveState(next,stateFile);return next;});
     writes=work.catch(()=>{});return work;
@@ -65,7 +80,41 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       const activityPages={'/history':historyPage,'/runs':runsPage,'/funnel':funnelPage,'/metrics':metricsPage};
       if(req.method==='GET'&&activityPages[pathname])return html(200,activityPages[pathname](loadState(stateFile)));
       if(req.method==='GET'&&pathname==='/today')return html(200,todayPage(loadState(stateFile),'',requestUrl.searchParams));
-      if(req.method==='GET'&&pathname==='/results')return html(200,resultsPage(loadState(stateFile),requestUrl.searchParams));
+      if(req.method==='GET'&&pathname==='/results'){
+        const query=requestUrl.searchParams;
+        return html(200,query.has('lead')?resultsPage(read(),query):resultsPageV2(read(),query));
+      }
+      if(req.method==='GET'&&pathname==='/review-queue')return html(200,priorityLeads(read(),requestUrl.searchParams));
+      if(req.method==='GET'&&pathname==='/icp-studio')return html(200,icpStudio(read(),requestUrl.searchParams));
+      if(req.method==='GET'&&pathname==='/settings')return html(200,settingsPage(read(),env));
+      if(req.method==='GET'&&pathname==='/exports')return html(200,exportsPage(read()));
+      if(req.method==='GET'&&pathname==='/results/export'){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        const state=read(),workspace=state.workspaces[state.activeWorkspaceId];
+        if(!workspace)return json(res,400,{error:'Choose a workspace first.'});
+        const filters=resultsFilters(requestUrl.searchParams);
+        res.writeHead(200,{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="whynow-results.csv"','Cache-Control':'no-store'});
+        return res.end(exportCompanies(workspace,filters,requestUrl.searchParams.getAll('accountId')));
+      }
+      if(req.method==='POST'&&['/results/searches','/icp-studio/save','/icp-studio/approve'].includes(pathname)){
+        if(!localAdmin||req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const form=await readSmallForm(req),workspaceId=form.get('workspaceId'),search=pathname==='/results/searches';
+        const icpParams=new URLSearchParams({icp:form.get('id')||''});
+        try{
+          await mutate(state=>{
+            if(!workspaceId||workspaceId!==state.activeWorkspaceId)throw Error('Workspace changed. Refresh and try again.');
+            const workspace=state.workspaces[workspaceId],now=new Date().toISOString();
+            if(workspace.status==='archived')throw Error('Restore this workspace before editing.');
+            if(search)saveSearch(workspace,form,now,randomUUID());
+            else if(pathname.endsWith('/approve')){
+              updateIcpApproval(workspace,form,now);
+              state.auditLog.push({schemaVersion:1,workspaceId,type:'icp_approved',icpId:form.get('id'),version:Number(form.get('version')),occurredAt:now});
+            }else editIcp(workspace,form);
+            return state;
+          });
+        }catch(error){return html(400,search?resultsPageV2(read(),form,error.message):icpStudio(read(),icpParams,error.message));}
+        res.writeHead(303,{Location:search?resultHref(resultsFilters(form)):'/icp-studio?'+icpParams});return res.end();
+      }
       if(req.method==='GET'&&pathname==='/discovery')return html(200,discoveryPage(loadState(stateFile),'',requestUrl.searchParams));
       if(req.method==='POST'&&pathname==='/prepare-demo'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
@@ -87,7 +136,49 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         res.writeHead(303,{Location:'/today'});return res.end();
       }
       const accountMatch=pathname.match(/^\/accounts\/([^/]+)$/),refreshMatch=pathname.match(/^\/accounts\/([^/]+)\/refresh$/),statusMatch=pathname.match(/^\/accounts\/([^/]+)\/status$/),templateDraftMatch=pathname.match(/^\/accounts\/([^/]+)\/drafts\/template$/);
-      if(req.method==='GET'&&accountMatch)return html(200,accountPage(loadState(stateFile),decodeURIComponent(accountMatch[1]),'',requestUrl.searchParams));
+      if(req.method==='GET'&&accountMatch){
+        const state=read(),id=decodeURIComponent(accountMatch[1]),job=personaJobs.get(state.activeWorkspaceId+':'+id);
+        return html(200,accountPage(state,id,job?.error,requestUrl.searchParams,job?.notice));
+      }
+      const personaAction=pathname.match(/^\/accounts\/([^/]+)\/(personas|drafts\/persona)$/);
+      if(req.method==='POST'&&personaAction){
+        if(!localAdmin||req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const fields=await readSmallForm(req),state=read(),workspaceId=fields.get('workspaceId'),accountId=decodeURIComponent(personaAction[1]);
+        if(!workspaceId||workspaceId!==state.activeWorkspaceId)return json(res,409,{error:'Workspace changed. Refresh and try again.'});
+        const location='/accounts/'+encodeURIComponent(accountId);
+        const showError=message=>html(400,accountPage(read(),accountId,message,new URLSearchParams({tab:'personas'})));
+        if(personaAction[2]==='drafts/persona'){
+          try{
+            await mutate(current=>{
+              if(current.activeWorkspaceId!==workspaceId)throw Error('Workspace changed. Refresh and try again.');
+              const {workspace,account}=accountForSearch(current,workspaceId,accountId);
+              const {personaKey}=require('./personas-page.cjs');
+              const person=savedPersonas(account).find(row=>personaKey(row)===fields.get('personaKey'));
+              if(!person||!personaTitles(workspace,account).includes(person.matchedRole))throw Error('The saved persona no longer matches approved roles.');
+              return createTemplateDraft(current,workspaceId,accountId,{title:person.matchedRole,senderFirstName:fields.get('senderFirstName'),demoMergeField:'true'},{approvedRole:person.matchedRole});
+            });
+          }catch(error){return showError(error.message);}
+          res.writeHead(303,{Location:location+'?tab=outreach'});return res.end();
+        }
+        const settings=peopleSettings(env),key=workspaceId+':'+accountId;
+        if(!settings.enabled||!settings.cap||!env.APOLLO_API_KEY)return showError('Apollo persona search is disabled. Use a LinkedIn buyer-role link.');
+        try{accountForSearch(state,workspaceId,accountId);}catch(error){return showError(error.message);}
+        if([...personaJobs.entries()].some(([id,job])=>id.startsWith(workspaceId+':')&&job.running))return showError('A persona search is already running in this workspace.');
+        const job={running:true,notice:'Checking for buyer personas. Reload to see the result.'};
+        personaJobs.set(key,job);
+        if(personaJobs.size>50)for(const [id,item] of personaJobs){if(!item.running){personaJobs.delete(id);break;}}
+        const scopedMutate=fn=>mutate(current=>{
+          if(current.activeWorkspaceId!==workspaceId)throw Error('Workspace changed. Refresh and try again.');
+          return fn(current);
+        });
+        void findPersonas({read,mutate:scopedMutate,runtime:guardedRuntimeFactory({env}),env,workspaceId,accountId}).then(()=>{
+          job.notice='Persona search complete.';
+        }).catch(error=>{
+          job.notice='';
+          job.error=error.status?`Apollo persona search returned HTTP ${error.status}.`:error.message;
+        }).finally(()=>{job.running=false;});
+        res.writeHead(303,{Location:location+'?tab=personas'});return res.end();
+      }
       if(req.method==='POST'&&refreshMatch){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         if(req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});

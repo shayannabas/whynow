@@ -6,29 +6,25 @@ const { todaySections, whyNow } = require('../account-lifecycle.cjs');
 const styles = require('./styles.cjs');
 
 const NAV_SECTIONS = [
-  ['Work', [
-    ['/today', 'Today', 'actNow'],
-    ['/results', 'Results', 'accounts'],
-    ['/discovery', 'Discovery', 'discovered'],
-    ['/kill-log', 'Kill Log', 'killed']
-  ]],
   ['Pipeline', [
     ['/', 'Overview'],
-    ['/accounts', 'Accounts', 'accounts'],
-    ['/scorecard', 'Scorecard']
+    ['/discovery', 'New discovery'],
+    ['/results', 'Results', 'accounts'],
+    ['/review-queue', 'Review queue', 'review']
   ]],
   ['Data', [
     ['/history', 'History', 'history'],
     ['/runs', 'Runs', 'runs'],
-    ['/funnel', 'Funnel', 'accounts'],
-    ['/metrics', 'Metrics'],
-    ['/collectors', 'Collectors']
+    ['/funnel', 'Funnel'],
+    ['/scorecard', 'Scorecard'],
+    ['/kill-log', 'Kill log', 'killed'],
+    ['/exports', 'Exports'],
+    ['/metrics', 'Metrics']
   ]],
   ['Setup', [
-    ['/onboarding', 'Add company'],
-    ['/onboarding/results', 'Research results', 'research'],
-    ['/onboarding/profile', 'Seller profile', 'profile'],
-    ['/workspaces', 'Workspaces', 'workspaces']
+    ['/icp-studio', 'ICP Studio'],
+    ['/onboarding/profile', 'Seller profile & playbook'],
+    ['/settings', 'Settings']
   ]]
 ];
 
@@ -68,7 +64,7 @@ function normalizePath(path) {
   const raw = String(path || '').trim();
   if (!raw) return '';
   const value = raw.split('?')[0] || '/';
-  if (value.startsWith('/accounts/')) return '/accounts';
+  if (value==='/accounts'||value.startsWith('/accounts/')) return '/results';
   if (value.startsWith('/collectors/') || value.startsWith('/sources/')) return '/collectors';
   if (value === '/onboarding/manual' || value === '/onboarding/profile') return '/onboarding/profile';
   if (value === '/onboarding/research/status') return '/onboarding/results';
@@ -103,6 +99,7 @@ function navCounts(state, workspace) {
   const availableWorkspaces = Object.keys(state?.workspaces || {}).map(id => getWorkspace(state, id)).filter(item => item.status !== 'archived' && !item.systemRole).length;
   return {
     actNow: sections.actNow.length,
+    review: sections.needsReview.length,
     accounts: accounts.length,
     discovered: accounts.filter(account => account.discoveryQuality?.sourceKind).length,
     killed,
@@ -117,7 +114,7 @@ function navCounts(state, workspace) {
 function navHtml(activePath, counts) {
   const active = normalizePath(activePath);
   return NAV_SECTIONS.map(([section, links]) => `<section class="nav-section"><div class="nav-section-label">${esc(section)}</div>${links.map(([href, label, countKey]) => {
-    const isActive = normalizePath(href) === active;
+    const isActive = normalizePath(href) === active || (active==='/today'&&href==='/');
     const count = countKey ? `<span class="nav-count" aria-label="${esc(String(counts[countKey] ?? 0))} ${esc(label.toLowerCase())}">${esc(String(counts[countKey] ?? 0))}</span>` : '';
     return `<a href="${esc(href)}" class="${isActive ? 'active' : ''}"${isActive ? ' aria-current="page"' : ''}>${esc(label)}${count}</a>`;
   }).join('')}</section>`).join('');
@@ -283,7 +280,7 @@ function overview(state, queryParams = new URLSearchParams()) {
     unranked: 'Unranked', 'skipped-killed': 'Skipped or killed', 'tier-1': 'Tier 1',
     'tier-2': 'Tier 2', 'tier-3': 'Tier 3', 'with-receipts': 'With receipts'
   }[filter] || '';
-  const board = `<section class="kanban-section"><div class="kanban-heading"><div><span class="overview-label">Seller workflow</span><h2>Account board</h2><p>${esc(String(shownCount))} shown${shownCount !== accounts.length ? ` of ${esc(String(accounts.length))} saved` : ''} · ${esc(String(killed.length))} killed · ${esc(String(skipped.length))} skipped${filterName ? ` · Filter: ${esc(filterName)}` : ''}</p></div><a class="button" href="/results">Open all results</a></div><div class="kanban-board">${filteredAccountList.map(([label, description, rows]) => `<article class="kanban-column" data-stage="${esc(label.toLowerCase().replaceAll(' ', '-'))}"><header><div><h3>${esc(label)}</h3><p>${esc(description)}</p></div><span>${esc(String(rows.length))}</span></header><div class="kanban-stack">${rows.slice(0, 8).map(account => accountCard(account, label)).join('') || '<div class="kanban-empty">No accounts in this section</div>'}${rows.length > 8 ? `<a class="kanban-more" href="/results">+ ${esc(String(rows.length - 8))} more accounts</a>` : ''}</div></article>`).join('')}</div></section>`;
+  const board = `<section class="kanban-section"><div class="kanban-heading"><div><span class="overview-label">Seller workflow</span><h2>Account board</h2><p>${esc(String(shownCount))} shown${shownCount !== accounts.length ? ` of ${esc(String(accounts.length))} saved` : ''} · ${esc(String(killed.length))} killed · ${esc(String(skipped.length))} skipped${filterName ? ` · Filter: ${esc(filterName)}` : ''}</p></div><div class="ss-actions"><a class="button" href="/today">Today</a><a class="button" href="/results">Open all results</a></div></div><div class="kanban-board">${filteredAccountList.map(([label, description, rows]) => `<article class="kanban-column" data-stage="${esc(label.toLowerCase().replaceAll(' ', '-'))}"><header><div><h3>${esc(label)}</h3><p>${esc(description)}</p></div><span>${esc(String(rows.length))}</span></header><div class="kanban-stack">${rows.slice(0, 8).map(account => accountCard(account, label)).join('') || '<div class="kanban-empty">No accounts in this section</div>'}${rows.length > 8 ? `<a class="kanban-more" href="/results">+ ${esc(String(rows.length - 8))} more accounts</a>` : ''}</div></article>`).join('')}</div></section>`;
   const recentRun = `<section class="card"><div class="overview-card-head"><div><span class="overview-label">Workspace activity</span><h2>Latest saved run</h2></div><a href="/history">View history</a></div><p>${esc(runSummary)}</p>${latestRun?.serperQueries !== undefined ? `<p class="muted">${esc(String(latestRun.serperQueries))} Serper queries recorded for this run.</p>` : ''}</section>`;
   const companyForm = `<section class="card overview-onboarding"><div><span class="overview-label">Start with a company name</span><h2>${workspace ? 'Research another company' : 'Build your first workspace'}</h2><p>WhyNow gathers public evidence and prepares a seller profile for review. Provider calls stay behind the local configuration and explicit controls.</p></div><form method="post" action="/onboarding/start"><label for="company-name">Company name</label><div class="row"><input id="company-name" name="name" required maxlength="120" placeholder="e.g. Vercel"><button class="primary">Continue</button></div></form>${workspace?.research ? `<p><span class="badge">Research · ${esc(researchStatus)}</span> <a href="/onboarding/results">View saved research</a></p>` : ''}${selected ? `<p><a href="/onboarding/profile">Review ${esc(selected.name)} seller profile</a></p>` : ''}</section>`;
   const demoCard = `<section class="card"><div class="overview-card-head"><div><span class="overview-label">Frozen reference</span><h2>Resolve parity demo</h2></div><span class="badge">${esc(currentStatus)}</span></div><p>Load the saved Resolve configuration to inspect scoring and retained disqualifications. This does not approve a seller profile.</p><form method="post" action="/reference-demo/load"><button>Load Resolve reference demo</button></form></section>`;
