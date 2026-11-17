@@ -27,7 +27,7 @@ function preflight(state,env,{domain='vercel.com',now=new Date()}={}){
   if(!workspace||workspace.status!=='active'||!workspace.sellerProfile.approvedAt)throw Error('An owner-approved seller profile is required.');
   const month=now.toISOString().slice(0,7),priorApollo=workspace.budgets.apollo?.month===month?workspace.budgets.apollo.calls:0;
   const priorOpenai=Object.values(state.workspaces).reduce((n,w)=>n+(w.budgets.openai?.month===month?w.budgets.openai.reservedMicros:0),0);
-  const paidEnv={...env,APOLLO_ENABLED:'true',APOLLO_MAX_CALLS_PER_RUN:'5',APOLLO_MONTHLY_CALL_LIMIT:String(priorApollo+5),APOLLO_MAX_CUSTOMERS_PER_RUN:'3',APOLLO_MAX_COMPANIES_PER_RUN:'25',OPENAI_ENABLED:'true',OPENAI_MONTHLY_LIMIT_USD:String((priorOpenai+500000)/1e6),OPENAI_WORKSPACE_MONTHLY_CALL_LIMIT:String((workspace.budgets.openai?.month===month?workspace.budgets.openai.calls:0)+1),OPENAI_MODEL:'gpt-5.5',OPENAI_ICP_TARGETING_MODEL:'gpt-5.5',OPENAI_RETRY_LIMIT:'0',SERPER_ENABLED:'false',GDELT_ENABLED:'false',EDGAR_ENABLED:'false',SCHEDULER_ENABLED:'false',GITHUB_ENABLED:'false'};
+  const paidEnv={...env,APOLLO_ENABLED:'true',APOLLO_COMPANY_SEARCH_ENABLED:'true',APOLLO_MAX_CALLS_PER_RUN:'5',APOLLO_MONTHLY_CALL_LIMIT:String(priorApollo+5),APOLLO_MAX_CUSTOMERS_PER_RUN:'3',APOLLO_MAX_COMPANIES_PER_RUN:'25',OPENAI_ENABLED:'true',OPENAI_MONTHLY_LIMIT_USD:String((priorOpenai+500000)/1e6),OPENAI_WORKSPACE_MONTHLY_CALL_LIMIT:String((workspace.budgets.openai?.month===month?workspace.budgets.openai.calls:0)+1),OPENAI_MODEL:'gpt-5.5',OPENAI_ICP_TARGETING_MODEL:'gpt-5.5',OPENAI_RETRY_LIMIT:'0',SERPER_ENABLED:'false',GDELT_ENABLED:'false',EDGAR_ENABLED:'false',SCHEDULER_ENABLED:'false',GITHUB_ENABLED:'false'};
   const built=buildPlaybookResearchRequest(state,workspace.id,paidEnv);
   if(built.estimate.maximumCostUsd>0.50)throw Error('The saved-page playbook request exceeds the $0.50 process cap.');
   const customers=workspace.sellerProfile.customers.filter(c=>apollo.publicDomain(c.domain)).slice(0,3).map(c=>({name:c.name,domain:c.domain}));
@@ -111,7 +111,7 @@ async function runBatch({file,artifactDir,env,runtimeFactory=opts=>new Collector
       const p=read().workspaces[prepared.workspaceId].sellerProfile.playbook;report.openai.status='saved_needs_review';report.playbook=p;
     }catch(error){report.openai.status='failed';report.openai.failure=safeFailure(error);if(error.usage)report.openai.usage=error.usage;if(Number.isFinite(error.costUsd))report.openai.actualCostUsd=error.costUsd;}
   }finally{
-    Object.assign(prepared.paidEnv,{APOLLO_ENABLED:'false',APOLLO_MAX_CALLS_PER_RUN:'0',APOLLO_MONTHLY_CALL_LIMIT:'0',OPENAI_ENABLED:'false',OPENAI_MONTHLY_LIMIT_USD:'0'});
+    Object.assign(prepared.paidEnv,{APOLLO_ENABLED:'false',APOLLO_COMPANY_SEARCH_ENABLED:'false',APOLLO_MAX_CALLS_PER_RUN:'0',APOLLO_MONTHLY_CALL_LIMIT:'0',OPENAI_ENABLED:'false',OPENAI_MONTHLY_LIMIT_USD:'0'});
     report.disabledAfter={APOLLO_ENABLED:prepared.paidEnv.APOLLO_ENABLED,APOLLO_MAX_CALLS_PER_RUN:prepared.paidEnv.APOLLO_MAX_CALLS_PER_RUN,APOLLO_MONTHLY_CALL_LIMIT:prepared.paidEnv.APOLLO_MONTHLY_CALL_LIMIT,OPENAI_ENABLED:prepared.paidEnv.OPENAI_ENABLED,OPENAI_MONTHLY_LIMIT_USD:prepared.paidEnv.OPENAI_MONTHLY_LIMIT_USD};
     report.preserved=JSON.stringify(preservation(read(),prepared.workspaceId))===JSON.stringify(prepared.preserved);
     report.envUnchanged=!envFile||hash(fs.readFileSync(envFile,'utf8'))===envHash;

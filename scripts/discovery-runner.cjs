@@ -9,7 +9,7 @@ const {phaseAConfigForWorkspace}=require('./phase-a-config.cjs');
 function positiveInteger(value,max){const number=Number(value);return Number.isInteger(number)&&number>0?Math.min(max,number):0;}
 function discoverySettings(env={}){return {maxQueries:positiveInteger(env.DISCOVERY_MAX_SERPER_QUERIES_PER_RUN,60),targetCount:Math.max(20,Math.min(30,positiveInteger(env.DISCOVERY_TARGET_COUNT,30)||25))};}
 function assertDiscoveryReady(env={}){const settings=discoverySettings(env);assertSerperReady(serperSettings(env));if(!settings.maxQueries)throw new Error('Set DISCOVERY_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 60.');return settings;}
-function discoveryStrategy(workspace,options={}){const strategy=options.strategy||workspace.discoveryStrategy||(workspace.referenceDemo?.loadOnly?'icp_queries':'lookalike');if(!['lookalike','trigger_search','trigger_first','icp_queries'].includes(strategy))throw Error('Choose lookalike or trigger_search discovery.');return strategy==='trigger_search'?'trigger_first':strategy;}
+function discoveryStrategy(workspace,options={}){const strategy=options.strategy||workspace.discoveryStrategy||(workspace.referenceDemo?.loadOnly?'icp_queries':'trigger_search');if(!['lookalike','trigger_search','trigger_first','icp_queries'].includes(strategy))throw Error('Choose lookalike or trigger_search discovery.');return strategy==='trigger_search'?'trigger_first':strategy;}
 function findRun(workspace,id){return workspace.runs.find(row=>row.type==='company_discovery'&&row.id===id);}
 function safeError(error){return {code:String(error?.code||'DISCOVERY_FAILED'),message:String(error?.message||'Discovery failed.').slice(0,300),status:Number.isInteger(error?.status)?error.status:null};}
 
@@ -39,10 +39,16 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     return findRun(read().workspaces[workspaceId],runId);
   }
   async function start(workspaceId,options={}){
-    const workspace=read().workspaces[workspaceId];if(!workspace)throw new Error('Workspace not found.');phaseAConfigForWorkspace(workspace);const strategy=discoveryStrategy(workspace,options);if(strategy==='lookalike')require('./collectors/apollo.cjs').assertReady(env);else assertSerperReady(serperSettings(env));const settings=discoverySettings(env),requested=positiveInteger(options.queryCap,60),queryCap=strategy==='lookalike'?0:requested||settings.maxQueries;if(strategy!=='lookalike'&&!queryCap)throw new Error('Set DISCOVERY_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 60.');
+    const workspace=read().workspaces[workspaceId];if(!workspace)throw new Error('Workspace not found.');const config=phaseAConfigForWorkspace(workspace),strategy=discoveryStrategy(workspace,options);
+    if(strategy==='trigger_first'&&!workspace.referenceDemo?.loadOnly){
+      if(!config.playbook)throw Error('Approve the seller playbook before running trigger search.');
+      if(!require('./trigger-first-discovery.cjs').buildTriggerFirstTasks(workspace).length)throw Error('No supported discovery queries. Trigger search currently needs an approved ATS jobs trigger with keywords.');
+    }
+    if(strategy==='lookalike')require('./collectors/apollo.cjs').assertSearchReady(env);else assertSerperReady(serperSettings(env));const settings=discoverySettings(env),requested=positiveInteger(options.queryCap,60),queryCap=strategy==='lookalike'?0:requested||settings.maxQueries;if(strategy!=='lookalike'&&!queryCap)throw new Error('Set DISCOVERY_MAX_SERPER_QUERIES_PER_RUN to a positive value up to 60.');
     if(workspace.runs.some(row=>row.type==='company_discovery'&&['queued','running'].includes(row.status)))throw new Error('A discovery run is already active.');
     const run={schemaVersion:1,id:id(),type:'company_discovery',status:'queued',profileRevision:workspace.profileRevision||0,startedAt:now().toISOString(),finishedAt:'',queryCap,serperQueries:0,tasks:[],rawFound:0,passedNoiseGate:0,newAccounts:0,newAccountIds:[],rejectedCount:0,errors:[]};
     run.strategy=strategy;run.apolloCalls=0;
+    if(strategy==='trigger_first'&&config.playbook)run.playbookDigest=config.playbook.approvedDigest;
     await mutate(state=>{state.workspaces[workspaceId].runs.push(run);return state;});
     const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
   }

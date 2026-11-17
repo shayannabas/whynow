@@ -31,19 +31,34 @@ function needsReviewReason(account={},now=new Date()){
   const reason=rejected[0].metadata?.notCitableReason||'The current evidence does not clearly belong to this account.';
   return `Only current evidence needs attribution review. ${reason}`;
 }
+// A receipt can improve the research order without making the account eligible for Act now.
+function recentSignal(account,now){
+  const rows=Object.values(account.signals||{}).filter(row=>{
+    const age=(now.getTime()-Date.parse(row?.observedAt||''))/86400000;
+    return row?.evidenceUrl&&row.inferred!==true&&row.citable!==false&&row.metadata?.citable!==false&&row.score>0&&age>=0&&age<90&&timestampInsideWindow(row,now);
+  }).map(row=>({...row,researchWeight:Math.min(5,Number(row.score))*(1-(now.getTime()-Date.parse(row.observedAt))/(90*86400000))}));
+  return rows.sort((a,b)=>b.researchWeight-a.researchWeight)[0]||null;
+}
+function topProspect(account,now){
+  const signal=recentSignal(account,now);
+  return {...account,researchSignal:signal,researchRank:Number(account.fitScore??account.score?.fitScore??0)+2*(signal?.researchWeight||0)};
+}
 function todaySections(workspace={},now=new Date(),options={}){
   const threshold=Number.isFinite(Number(options.goodFitThreshold))?Number(options.goodFitThreshold):GOOD_FIT_THRESHOLD;
   const base=(workspace.accounts||[]).filter(account=>!account.kills?.length&&account.killStatus!=='killed'&&account.status!=='skipped').map(account=>({...account,whyNow:whyNow(account,now)}));
-  const actNow=[],worthResearching=[],needsReview=[];
+  const actNow=[],worthResearching=[],needsReview=[],researchable=[];
   for(const account of base){
     const reviewReason=needsReviewReason(account,now),hasTrigger=Boolean(latestTrigger(account,now));
     if(reviewReason){needsReview.push({...account,reviewReason});continue;}
+    researchable.push(account);
     if(![1,2,3].includes(Number(account.tier))){needsReview.push({...account,reviewReason:'Tier unknown — verify firmographics before placing this account in the seller queue.'});continue;}
     if(hasTrigger){actNow.push(account);continue;}
     if(Number(account.fitScore||0)>=threshold&&account.tier!=='parked')worthResearching.push(account);
   }
   actNow.sort(queueSort);worthResearching.sort((left,right)=>Number(right.fitScore||0)-Number(left.fitScore||0)||queueSort(left,right));needsReview.sort((left,right)=>Number(right.fitScore||0)-Number(left.fitScore||0)||String(left.name).localeCompare(String(right.name)));
-  return {actNow,worthResearching,needsReview,goodFitThreshold:threshold};
+  const topProspects=actNow.length?[]:researchable.map(account=>topProspect(account,now))
+    .sort((a,b)=>b.researchRank-a.researchRank||String(a.name).localeCompare(String(b.name)));
+  return {actNow,worthResearching,needsReview,topProspects,goodFitThreshold:threshold};
 }
 function todayQueue(workspace={},now=new Date(),options={}){const sections=todaySections(workspace,now,options);return [...sections.actNow,...sections.worthResearching];}
 function updateAccountStatus(state,workspaceId,accountId,fields={},options={}){

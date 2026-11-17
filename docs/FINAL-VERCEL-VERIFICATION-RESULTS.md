@@ -1,6 +1,6 @@
 # Final Vercel one-use verification — November 16, 2026
 
-**Status: stopped on Apollo company-search HTTP403. Authorization used and exhausted; do not repeat or spend the unused fifth attempt.** Pump remains proposal-only; README/Phase3 close-out is held.
+**Status: stopped on Apollo company-search HTTP403. Authorization used and exhausted; do not repeat or spend the unused fifth attempt.** Pump discovery remains proposal-only; README/Phase3 close-out is held.
 
 ## Saved approvals and workspace isolation
 
@@ -32,7 +32,7 @@ The credit delta is explicitly an owner observation from the web app after the b
 |3 | Enrich sensay.io | HTTP200 usable Sensay estimate. |
 |4 | mixed_companies/search, page1/per_page25 | **HTTP403**. Immediate whole-batch stop, no retry. |
 
-The403 response body was not retained by the strict transport stop. Its exact refusal explanation is unknown; do not label it a work-email or paid-plan requirement without evidence. There was no extra diagnostic/billing request after the stop.
+The owner accepted the HTTP 403 as a free-plan limitation for company search on this account. The transport did not retain the response body. There was no retry or follow-up diagnostic request.
 
 ## Derived pattern and limitations
 
@@ -53,6 +53,6 @@ No candidate was returned, so there is no new ranked list, why-now receipt, kill
 
 All child provider switches/caps were returned disabled/zero, including Apollo and Serper; OpenAI stayed false/zero throughout. .env is unchanged. Approved seller fields, ICP/playbook/approval, Resolve and existing drafts passed preservation checks. The local server remains on port3000 with provider switches/caps disabled/zero, preserving the active workspace.
 
-[Pump proposal](PUMP-ONE-USE-PROPOSAL.md): own-page research,3 focused GPT-5.5 calls including the playbook, max40000 estimated input/8000 output tokens per call, conservative maximum$1.32/proposed cap$1.35; then STOP for human review. Only after approval and separate execution authorization, the same5-Apollo/30-Serper/150-free/template-only pipeline is proposed. Apollo company-search403 must be resolved before its discovery stage. No Pump page, model call, workspace creation or lookup ran.
+[Pump plan](PUMP-ONE-USE-PROPOSAL.md) records separate authorization for Pump research and the proposal for trigger search. Vercel’s company-search refusal does not block first-party Pump research.
 
 Full offline suite:87 files,436 passed,1 existing skipped test (437 total). Seven new fictional-response runner tests cover one-use/approval guards, no retries, strict HTTP and HTTP200-refusal stops, linked ATS identity, preserved candidates and blocked templates. [Full output](FINAL-VERCEL-VERIFICATION-TESTS.txt). No tests call live providers.

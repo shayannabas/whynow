@@ -50,3 +50,20 @@ describe('simple account lifecycle and Today queue',()=>{
     expect(sections.worthResearching.map(row=>row.name)).toEqual(['Binance']);
   });
 });
+
+it('ranks research-only prospects by fit and recent receipted signals when Act now is empty',()=>{
+  const now=new Date('2026-11-17T12:00:00Z'),signal={key:'techStack',score:5,observedAt:'2026-11-16',evidenceUrl:'https://cedarrelay.example/engineering'};
+  const base={status:'new',tier:1,triggers:[],fitScore:37};
+  const accounts=[
+    {...base,id:'moss',name:'Moss Loom',fitScore:41,signals:{techStack:{...signal,inferred:true}}},
+    {...base,id:'cedar',name:'Cedar Relay',signals:{techStack:signal}},
+    {...base,id:'willow',name:'Willow Foundry',fitScore:39,signals:{techStack:{...signal,observedAt:'2026-01-01'}}},
+    {...base,id:'wrong',name:'Harbor Elm',fitScore:100,identityReviewReason:'Wrong entity'},
+    {...base,id:'killed',name:'Flint Run',fitScore:100,kills:[{code:'KILL_EXISTING_CUSTOMER'}]},
+  ];
+  const sections=lifecycle.todaySections({accounts},now);
+  expect(sections.actNow).toEqual([]);
+  expect(sections.worthResearching.map(row=>row.id)).toEqual(['moss']);
+  expect(sections.topProspects.map(row=>row.id)).toEqual(['cedar','moss','willow']);
+  expect(sections.topProspects[0].researchSignal.evidenceUrl).toBe(signal.evidenceUrl);
+});

@@ -12,14 +12,14 @@ Type in the company you sell for. WhyNow figures out who should buy from you, wh
 
 ## 2. What changes from v4
 
-v4 found new accounts mainly through job-posting searches. That is Resolve-specific: for Resolve, hiring SREs is the pain itself. v5 is seller-configured. Research writes a per-seller "why now" playbook, accounts are found as lookalikes of the seller's customers (Apollo), and timing comes from the playbook's triggers. Resolve becomes one configuration, not the built-in logic.
+v4 found new accounts mainly through job-posting searches. That is Resolve-specific: for Resolve, hiring SREs is the pain itself. v5 is seller-configured. Research writes a per-seller "why now" playbook, the approved playbook supplies discovery and timing triggers. Apollo can enrich companies by domain, with lookalike search available as an explicit opt-in. Resolve becomes one configuration, not the built-in logic.
 
 ## 3. End-to-end flow
 
 1. Learn the seller: research produces the seller profile (customers, competitors, size) plus the playbook. A human approves both.
-2. Find accounts: default strategy `lookalike` (Apollo). Optional strategy `trigger_search` (existing ATS job search, kept for sellers whose playbook makes hiring the core trigger). Competitor-customer discovery is a documented next step.
+2. Find accounts: default strategy `trigger_search` uses the seller’s approved playbook. The current discovery adapter verifies ATS postings. News-based discovery is proposed for Pump Part B. Optional `lookalike` requires the separate Apollo company-search switch. Competitor-customer discovery is a documented next step.
 3. Check timing: run the existing timing collectors on candidates according to the approved playbook triggers.
-4. Rank: use the existing six-slot scorecard, firmographic tiering, decisioning and kill engine. Tiering and Act now eligibility remain exactly as they are for every workspace, including future playbooks; no new fit gate or threshold is introduced. An approved playbook supplies the why-now / activePain slot's triggers, keywords, freshness windows and strength.
+4. Rank: use the existing six-slot scorecard, firmographic tiering, decisioning and kill engine. Tiering and Act now eligibility remain exactly as they are for every workspace, including future playbooks; no new fit gate or threshold is introduced. An approved playbook supplies the why-now / activePain slot's triggers, keywords, freshness windows and strength. When Act now is empty, Today shows a research-only Top prospects list ranked by fit and recent receipted signals.
 5. Draft: existing outreach drafting with receipts. The opener uses the matched trigger's message angle.
 
 Contact lookup (Apollo people endpoints) remains deferred and is out of scope for this plan.
@@ -49,7 +49,7 @@ Examples (illustrative, not data):
 Collector `scripts/collectors/apollo.cjs`, limited to `organizations/enrich` and `mixed_companies/search`.
 
 - Key read only from `APOLLO_API_KEY`. Never logged, never in headers in logs, never in Git.
-- `APOLLO_ENABLED=false` by default. Persistent per-workspace monthly call counter and a per-run cap. Stop on the first error. On HTTP 429, one retry with backoff.
+- `APOLLO_ENABLED=false` by default. Company search also requires `APOLLO_COMPANY_SEARCH_ENABLED=true`. Vercel’s HTTP 403 is recorded as a free-plan limitation and was not retried. Persistent per-workspace monthly call counter and a per-run cap. Stop on the first error. On HTTP 429, one retry with backoff.
 - Strategy: enrich the approved customers → derive the common pattern (industry, employee range, country, technologies) and show it as receipts → company search with that pattern → exclude the seller's customers, competitors and existing kills → dedupe by domain → keep rejected candidates with reasons.
 - Apollo firmographic values are receipts labeled "Apollo" with the retrieval date. They are estimates and must be shown as sourced, not as facts.
 - No people or contact endpoints in this plan.

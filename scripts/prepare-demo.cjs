@@ -1,7 +1,7 @@
 'use strict';
 
 const {randomUUID}=require('node:crypto');
-const {discoverySettings}=require('./discovery-runner.cjs');
+const {discoverySettings,discoveryStrategy}=require('./discovery-runner.cjs');
 const {refreshAllSettings}=require('./refresh-all-runner.cjs');
 
 const HARD_MAX_PREPARE_DEMO_SERPER_QUERIES=150;
@@ -17,7 +17,7 @@ function createPrepareDemoCoordinator({read,mutate,discoveryCoordinator,refreshA
     const initial=read().workspaces[workspaceId],runSettings=findRun(initial,runId),triggerFirst=runSettings.strategy==='trigger_first',lookalike=runSettings.strategy==='lookalike',settings={maxQueries:runSettings.queryCap},discovered=initial.accounts.filter(row=>row.discoveryQuality?.sourceKind).length,target=Math.max(discovered,discoverySettings(env).targetCount),perAccount=refreshAllSettings(env).perAccountQueries,discoveryCap=triggerFirst?Math.min(40,settings.maxQueries-10*perAccount):Math.min(60,settings.maxQueries-(target*perAccount));
     if(discoveryCap<1)throw new Error(`The ${settings.maxQueries}-query cap cannot cover discovery and ${target} account refreshes.`);
     await updateRun(workspaceId,runId,run=>{run.status='running';run.stage='discovery';run.progress={completed:0,total:3,label:'Discovering prospects'};run.discoveryQueryCap=discoveryCap;});
-    const discovery=await discoveryCoordinator.start(workspaceId,lookalike?{strategy:'lookalike'}:triggerFirst?{queryCap:discoveryCap,strategy:'trigger_first'}:{queryCap:discoveryCap}),discoveryResult=await discoveryCoordinator.wait(discovery.id);
+    const discovery=await discoveryCoordinator.start(workspaceId,lookalike?{strategy:'lookalike'}:triggerFirst?{queryCap:discoveryCap,strategy:'trigger_first'}:{queryCap:discoveryCap,strategy:'icp_queries'}),discoveryResult=await discoveryCoordinator.wait(discovery.id);
     if(!discoveryResult||discoveryResult.status==='failed')throw new Error('Discovery did not complete successfully.');
     await updateRun(workspaceId,runId,run=>{run.discoveryRunId=discoveryResult.id;run.serperQueries=Number(discoveryResult.serperQueries||0);run.apolloCalls=Number(discoveryResult.apolloCalls||0);run.stage='refresh_all';run.progress={completed:1,total:3,label:'Refreshing discovered accounts'};});
     const remaining=settings.maxQueries-Number(discoveryResult.serperQueries||0),eligible=read().workspaces[workspaceId].accounts.filter(row=>row.discoveryQuality?.sourceKind&&(!triggerFirst||row.discoveryQuality.quality==='first_party_operating_company'&&!row.kills?.length)).slice(0,triggerFirst?10:Infinity),accountCount=eligible.length;
@@ -34,7 +34,7 @@ function createPrepareDemoCoordinator({read,mutate,discoveryCoordinator,refreshA
     if(String(env.OPENAI_ENABLED).toLowerCase()==='true')throw new Error('Turn OpenAI off before preparing a demo. Drafts are a separate manual action.');
     if(workspace.runs.some(row=>row.type==='prepare_demo'&&['queued','running'].includes(row.status)))throw new Error('Prepare demo is already running.');
     const run={schemaVersion:1,id:id(),type:'prepare_demo',status:'queued',stage:'queued',startedAt:now().toISOString(),finishedAt:'',queryCap:prepareDemoSettings(env).maxQueries,serperQueries:0,discoveryQueryCap:0,discoveryRunId:'',refreshAllRunId:'',accountsPrepared:0,progress:{completed:0,total:3,label:'Queued'},errors:[]};
-    run.strategy=workspace.referenceDemo?.loadOnly?'icp_queries':workspace.discoveryStrategy||'lookalike';if(run.strategy==='trigger_first')run.queryCap=Math.min(100,run.queryCap);
+    run.strategy=discoveryStrategy(workspace);if(run.strategy==='trigger_first')run.queryCap=Math.min(100,run.queryCap);
     await mutate(state=>{state.workspaces[workspaceId].runs.push(run);return state;});
     const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
   }

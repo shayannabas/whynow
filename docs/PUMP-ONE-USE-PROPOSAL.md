@@ -1,8 +1,10 @@
-# Pump one-use proposal — not authorized, not run
+# Pump one-use research and discovery plan
 
 Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. This identity has not been checked online. No Pump page, search, model call or company API has been requested. No workspace/profile was created or approved. Hold README/Phase3 close-out until after this proposed verification.
 
 ## Part A — first-party seller research and playbook
+
+Authorized once by the owner on November 17, 2026, after the offline changes pass tests and are pushed.
 
 - First-party domains under pump.co only, using homepage/sitemap links and prioritized customer/case-study, comparison, pricing and about pages. No external YC lookup or search engine.
 - **Maximum20 content HTTP requests,2 sitemap requests and3 robots requests:25 total.** Redirects count toward these ceilings. Respect robots and private-address/redirect/size/pacing guards. Missing or disallowed pages remain missing; never bypass.
@@ -15,18 +17,11 @@ Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. This id
 
 ## Part B — separate one-use pipeline after approval and owner OK
 
-The Vercel final run stopped on mixed_companies/search HTTP403. That access/refusal issue must be resolved by the owner before Pump PartB is authorized; do not blindly repeat the refused endpoint or spend a new research budget assuming lookalike discovery already works. No paid plan upgrade is included. This cannot execute in the research batch before human approval. Use a distinct durable one-use marker and approved customer domains from Pump's actual reviewed research; no invented seed companies or domains.
+Proposal only. Requires the saved seller profile, the saved playbook and separate owner authorization. Use a distinct durable one-use marker.
 
-- **Apollo max5 API attempts:** up to4 customer lookups to obtain3 usable profiles, then1 company search, one page/per_page25. No retries. A200 not-found is recorded and proceeds to the next approved confirmed seed; any HTTP error/refusal/paid usage stops. Corrected primary domains are suggestions only. One Apollo robots network check at most if a fresh copy is unavailable.
-- **At most25 candidates**, customer/competitor/seller/retained-kill exclusions and domain dedupe; retain rejections with reasons and estimated Apollo receipts.
-- Timing uses **Pump's approved playbook**, never Resolve/Vercel constants or unapproved fallback. **Serper max30 shared queries** (up to25 initial +5 follow-ups), no retries.
-- Free collector caps identical to the Vercel proposal: Greenhouse20, Lever20, Ashby20, HN40, board/receipt pages20, collector robots30: **150 maximum**, with persisted/day limits possibly lower. Disable any source not supported by the approved playbook or outside this allowance. Never count a source without an event collector.
-- Existing scorecard/tiering/kills/Act now rules remain; no new fit gate. **Maximum25 deterministic copy-only Demo templates** for actual Act now results, all existing validation gates. **OpenAI0** in discovery/timing/drafting. Blocked templates are reported, never silently rewritten or sent.
-- No people/contact endpoint, sending, paid upgrade, deployment, GDELT, SEC, Wikidata or unapproved extra research.
-- Restore all child-process provider switches/caps disabled/zero, .env unchanged, keep port3000 running disabled. Report attempts/credits/queries, ranked counts, receipts, kills, draft blocks and errors; never repeat a consumed run.
-
-## Combined proposed ceiling
-
-**3 OpenAI calls / $1.35 cap ($1.32 conservative maximum),5 Apollo attempts,30 Serper queries,25 research fetches +150 collector fetches +1 Apollo robots check,25 company candidates,25 template drafts.** The two parts have an explicit owner-review stop between them and separate one-use markers. No credit purchase or plan upgrade. Apollo/Serper dollar costs are not guessed from unverified account entitlements; only approved free-plan/query allowances apply.
-
-Proposal only. No execution is authorized by this document.
+- **Serper max 40 total.** Prioritize current funding announcements, DevOps/platform/cloud infrastructure hiring, and evidence that an AI startup is scaling cloud infrastructure. Use the approved Pump playbook’s terms and freshness windows. Verify ATS posts at the source and verify dated funding and expansion announcements against original reporting before using them for timing. News-based candidate discovery and verification need a recorded-response test before this run.
+- **Up to 25 companies.** Verify operating-company identity, dedupe by domain, exclude the seller, customers, competitors and retained kills, and retain rejected candidates with reasons and receipts.
+- **Free collectors max 150 HTTP requests**, including redirects and robots. Respect per-source and persisted budgets.
+- **Apollo organizations/enrich max 10 API attempts**, no company search and no paid plan upgrade. Use enrichment only for verified domains and display estimates as estimates. Any required Apollo robots check comes from the free HTTP allowance.
+- **At most 25 copy-only templates** for Act now, subject to the existing validation gates. Zero OpenAI. Existing scoring, tiering, kills and Act now eligibility apply.
+- Restore providers disabled/zero and report counts, receipts, attempts, credits, rejections and errors. No contact lookup or sending. The exhausted Vercel company-search batch will not be retried.

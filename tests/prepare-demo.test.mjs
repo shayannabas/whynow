@@ -15,7 +15,7 @@ function harness({approved=true,openai='false'}={}){
 describe('Prepare demo background workflow',()=>{
   it('runs discovery then refresh-all under one cap without OpenAI',async()=>{
     const h=harness(),queued=await h.coordinator.start(h.workspaceId),run=await h.coordinator.wait(queued.id);
-    expect(h.discoveryCoordinator.start).toHaveBeenCalledWith(h.workspaceId,{queryCap:25});
+    expect(h.discoveryCoordinator.start).toHaveBeenCalledWith(h.workspaceId,{queryCap:25,strategy:'icp_queries'});
     expect(h.refreshAllCoordinator.start).toHaveBeenCalledWith(h.workspaceId,{queryCap:130});
     expect(run).toMatchObject({status:'complete',stage:'reranked',queryCap:150,serperQueries:120,accountsPrepared:25,progress:{completed:3,total:3}});
   });
