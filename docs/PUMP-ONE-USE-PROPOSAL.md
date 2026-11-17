@@ -15,7 +15,7 @@ Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. This id
 
 ## Part B — separate one-use pipeline after approval and owner OK
 
-This cannot execute in the research batch before human approval. Use a distinct durable one-use marker and approved customer domains from Pump's actual reviewed research; no invented seed companies or domains.
+The Vercel final run stopped on mixed_companies/search HTTP403. That access/refusal issue must be resolved by the owner before Pump PartB is authorized; do not blindly repeat the refused endpoint or spend a new research budget assuming lookalike discovery already works. No paid plan upgrade is included. This cannot execute in the research batch before human approval. Use a distinct durable one-use marker and approved customer domains from Pump's actual reviewed research; no invented seed companies or domains.
 
 - **Apollo max5 API attempts:** up to4 customer lookups to obtain3 usable profiles, then1 company search, one page/per_page25. No retries. A200 not-found is recorded and proceeds to the next approved confirmed seed; any HTTP error/refusal/paid usage stops. Corrected primary domains are suggestions only. One Apollo robots network check at most if a fresh copy is unavailable.
 - **At most25 candidates**, customer/competitor/seller/retained-kill exclusions and domain dedupe; retain rejections with reasons and estimated Apollo receipts.

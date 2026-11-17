@@ -1,5 +1,15 @@
 # WhyNow traceability
 
+## Final Vercel verification — November16, one-use exhausted
+
+`run-final-vercel-verification.cjs` adds saved-approval/digest guards before consuming a marker, per-workspace persistent counter reservations, one shared transport cap/fatal latch, no retries and explicit refusal handling even onHTTP200. It combines approved news keywords within Serper's500-character limit; uses first-party ATS board links, existing classification/scoring and template validators; preserves prior data and never changes activeWorkspaceId. Seven fictional-response tests include missing-approval/non-consumption, single-use, exact search shape, strict HTTP/JSON refusal stops and blocked templates.
+
+The owner completed app approvals while initial preflights correctly waited: active seller revision7, approved playbookv3. Live batch used4 Apollo attempts: Weather Company lookup returned Weather Channel/weather.com (not accepted); Rogo/rogo.ai not found; Sensay enriched; one search refusedHTTP403. Stop honored:0 Serper/free collectors/OpenAI, no candidates/timing/templates. Owner reports2 credits used, balance95→93/95; not API telemetry. Single-customer employee band21–50 is below approved100 floor; unchanged and explicitly flagged.
+
+Whole Vercel counts0 Act now/0 Worth researching/1 pre-existing Needs review/0 killed; new batch all0. Approved seller/ICP/playbook/Resolve/existing drafts/.env preserved. All child flags/caps disabled/zero; active workspace retained, port3000 running. Final authorization exhausted, no reuse of remaining attempt. [Full results](FINAL-VERCEL-VERIFICATION-RESULTS.md); [tests](FINAL-VERCEL-VERIFICATION-TESTS.txt):87 files,436 pass/1 existing skip.
+
+[Pump](PUMP-ONE-USE-PROPOSAL.md) is an unexecuted owner-review proposal: first-party pages,3 focused GPT-5.5 calls including playbook, estimated max$1.32/proposed cap$1.35, review stop, then a separately authorized bounded pipeline. No Pump API/page/model action or workspace creation. Resolve Apollo search403 before that discovery stage; README/Phase3 remains held.
+
 ## November16 offline follow-up — no provider calls
 
 `playbook.cjs` adds workspace-derived seller/approved-product/competitor vocabulary and the five named compliance standards. Generation, save, review and approved-policy reads pass the same context. Other receipt, role, numeric, entity, freshness and strength rules remain. `revalidate-playbook.cjs` updates derived metadata only: Vercel v1 policy digest, version and needs_review status unchanged; four blockers reduce to two existing combined-name warnings (t6/t7). No approval.

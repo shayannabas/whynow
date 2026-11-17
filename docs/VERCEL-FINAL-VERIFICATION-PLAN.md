@@ -1,6 +1,8 @@
-# Vercel final verification — proposal only
+# Vercel final verification — consumed specification
 
-Date: November 16, 2026. The owner has now authorized this one final run, retaining Rogo/rogo.ai. Execution still requires the actual saved seller/playbook approvals; no batch marker is consumed before that preflight succeeds. The proposal below records its original review checkpoint. **Not run yet.** The earlier Phase2 batch remains used/exhausted. No provider call or approval was made during this offline follow-up.
+Date: November 16, 2026. **This final batch is now USED/EXHAUSTED:4 Apollo attempts, searchHTTP403, no further project calls.** See [final results](FINAL-VERCEL-VERIFICATION-RESULTS.md). The specification/checkpoint below is historical, not reusable authorization.
+
+Original checkpoint: The owner has now authorized this one final run, retaining Rogo/rogo.ai. Execution still requires the actual saved seller/playbook approvals; no batch marker is consumed before that preflight succeeds. The proposal below records its original review checkpoint. Execution is recorded in the final results linked above. The earlier Phase2 batch remains used/exhausted. No provider call or approval was made during this offline follow-up.
 
 ## Offline fixes and current review state
 

@@ -1,3 +1,17 @@
+# November16 — final Vercel batch used; Pump proposal held
+
+- [x] Verify actual owner approvals before requests: seller active revision7, playbookv3 approved. No agent approval, form save or active-workspace switch.
+- [x] Commit/test bounded execution (d72cdd6), consume one exclusive marker/audit record, preserve domains and use4/5 Apollo attempts with no retries.
+- [x] Weather lookup returns different Weather Channel/weather.com entity; Rogo/rogo.ai not found; Sensay enriched. Search page1/per_page25 returnsHTTP403; stop all subsequent project calls.
+- [x] Exact usage:4 Apollo attempts; **2 credits owner-reported (95→93/95, Exports)**;0 Serper,0 free collector network requests,0 OpenAI,0 new candidates/timing checks/templates. Credits were not exposed by API metadata.
+- [x] Counts: new batch0 Act now/0 Worth researching/0 Needs review/0 killed; whole Vercel0/0/1 pre-existing review/0. Retain all history, no success claim.
+- [x] Flag weak Sensay-only21–50 employee pattern below approved100 floor; no silent change. Restore process providers disabled/zero, preserve .env, owner seller/playbook/Resolve/drafts and active workspace; port3000 remains running.
+- [x] Prepare [Pump proposal](PUMP-ONE-USE-PROPOSAL.md) only:3 GPT-5.5 research calls including playbook, estimated max$1.32/proposed process cap$1.35, human-review stop, then separately authorized same bounded pipeline. No Pump fetch or generation.
+- [ ] Apollo company-search403 unresolved. No reuse of the final Vercel allowance. No Pump discovery authorization. README/Phase3 close-out held until after Pump.
+- [x] Full offline suite87 files,436 pass/1 existing skip. [Results](FINAL-VERCEL-VERIFICATION-RESULTS.md); [full test output](FINAL-VERCEL-VERIFICATION-TESTS.txt).
+
+## Earlier checkpoints (historical)
+
 # November 16 — offline corrections and final-run proposal
 
 - [x] Narrow playbook name/compliance exceptions with positive/negative fictional tests; preserve every other rule. Saved Vercel v1 revalidated without regeneration or content/version/approval changes:4→2 blocking warnings, t6/t7 unsupported-name sequences remain.
