@@ -399,3 +399,12 @@ Full suite:77 files,378 passed,1 intentional skip. Okta's original June posting 
 ## Documentation provenance cleanup — November 13, 2026
 
 Removed personal attribution and relationship wording from published documentation, repaired placeholder baseline prose and retained private provenance only in ignored local notes. No runtime code, fixtures, configuration, state or approval behavior changed. Full offline suite: 77 files passed; 378 tests passed and 1 intentional skip. Tracked-file content and filenames contain no author-name matches.
+
+
+## Playbook trigger search and Pump research — November 17, 2026
+
+| Behavior | Implementation and verification |
+| --- | --- |
+| New sellers default to playbook trigger search | Discovery and Prepare demo share the strategy selector. ATS terms and original posting freshness come from an approved playbook. The runner stops if the saved approval changes. Fictional recordings cover the default, unapproved gate, and optional Apollo search switch. |
+| Today fallback | The account lifecycle builds a display-only Top prospects list from fit and recent receipts. The fallback excludes killed and identity-review accounts. Act now, tiering and Resolve parity tests remain unchanged. |
+| Bounded Pump Part A | Transport tests cover first-party redirects, robots, request ceilings, one-use persistence, incomplete response handling and preflight. The live run saved 18 pages and stopped with zero model calls when two request estimates exceeded 40,000 tokens. See [Pump results](PUMP-PART-A-RESULTS.md). |

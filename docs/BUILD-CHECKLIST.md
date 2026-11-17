@@ -1,3 +1,14 @@
+# November 17 — playbook discovery default and Pump research evidence
+
+- [x] Default new seller discovery to the approved playbook’s ATS rules. Keep the frozen Resolve strategy and make Apollo company search an explicit opt-in independent of enrichment.
+- [x] Show Top prospects when Act now is empty. This research list uses fit and recent sourced signals and leaves Act now and tiering unchanged.
+- [x] Record the final Vercel HTTP 403 as a free-plan company-search limitation. No retry.
+- [x] Run the Pump first-party collection once. Saved 18 pages in 25 requests. Two serialized model requests exceeded the 40,000 input-token ceiling, so preflight stopped the batch before generation. $0 actual. [Pump results](PUMP-PART-A-RESULTS.md)
+- [x] Full offline suite passed across 88 files with 442 passes and one existing skip. Browser verified the saved Pump evidence. Providers disabled and `.env` unchanged.
+- [ ] Pump seller profile and playbook remain pending generation. [Part B](PUMP-ONE-USE-PROPOSAL.md) requires separate owner authorization and approvals. README and Phase 3 close-out remain on hold.
+
+## November 16 checkpoint (historical)
+
 # November16 — final Vercel batch used; Pump proposal held
 
 - [x] Verify actual owner approvals before requests: seller active revision7, playbookv3 approved. No agent approval, form save or active-workspace switch.

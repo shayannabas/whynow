@@ -1,10 +1,10 @@
 # Pump one-use research and discovery plan
 
-Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. This identity has not been checked online. No Pump page, search, model call or company API has been requested. No workspace/profile was created or approved. Hold README/Phase3 close-out until after this proposed verification.
+Date: November 16, 2026. Owner supplied identity: Pump, pump.co, YC S22. Part A saved first-party evidence and stopped before generation. Part B remains proposal-only. Hold README/Phase3 close-out until after this proposed verification.
 
 ## Part A — first-party seller research and playbook
 
-Authorized once by the owner on November 17, 2026, after the offline changes pass tests and are pushed.
+Authorized once by the owner on November 17, 2026. The fetch allowance has been used. [Results and preflight](PUMP-PART-A-RESULTS.md) record the 18 saved pages and the zero-call stop.
 
 - First-party domains under pump.co only, using homepage/sitemap links and prioritized customer/case-study, comparison, pricing and about pages. No external YC lookup or search engine.
 - **Maximum20 content HTTP requests,2 sitemap requests and3 robots requests:25 total.** Redirects count toward these ceilings. Respect robots and private-address/redirect/size/pacing guards. Missing or disallowed pages remain missing; never bypass.
