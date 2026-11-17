@@ -1,6 +1,6 @@
 # Current status — November 17, 2026
 
-Owner authorized one news-first Pump Part B run after offline tests and commit, with profile and playbook v6 preserved. Limits are 80 Serper, 150 free requests, 25 candidates, 15 Apollo organization enrichments, and zero OpenAI. News has a 48-query allocation. Keep the persistent Serper monthly cap at the owner-authorized 300. Preserve the rest of .env. Provider errors stop the run. Restore process switches after the run and stop live tuning. Interface v2 begins offline after the run report is committed and its plan is recorded.
+The one-use Pump news-first run is exhausted. It used 80 Serper (55 News), 34 free HTTP and 10 Apollo organization requests, with zero OpenAI. After saved-evidence identity review, Pump has two Act now, 13 Needs review and one killed. No drafts passed. See [the batch report](docs/PUMP-PART-B-NEWS-FIRST.md). Preserve approvals, drafts and the active workspace. The persistent Serper monthly cap remains 300. Interface v2 is offline after the plan is committed. No provider calls or approvals are authorized.
 
 Offline default discovery and Today fallback are implemented. Apollo organization enrichment is independent of opt-in company search. Vercel’s HTTP 403 is recorded as a free-plan company-search limitation and the Vercel authorization is exhausted.
 

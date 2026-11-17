@@ -1,3 +1,11 @@
+# November 17 — Pump news-first discovery
+
+- [x] Date-filter News and ATS searches, prioritize News and retain identity and access failures.
+- [x] Run and exhaust the one-use allowance. 80 Serper (55 News), 34 free HTTP, 10 Apollo organization enrichments, zero OpenAI.
+- [x] Report two Act now after identity review, 13 Needs review and one killed. All three template attempts were blocked. [Results](PUMP-PART-B-NEWS-FIRST.md)
+- [x] Offline suite passed with 458 tests and one existing skip. Providers disabled. Owner approvals, drafts and active workspace preserved.
+- [ ] Interface v2 and ICPs are offline-only.
+
 # November 17 — Pump public-page resilience rerun
 
 - [x] Skip blocked public pages with candidate-level reasons and a 15-error cap. Provider auth, quota, rate limit and server errors stop the batch.
