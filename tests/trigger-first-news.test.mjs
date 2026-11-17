@@ -50,3 +50,13 @@ it('rejects an old article even when the search result claims it is recent',asyn
   expect(h.requestText).toHaveBeenCalledOnce();
   expect(h.read().workspaces[h.id].accounts).toEqual([]);
 });
+
+
+it('rejects a different funding round or amount and recognizes the same event from another headline',()=>{
+  const {sameNewsEvent}=require('../scripts/trigger-first-news.cjs');
+  const base={name:'Fir Market',title:'Fir Market raises $100M Series A funding',sourceDate:'2026-11-15'};
+  expect(sameNewsEvent(base,{...base,title:'Fir Market announces $100 million Series A',sourceDate:'2026-11-16'})).toBe(true);
+  expect(sameNewsEvent(base,{...base,title:'Fir Market announces $200 million Series A'})).toBe(false);
+  expect(sameNewsEvent(base,{...base,title:'Fir Market announces $100M Series B'})).toBe(false);
+  expect(sameNewsEvent(base,{...base,sourceDate:'2026-10-15'})).toBe(false);
+});

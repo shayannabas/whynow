@@ -18,10 +18,11 @@ const {recordSource}=require('./sources.cjs');
 const {createTemplateDraft}=require('./outreach-drafts.cjs');
 const {todaySections,whyNow,latestTrigger}=require('./account-lifecycle.cjs');
 
-const BATCH='pump-part-b-nov17-2026-one-use';
-const CAPS=Object.freeze({serper:40,free:150,apollo:10,candidates:25});
+const BATCH='pump-part-b-nov17-2026-page-resilience-rerun';
+const CAPS=Object.freeze({serper:40,free:150,apollo:10,candidates:25,skippedPages:15});
 const RULES=Object.freeze({'recent-funding':'news','ai-or-gpu-spend':'news','migration-or-multicloud':'news','devops-cloud-hiring':'ats_jobs'});
-const FREE_SOURCES=new Set(['robots','engineering_web','greenhouse','lever','ashby']);
+const ATS_SOURCES=new Set(['greenhouse','lever','ashby']);
+const FREE_SOURCES=new Set(['robots','engineering_web',...ATS_SOURCES]);
 const OFF=Object.freeze({
   SERPER_ENABLED:'false',SERPER_MONTHLY_QUERY_LIMIT:'0',WORKSPACE_MAX_SERPER_QUERIES_PER_RUN:'0',
   APOLLO_ENABLED:'false',APOLLO_COMPANY_SEARCH_ENABLED:'false',APOLLO_MAX_CALLS_PER_RUN:'0',APOLLO_MONTHLY_CALL_LIMIT:'0',
@@ -66,7 +67,7 @@ function roundRobinCandidates(rows) {
   return selected;
 }
 
-function guardedRuntime(runtime,{report,checkpoint,assertCurrent}) {
+function guardedRuntime(runtime,{report,checkpoint,assertCurrent,getCandidate=()=>null}) {
   const request=runtime.request.bind(runtime),transport=runtime.fetch;
   const stop=(code,status=null)=> {
     report.failure??={code,httpStatus:status};
@@ -77,10 +78,37 @@ function guardedRuntime(runtime,{report,checkpoint,assertCurrent}) {
     if(report.failure)throw new CollectorHttpError(report.failure.code,'Pump Part B stopped.',report.failure.httpStatus);
     assertCurrent();
   };
-  runtime.request=(source,value,options={})=>{
+  const skip=(value,error)=>{
+    const candidate=getCandidate();
+    if(report.skippedPages.length>=CAPS.skippedPages)stop('SKIPPED_PAGE_CAP');
+    const trace=report.requests.at(-1);
+    report.skippedPages.push({
+      candidate:candidate?.name||'',candidateUrl:candidate?.sourceUrl||'',url:value,
+      reason:error.code||'FETCH_FAILED',httpStatus:error.status||null,
+      ...(trace?.source==='robots'&&trace.httpStatus>=400?{robotsUrl:trace.url}:{})
+    });
+    checkpoint();
+    if(report.skippedPages.length===CAPS.skippedPages)stop('SKIPPED_PAGE_CAP');
+  };
+  runtime.request=async(source,value,options={})=>{
     check();
     if(!FREE_SOURCES.has(source)&&!['serper','apollo'].includes(source))stop('UNAUTHORIZED_SOURCE');
-    return request(source,value,options);
+    const start=report.requests.length;
+    try{return await request(source,value,options);}
+    catch(error){
+      check();
+      // The outer request owns the skipped-page record for a robots failure.
+      if(source==='robots')throw error;
+      const robotsFailure=report.requests.length>start&&report.requests.at(-1)?.source==='robots'||
+        ['ROBOTS_DISALLOWED','CRAWL_DELAY'].includes(error.code);
+      if(source==='engineering_web'||robotsFailure||ATS_SOURCES.has(source)&&[404,410].includes(error.status)){
+        skip(value,error);
+        if(source==='apollo'&&robotsFailure)throw new CollectorHttpError('APOLLO_ROBOTS_UNAVAILABLE','Apollo robots verification could not complete.',error.status);
+      }else if(['serper','apollo'].includes(source)&&error.code==='INVALID_JSON'){
+        stop('PROVIDER_RESPONSE_INVALID',error.status);
+      }
+      throw error;
+    }
   };
   runtime.fetch=async(value,options)=>{
     check();
@@ -105,11 +133,21 @@ function guardedRuntime(runtime,{report,checkpoint,assertCurrent}) {
     const response=await transport(value,options);
     trace.httpStatus=response.status;
     checkpoint();
-    // The owner requested a stop on any HTTP error, including robots responses.
-    if(response.status>=400)stop('HTTP_ERROR',response.status);
+    const providerError=['serper','apollo'].includes(source)&&response.status>=400;
+    const atsError=ATS_SOURCES.has(source)&&([401,402,403,429].includes(response.status)||response.status>=500);
+    if(providerError||atsError)stop('PROVIDER_HTTP_ERROR',response.status);
+    if(source==='serper'||ATS_SOURCES.has(source)&&response.status>=200&&response.status<300) {
+      const body=await response.text();
+      let value;
+      try{value=JSON.parse(body);}
+      catch{stop('PROVIDER_RESPONSE_INVALID',response.status);}
+      const hasResults=Array.isArray(value)||['news','organic','jobs'].some(key=>Array.isArray(value?.[key]));
+      if(value?.error||value?.error_message||value?.errors?.length||value?.message&&!hasResults)stop('PROVIDER_REFUSED',response.status);
+      return {...response,text:async()=>body};
+    }
     return response;
   };
-  return check;
+  return {check,skip};
 }
 
 function sizeFromVerifiedSources(target,{sourcePage,verifiedEvent,now}) {
@@ -127,10 +165,10 @@ function sizeFromVerifiedSources(target,{sourcePage,verifiedEvent,now}) {
 function ranked(workspace,now) {
   const sections=todaySections(workspace,now);
   const row=a=>{
-    const trigger=latestTrigger(a,now),savedSourceId=trigger?.metadata?.savedSourceId;
-    return {name:a.name,id:a.id,domain:a.domain,fit:a.fitScore,tier:a.tier,trigger:trigger?.title||null,
-      triggerDate:trigger?.occurredAt||null,receipt:savedSourceId?'/sources/'+savedSourceId:trigger?.evidenceUrl||null,
-      originalReceipt:trigger?.evidenceUrl||null,reviewReason:a.reviewReason||'',
+    const trigger=latestTrigger(a,now),listing=!trigger?a.newsListing:null,savedSourceId=trigger?.metadata?.savedSourceId||listing?.savedSourceId;
+    return {name:a.name,id:a.id,domain:a.domain,fit:a.fitScore,tier:a.tier,trigger:trigger?.title||listing?.title||null,
+      triggerDate:trigger?.occurredAt||listing?.listedAt||null,receipt:savedSourceId?'/sources/'+savedSourceId:trigger?.evidenceUrl||listing?.sourceUrl||null,
+      receiptStatus:listing?.label||null,originalReceipt:trigger?.evidenceUrl||listing?.sourceUrl||null,reviewReason:a.reviewReason||'',
       researchReceipt:a.researchSignal?.evidenceUrl||(!trigger?a.sourceUrl:null),sizeReceipt:a.firmographics?.fields?.employeeCount?.sourceUrl||null};
   };
   return {
@@ -166,7 +204,7 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
   const envHash=envFile?hash(fs.readFileSync(envFile,'utf8')):null;
   const report={batch:BATCH,workspaceId:w.id,startedAt:now().toISOString(),status:'started',stage:'discovery',
     approvals:{profileRevision:w.profileRevision,profileApprovedAt:w.sellerProfile.approvedAt,playbookVersion:policy.version,playbookApprovedAt:policy.approvedAt},
-    serperQueries:0,apolloAttempts:0,freeRequests:0,freeBySource:{},openaiCalls:0,requests:[],enrichments:[],templates:[],draftBlocks:[],candidateChecks:0};
+    serperQueries:0,apolloAttempts:0,freeRequests:0,freeBySource:{},openaiCalls:0,requests:[],enrichments:[],templates:[],draftBlocks:[],skippedPages:[],candidateChecks:0};
   fs.mkdirSync(artifactDir);
   const checkpoint=()=>atomicWrite(path.join(artifactDir,'report.json'),JSON.stringify(report,null,2));
   const assertCurrent=()=>{
@@ -175,7 +213,8 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
       throw Object.assign(Error(),{code:'PUMP_APPROVAL_CHANGED'});
     }
   };
-  const check=guardedRuntime(runtime,{report,checkpoint,assertCurrent});
+  let candidate=null;
+  const {check,skip}=guardedRuntime(runtime,{report,checkpoint,assertCurrent,getCandidate:()=>candidate});
   const runFor=state=>state.workspaces[w.id].runs.find(row=>row.id===BATCH);
   try {
     checkpoint();
@@ -196,7 +235,8 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
       return state;
     });
     const discovery=await executeTriggerFirst({read,mutate,workspaceId:w.id,runId:BATCH,runtime,searchProvider:search,newsSearchProvider:searchNews,
-      reserveQuery,settings:{maxQueries:CAPS.serper},env:live,now,checkRun:check,sizeCandidate:sizeFromVerifiedSources,
+      reserveQuery,settings:{maxQueries:CAPS.serper},env:live,now,checkRun:check,sizeCandidate:sizeFromVerifiedSources,allowNewsFallback:true,
+      onCandidate:row=>{candidate=row;},onPaywall:url=>skip(url,{code:'PAYWALL'}),
       selectCandidates:rows=>{const selected=roundRobinCandidates(rows);report.candidateChecks=selected.length;checkpoint();return selected;}});
     check();
     report.rejections=discovery.rejections;
@@ -211,14 +251,16 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
       const account=read().workspaces[w.id].accounts.find(row=>row.id===id);
       const domain=publicDomain(account?.firmographicEntity?.domain||account?.domain);
       if(!account||account.kills?.length||account.firmographics?.fields?.employeeCount?.value>0||!domain||queried.has(domain))continue;
+      candidate={name:account.name,sourceUrl:account.sourceUrl};
       queried.add(domain);
       let organization;
       try { organization=await client.enrich(w.id,BATCH,domain); }
       catch(error) {
         check();
-        if(!['APOLLO_NOT_FOUND','APOLLO_DOMAIN_MISMATCH'].includes(error.code))throw error;
+        if(!['APOLLO_NOT_FOUND','APOLLO_DOMAIN_MISMATCH','APOLLO_ROBOTS_UNAVAILABLE'].includes(error.code))throw error;
         report.enrichments.push({name:account.name,domain,status:error.code});
         checkpoint();
+        if(error.code==='APOLLO_ROBOTS_UNAVAILABLE')break;
         continue;
       }
       if(!Number.isFinite(organization.employeeCount)||organization.employeeCount<1) {
@@ -261,6 +303,7 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
     const after=read(),current=after.workspaces[w.id],run=runFor(after);
     report.finishedAt=now().toISOString();
     report.sections=ranked(current,now());
+    report.serperMonthlyRemaining=Math.max(0,serperConfig.monthlyLimit-(current.budgets.serperQueries?.queries||0));
     report.newAccountIds=run?.newAccountIds||[];
     report.apolloDiagnostics=run?.apolloDiagnostics||[];
     report.serperReserved=run?.serperQueries||0;
@@ -275,6 +318,7 @@ async function run({file,artifactDir=path.join(path.dirname(file),BATCH),env,env
       const entry=runFor(state);
       Object.assign(entry,{status:report.status==='complete'?'complete':'failed',finishedAt:report.finishedAt});
       if(report.failure)entry.errors.push(report.failure);
+      entry.skippedPages=report.skippedPages;
       state.workspaces[w.id].budgets.discoveryCollector={day:date,...runtime.snapshot()};
       return state;
     });
@@ -293,7 +337,7 @@ if(require.main===module) {
     }catch(error){console.error(JSON.stringify(safeError(error)));process.exitCode=1;}
   }else if(process.argv[2]==='--run') {
     run({file,env,envFile}).then(r=>console.log(JSON.stringify({
-      status:r.status,stage:r.stage,failure:r.failure,serperQueries:r.serperQueries,apolloAttempts:r.apolloAttempts,freeRequests:r.freeRequests,freeBySource:r.freeBySource,preserved:r.preserved,envUnchanged:r.envUnchanged
+      status:r.status,stage:r.stage,failure:r.failure,serperQueries:r.serperQueries,apolloAttempts:r.apolloAttempts,freeRequests:r.freeRequests,freeBySource:r.freeBySource,skippedPages:r.skippedPages.length,preserved:r.preserved,envUnchanged:r.envUnchanged
     }))).catch(error=>{console.error(JSON.stringify(safeError(error)));process.exitCode=1;});
   }else throw Error('Use --verify or --run.');
 }

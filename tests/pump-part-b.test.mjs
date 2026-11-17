@@ -6,16 +6,19 @@ import {expect,it,vi} from 'vitest';
 import {fixture} from './fixtures/pipeline/fictional.mjs';
 
 const require=createRequire(import.meta.url);
-const {BATCH,CAPS,RULES,roundRobinCandidates,run}=require('../scripts/run-pump-part-b.cjs');
+const {BATCH,CAPS,RULES,roundRobinCandidates,guardedRuntime,run}=require('../scripts/run-pump-part-b.cjs');
 const {draftPlaybook,digest}=require('../scripts/playbook.cjs');
 const {loadState,saveState}=require('../scripts/server/state.cjs');
-const {CollectorRuntime}=require('../scripts/collectors/runtime.cjs');
+const {CollectorRuntime,CollectorHttpError}=require('../scripts/collectors/runtime.cjs');
 const now=()=>new Date('2026-11-17T12:00:00Z');
 const response=(status,body,type='application/json')=>({status,headers:new Headers({'content-type':type}),text:async()=>body});
 const json=value=>response(200,JSON.stringify(value));
 const date=now().toISOString(),newsTitle='Fir Market raises Series A funding',newsUrl='https://ledger-news.example/articles/fir-market';
+const alternateUrl='https://cloud-news.example/fir-market-series-a',otherUrl='https://market-news.example/fir-market-series-a',unusedUrl='https://uncalled-news.example/fir-market-series-a';
+const article=`<meta property="article:published_time" content="2026-11-15T12:00:00Z"><article><h1>${newsTitle}</h1><p>Fir Market raises Series A capital for infrastructure and revenue operations.</p></article>`;
+const listing=url=>({title:newsTitle,link:url,snippet:'Fir Market said the new round will support its cloud infrastructure.',date:'2 days ago'});
 
-function harness({approved=true,robotsStatus=200}={}) {
+function harness({approved=true,robotsStatus=200,articleStatus=200,providerStatus=200,providerRefusal=false,alternateMode}={}) {
   const {state,id,workspace,raw,receipts}=fixture();
   Object.assign(workspace,{name:'Pump',status:approved?'active':'needs_review',universeSeeds:[{name:'Fir Market',domain:'firmarket.example',segment:'revenue_teams'}]});
   workspace.sellerProfile={...workspace.sellerProfile,sellerName:'Pump',domain:'pump.co',approvedAt:approved?date:null};
@@ -32,11 +35,22 @@ function harness({approved=true,robotsStatus=200}={}) {
     const url=new URL(value);
     if(url.pathname==='/robots.txt')return response(url.hostname==='ledger-news.example'?robotsStatus:200,'User-agent: *\nAllow: /','text/plain');
     if(url.hostname==='google.serper.dev') {
+      if(providerStatus!==200)return response(providerStatus,'{}');
+      if(providerRefusal)return json({message:'Fictional quota refusal'});
       const q=JSON.parse(options.body).q;
-      if(url.pathname==='/news')return json({news:q.includes('raises')?[{title:newsTitle,link:newsUrl,date:'2 days ago'}]:[]});
+      if(url.pathname==='/news'){
+        if(q.startsWith('"Fir Market"'))return json({news:alternateMode?[listing(alternateUrl),listing(otherUrl),listing(unusedUrl)]:[]});
+        return json({news:q.includes('raises')?[listing(newsUrl)]:[]});
+      }
       return json({organic:q.includes('Fir Market')?[{title:'Fir Market | Official',link:'https://firmarket.example/'}]:[]});
     }
-    if(value===newsUrl)return response(200,`<meta property="article:published_time" content="2026-11-15T12:00:00Z"><article><h1>${newsTitle}</h1><p>Fir Market raises Series A capital for infrastructure and revenue operations.</p></article>`,'text/html');
+    if(value===newsUrl)return response(articleStatus,articleStatus===200?article:'Unavailable','text/html');
+    if(value===alternateUrl)return alternateMode==='verify'?response(404,'Missing','text/html'):
+      response(200,'<script type="application/ld+json">{"isAccessibleForFree":false}</script>','text/html');
+    if(value===otherUrl){
+      if(alternateMode==='verify')return response(200,article,'text/html');
+      throw new CollectorHttpError('TIMEOUT','The article timed out.');
+    }
     if(url.hostname==='firmarket.example')return response(200,'<p>Fir Market is a software company. Our product helps enterprise customers with revenue operations.</p>','text/html');
     if(url.hostname==='api.apollo.io'&&url.pathname==='/api/v1/organizations/enrich')return json({organization:{primary_domain:'firmarket.example',name:'Fir Market',estimated_num_employees:275}});
     throw Error('Unexpected fictional destination');
@@ -55,16 +69,75 @@ it('requires both saved owner actions before consuming the batch',async()=>{
   }finally{h.cleanup();}
 });
 
-it('stops every transport on an HTTP error even when a collector catches it',async()=>{
-  const h=harness({robotsStatus:404});
+it('stops on a provider rate limit before calling a free source or another query',async()=>{
+  const h=harness({providerStatus:429});
   try {
     const r=await h.run();
-    expect(r).toMatchObject({status:'stopped',stage:'discovery',failure:{code:'HTTP_ERROR',httpStatus:404},freeRequests:1,apolloAttempts:0,openaiCalls:0});
-    expect(h.fetch.mock.calls.at(-1)[0]).toBe('https://ledger-news.example/robots.txt');
+    expect(r).toMatchObject({status:'stopped',stage:'discovery',failure:{code:'PROVIDER_HTTP_ERROR',httpStatus:429},serperQueries:1,freeRequests:0,apolloAttempts:0,openaiCalls:0});
+    expect(h.fetch).toHaveBeenCalledOnce();
     expect(r.templates).toEqual([]);
     expect(loadState(h.file).workspaces[h.id].runs[0].status).toBe('failed');
     await expect(h.run()).rejects.toMatchObject({code:'PUMP_BATCH_UNAVAILABLE'});
   }finally{h.cleanup();}
+});
+
+it('stops on an API refusal carried in an HTTP 200 response',async()=>{
+  const h=harness({providerRefusal:true});
+  try {
+    const r=await h.run();
+    expect(r.failure).toEqual({code:'PROVIDER_REFUSED',httpStatus:200});
+    expect(h.fetch).toHaveBeenCalledOnce();
+    expect(r.skippedPages).toEqual([]);
+  }finally{h.cleanup();}
+});
+
+it('skips a robots refusal and a missing alternate, then verifies the same event at a second outlet',async()=>{
+  const h=harness({robotsStatus:403,alternateMode:'verify'});
+  try {
+    const r=await h.run();
+    expect(r.status).toBe('complete');
+    expect(r.skippedPages).toMatchObject([
+      {candidate:'Fir Market',url:newsUrl,reason:'HTTP_ERROR',httpStatus:403,robotsUrl:'https://ledger-news.example/robots.txt'},
+      {candidate:'Fir Market',url:alternateUrl,reason:'HTTP_ERROR',httpStatus:404}
+    ]);
+    expect(r.sections.actNow[0]).toMatchObject({name:'Fir Market',originalReceipt:otherUrl});
+    expect(h.fetch.mock.calls.some(([url])=>url===newsUrl||url===unusedUrl)).toBe(false);
+  }finally{h.cleanup();}
+});
+
+it('keeps a dated listing in research sections after the primary, a paywall and a timeout, with no trigger or draft',async()=>{
+  const h=harness({articleStatus:403,alternateMode:'blocked'});
+  try {
+    const r=await h.run();
+    expect(r.status).toBe('complete');
+    expect(r.skippedPages.map(row=>[row.candidate,row.reason,row.httpStatus])).toEqual([
+      ['Fir Market','HTTP_ERROR',403],['Fir Market','PAYWALL',null],['Fir Market','TIMEOUT',null]
+    ]);
+    expect(r.sections.actNow).toEqual([]);
+    expect(r.templates).toEqual([]);
+    expect(r.sections.needsReview[0]).toMatchObject({name:'Fir Market',receiptStatus:'news listing (unverified article)',triggerDate:'2026-11-15T12:00:00.000Z'});
+    expect(r.sections.topProspects[0]).toMatchObject({name:'Fir Market',receiptStatus:'news listing (unverified article)'});
+    const state=loadState(h.file),account=state.workspaces[h.id].accounts[0];
+    expect(account.triggers).toEqual([]);
+    expect(state.sources[account.newsListing.savedSourceId]).toMatchObject({url:newsUrl,title:'news listing (unverified article)'});
+    expect(h.fetch.mock.calls.some(([url])=>url===unusedUrl)).toBe(false);
+  }finally{h.cleanup();}
+});
+
+it('stops page fetching at the fifteenth skip',async()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'whynow-pump-skip-cap-'));
+  try {
+    const fetch=vi.fn(async url=>url.endsWith('/robots.txt')?response(404,'','text/plain'):response(403,'Blocked','text/plain'));
+    const runtime=new CollectorRuntime({env:{CRAWLER_CONTACT_EMAIL:'crawler@example.invalid'},cacheDir:dir,
+      lookup:async()=>[{address:'93.184.216.34',family:4}],sleep:async()=>{},fetch});
+    const report={freeRequests:0,freeBySource:{},requests:[],skippedPages:[]};
+    guardedRuntime(runtime,{report,checkpoint:()=>{},assertCurrent:()=>{},getCandidate:()=>({name:'Fictional Fir'})});
+    for(let i=0;i<14;i++)await expect(runtime.requestText('https://ledger-news.example/article-'+i,'engineering_web')).rejects.toMatchObject({status:403});
+    await expect(runtime.requestText('https://ledger-news.example/article-14','engineering_web')).rejects.toMatchObject({code:'SKIPPED_PAGE_CAP'});
+    await expect(runtime.requestText('https://ledger-news.example/article-15','engineering_web')).rejects.toMatchObject({code:'SKIPPED_PAGE_CAP'});
+    expect(report.skippedPages).toHaveLength(15);
+    expect(fetch).toHaveBeenCalledTimes(16);
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
 
 it('scores a receipt-backed candidate with a saved Apollo employee estimate and no search or people calls',async()=>{

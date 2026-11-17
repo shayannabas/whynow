@@ -4,6 +4,7 @@ const {activeTriggers}=require('./decisioning.cjs');
 
 const ACCOUNT_STATUSES=['new','working','skipped'];
 const GOOD_FIT_THRESHOLD=40;
+const NEWS_REVIEW_REASON='Only a dated news listing is saved. Verify the article before using it as a timing signal.';
 function latestTrigger(account={},now=new Date()){return activeTriggers(account,now).sort((a,b)=>(Date.parse(b.occurredAt||b.detectedAt||'')||0)-(Date.parse(a.occurredAt||a.detectedAt||'')||0))[0]||null;}
 function whyNow(account={},now=new Date()){
   const trigger=latestTrigger(account,now);if(trigger){const receipt=require('./collectors/ats-receipts.cjs').primaryTriggerReceipt(trigger);return {line:String(trigger.title||trigger.evidenceText||trigger.type||'Fresh public signal.'),receipt:receipt.url,receiptLabel:receipt.label,originalReceipt:receipt.originalUrl,kind:String(trigger.type||trigger.triggerType||'signal')};}
@@ -26,6 +27,7 @@ function needsReviewReason(account={},now=new Date()){
   if(reportYear&&reportYear<now.getUTCFullYear()-2)return 'Size receipt is an outdated corporate report; verify the employer identity and current size before queueing.';
   if(account.discoveryQuality?.isValidTargetAccount===false)return account.discoveryQuality.reason||'Company identity failed discovery review.';
   if(account.segmentClassification?.requiresReview)return 'Segment is not supported by unambiguous company evidence; review before ranking.';
+  if(account.newsListing&&!activeTriggers(account,now).length)return NEWS_REVIEW_REASON;
   const rejected=[...(account.triggers||[]),...(account.triggerHistory||[])].filter(row=>row?.evidenceUrl&&timestampInsideWindow(row,now)&&(row.citable===false||row.metadata?.citable===false));
   if(!rejected.length||activeTriggers(account,now).length)return '';
   const reason=rejected[0].metadata?.notCitableReason||'The current evidence does not clearly belong to this account.';
@@ -49,7 +51,12 @@ function todaySections(workspace={},now=new Date(),options={}){
   const actNow=[],worthResearching=[],needsReview=[],researchable=[];
   for(const account of base){
     const reviewReason=needsReviewReason(account,now),hasTrigger=Boolean(latestTrigger(account,now));
-    if(reviewReason){needsReview.push({...account,reviewReason});continue;}
+    if(reviewReason){
+      const reviewed={...account,reviewReason};
+      needsReview.push(reviewed);
+      if(reviewReason===NEWS_REVIEW_REASON)researchable.push(reviewed);
+      continue;
+    }
     researchable.push(account);
     if(![1,2,3].includes(Number(account.tier))){needsReview.push({...account,reviewReason:'Tier unknown — verify firmographics before placing this account in the seller queue.'});continue;}
     if(hasTrigger){actNow.push(account);continue;}

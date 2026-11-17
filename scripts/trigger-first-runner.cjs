@@ -4,7 +4,7 @@ const {NEWS_KIND,candidateFromNewsResult,verifyNewsCandidate}=require('./trigger
 const {recordSource}=require('./sources.cjs');
 const {collectFirmographics}=require('./collectors/firmographics.cjs');
 function triggerFirstPlan(workspace){const searches=buildTriggerFirstTasks(workspace);return {strategy:'trigger_first',searches,maxVerificationCandidates:10,identityQueries:10,firmographicQueries:10,maxDiscoveryQueries:Math.min(40,searches.length+20),refreshAccounts:10,maxRefreshQueries:50,hardTotalCap:100};}
-async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,searchProvider,newsSearchProvider,reserveQuery,settings,env,now=()=>new Date(),verify=verifyCandidate,selectCandidates,checkRun=()=>{},sizeCandidate}){
+async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,searchProvider,newsSearchProvider,reserveQuery,settings,env,now=()=>new Date(),verify=verifyCandidate,selectCandidates,checkRun=()=>{},sizeCandidate,allowNewsFallback=false,onCandidate=()=>{},onPaywall}){
  const workspace=read().workspaces[workspaceId],plan=triggerFirstPlan(workspace),candidates=[],tasks=[],rejected=[],errors=[],added=[],vendors=[];
  await mutate(state=>{const w=state.workspaces[workspaceId],changed=require('./company-identity.cjs').quarantineLegacyCandidates(w,require('./phase-a-config.cjs').phaseAConfigForWorkspace(w));if(changed.length)state.auditLog.push({schemaVersion:1,type:'legacy_discovery_quarantined',workspaceId,occurredAt:now().toISOString(),accounts:changed});return state;});
  const checkRevision=()=>{checkRun();const w=read().workspaces[workspaceId],r=w.runs.find(r=>r.id===runId);if((w.profileRevision||0)!==(r.profileRevision||0)||w.status!=='active'&&!w.referenceDemo?.loadOnly||(r.playbookDigest&&require('./playbook.cjs').approvedPlaybook(w)?.approvedDigest!==r.playbookDigest))throw Object.assign(Error('Approved profile changed during discovery.'),{code:'PROFILE_CHANGED'});};
@@ -14,9 +14,14 @@ async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,search
  const unique=dedupeJobCandidates(candidates);
  const selected=selectCandidates?selectCandidates(unique):unique.slice(0,plan.maxVerificationCandidates);
  for(const candidate of selected){try{
+   onCandidate(candidate);
    const identityResults=await query('"'+candidate.name.replace(/"/g,'')+'" official website','official_identity');
    const verifier=candidate.kind===NEWS_KIND?verifyNewsCandidate:verify;
-   const result=await verifier(candidate,{runtime,workspace:read().workspaces[workspaceId],identityResults,now:now(),firmographicsCollector:sizeCandidate|| (async(target,context)=>{const rows=await query('"'+target.name.replace(/"/g,'')+'" "'+target.domain+'" employees revenue','firmographics');return collectFirmographics(target,{...context,searchResults:rows.map(row=>({...row,kind:'firmographics'}))});})});
+   const findAlternateNews=allowNewsFallback?async text=>{
+     try{return await query(text,NEWS_KIND);}
+     catch(error){checkRun();if(/LIMIT/.test(error.code||''))return [];throw error;}
+   }:undefined;
+   const result=await verifier(candidate,{runtime,workspace:read().workspaces[workspaceId],identityResults,now:now(),findAlternateNews,onPaywall,firmographicsCollector:sizeCandidate|| (async(target,context)=>{const rows=await query('"'+target.name.replace(/"/g,'')+'" "'+target.domain+'" employees revenue','firmographics');return collectFirmographics(target,{...context,searchResults:rows.map(row=>({...row,kind:'firmographics'}))});})});
    checkRun();
    if(!result.accepted&&!result.vendorAccount){rejected.push({name:candidate.name,url:candidate.sourceUrl,reason:result.reason,error:result.error});continue;}
    checkRevision();await mutate(state=>{
@@ -24,6 +29,11 @@ async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,search
      if(result.page){const saved=recordSource(state,{url:result.page.url,text:require('./collectors/common.cjs').stripHtml(result.page.text),title:account.name,fetchedAt:result.page.fetchedAt});state=saved.state;}
      if(result.atsReceipt){const saved=recordSource(state,result.atsReceipt);state=saved.state;for(const trigger of account.triggers)trigger.metadata={...trigger.metadata,savedSourceId:saved.source.id,receiptAvailability:'api_job_text_confirmed'};}
      if(result.newsReceipt){const saved=recordSource(state,result.newsReceipt);state=saved.state;for(const trigger of [...account.triggers,...(account.triggerHistory||[])])if(trigger.evidenceUrl===result.newsReceipt.url)trigger.metadata={...trigger.metadata,savedSourceId:saved.source.id};}
+     if(result.newsListingReceipt){
+       const saved=recordSource(state,result.newsListingReceipt);state=saved.state;
+       account.newsListing.savedSourceId=saved.source.id;
+     }
+     if(result.newsAlternates?.length)account.discovery={...account.discovery,newsAlternateAttempts:result.newsAlternates};
      state.workspaces[workspaceId].accounts.push(account);state.auditLog.push({schemaVersion:1,type:result.vendorAccount?'discovery_vendor_retained':'trigger_first_account_added',workspaceId,accountId:account.id,sourceUrl:account.sourceUrl,occurredAt:now().toISOString()});
      (result.vendorAccount?vendors:added).push(account.id);
      const run=state.workspaces[workspaceId].runs.find(r=>r.id===runId);
