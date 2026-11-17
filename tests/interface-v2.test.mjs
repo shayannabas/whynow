@@ -7,6 +7,7 @@ import people from '../scripts/collectors/apollo-people.cjs';
 import runtimeModule from '../scripts/collectors/runtime.cjs';
 import playbooks from '../scripts/playbook.cjs';
 import icps from '../scripts/icps.cjs';
+import drafts from '../scripts/outreach-drafts.cjs';
 
 const now=()=>new Date('2026-11-17T12:00:00Z');
 function scenario(){
@@ -100,6 +101,25 @@ describe('Company-scoped persona search',()=>{
       await expect(people.findPersonas({...input,env:{}})).rejects.toThrow(/disabled/);
       expect(fetch).toHaveBeenCalledTimes(2);
     }finally{rmSync(cacheDir,{recursive:true,force:true});}
+  });
+  it('creates a merge-field draft using the approved role and a seller receipt without customer proof',()=>{
+    const {state,w}=scenario(),a=w.accounts[0];
+    const claim='Fictional Studio helps platform teams plan infrastructure work and keep shared requests visible as the team decides which projects can move forward.';
+    Object.assign(w.sellerProfile,{name:'Fictional Studio',oneLiner:claim,evidence:{oneLiner:{sourceUrl:'https://studio.example/product',evidenceQuote:claim}}});
+    w.icpConfig.outreach={framingLibrary:['Teams planning infrastructure often start by comparing how they handle demand and project intake when several different teams expect support.'],closingQuestions:['Worth a quick look at the workflow?','Would you be open to comparing notes?','Could we discuss where your team starts?']};
+    Object.assign(a.triggers[0],{type:'funding',title:'Haylift Works announces Series A funding',evidenceText:'Haylift Works announces Series A funding'});
+    a.triggers[0].metadata.matchedKeywords=['Series A funding'];
+    a.personas=[{name:'Mira Fiction',title:'VP Operations',matchedRole:'VP Operations',linkedinUrl:'https://www.linkedin.com/in/fictional-mira'}];
+    w.drafts=[];
+    const next=drafts.createTemplateDraft({...state,auditLog:[]},w.id,a.id,{
+      title:'VP Operations',demoMergeField:'true',senderFirstName:'Avery'
+    },{now:()=>now().toISOString(),approvedRole:'VP Operations'});
+    const draft=next.workspaces[w.id].drafts[0];
+    expect(draft.validation.ok).toBe(true);
+    expect(draft.body).toMatch(/^Hi \{\{first_name\}\},/);
+    expect(draft.contact.title).toBe('VP Operations');
+    expect(draft.evidenceRefs).toContain('https://studio.example/product');
+    expect(JSON.stringify(draft)).not.toMatch(/Mira Fiction|linkedin\.com/);
   });
   it('does not query an unapproved ICP, another workspace, unverified identity or blocked company',async()=>{
     const {state,w}=scenario(),runtime={requestJsonPost:vi.fn()};

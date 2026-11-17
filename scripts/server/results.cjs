@@ -134,8 +134,8 @@ function companyCell(account,tab=''){
   const initials=String(account.name||'Company').split(/\s+/).slice(0,2).map(word=>word[0]).join('').toUpperCase();
   return `<a class="v2-company" href="${accountLink(account,tab)}"><span aria-hidden="true" class="v2-initials">${esc(initials)}</span><span><b>${esc(account.name)}</b><small>${esc(account.domain||'Domain unknown')}</small></span></a>`;
 }
-function table(columns,rows,empty){
-  return `<div class="ss-table-shell"><table class="ss-table v2-table"><thead><tr>${columns.map(title=>`<th scope="col">${esc(title)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${columns.length}"><p class="ss-empty">${esc(empty)}</p></td></tr>`}</tbody></table></div>`;
+function table(columns,rows,empty,className=''){
+  return `<div class="ss-table-shell"><table class="ss-table v2-table ${className}"><thead><tr>${columns.map(title=>`<th scope="col">${esc(title)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${columns.length}"><p class="ss-empty">${esc(empty)}</p></td></tr>`}</tbody></table></div>`;
 }
 function companiesTable(workspace,rows,now){
   return table(['Select','Company','Matched ICP','Top signal','Score','Tier','Evidence','Contact','Status'],rows.map(account=>{
@@ -145,11 +145,11 @@ function companiesTable(workspace,rows,now){
       companyCell(account),
       icp?`<span title="${esc(account.matchedIcpReason||'Saved workspace segment')}">${esc(icp.name)}</span>`:'<span class="muted">Unmatched</span>',
       signal?link(require('../collectors/ats-receipts.cjs').primaryTriggerReceipt(signal).url,signal.title||signal.type)||esc(signal.title||signal.type):'<span class="muted">No active signal</span>',
-      badge(account.fitScore??'—','score'),badge(tierLabel(account),'tier'),`<a href="${accountLink(account,'evidence')}">${evidence.length} sources</a>`,
+      badge(account.fitScore??'—','score'),badge(tierLabel(account),'tier'),`<a href="${accountLink(account,'evidence')}">${evidence.length} ${evidence.length===1?'source':'sources'}</a>`,
       `<a href="${accountLink(account,'personas')}">${badge(contactReady(account)?'Ready':'Missing',contactReady(account)?'ready':'review')}</a>`,
       badge(status,blocked(account)?'blocked':status==='Needs review'?'review':'evidence')
     ];
-  }),'No companies match. Adjust the filters or open New discovery.');
+  }),'No companies match. Adjust the filters or open New discovery.','v2-companies');
 }
 function resultsContent(workspace,filters,accounts,now){
   if(filters.tab==='contacts')return table(['Company','Contact','Personas','Action'],accounts.map(account=>[

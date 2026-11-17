@@ -12,6 +12,6 @@ function buildPlaybookResearchRequest(state,workspaceId,env={}){
 }
 function saveGeneratedPlaybook(state,workspaceId,value,built,now=new Date().toISOString()){
  const w=state.workspaces[workspaceId],g=built.guard;if(!w||w.status==='archived'||Number(w.profileRevision||0)!==g.profileRevision||Number(w.sellerProfile.playbook?.version||0)!==g.playbookVersion||sourceSetHash(state,w)!==g.sourceSetHash)throw Error('The seller, receipts or playbook changed during generation.');
- const raw=expandRunLocalReceiptIds(value,built.receiptIdMap),next=structuredClone(state),playbook=draftPlaybook(raw,receiptsForWorkspace(state,w),now,g.playbookVersion+1,w);next.workspaces[workspaceId].sellerProfile.playbook=playbook;next.auditLog.push({schemaVersion:1,type:'playbook_generated',workspaceId,occurredAt:now,playbookVersion:playbook.version,model:built.request.model,promptVersion:built.request.promptVersion});return next;
+ const raw=expandRunLocalReceiptIds(value,built.receiptIdMap),next=structuredClone(state),playbook=draftPlaybook(raw,receiptsForWorkspace(state,w),now,g.playbookVersion+1,w);next.workspaces[workspaceId].sellerProfile.playbook=playbook;require('../icps.cjs').reseedIcps(next.workspaces[workspaceId]);next.auditLog.push({schemaVersion:1,type:'playbook_generated',workspaceId,occurredAt:now,playbookVersion:playbook.version,model:built.request.model,promptVersion:built.request.promptVersion});return next;
 }
 module.exports={buildPlaybookResearchRequest,saveGeneratedPlaybook};

@@ -30,13 +30,13 @@ async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,search
    const result=await verifier(candidate,{runtime,workspace:read().workspaces[workspaceId],identityResults,resolveIdentity,now:now(),findAlternateNews,onPaywall,firmographicsCollector:sizeCandidate|| (async(target,context)=>{const rows=await query('"'+target.name.replace(/"/g,'')+'" "'+target.domain+'" employees revenue','firmographics');return collectFirmographics(target,{...context,searchResults:rows.map(row=>({...row,kind:'firmographics'}))});})});
    checkRun();
    if(!result.accepted&&!result.vendorAccount){
-     const rejection={name:candidate.name,url:candidate.sourceUrl,reason:result.reason,error:result.error};
+     const rejection={name:candidate.name,url:candidate.sourceUrl,reason:result.reason,error:result.error,...icpMatch(candidate)};
      if(result.newsListingReceipt)await mutate(state=>{
        const saved=recordSource(state,result.newsListingReceipt);
        rejection.newsListing={...result.newsListing,savedSourceId:saved.source.id};
        const workspace=saved.state.workspaces[workspaceId];
        workspace.rejectedDiscovery=[...(workspace.rejectedDiscovery||[]),{
-         name:rejection.name,sourceUrl:'/sources/'+saved.source.id,newsListing:rejection.newsListing,rejectionReason:rejection.reason
+         name:rejection.name,sourceUrl:'/sources/'+saved.source.id,newsListing:rejection.newsListing,rejectionReason:rejection.reason,...icpMatch(candidate)
        }];
        return saved.state;
      });

@@ -37,12 +37,15 @@ function workspaceIcps(workspace={}){
 }
 function reseedIcps(workspace){
   const prior=workspace.icps||[],derived=deriveIcps(workspace);
+  const retired=[];
   workspace.icps=[...derived.map(row=>{
     const saved=prior.find(item=>item.id===row.id);
     if(saved&&!saved.derived)return saved;
     if(saved&&editableDigest(saved)===editableDigest(row))return {...row,version:saved.version,status:saved.status,approvedAt:saved.approvedAt};
+    if(saved)retired.push(saved);
     return {...row,version:(saved?.version||0)+1};
   }),...prior.filter(row=>!row.derived&&!derived.some(item=>item.id===row.id))];
+  if(retired.length)workspace.icpHistory=[...(workspace.icpHistory||[]),...retired];
 }
 function editableDigest({id,name,description,firmographics,buyerPersonas,triggerIds,exclusions,queryRules}){
   return JSON.stringify({id,name,description,firmographics,buyerPersonas,triggerIds,exclusions,queryRules});

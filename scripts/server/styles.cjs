@@ -109,6 +109,8 @@ const WHY_NOW_CSS = `
 `;
 
 const INTERFACE_CSS = `
+.ss-discovery-page .ss-header{justify-content:space-between;flex-wrap:wrap;align-items:flex-start}
+.ss-discovery-page .ss-header>div:first-child{display:block}
 .v2-page{display:grid;gap:18px}
 .v2-page .ss-header{margin:0;align-items:flex-start;gap:18px}
 .v2-actions,.v2-tabs,.v2-chips,.v2-filterbar,.v2-search,.v2-review-form{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
@@ -118,7 +120,9 @@ const INTERFACE_CSS = `
 .v2-chip{display:inline-block;min-height:30px;padding:6px 11px;border:1px solid var(--line);border-radius:20px;color:var(--ink-2);font-size:12px;font-weight:700;overflow-wrap:anywhere;text-decoration:none;background:var(--surface)}
 .v2-chip:hover,.v2-chip.selected{border-color:var(--accent-border);background:var(--accent-soft);color:var(--accent-strong)}
 .v2-filterbar{align-items:flex-start;justify-content:space-between}
-.v2-search input{min-width:min(265px,100%);max-width:100%}
+.v2-search{flex:1;min-width:min(330px,100%)}
+.v2-search input[type=search]{width:min(285px,100%);max-width:100%}
+.v2-search button{width:auto}
 .v2-pop{position:relative}
 .v2-pop summary{cursor:pointer;list-style:none}
 .v2-pop form{position:absolute;inset-inline-end:0;z-index:8;min-width:225px;padding:12px;display:grid;gap:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow-md)}
@@ -126,7 +130,22 @@ const INTERFACE_CSS = `
 .v2-company{display:flex;gap:9px;align-items:center;min-width:135px;color:var(--ink);text-decoration:none}
 .v2-company small,.v2-lead small{display:block;color:var(--ink-2);font-size:11px}
 .v2-initials{display:grid;place-items:center;width:33px;height:33px;flex:0 0 33px;background:var(--accent-soft);color:var(--accent-strong);border-radius:9px;font-size:12px;font-weight:750}
-.v2-table a{overflow-wrap:anywhere}
+.v2-table a{overflow-wrap:anywhere;color:var(--accent-strong)}
+.v2-table a.v2-company{color:var(--ink)}
+.v2-page .ss-table.v2-table{min-width:580px;table-layout:auto}
+.v2-page .ss-table.v2-companies{min-width:860px}
+.v2-page .ss-table.v2-table td,.v2-page .ss-table.v2-table th{white-space:normal;overflow:visible;text-overflow:unset;overflow-wrap:anywhere;vertical-align:middle}
+.v2-page .ss-table.v2-companies th:first-child{width:60px}
+.v2-page .ss-table.v2-companies th:nth-child(2){width:18%}
+.v2-page .ss-table.v2-companies th:nth-child(3){width:16%}
+.v2-page .ss-table.v2-companies th:nth-child(4){width:20%}
+.v2-page .ss-table.v2-companies th:nth-child(5){min-width:66px}
+.v2-page .ss-table.v2-companies th:nth-child(7){min-width:84px}
+.v2-page .ss-table.v2-companies th:nth-child(8){min-width:84px}
+.v2-page .ss-table.v2-companies th:last-child{min-width:104px}
+.v2-page .ss-table.v2-table .ss-badge{display:inline-block;margin:0;padding:3px 8px;overflow-wrap:normal}
+.v2-page .ss-table.v2-companies .ss-badge.score{white-space:nowrap}
+.v2-matched{margin:5px 0;color:var(--ink-2);font-size:12px;overflow-wrap:anywhere}
 .v2-page .ss-badge,.v2-page .tier-chip{white-space:normal;overflow-wrap:anywhere;max-width:100%}
 .v2-lead-list{display:grid;gap:8px;margin-top:12px}
 .v2-lead{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px;border:1px solid var(--line);border-radius:10px;color:var(--ink);text-decoration:none}
