@@ -13,7 +13,7 @@ function discoveryStrategy(workspace,options={}){const strategy=options.strategy
 function findRun(workspace,id){return workspace.runs.find(row=>row.type==='company_discovery'&&row.id===id);}
 function safeError(error){return {code:String(error?.code||'DISCOVERY_FAILED'),message:String(error?.message||'Discovery failed.').slice(0,300),status:Number.isInteger(error?.status)?error.status:null};}
 
-function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),searchProvider=(query,options)=>search(query,options),newsSearchProvider=(query,options)=>searchNews(query,options),triggerVerifier,now=()=>new Date(),id=()=>randomUUID()}={}){
+function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=options=>new CollectorRuntime(options),searchProvider=(query,options)=>search(query,options),newsSearchProvider=(query,options)=>searchNews(query,options),triggerVerifier,onComplete=()=>{},now=()=>new Date(),id=()=>randomUUID()}={}){
   const pending=new Map();
   const updateRun=(workspaceId,runId,fn)=>mutate(state=>{const workspace=state.workspaces[workspaceId],run=findRun(workspace,runId);if(!run)throw new Error('Discovery run disappeared.');fn(run,workspace);return state;});
   const reserveQuery=(workspaceId,runId,settings)=>updateRun(workspaceId,runId,(run,workspace)=>{
@@ -50,7 +50,7 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     run.strategy=strategy;run.apolloCalls=0;
     if(strategy==='trigger_first'&&config.playbook)run.playbookDigest=config.playbook.approvedDigest;
     await mutate(state=>{state.workspaces[workspaceId].runs.push(run);return state;});
-    const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
+    const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).then(result=>{void Promise.resolve().then(()=>onComplete(workspaceId,result)).catch(()=>{});return result;}).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
   }
   async function wait(runId){if(pending.has(runId))await pending.get(runId);for(const workspace of Object.values(read().workspaces)){const run=findRun(workspace,runId);if(run)return structuredClone(run);}return null;}
   return {start,wait};

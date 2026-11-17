@@ -10,7 +10,7 @@ const NAV_SECTIONS = [
     ['/', 'Overview'],
     ['/discovery', 'New discovery'],
     ['/results', 'Results', 'accounts'],
-    ['/review-queue', 'Review queue', 'review']
+    ['/review-queue', 'Priority leads', 'review']
   ]],
   ['Data', [
     ['/history', 'History', 'history'],
@@ -84,8 +84,8 @@ function receiptCount(account = {}) {
   return urls.size;
 }
 
-function tierLabel(account = {}) {
-  if (account.killStatus === 'killed' || account.kills?.length) return 'Killed';
+function tierLabel(account = {},{includeKill=true}={}) {
+  if (includeKill&&(account.killStatus === 'killed' || account.kills?.length)) return 'Killed';
   const value = String(account.tier ?? '').trim().toLowerCase().replace(/^tier\s*/, '');
   if (['1', '2', '3'].includes(value)) return `Tier ${value}`;
   if (value === 'parked') return 'Tier unknown';

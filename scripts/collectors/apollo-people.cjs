@@ -2,7 +2,7 @@
 
 const {rootDomain}=require('../entity-rules.cjs');
 const {approvedPlaybook}=require('../playbook.cjs');
-const {approvedIcps}=require('../icps.cjs');
+const {approvedIcps,matchedIcp}=require('../icps.cjs');
 const ENDPOINT='https://api.apollo.io/api/v1/mixed_people/api_search';
 const MAX_PERSONAS=10;
 const tidy=value=>typeof value==='string'?value.replace(/[\s\u0000-\u001f]+/g,' ').trim().slice(0,160):'';
@@ -15,7 +15,7 @@ function linkedinProfile(value){
   return 'https://www.linkedin.com'+url.pathname.replace(/\/$/,'');
 }
 function linkedinPeopleSearch(company,title){
-  return 'https://www.linkedin.com/search/results/people/?'+new URLSearchParams({keywords:tidy(title)+' '+tidy(company)});
+  return 'https://www.linkedin.com/search/results/people/?'+new URLSearchParams({keywords:[tidy(title),tidy(company)].filter(Boolean).join(' ')});
 }
 function playbookTitles(workspace){
   const roles=approvedPlaybook(workspace)?.buyerRoles;
@@ -29,6 +29,17 @@ function personaTitles(workspace,account){
   const icp=approvedIcps(workspace).find(row=>row.id===id);
   const allowed=new Set((icp?.buyerPersonas||[]).map(canonical));
   return playbookTitles(workspace).filter(title=>allowed.has(canonical(title)));
+}
+function personaRole(workspace,title){
+  const roles=approvedPlaybook(workspace)?.buyerRoles||workspace.sellerProfile?.playbook?.buyerRoles||{};
+  const legacy=workspace.icpConfig?.personas||{};
+  return [['Economic buyer',roles.economicBuyer||legacy.buyerTitles],['Champion',roles.champion||legacy.championTitles],['User',roles.endUser]].find(([,titles])=>(titles||[]).some(value=>canonical(value)===canonical(title)))?.[0]||'Buyer role';
+}
+function searchPaths(workspace,account){
+  const id=account.matchedIcpId||account.icpSegment;
+  const icp=approvedIcps(workspace).find(row=>row.id===id)||matchedIcp(workspace,account);
+  const titles=icp?.buyerPersonas?.length?icp.buyerPersonas:playbookTitles(workspace);
+  return (titles.length?titles:['']).map(title=>({title:title||'People at '+account.name,url:linkedinPeopleSearch(account.name,title)}));
 }
 function matchTitle(title,roles){
   const actual=' '+canonical(title)+' ';
@@ -57,7 +68,8 @@ function savedPersonas(account={}){
 function contactReady(account){return savedPersonas(account).some(row=>row.linkedinUrl);}
 function peopleSettings(env={}){
   const cap=Number(env.APOLLO_PEOPLE_MONTHLY_CALL_LIMIT);
-  return {enabled:env.APOLLO_PEOPLE_ENABLED==='true',cap:Number.isSafeInteger(cap)&&cap>0?Math.min(cap,100):0};
+  const run=Number(env.APOLLO_PEOPLE_MAX_CALLS_PER_RUN);
+  return {enabled:env.APOLLO_ENABLED==='true'&&env.APOLLO_PEOPLE_ENABLED==='true',runCap:Number.isSafeInteger(run)&&run>0?Math.min(run,25):0,cap:Number.isSafeInteger(cap)&&cap>0?Math.min(cap,100):0};
 }
 function accountForSearch(state,workspaceId,accountId){
   const workspace=state.workspaces[workspaceId],account=workspace?.accounts.find(row=>row.id===accountId),domain=rootDomain(account?.domain);
@@ -96,4 +108,4 @@ async function findPersonas({read,mutate,runtime,env,workspaceId,accountId,now=(
   });
 }
 
-module.exports={ENDPOINT,MAX_PERSONAS,linkedinProfile,linkedinPeopleSearch,playbookTitles,personaTitles,sanitizePersonas,savedPersonas,contactReady,peopleSettings,accountForSearch,findPersonas};
+module.exports={ENDPOINT,MAX_PERSONAS,linkedinProfile,linkedinPeopleSearch,playbookTitles,personaTitles,personaRole,searchPaths,sanitizePersonas,savedPersonas,contactReady,peopleSettings,accountForSearch,findPersonas};

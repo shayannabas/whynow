@@ -30,7 +30,9 @@ const {historyPage,runsPage,funnelPage,metricsPage}=require('./activity-pages.cj
 const {resultsPageV2,resultsFilters,exportCompanies,saveSearch,resultHref}=require('./results.cjs');
 const {icpStudio,priorityLeads,settingsPage,exportsPage}=require('./targeting-pages.cjs');
 const {editIcp,updateIcpApproval}=require('../icps.cjs');
-const {findPersonas,peopleSettings,accountForSearch,personaTitles,savedPersonas}=require('../collectors/apollo-people.cjs');
+const {accountForSearch,contactReady,personaTitles,savedPersonas}=require('../collectors/apollo-people.cjs');
+
+const {createPersonaCoordinator}=require('../persona-runner.cjs');
 
 async function readSmallForm(req){
   let body='';
@@ -48,7 +50,6 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   loadState(stateFile);
   let writes = Promise.resolve();
   const jobs=new Map();
-  const personaJobs=new Map();
   const mutate=fn=>{
     const work=writes.then(()=>{const next=fn(loadState(stateFile));saveState(next,stateFile);return next;});
     writes=work.catch(()=>{});return work;
@@ -62,7 +63,8 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
   const refreshCoordinator=providedRefresh||createRefreshCoordinator({read,mutate,researchCoordinator,synthesisCoordinator,env});
   const phaseBRefreshCoordinator=providedPhaseBRefresh||createPhaseBRefreshCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
   const phaseBRefreshAllCoordinator=providedPhaseBRefreshAll||createRefreshAllCoordinator({read,mutate,env,accountCoordinator:phaseBRefreshCoordinator});
-  const discoveryCoordinator=providedDiscovery||createDiscoveryCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
+  const personaCoordinator=createPersonaCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory});
+  const discoveryCoordinator=providedDiscovery||createDiscoveryCoordinator({read,mutate,env,runtimeFactory:guardedRuntimeFactory,onComplete:personaCoordinator.afterDiscovery});
   const prepareDemoCoordinator=providedPrepareDemo||(typeof discoveryCoordinator.wait==='function'&&typeof phaseBRefreshAllCoordinator.wait==='function'?createPrepareDemoCoordinator({read,mutate,env,discoveryCoordinator,refreshAllCoordinator:phaseBRefreshAllCoordinator}):{start:async()=>{throw new Error('Prepare demo coordinator is unavailable.');}});
   // Persisted interrupted research can resume after a local restart. Errors are
   // saved in the workspace and never crash the HTTP server.
@@ -115,6 +117,18 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
         }catch(error){return html(400,search?resultsPageV2(read(),form,error.message):icpStudio(read(),icpParams,error.message));}
         res.writeHead(303,{Location:search?resultHref(resultsFilters(form)):'/icp-studio?'+icpParams});return res.end();
       }
+      if(req.method==='POST'&&pathname==='/results/personas'){
+        if(!localAdmin||req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const form=await readSmallForm(req),state=read(),workspaceId=form.get('workspaceId');
+        if(!workspaceId||workspaceId!==state.activeWorkspaceId)return json(res,409,{error:'Workspace changed. Refresh and try again.'});
+        const selected=new Set(form.getAll('accountId'));
+        const accountIds=state.workspaces[workspaceId].accounts.filter(row=>selected.has(row.id)&&!contactReady(row)).map(row=>row.id);
+        try{
+          if(!accountIds.length)throw Error('Select at least one company marked Search path.');
+          await personaCoordinator.start(workspaceId,{accountIds,requireActive:true});
+        }catch(error){return html(400,resultsPageV2(read(),form,error.message));}
+        res.writeHead(303,{Location:'/results?tab=contacts'});return res.end();
+      }
       if(req.method==='GET'&&pathname==='/discovery')return html(200,discoveryPage(loadState(stateFile),'',requestUrl.searchParams));
       if(req.method==='POST'&&pathname==='/prepare-demo'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
@@ -137,8 +151,9 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       }
       const accountMatch=pathname.match(/^\/accounts\/([^/]+)$/),refreshMatch=pathname.match(/^\/accounts\/([^/]+)\/refresh$/),statusMatch=pathname.match(/^\/accounts\/([^/]+)\/status$/),templateDraftMatch=pathname.match(/^\/accounts\/([^/]+)\/drafts\/template$/);
       if(req.method==='GET'&&accountMatch){
-        const state=read(),id=decodeURIComponent(accountMatch[1]),job=personaJobs.get(state.activeWorkspaceId+':'+id);
-        return html(200,accountPage(state,id,job?.error,requestUrl.searchParams,job?.notice));
+        const state=read(),id=decodeURIComponent(accountMatch[1]),run=state.workspaces[state.activeWorkspaceId]?.runs.findLast(row=>row.type==='persona_search'&&row.accountIds.includes(id));
+        const message=run?.status==='failed'?run.errors[0]?.message:run?.status==='complete'?'Persona search complete.':run?'Persona search is running.':'';
+        return html(200,accountPage(state,id,'',requestUrl.searchParams,message));
       }
       const personaAction=pathname.match(/^\/accounts\/([^/]+)\/(personas|drafts\/persona)$/);
       if(req.method==='POST'&&personaAction){
@@ -160,23 +175,8 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
           }catch(error){return showError(error.message);}
           res.writeHead(303,{Location:location+'?tab=outreach'});return res.end();
         }
-        const settings=peopleSettings(env),key=workspaceId+':'+accountId;
-        if(!settings.enabled||!settings.cap||!env.APOLLO_API_KEY)return showError('Apollo persona search is disabled. Use a LinkedIn buyer-role link.');
-        try{accountForSearch(state,workspaceId,accountId);}catch(error){return showError(error.message);}
-        if([...personaJobs.entries()].some(([id,job])=>id.startsWith(workspaceId+':')&&job.running))return showError('A persona search is already running in this workspace.');
-        const job={running:true,notice:'Checking for buyer personas. Reload to see the result.'};
-        personaJobs.set(key,job);
-        if(personaJobs.size>50)for(const [id,item] of personaJobs){if(!item.running){personaJobs.delete(id);break;}}
-        const scopedMutate=fn=>mutate(current=>{
-          if(current.activeWorkspaceId!==workspaceId)throw Error('Workspace changed. Refresh and try again.');
-          return fn(current);
-        });
-        void findPersonas({read,mutate:scopedMutate,runtime:guardedRuntimeFactory({env}),env,workspaceId,accountId}).then(()=>{
-          job.notice='Persona search complete.';
-        }).catch(error=>{
-          job.notice='';
-          job.error=error.status?`Apollo persona search returned HTTP ${error.status}.`:error.message;
-        }).finally(()=>{job.running=false;});
+        try{await personaCoordinator.start(workspaceId,{accountIds:[accountId],requireActive:true});}
+        catch(error){return showError(error.message);}
         res.writeHead(303,{Location:location+'?tab=personas'});return res.end();
       }
       if(req.method==='POST'&&refreshMatch){

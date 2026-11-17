@@ -81,7 +81,7 @@ describe('Company-scoped persona search',()=>{
   });
   it('limits a response to ten matching people, one page and approved fields with no API cache',async()=>{
     const {state,w}=scenario(),cacheDir=mkdtempSync(join(tmpdir(),'whynow-personas-'));
-    const env={APOLLO_PEOPLE_ENABLED:'true',APOLLO_PEOPLE_MONTHLY_CALL_LIMIT:'1',APOLLO_API_KEY:'fake-test-key',CRAWLER_CONTACT_EMAIL:'crawler@example.test'};
+    const env={APOLLO_ENABLED:'true',APOLLO_PEOPLE_ENABLED:'true',APOLLO_PEOPLE_MONTHLY_CALL_LIMIT:'1',APOLLO_API_KEY:'fake-test-key',CRAWLER_CONTACT_EMAIL:'crawler@example.test'};
     const payload={people:[...fictionalPayload.people,...Array.from({length:12},(_,i)=>({name:'Fictional Person '+i,title:'VP Operations',linkedin_url:'https://www.linkedin.com/in/example-'+i,email:'never-store@example.test'}))]};
     const fetch=vi.fn(async url=>url.endsWith('robots.txt')?new Response('User-agent: *\nAllow: /'):new Response(JSON.stringify(payload),{headers:{'Content-Type':'application/json'}}));
     const runtime=new runtimeModule.CollectorRuntime({env,cacheDir,fetch,lookup:async()=>[{address:'93.184.216.34',family:4}],sleep:async()=>{}});
@@ -123,7 +123,7 @@ describe('Company-scoped persona search',()=>{
   });
   it('does not query an unapproved ICP, another workspace, unverified identity or blocked company',async()=>{
     const {state,w}=scenario(),runtime={requestJsonPost:vi.fn()};
-    const env={APOLLO_PEOPLE_ENABLED:'true',APOLLO_PEOPLE_MONTHLY_CALL_LIMIT:'2',APOLLO_API_KEY:'fake-test-key'};
+    const env={APOLLO_ENABLED:'true',APOLLO_PEOPLE_ENABLED:'true',APOLLO_PEOPLE_MONTHLY_CALL_LIMIT:'2',APOLLO_API_KEY:'fake-test-key'};
     const input={read:()=>state,mutate:async fn=>fn(state),runtime,env,workspaceId:w.id,accountId:'hay',now};
     w.icps[0].status='needs_review';
     await expect(people.findPersonas(input)).rejects.toThrow(/approve the matching ICP/i);

@@ -5,7 +5,7 @@ const {shell,tierLabel}=require('./pages.cjs');
 const {latestTrigger,needsReviewReason}=require('../account-lifecycle.cjs');
 const {approvedPlaybook}=require('../playbook.cjs');
 const {workspaceIcps,matchedIcp}=require('../icps.cjs');
-const {contactReady,savedPersonas}=require('../collectors/apollo-people.cjs');
+const {contactReady,savedPersonas,searchPaths}=require('../collectors/apollo-people.cjs');
 
 const TABS=[['companies','Companies'],['contacts','Contacts'],['signals','Signals'],['sources','Sources'],['queries','Queries'],['runs','Runs']];
 const STATUSES=[['','All'],['tier1','Tier 1'],['tier2','Tier 2'],['tier3','Tier 3'],['review','Needs review'],['approved','Approved'],['blocked','Blocked'],['archived','Archived']];
@@ -82,7 +82,7 @@ function matchStatus(account,status,now){
   return true;
 }
 function accountStatus(account,now){
-  if(blocked(account))return 'Blocked';
+  if(blocked(account))return 'Killed';
   if(archived(account))return 'Archived';
   if(matchStatus(account,'review',now))return 'Needs review';
   if(matchStatus(account,'approved',now))return 'Approved';
@@ -119,8 +119,8 @@ function csvCell(value){
 }
 function exportCompanies(workspace,filters,ids=[],now=new Date()){
   const rows=filterAccounts(workspace,filters,now).filter(row=>!ids.length||ids.includes(row.id)).map(account=>[
-    account.name,account.domain,matchedIcp(workspace,account)?.name,latestTrigger(account,now)?.title,account.fitScore,tierLabel(account),
-    accountReceipts(account).length,contactReady(account)?'Ready':'Missing',accountStatus(account,now)
+    account.name,account.domain,matchedIcp(workspace,account)?.name,latestTrigger(account,now)?.title,account.fitScore,tierLabel(account,{includeKill:false}),
+    accountReceipts(account).length,contactReady(account)?'Ready':'Search path',accountStatus(account,now)
   ]);
   return [['Company','Domain','Matched ICP','Top signal','Fit','Tier','Evidence count','Contact','Status'],...rows].map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n';
 }
@@ -137,24 +137,25 @@ function companyCell(account,tab=''){
 function table(columns,rows,empty,className=''){
   return `<div class="ss-table-shell"><table class="ss-table v2-table ${className}"><thead><tr>${columns.map(title=>`<th scope="col">${esc(title)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${columns.length}"><p class="ss-empty">${esc(empty)}</p></td></tr>`}</tbody></table></div>`;
 }
+function selection(account){return `<input type="checkbox" form="export-results" name="accountId" value="${esc(account.id)}" aria-label="Select ${esc(account.name)}">`;}
 function companiesTable(workspace,rows,now){
   return table(['Select','Company','Matched ICP','Top signal','Score','Tier','Evidence','Contact','Status'],rows.map(account=>{
     const icp=matchedIcp(workspace,account),signal=latestTrigger(account,now),evidence=accountReceipts(account),status=accountStatus(account,now);
     return [
-      `<input type="checkbox" form="export-results" name="accountId" value="${esc(account.id)}" aria-label="Select ${esc(account.name)}">`,
+      selection(account),
       companyCell(account),
       icp?`<span title="${esc(account.matchedIcpReason||'Saved workspace segment')}">${esc(icp.name)}</span>`:'<span class="muted">Unmatched</span>',
       signal?link(require('../collectors/ats-receipts.cjs').primaryTriggerReceipt(signal).url,signal.title||signal.type)||esc(signal.title||signal.type):'<span class="muted">No active signal</span>',
-      badge(account.fitScore??'—','score'),badge(tierLabel(account),'tier'),`<a href="${accountLink(account,'evidence')}">${evidence.length} ${evidence.length===1?'source':'sources'}</a>`,
-      `<a href="${accountLink(account,'personas')}">${badge(contactReady(account)?'Ready':'Missing',contactReady(account)?'ready':'review')}</a>`,
+      badge(account.fitScore??'—','score'),badge(tierLabel(account,{includeKill:false}),'tier'),`<a href="${accountLink(account,'evidence')}">${evidence.length} ${evidence.length===1?'source':'sources'}</a>`,
+      `<a href="${accountLink(account,'personas')}">${badge(contactReady(account)?'Ready':'Search path',contactReady(account)?'ready':'review')}</a>`,
       badge(status,blocked(account)?'blocked':status==='Needs review'?'review':'evidence')
     ];
   }),'No companies match. Adjust the filters or open New discovery.','v2-companies');
 }
 function resultsContent(workspace,filters,accounts,now){
-  if(filters.tab==='contacts')return table(['Company','Contact','Personas','Action'],accounts.map(account=>[
-    companyCell(account,'personas'),badge(contactReady(account)?'Ready':'Missing',contactReady(account)?'ready':'review'),
-    String(savedPersonas(account).length),`<a href="${accountLink(account,'personas')}">${contactReady(account)?'Review personas':'Find personas'}</a>`
+  if(filters.tab==='contacts')return table(['Select','Company','Contact','Personas','Search paths'],accounts.map(account=>[
+    selection(account),companyCell(account,'personas'),badge(contactReady(account)?'Ready':'Search path',contactReady(account)?'ready':'review'),
+    String(savedPersonas(account).length),`<details><summary>Search paths</summary><ul>${searchPaths(workspace,account).map(path=>`<li>${esc(path.title)} · ${link(path.url,'Search on LinkedIn')}</li>`).join('')}</ul></details>`
   ]),'No companies match the contact filters.');
   if(filters.tab==='signals')return table(['Company','Signal','Date','Receipt'],accounts.flatMap(account=>signals(account).map(row=>[
     companyCell(account),esc(row.title||row.type),esc(date(row.occurredAt||row.detectedAt)),link(require('../collectors/ats-receipts.cjs').primaryTriggerReceipt(row).url,'Open receipt')
@@ -183,22 +184,24 @@ function resultsPageV2(state,query=new URLSearchParams(),error=''){
   if(!workspace)return shell(state,'<h1>Results</h1><p>Choose a workspace to view saved results.</p>','Results','/results');
   const filters=resultsFilters(query),now=new Date(),accounts=filterAccounts(workspace,filters,now),runs=discoveryRuns(workspace),options=filterOptions(workspace);
   const saved=(workspace.savedSearches||[]).map(row=>chip(row.name,resultHref(row.filters))).join('');
-  const active=Object.entries(options).filter(([key])=>filters[key]).map(([key,option])=>chip((option.values.find(([value])=>value===filters[key])?.[1]||filters[key])+' ×',resultHref(filters,{[key]:''}),true)).join('');
-  const inputs=Object.entries(options).map(([key,{label,values}])=>`<label>${esc(label)}<select name="${key}"><option value="">Any</option>${values.map(([value,title])=>`<option value="${esc(value)}"${value===filters[key]?' selected':''}>${esc(title)}</option>`).join('')}</select></label>`).join('');
+  const groups=Object.entries(options).filter(([key,value])=>key!=='signal'||value.values.length).map(([key,{label,values}])=>{
+    const value=filters[key],selected=values.find(([id])=>id===value)?.[1]||value;
+    const choices=values.filter(([id])=>id!==value).map(([id,text])=>chip(text,resultHref(filters,{[key]:id}))).join('');
+    return `<div class="v21-filter"><b>${esc(label)}</b>${value?chip(selected+' ×',resultHref(filters,{[key]:''}),true):'<span class="v21-any">Any</span>'}${choices?`<details class="v21-choices"><summary aria-label="Choose ${esc(label)}">+</summary><div>${choices}</div></details>`:''}</div>`;
+  }).join('');
   const body=`<div class="ss-page v2-page">
     <header class="ss-header"><div><h1 class="ss-title">Results</h1><p class="ss-subtitle">Review discovery, saved signals and evidence for ${esc(workspace.name)}.</p></div>
     <div class="v2-actions">
       <details class="v2-pop"><summary class="ss-btn">Save search</summary><form method="post" action="/results/searches">${hiddenFilters(filters)}<input type="hidden" name="workspaceId" value="${esc(workspace.id)}"><label>Search name<input name="name" required maxlength="80"></label><button class="ss-btn primary">Save</button></form></details>
       <form id="export-results" action="/results/export">${hiddenFilters(filters)}<button type="submit" class="ss-btn">Export</button></form>
-      <a class="ss-btn primary" href="${esc(resultHref(filters,{tab:'contacts',contact:'missing'}))}">Find missing contacts</a>
+      <button type="submit" form="export-results" formmethod="post" formaction="/results/personas" name="workspaceId" value="${esc(workspace.id)}" class="ss-btn primary">Find missing contacts</button>
     </div></header>
     ${error?`<p class="notice" role="alert">${esc(error)}</p>`:''}
     <section class="panel v2-surface">
       <nav aria-label="Result views" class="v2-tabs">${TABS.map(([key,label])=>chip(label,resultHref(filters,{tab:key,contact:key==='contacts'?filters.contact:''}),filters.tab===key)).join('')}</nav>
-      <div class="v2-filterbar">
-        <form class="v2-search" action="/results">${hiddenFilters(filters,['q'])}<input type="search" name="q" aria-label="Search results" placeholder="Search company, domain or ICP" value="${esc(filters.q)}"><button class="ss-btn">Search</button></form>
-        <div class="v2-chips">${active}<details class="v2-pop"><summary class="ss-btn" aria-label="Add filter">+ Filter</summary><form action="/results">${hiddenFilters(filters,Object.keys(options))}${inputs}<a href="/kill-log">Review exclusions</a><button class="ss-btn primary">Apply filters</button></form></details>${filters.contact==='missing'?chip('Missing contacts ×',resultHref(filters,{contact:''}),true):''}</div>
-      </div>
+      <div class="v21-filters" aria-label="Result filters">${groups}${filters.contact==='missing'?chip('Search path ×',resultHref(filters,{contact:''}),true):''}</div>
+      <h2 class="v21-result-count">${accounts.length} ${accounts.length===1?'company':'companies'} shown</h2>
+      <form class="v2-search" action="/results">${hiddenFilters(filters,['q'])}<input type="search" name="q" aria-label="Search results" placeholder="Search company, domain or ICP" value="${esc(filters.q)}"><button class="ss-btn">Search</button></form>
       ${saved?`<nav class="v2-chips" aria-label="Saved searches">${saved}</nav>`:''}
       <nav class="v2-chips" aria-label="Discovery sessions">${chip(`All sessions · ${workspace.accounts.length}`,resultHref(filters,{session:''}),!filters.session)}${runs.length?chip(`Latest · ${sessionIds(runs[0]).size}`,resultHref(filters,{session:'latest'}),filters.session==='latest'):''}${runs.map(run=>chip(`${date(run.startedAt)} · ${sessionIds(run).size}`,resultHref(filters,{session:run.id}),filters.session===run.id)).join('')}</nav>
       <nav class="v2-chips" aria-label="Account status">${STATUSES.map(([key,label])=>chip(label,resultHref(filters,{status:key}),filters.status===key)).join('')}</nav>

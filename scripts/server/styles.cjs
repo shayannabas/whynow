@@ -120,9 +120,20 @@ const INTERFACE_CSS = `
 .v2-chip{display:inline-block;min-height:30px;padding:6px 11px;border:1px solid var(--line);border-radius:20px;color:var(--ink-2);font-size:12px;font-weight:700;overflow-wrap:anywhere;text-decoration:none;background:var(--surface)}
 .v2-chip:hover,.v2-chip.selected{border-color:var(--accent-border);background:var(--accent-soft);color:var(--accent-strong)}
 .v2-filterbar{align-items:flex-start;justify-content:space-between}
-.v2-search{flex:1;min-width:min(330px,100%)}
-.v2-search input[type=search]{width:min(285px,100%);max-width:100%}
+.v2-search{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:8px;min-width:0}
+.v2-search input[type=search]{width:100%;min-width:0}
 .v2-search button{width:auto}
+.v21-filters{display:flex;flex-wrap:wrap;gap:6px}
+.v21-filter{display:flex;align-items:center;gap:7px;padding:4px 8px;border:1px solid var(--line);background:var(--surface);border-radius:8px;font-size:12px}
+.v21-filter .v2-chip{min-height:22px;padding:3px 8px}
+.v21-any{color:var(--ink-2);background:var(--neutral-soft);padding:3px 7px;border-radius:15px}
+.v21-choices{position:relative}
+.v21-choices summary{list-style:none;padding:1px 5px;cursor:pointer;color:var(--accent-strong);font-weight:800}
+.v21-choices>div{position:absolute;top:100%;left:0;z-index:12;min-width:160px;max-width:min(90vw,360px);max-height:260px;overflow:auto;display:grid;gap:5px;padding:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-md)}
+.v21-result-count{font-size:16px;margin:0}
+.v2-chip,.v2-page .ss-table.v2-table .ss-badge{white-space:nowrap}
+.v2-table td{min-width:min-content}
+.v2-page .v2-table th:nth-child(8){min-width:108px}
 .v2-pop{position:relative}
 .v2-pop summary{cursor:pointer;list-style:none}
 .v2-pop form{position:absolute;inset-inline-end:0;z-index:8;min-width:225px;padding:12px;display:grid;gap:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow-md)}
