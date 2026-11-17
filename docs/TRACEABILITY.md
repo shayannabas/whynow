@@ -1,5 +1,15 @@
 # WhyNow traceability
 
+## General pipeline v5 Phase 2 — one-use Vercel verification, 2026-11-16
+
+`run-phase2-vercel-nov16.cjs` commits explicit owner limits, consumes an exclusive marker and durable audit/run record before requests, applies a fixed destination/attempt guard over the existing guarded runtime, sanitizes organization response fields before caching, and restores child-process flags in finally. `phase2-vercel-batch.test.mjs` adds seven offline fictional-response tests for robots denial, refused StepA, no duplicate enrichment, page1/per_page25, 429 counting, reported paid-cost stop, one-use replay rejection and incomplete OpenAI usage/no retry. Whole suite:83 files,416 pass/1 intentional skip.
+
+Actual authorized run: exactly1 robots check/HTTP200 allowing both API paths, then1 organizations/enrich attempt for Rogo/rogo.ai, HTTP200 but no usable expected organization object. No StepB/search, pattern or candidates. Safe metadata does not establish credit usage or usable free-plan access. Original response body was intentionally not retained. Stop honored; do not repeat.
+
+Independently, one saved-page Vercel playbook call completed with GPT-5.5/low/max8000/no retry. Estimate$0.398220, usage20171 input/2210 output/0 reasoning, usage-based cost$0.167155. Version1 needs_review has10 triggers/3 anti-triggers/4 blocking warnings. The capitalization and compliance-number heuristics have likely false positives; rules/output are unchanged and no approval occurred. Until owner approval the playbook retains legacy scoring behavior.
+
+Preservation checks confirm Vercel seller approval/fields/revision5 (excluding its new pending playbook), Resolve and all saved drafts. .env unchanged, process provider flags restored disabled/zero, no Serper/seller-page fetch/refresh/contact call, port3000 kept providers-disabled. [Full result, policies and warnings](GENERAL-PIPELINE-PHASE-2.md); [offline output](GENERAL-PIPELINE-PHASE-2-TESTS.txt). Batch used/exhausted, not an Apollo success claim; further live work requires a new owner instruction.
+
 ## General pipeline v5 Phase 1 — offline, 2026-11-14
 
 The owner-approved [v5 plan](GENERAL-PIPELINE-PLAN.md), including the explicit no-new-fit-gate clarification, governs this checkpoint. [Verification/file inventory](GENERAL-PIPELINE-PHASE-1.md) and [full test output](GENERAL-PIPELINE-PHASE-1-TESTS.txt).

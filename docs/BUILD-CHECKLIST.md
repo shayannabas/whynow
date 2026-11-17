@@ -1,3 +1,18 @@
+# Vercel Phase 2 — one-use checkpoint, November 16, 2026
+
+- [x] Record owner authorization and commit offline-tested one-use controls before network access (`14c42d1`).
+- [x] One Apollo robots check: HTTP200; both company API paths allowed. Guards preserved.
+- [x] StepA attempted once on Rogo/rogo.ai: HTTP200, no usable organization in the expected response schema. Stop honored; StepB/search not run. No pattern/candidates/rejections. Credit usage was not exposed; usable free-plan access remains unverified.
+- [x] One GPT-5.5 Vercel playbook call, saved pages only, low reasoning/max8000/no retry. Preflight$0.398220 within$0.50; returned usage20171 input/2210 output/0 reasoning; cost$0.167155.
+- [x] Save playbook v1 needs_review:10 triggers,3 anti-triggers,4 blocking warnings. Flag likely validator false positives without silently loosening rules or changing output. No approval.
+- [x] Apollo false/zero caps and OpenAI false/zero restored process-only; .env unchanged. Preserve Vercel approved seller revision5, Resolve and all drafts. No Serper, seller-page fetches, refreshes or contacts; port3000 kept running disabled.
+- [x] Offline suite83 files:416 passed/1 existing skip. [Results and trigger/warning details](GENERAL-PIPELINE-PHASE-2.md); [full output](GENERAL-PIPELINE-PHASE-2-TESTS.txt).
+- [ ] Apollo usable enrichment/search and real lookalike discovery: NOT VERIFIED. Authorization exhausted; no retry or continuation is authorized.
+
+Change log — November16: consumed the single Vercel verification batch; recorded partial Apollo failure and pending playbook generation honestly. Phase3 documentation/demo work and further live investigation remain unstarted.
+
+## Historical Phase 1 checkpoint
+
 # General pipeline v5 — Phase 1 offline checkpoint, November 14, 2026
 
 Source of truth: [General Pipeline Plan](GENERAL-PIPELINE-PLAN.md). [Verification and file inventory](GENERAL-PIPELINE-PHASE-1.md).
