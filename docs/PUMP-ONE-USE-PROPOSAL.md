@@ -33,3 +33,6 @@ The owner authorized one run on November 17, 2026 after both owner approvals per
 - Use up to **10 Apollo organizations/enrich attempts** for missing employee counts on promoted accounts. Keep the estimate and receipt. Company search and people endpoints are outside the authorization.
 - Use the existing scorecard, tiering and kills. Save deterministic Demo drafts only for Act now. Zero OpenAI.
 - The first HTTP error stops the entire batch. Robots HTTP errors count. Restore all providers to disabled with zero caps. Retain the existing approved profile, playbook, .env, active workspace and other saved state.
+
+
+The separately authorized public-page resilience rerun is also consumed. See [the rerun results](PUMP-PART-B-RERUN.md). The stop-on-any-HTTP rule above applies to the original run.

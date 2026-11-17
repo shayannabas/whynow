@@ -18,7 +18,7 @@ const alternateUrl='https://cloud-news.example/fir-market-series-a',otherUrl='ht
 const article=`<meta property="article:published_time" content="2026-11-15T12:00:00Z"><article><h1>${newsTitle}</h1><p>Fir Market raises Series A capital for infrastructure and revenue operations.</p></article>`;
 const listing=url=>({title:newsTitle,link:url,snippet:'Fir Market said the new round will support its cloud infrastructure.',date:'2 days ago'});
 
-function harness({approved=true,robotsStatus=200,articleStatus=200,providerStatus=200,providerRefusal=false,alternateMode}={}) {
+function harness({approved=true,robotsStatus=200,articleStatus=200,providerStatus=200,providerRefusal=false,alternateMode,officialIdentity=true}={}) {
   const {state,id,workspace,raw,receipts}=fixture();
   Object.assign(workspace,{name:'Pump',status:approved?'active':'needs_review',universeSeeds:[{name:'Fir Market',domain:'firmarket.example',segment:'revenue_teams'}]});
   workspace.sellerProfile={...workspace.sellerProfile,sellerName:'Pump',domain:'pump.co',approvedAt:approved?date:null};
@@ -42,7 +42,7 @@ function harness({approved=true,robotsStatus=200,articleStatus=200,providerStatu
         if(q.startsWith('"Fir Market"'))return json({news:alternateMode?[listing(alternateUrl),listing(otherUrl),listing(unusedUrl)]:[]});
         return json({news:q.includes('raises')?[listing(newsUrl)]:[]});
       }
-      return json({organic:q.includes('Fir Market')?[{title:'Fir Market | Official',link:'https://firmarket.example/'}]:[]});
+      return json({organic:q.includes('Fir Market')&&officialIdentity?[{title:'Fir Market | Official',link:'https://firmarket.example/'}]:[]});
     }
     if(value===newsUrl)return response(articleStatus,articleStatus===200?article:'Unavailable','text/html');
     if(value===alternateUrl)return alternateMode==='verify'?response(404,'Missing','text/html'):
@@ -121,6 +121,19 @@ it('keeps a dated listing in research sections after the primary, a paywall and 
     expect(account.triggers).toEqual([]);
     expect(state.sources[account.newsListing.savedSourceId]).toMatchObject({url:newsUrl,title:'news listing (unverified article)'});
     expect(h.fetch.mock.calls.some(([url])=>url===unusedUrl)).toBe(false);
+  }finally{h.cleanup();}
+});
+
+it('retains the listing on a rejected lead even when the company domain is unresolved',async()=>{
+  const h=harness({articleStatus:403,officialIdentity:false});
+  try{
+    const r=await h.run();
+    expect(r.rejections[0]).toMatchObject({name:'Fir Market',reason:'identity_unresolved',newsListing:{label:'news listing (unverified article)'}});
+    expect(r.sections.topProspects).toEqual([]);
+    const state=loadState(h.file);
+    const [lead]=state.workspaces[h.id].rejectedDiscovery;
+    expect(state.sources[lead.newsListing.savedSourceId].text).toContain(newsTitle);
+    expect(state.workspaces[h.id].accounts).toEqual([]);
   }finally{h.cleanup();}
 });
 

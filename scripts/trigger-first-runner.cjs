@@ -23,7 +23,20 @@ async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,search
    }:undefined;
    const result=await verifier(candidate,{runtime,workspace:read().workspaces[workspaceId],identityResults,now:now(),findAlternateNews,onPaywall,firmographicsCollector:sizeCandidate|| (async(target,context)=>{const rows=await query('"'+target.name.replace(/"/g,'')+'" "'+target.domain+'" employees revenue','firmographics');return collectFirmographics(target,{...context,searchResults:rows.map(row=>({...row,kind:'firmographics'}))});})});
    checkRun();
-   if(!result.accepted&&!result.vendorAccount){rejected.push({name:candidate.name,url:candidate.sourceUrl,reason:result.reason,error:result.error});continue;}
+   if(!result.accepted&&!result.vendorAccount){
+     const rejection={name:candidate.name,url:candidate.sourceUrl,reason:result.reason,error:result.error};
+     if(result.newsListingReceipt)await mutate(state=>{
+       const saved=recordSource(state,result.newsListingReceipt);
+       rejection.newsListing={...result.newsListing,savedSourceId:saved.source.id};
+       const workspace=saved.state.workspaces[workspaceId];
+       workspace.rejectedDiscovery=[...(workspace.rejectedDiscovery||[]),{
+         name:rejection.name,sourceUrl:'/sources/'+saved.source.id,newsListing:rejection.newsListing,rejectionReason:rejection.reason
+       }];
+       return saved.state;
+     });
+     rejected.push(rejection);
+     continue;
+   }
    checkRevision();await mutate(state=>{
      const live=state.workspaces[workspaceId],account=result.account||result.vendorAccount;if(live.accounts.some(a=>a.domain===account.domain))return state;
      if(result.page){const saved=recordSource(state,{url:result.page.url,text:require('./collectors/common.cjs').stripHtml(result.page.text),title:account.name,fetchedAt:result.page.fetchedAt});state=saved.state;}

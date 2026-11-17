@@ -4,9 +4,9 @@ Offline default discovery and Today fallback are implemented. Apollo organizatio
 
 Pump Part A rerun `pump-part-a-nov17-2026-priority-rerun` is used and exhausted. Reused 18 pages, spent 15 first-party requests and saved 11 more pages. Zero Serper and Apollo. All three GPT-5.5 requests passed the 40,000 input-token preflight. Actual cost $0.343355 with cached input tokens 0 / 19,200 / 19,200. Pump profile revision 1 and playbook version 1 are needs_review. Saved 15 customers, 14 comparison entries, five segments and six triggers. No approval. See [rerun results](docs/PUMP-PART-A-RERUN.md). Providers disabled and caps zero, .env unchanged. Part A is exhausted. Follow the separate Part B authorization below.
 
-## Pump Part B — one authorized rerun
+## Pump Part B rerun — used and exhausted
 
-The owner authorized one new Pump Part B batch after offline tests and a commit. Verify the saved Pump profile and playbook v6 approvals without saving forms or switching the workspace. Keep the same caps: 40 Serper queries, 150 free requests, 25 candidates, 10 Apollo organization enrichments, and zero OpenAI. Stop on provider failures. Record and skip third-party page failures, with a maximum of 15 skipped pages. Try up to two outlets for the same news event. If verification still fails, keep an explicitly unverified listing for research only. Templates remain Act now only. Restore providers disabled and caps zero. Interface v2 is offline and begins after the rerun report is committed.
+The second one-use Pump batch completed under the revised public-page failure policy. It checked 25 leads and skipped four pages. Usage: 19 live Serper requests and 17 cache hits against 36 ledger reservations, 25 free HTTP requests, zero Apollo and OpenAI, zero accounts and templates. Two unverified news listings were retained from saved responses on rejected leads. Approvals and the active workspace were preserved. Providers are disabled with zero caps. See [Pump rerun results](docs/PUMP-PART-B-RERUN.md). No further live batch is authorized. Interface v2 is offline, pending the owner's specification.
 
 ## Original Pump Part B — used and exhausted
 

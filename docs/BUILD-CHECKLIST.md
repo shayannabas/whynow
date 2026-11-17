@@ -1,3 +1,14 @@
+# November 17 — Pump public-page resilience rerun
+
+- [x] Skip blocked public pages with candidate-level reasons and a 15-error cap. Provider auth, quota, rate limit and server errors stop the batch.
+- [x] Try up to two outlets matching the same event. Dated unverified listings stay out of Act now and draft evidence.
+- [x] Rerun once with approved playbook v6. Checked 25 leads, skipped four pages, used 19 live Serper requests and 25 free requests. Zero promoted accounts, Apollo calls, OpenAI calls or drafts.
+- [x] Retain two listings on rejected leads using saved responses. Preserve approvals, workspace selection and .env. [Run results](PUMP-PART-B-RERUN.md)
+- [x] Full suite 456 passed, one existing skip.
+- [ ] Interface v2 is offline and requires the missing specification.
+
+## Prior checkpoint
+
 # November 17 — Pump Part B stopped on HTTP 403
 
 - [x] Verify Pump seller revision 4 and playbook v6 owner approvals before consuming the batch.

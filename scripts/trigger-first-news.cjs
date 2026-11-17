@@ -152,12 +152,16 @@ async function verifyNewsCandidate(candidate,context) {
   const listingText=[candidate.title,candidate.snippet].filter(Boolean).join('\n');
   if(!listingText||!rule.keywords.some(term=>listingText.toLowerCase().includes(term.toLowerCase())))return primary;
   const result=await verifyOperating(candidate,{...context,event:null,kind:NEWS_KIND,sourceUrl:candidate.sourceUrl});
-  if(!result.accepted)return result;
-  const listing={label:NEWS_LISTING_LABEL,title:candidate.title,snippet:candidate.snippet,listedAt:candidate.sourceDate,sourceUrl:candidate.sourceUrl,citable:false,attempts:skipped};
-  return {...result,account:{...result.account,newsListing:listing},newsListingReceipt:{
-    url:candidate.sourceUrl,title:NEWS_LISTING_LABEL,text:'Serper News listing date: '+candidate.sourceDate+'\n'+listingText,
-    fetchedAt:now.toISOString()
-  }};
+  const {listing,receipt}=buildNewsListing(candidate,skipped,now.toISOString());
+  return {...result,newsListing:listing,newsListingReceipt:receipt,
+    ...(result.accepted?{account:{...result.account,newsListing:listing}}:{})};
 }
 
-module.exports={NEWS_KIND,NEWS_LISTING_LABEL,buildNewsTasks,candidateFromNewsResult,sameNewsEvent,alternateNewsCandidates,verifyNewsCandidate};
+function buildNewsListing(candidate,attempts,fetchedAt) {
+  const listing={label:NEWS_LISTING_LABEL,title:candidate.title,snippet:candidate.snippet,listedAt:candidate.sourceDate,sourceUrl:candidate.sourceUrl,citable:false,attempts};
+  const receipt={url:listing.sourceUrl,title:listing.label,
+    text:'Serper News listing date: '+listing.listedAt+'\n'+[listing.title,listing.snippet].filter(Boolean).join('\n'),fetchedAt};
+  return {listing,receipt};
+}
+
+module.exports={NEWS_KIND,NEWS_LISTING_LABEL,buildNewsTasks,candidateFromNewsResult,sameNewsEvent,alternateNewsCandidates,verifyNewsCandidate,buildNewsListing};
