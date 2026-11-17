@@ -533,6 +533,6 @@ function createResearchCoordinator({
 
 module.exports={
   createResearchCoordinator,ResearchError,safeError,normalizeResearchUrl,selectResearchTargets,selectResearchUrls,discoveryQueries,
-  homepageTargets,sitemapTargets,externalTargetForRow,
+  homepageTargets,sitemapTargets,externalTargetForRow,rankUrl,titleFromHtml,truncateUtf8,
   COMMON_SELLER_PATHS,LOW_PRIORITY_PATH_PATTERN,MAX_CANDIDATES,MAX_SERPER_QUERIES,MAX_FETCHED_PAGES,MAX_STORED_TEXT_PER_PAGE,MAX_STORED_TEXT_PER_RUN
 };
