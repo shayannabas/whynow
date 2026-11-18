@@ -1,5 +1,5 @@
 const {getWorkspace,updateWorkspace}=require('../server/state.cjs');
-const {json}=require('../utils.cjs');
+const {json,esc}=require('../utils.cjs');
 const {resolveSeller,confirmCandidate}=require('./resolve-seller.cjs');
 const {onboardingPage}=require('./pages.cjs');
 const {profilePage}=require('./profile-page.cjs');
@@ -49,7 +49,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
     json(res,200,{schemaVersion:1,workspaceId:workspace.id,workspaceStatus:workspace.status,research:workspace.research,providers});return true;
   }
 
-  const allowed=new Set(['/onboarding/playbook/save','/onboarding/playbook/approve','/onboarding/start','/onboarding/resolve','/onboarding/confirm','/onboarding/profile/save','/onboarding/profile/approve','/onboarding/profile/restore-competitor','/onboarding/profile/confirm-domain','/onboarding/research/confirm','/onboarding/research/retry','/onboarding/research/generate','/onboarding/refresh/approve','/onboarding/refresh/reject']);
+  const allowed=new Set(['/onboarding/messaging/approve','/onboarding/messaging/templates','/onboarding/playbook/save','/onboarding/playbook/approve','/onboarding/start','/onboarding/resolve','/onboarding/confirm','/onboarding/profile/save','/onboarding/profile/approve','/onboarding/profile/restore-competitor','/onboarding/profile/confirm-domain','/onboarding/research/confirm','/onboarding/research/retry','/onboarding/research/generate','/onboarding/refresh/approve','/onboarding/refresh/reject']);
   if(req.method!=='POST'||!allowed.has(pathname)){json(res,404,{error:'Page not found'});return true;}
   if(req.headers.origin!==`http://${req.headers.host}`){json(res,403,{error:'Use the local page form'});return true;}
   let form;
@@ -87,6 +87,25 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
           rejectRefresh(current,id,{proposalId:form.get('proposalId'),revision:form.get('revision')});
       });
       redirect('/onboarding/profile');
+    }catch(error){html(400,profilePage(state,{error:error.message}));}
+    return true;
+  }
+
+  if(pathname.startsWith('/onboarding/messaging/')){
+    const {approveMessaging,createActNowTemplates}=require('./messaging-proof.cjs');
+    try{
+      let outcome;
+      await mutate(current=>{
+        if(current.activeWorkspaceId!==id)throw Error('Workspace changed. Refresh and try again.');
+        if(pathname.endsWith('/approve'))return approveMessaging(current,id,form);
+        outcome=createActNowTemplates(current,id,form.get('profileRevision'));
+        return outcome.state;
+      });
+      if(!outcome)redirect('/onboarding/profile#messaging-proof');
+      else html(200,require('../server/pages.cjs').shell(outcome.state,`<section class="panel"><h1>Act now templates</h1>
+        <p>${outcome.created.length} created · ${outcome.blocked.length} need attention</p>
+        <ul>${outcome.created.map(row=>`<li><a href="/accounts/${encodeURIComponent(row.id)}?tab=outreach">${esc(row.name)}</a></li>`).join('')}
+        ${outcome.blocked.map(row=>`<li>${esc(row.name)} · ${esc(row.reason)}</li>`).join('')}</ul><a href="/onboarding/profile#messaging-proof">Back to messaging</a></section>`,'Act now templates','/onboarding/profile'));
     }catch(error){html(400,profilePage(state,{error:error.message}));}
     return true;
   }
