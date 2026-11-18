@@ -146,7 +146,7 @@ const INTERFACE_CSS = `
 .v2-page .ss-table.v2-table{min-width:580px;table-layout:auto}
 .v2-page .ss-table.v2-companies{min-width:860px}
 .v2-page .ss-table.v2-table td,.v2-page .ss-table.v2-table th{white-space:normal;overflow:visible;text-overflow:unset;overflow-wrap:anywhere;vertical-align:middle}
-.v2-page .ss-table.v2-companies th:first-child{width:60px}
+.v2-page .ss-table.v2-companies th:first-child{min-width:58px;width:60px;white-space:nowrap}
 .v2-page .ss-table.v2-companies th:nth-child(2){width:18%}
 .v2-page .ss-table.v2-companies th:nth-child(3){width:16%}
 .v2-page .ss-table.v2-companies th:nth-child(4){width:20%}
@@ -175,6 +175,7 @@ const INTERFACE_CSS = `
 .v2-role-list{display:grid;gap:8px}
 .v2-role-list li{display:flex;gap:10px;flex-wrap:wrap}
 
+.brief .panel.insight-card h2:before{content:none}
 .v21-timing,.v21-person-head,.v21-sender{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .v21-timing>span+span:before{content:"·";margin-right:10px;color:var(--ink-2)}
 .brief-company,.v21-icp-summary{overflow-wrap:anywhere}

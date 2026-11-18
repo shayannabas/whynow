@@ -50,7 +50,7 @@ function publicFailures(rows=[]){
 function stageStates(cursor,done,failed){
   return STAGES.map((name,index)=>({name,status:index+1<cursor||done?'Done':index+1===cursor?failed?'Needs attention':'Current':'Locked'}));
 }
-function pipelineProgress(state,{mode='',step=0,runId='',now=new Date()}={}){
+function pipelineProgress(state,{mode='',step=0,runId='',now=new Date(),env={}}={}){
   const w=work(state),model=pipelineModel(w),research=model.research,synthesis=research?.synthesisJob;
   const runs=discoveryRuns(w);
   const replay=mode==='replay'?runs.find(run=>terminal(run)&&(!runId||run.id===runId)):null;
@@ -65,6 +65,8 @@ function pipelineProgress(state,{mode='',step=0,runId='',now=new Date()}={}){
   const details=researchingActive?{
     serper:count(research?.usage?.queriesReserved),serperCap:count(research?.caps?.queries),
     pages:count(research?.usage?.pagesSaved),
+    openaiReservedUsd:Number.isInteger(w?.budgets?.openai?.reservedMicros)?w.budgets.openai.reservedMicros/1e6:null,
+    openaiCapUsd:Number(env.OPENAI_MONTHLY_LIMIT_USD)>0?Number(env.OPENAI_MONTHLY_LIMIT_USD):null,
     openaiUsd:(synthesis?.calls||[]).length?synthesis.calls.reduce((sum,call)=>sum+(Number(call.costUsd)||0),0):null
   }:runProgress(run);
   const fraction=researchingActive?(research?.steps||[]).filter(item=>item.status==='complete').length/Math.max(1,research?.steps?.length||0):

@@ -32,7 +32,8 @@ const progressClient=`
       const d=p.details,usage=[];
       if(d.serper!=null)usage.push(d.serper+(d.serperCap!=null?' of '+d.serperCap:'')+' searches used');
       if(d.apollo!=null)usage.push(d.apollo+(d.apolloCap!=null?' of '+d.apolloCap:'')+' Apollo calls used');
-      if(d.openaiUsd!=null)usage.push('OpenAI $'+d.openaiUsd.toFixed(4));
+      if(d.openaiUsd!=null)usage.push('OpenAI $'+d.openaiUsd.toFixed(4)+' used');
+      if(d.openaiReservedUsd!=null)usage.push('OpenAI $'+d.openaiReservedUsd.toFixed(4)+(d.openaiCapUsd!=null?' of $'+d.openaiCapUsd.toFixed(2):'')+' reserved this month');
       if(d.pages!=null)usage.push(d.pages+' seller pages saved');
       if(d.candidates!=null)usage.push(d.candidates+' candidates found');
       if(d.checked!=null)usage.push(d.checked+(d.selected!=null?' of '+d.selected:'')+' companies checked');

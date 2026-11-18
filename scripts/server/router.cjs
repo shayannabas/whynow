@@ -88,7 +88,7 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       if(req.method==='GET'&&pathname==='/pipeline/progress'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
         const q=requestUrl.searchParams;
-        return json(res,200,pipelineProgress(read(),{mode:q.get('mode'),step:q.get('step'),runId:q.get('run')}));
+        return json(res,200,pipelineProgress(read(),{mode:q.get('mode'),step:q.get('step'),runId:q.get('run'),env}));
       }
       if(req.method==='POST'&&['/pipeline/icps/approve','/pipeline/discovery'].includes(pathname)){
         if(!localAdmin||req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});

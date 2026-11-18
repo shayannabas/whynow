@@ -49,6 +49,7 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
     if(workspace.runs.some(row=>row.type==='company_discovery'&&['queued','running'].includes(row.status)))throw new Error('A discovery run is already active.');
     const run={schemaVersion:1,id:id(),type:'company_discovery',status:'queued',profileRevision:workspace.profileRevision||0,startedAt:now().toISOString(),finishedAt:'',queryCap,serperQueries:0,tasks:[],rawFound:0,passedNoiseGate:0,newAccounts:0,newAccountIds:[],rejectedCount:0,errors:[]};
     run.strategy=strategy;run.apolloCalls=0;
+    if(strategy==='lookalike')run.apolloCap=require('./collectors/apollo.cjs').settings(env).runCap;
     if(strategy==='trigger_first'&&config.playbook)run.playbookDigest=config.playbook.approvedDigest;
     await mutate(state=>{state.workspaces[workspaceId].runs.push(run);return state;});
     const promise=Promise.resolve().then(()=>execute(workspaceId,run.id)).then(result=>{void Promise.resolve().then(()=>onComplete(workspaceId,result)).catch(()=>{});return result;}).catch(async error=>{try{await updateRun(workspaceId,run.id,saved=>{saved.status='failed';saved.finishedAt=now().toISOString();saved.errors.push(safeError(error));});}catch{}return null;}).finally(()=>pending.delete(run.id));pending.set(run.id,promise);return run;
