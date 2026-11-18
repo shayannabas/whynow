@@ -1,5 +1,13 @@
 # WhyNow traceability
 
+## Interface v2.1 — November 17
+
+- Contact search paths and scoped jobs use `scripts/collectors/apollo-people.cjs` and `scripts/persona-runner.cjs`. Mocked fixture tests cover master switch, approved roles, caps, deduplication and count-only run records.
+- The guide and header use `scripts/pipeline.cjs`, `scripts/server/pipeline-page.cjs` and `scripts/server/pipeline-progress.cjs`. Tests cover sequencing, saved counts, elapsed time and all eight provider-free replay stages.
+- Messaging wording uses `scripts/onboarding/messaging-proof.cjs`. Tests cover verbatim first-party evidence, explicit approval and revision invalidation. Six Pump suggestions remain pending.
+- Desktop verification used only fictional companies and people. The suite passed 475 tests with one existing skip. Pump's one-use people test has zero attempts because its matched ICP is pending. [Verification and receipts](INTERFACE-V2-1-VERIFICATION.md)
+
+
 
 ## Interface v2 and ICPs — November 17
 

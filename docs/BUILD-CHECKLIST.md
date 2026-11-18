@@ -1,3 +1,12 @@
+# November 17 — Interface v2.1
+
+- [x] Contact search paths, bounded persona jobs, visible Results filters and separate Killed status.
+- [x] Trigger age and receipts, compact lead actions, ICP query previews and inline role drafts with one sender setting.
+- [x] Eight guided stages, explicit owner review, provider-free Replay and persistent progress with saved counts.
+- [x] Six Pump wording proposals from saved first-party receipts. Owner review is pending and no templates were created.
+- [ ] Pump Apollo one-use test blocked at ICP approval preflight. Zero calls and no authorization consumed.
+- [x] Full offline suite: 95 files, 475 passed, one existing skip. Desktop verified with fictional data. Port 3000 stays providers-disabled. [Verification](INTERFACE-V2-1-VERIFICATION.md)
+
 # November 17 — Interface v2
 
 - [x] Commit the [Interface v2 specification](GENERAL-PIPELINE-PLAN.md#12-interface-v2--icps) before writing code.
