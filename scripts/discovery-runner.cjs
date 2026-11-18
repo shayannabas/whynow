@@ -32,6 +32,7 @@ function createDiscoveryCoordinator({read,mutate,env=process.env,runtimeFactory=
       try{
         await reserveQuery(workspaceId,runId,settings);const results=await searchProvider(task.query,{runtime,env,num:10,task});const candidates=(results||[]).map(row=>candidateFromResult(task,row)).filter(Boolean);live.push(...candidates);reports.push({taskId:task.id,query:task.query,segment:task.segment,status:'complete',results:(results||[]).length,candidates:candidates.length});
       }catch(error){reports.push({taskId:task.id,query:task.query,segment:task.segment,status:'error',results:0,candidates:0,error:safeError(error)});if(['DISCOVERY_RUN_LIMIT','SERPER_MONTHLY_LIMIT'].includes(error.code))break;}
+      await updateRun(workspaceId,runId,run=>{run.tasks=[...reports];run.rawFound=seeded.length+live.length;run.plannedQueries=tasks;});
       const currentQueries=findRun(read().workspaces[workspaceId],runId).serperQueries,selection=selectBalancedCandidates(workspace,[...seeded,...live],{limit:settings.targetCount});if(currentQueries>=minimumQueries&&selection.selected.length>=settings.targetCount)break;
     }
     const selection=selectBalancedCandidates(workspace,[...seeded,...live],{limit:settings.targetCount});

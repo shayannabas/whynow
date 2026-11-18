@@ -10,13 +10,16 @@ function triggerFirstPlan(workspace,now){const searches=buildTriggerFirstTasks(w
 async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,searchProvider,newsSearchProvider,reserveQuery,settings,env,now=()=>new Date(),verify=verifyCandidate,selectCandidates,checkRun=()=>{},sizeCandidate,allowNewsFallback=false,onCandidate=()=>{},onPaywall,searchPlan,resolveIdentity,keepUnresolved=false}){
  const workspace=read().workspaces[workspaceId],plan=triggerFirstPlan(workspace,now()),candidates=[],tasks=[],rejected=[],errors=[],added=[],vendors=[];
  await mutate(state=>{const w=state.workspaces[workspaceId],changed=require('./company-identity.cjs').quarantineLegacyCandidates(w,require('./phase-a-config.cjs').phaseAConfigForWorkspace(w));if(changed.length)state.auditLog.push({schemaVersion:1,type:'legacy_discovery_quarantined',workspaceId,occurredAt:now().toISOString(),accounts:changed});return state;});
+ const progress=fn=>mutate(state=>{const run=state.workspaces[workspaceId].runs.find(row=>row.id===runId);fn(run);return state;});
  const checkRevision=()=>{checkRun();const w=read().workspaces[workspaceId],r=w.runs.find(r=>r.id===runId);if((w.profileRevision||0)!==(r.profileRevision||0)||w.status!=='active'&&!w.referenceDemo?.loadOnly||(r.playbookDigest&&require('./playbook.cjs').approvedPlaybook(w)?.approvedDigest!==r.playbookDigest))throw Object.assign(Error('Approved profile changed during discovery.'),{code:'PROFILE_CHANGED'});};
  checkRevision();
  const query=async(text,kind,details={})=>{checkRevision();await reserveQuery(workspaceId,runId,settings);const provider=kind===NEWS_KIND?newsSearchProvider:searchProvider;return provider(text,{runtime,env,num:10,tbs:details.tbs,task:{...details,kind,query:text}});};
- for(const task of searchPlan||plan.searches){if(read().workspaces[workspaceId].runs.find(r=>r.id===runId).serperQueries>=settings.maxQueries-2)break;try{const results=await query(task.query,task.kind,task),found=results.map(row=>task.kind===NEWS_KIND?candidateFromNewsResult(row,task,workspace,now()):candidateFromJobResult(row,workspace)).filter(Boolean).map(row=>({...row,...(task.icpId?{matchedIcpId:task.icpId,matchedIcpReason:'Matched the approved '+task.icpLabel+' '+(task.kind===NEWS_KIND?'news':'hiring')+' query.'}:{})}));candidates.push(...found);tasks.push({...task,status:'complete',results:results.length,candidates:found.length});}catch(e){errors.push({code:e.code||'SEARCH_FAILED',status:e.status||null});checkRun();if(e.code==='PROFILE_CHANGED')throw e;if(/LIMIT/.test(e.code||''))break;}}
+ for(const task of searchPlan||plan.searches){if(read().workspaces[workspaceId].runs.find(r=>r.id===runId).serperQueries>=settings.maxQueries-2)break;try{const results=await query(task.query,task.kind,task),found=results.map(row=>task.kind===NEWS_KIND?candidateFromNewsResult(row,task,workspace,now()):candidateFromJobResult(row,workspace)).filter(Boolean).map(row=>({...row,...(task.icpId?{matchedIcpId:task.icpId,matchedIcpReason:'Matched the approved '+task.icpLabel+' '+(task.kind===NEWS_KIND?'news':'hiring')+' query.'}:{})}));candidates.push(...found);tasks.push({...task,status:'complete',results:results.length,candidates:found.length});await progress(run=>{run.tasks=[...tasks];run.rawFound=candidates.length;});}catch(e){errors.push({code:e.code||'SEARCH_FAILED',status:e.status||null});checkRun();if(e.code==='PROFILE_CHANGED')throw e;if(/LIMIT/.test(e.code||''))break;}}
  const unique=dedupeJobCandidates(candidates);
  const selected=selectCandidates?selectCandidates(unique):unique.slice(0,plan.maxVerificationCandidates);
+ await progress(run=>{run.progress={checked:0,total:selected.length,verified:0,rejected:0};run.plannedQueries=searchPlan||plan.searches;});
  const identityMemo=new Map();
+ let checked=0;
  for(const candidate of selected){try{
    onCandidate(candidate);
    const identityKey=require('./entity-rules.cjs').normalizedEntityName(candidate.name);
@@ -78,7 +81,7 @@ async function executeTriggerFirst({read,mutate,workspaceId,runId,runtime,search
      Object.assign(run,{newAccountIds:[...added],newAccounts:added.length,vendorAccountIds:[...vendors]});
      return state;
    });
- }catch(e){errors.push({name:candidate.name,code:e.code||'VERIFICATION_FAILED',status:e.status||null});checkRun();if(e.code==='PROFILE_CHANGED')throw e;if(/LIMIT/.test(e.code||''))break;}}
+ }catch(e){errors.push({name:candidate.name,code:e.code||'VERIFICATION_FAILED',status:e.status||null});checkRun();if(e.code==='PROFILE_CHANGED')throw e;if(/LIMIT/.test(e.code||''))break;}finally{checked+=1;await progress(run=>{run.progress={checked,total:selected.length,verified:added.length,rejected:rejected.length};});}}
  await mutate(state=>{const w=state.workspaces[workspaceId],run=w.runs.find(r=>r.id===runId);Object.assign(run,{status:errors.length?'complete_with_errors':'complete',finishedAt:now().toISOString(),tasks,plannedQueries:searchPlan||plan.searches,rawFound:candidates.length,candidateChecks:selected.length,passedNoiseGate:added.length,newAccounts:added.length,newAccountIds:added,vendorAccountIds:vendors,rejectedCount:rejected.length,rejections:rejected,errors});w.budgets.discoveryCollector={day:now().toISOString().slice(0,10),...runtime.snapshot()};return state;});
  return read().workspaces[workspaceId].runs.find(r=>r.id===runId);
 }

@@ -34,6 +34,8 @@ const {accountForSearch,contactReady,personaTitles,savedPersonas}=require('../co
 
 const {saveSender,senderFirstName}=require('./sender-settings.cjs');
 const {createPersonaCoordinator}=require('../persona-runner.cjs');
+const {pipelinePage}=require('./pipeline-page.cjs');
+const {pipelineModel,pipelineProgress}=require('../pipeline.cjs');
 
 async function readSmallForm(req){
   let body='';
@@ -82,6 +84,38 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       const localAdmin=env.NODE_ENV!=='production'&&['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)&&/^(127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(req.headers.host||'');
       const activityPages={'/history':historyPage,'/runs':runsPage,'/funnel':funnelPage,'/metrics':metricsPage};
       if(req.method==='GET'&&activityPages[pathname])return html(200,activityPages[pathname](loadState(stateFile)));
+      if(req.method==='GET'&&pathname==='/pipeline')return html(200,pipelinePage(read(),requestUrl.searchParams));
+      if(req.method==='GET'&&pathname==='/pipeline/progress'){
+        if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
+        const q=requestUrl.searchParams;
+        return json(res,200,pipelineProgress(read(),{mode:q.get('mode'),step:q.get('step'),runId:q.get('run')}));
+      }
+      if(req.method==='POST'&&['/pipeline/icps/approve','/pipeline/discovery'].includes(pathname)){
+        if(!localAdmin||req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const form=await readSmallForm(req),wId=form.get('workspaceId'),current=read();
+        if(!wId||wId!==current.activeWorkspaceId)return json(res,409,{error:'Workspace changed. Refresh and try again.'});
+        const icp=pathname.endsWith('/approve'),step=icp?'4':'6';
+        try{
+          if(icp)await mutate(state=>{
+            const w=state.workspaces[wId],model=pipelineModel(w);
+            if(wId!==state.activeWorkspaceId||model.current!==4||String(w.profileRevision)!==form.get('profileRevision'))throw Error('The profile or ICPs changed. Refresh before approving.');
+            const reviewed=new Set(form.getAll('icpVersion')),pending=model.icps.filter(row=>row.status!=='approved');
+            if(!form.has('acknowledged')||pending.length!==reviewed.size||pending.some(row=>!reviewed.has(row.id+':'+row.version)))throw Error('Review and confirm the current ICP versions.');
+            const now=new Date().toISOString();
+            for(const row of pending){
+              updateIcpApproval(w,new URLSearchParams({id:row.id,version:String(row.version),acknowledged:'on'}),now);
+              state.auditLog.push({schemaVersion:1,workspaceId:wId,type:'icp_approved',icpId:row.id,version:row.version,occurredAt:now});
+            }
+            return state;
+          });
+          else {
+            const model=pipelineModel(current.workspaces[wId]);
+            if(model.current!==6)throw Error('Review the seller profile, ICPs and playbook before discovery.');
+            await discoveryCoordinator.start(wId);
+          }
+        }catch(error){return html(400,pipelinePage(read(),new URLSearchParams({step}),error.message));}
+        res.writeHead(303,{Location:icp?'/pipeline?step=5':'/pipeline?step=6'});return res.end();
+      }
       if(req.method==='GET'&&pathname==='/today')return html(200,todayPage(loadState(stateFile),'',requestUrl.searchParams));
       if(req.method==='GET'&&pathname==='/results'){
         const query=requestUrl.searchParams;

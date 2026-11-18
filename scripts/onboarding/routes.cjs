@@ -55,6 +55,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
   let form;
   try{form=await readForm(req);}catch(error){json(res,error.status||400,{error:error.message});return true;}
 
+  const guided=form.get('guided')==='1';
   if(pathname==='/onboarding/start'){
     try{
       const next=await mutate(current=>requestResearch(current,form.get('name'))),id=next.activeWorkspaceId;
@@ -62,7 +63,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
         if(providers.serperReady)void researchCoordinator.start(id).catch(()=>{});
         else try{await researchCoordinator.start(id);}catch{}
       }
-      redirect('/onboarding/results');
+      redirect(guided?'/pipeline?step=2':'/onboarding/results');
     }catch(error){html(400,nameEntryPage(state,{error:error.message,name:form.get('name'),providers}));}
     return true;
   }
@@ -72,7 +73,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
   const workspace=getWorkspace(state,id);
 
   if(pathname.startsWith('/onboarding/playbook/')){
-    try{await mutate(current=>{if(current.activeWorkspaceId!==id)throw Error('Workspace changed. Refresh and try again.');return require('../playbook.cjs').reviewPlaybook(current,id,{action:pathname.endsWith('/save')?'save':'approve',revision:form.get('revision'),profileRevision:form.get('profileRevision'),raw:require('./playbook-page.cjs').parsePlaybookForm(form),acknowledged:form.has('acknowledged')});});redirect('/onboarding/profile');}
+    try{await mutate(current=>{if(current.activeWorkspaceId!==id)throw Error('Workspace changed. Refresh and try again.');return require('../playbook.cjs').reviewPlaybook(current,id,{action:pathname.endsWith('/save')?'save':'approve',revision:form.get('revision'),profileRevision:form.get('profileRevision'),raw:require('./playbook-page.cjs').parsePlaybookForm(form),acknowledged:form.has('acknowledged')});});redirect(guided?'/pipeline?step=6':'/onboarding/profile');}
     catch(error){html(400,profilePage(state,{error:error.message}));}return true;
   }
 
@@ -97,9 +98,9 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
         const qualityReasons=Object.fromEntries([...form].filter(([key])=>key.startsWith('qualityReason.')).map(([key,value])=>[key.slice('qualityReason.'.length),value]));
         if(pathname.endsWith('/restore-competitor'))return restoreCompetitor(current,id,{candidateId:form.get('candidateId'),revision:form.get('revision')});
         if(pathname.endsWith('/confirm-domain'))return require('./domain-suggestions.cjs').confirmDomain(current,id,{suggestionId:form.get('suggestionId'),revision:form.get('revision')});
-        return pathname.endsWith('/save')?saveManualProfile(current,id,form):approveManualProfile(current,id,{revision:form.get('revision'),acknowledged:form.has('acknowledged'),qualityReasons});
+        return pathname.endsWith('/save')?saveManualProfile(current,id,form):approveManualProfile(current,id,{revision:form.get('revision'),acknowledged:form.has('acknowledged'),qualityReasons,reviewIcps:!guided});
       });
-      redirect('/onboarding/profile');
+      redirect(guided?'/pipeline?step=4':'/onboarding/profile');
     }catch(error){html(400,profilePage(state,{error:error.message,submitted:pathname.endsWith('/save')?form:null}));}
     return true;
   }
@@ -117,7 +118,7 @@ async function onboardingRoute({req,res,pathname,state,mutate,env,researchCoordi
         if(!synthesisCoordinator)throw new Error('Drafting coordinator is unavailable.');
         await synthesisCoordinator.start(id,{wait:false,requireActive:true});
       }
-      redirect('/onboarding/results');
+      redirect(guided?'/pipeline?step=2':'/onboarding/results');
     }catch(error){html(400,researchPage(state,{error:error.message,providers}));}
     return true;
   }

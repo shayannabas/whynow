@@ -230,7 +230,7 @@ function saveManualProfile(state,id,form,{now=()=>new Date().toISOString()}={}) 
     }
   });
 }
-function approveManualProfile(state,id,{revision,acknowledged=false,qualityReasons={},now=()=>new Date().toISOString()}={}) {
+function approveManualProfile(state,id,{revision,acknowledged=false,qualityReasons={},reviewIcps=true,now=()=>new Date().toISOString()}={}) {
   const workspace=getWorkspace(state,id);checkRevision(workspace,revision);
   if(workspace.status!=='needs_review')throw new Error('Save a draft before approving it.');
   const errors=approvalProblems(workspace);if(errors.length)throw new Error(errors.join(' '));
@@ -242,7 +242,7 @@ function approveManualProfile(state,id,{revision,acknowledged=false,qualityReaso
   });
   const next=updateWorkspace(state,id,w=>{
     w.status='active';w.sellerProfile.approvedAt=now();w.sellerProfile.deliveryAllowed=false;
-    require('../icps.cjs').approveIcps(w,w.sellerProfile.approvedAt);
+    if(reviewIcps)require('../icps.cjs').approveIcps(w,w.sellerProfile.approvedAt);
     w.icpConfig.defaultsReviewRequired=false;w.deliveryMode='demo';w.profileRevision+=1;
     if(w.research?.status==='review_required'){
       w.research.status='approved';w.research.revision=(w.research.revision||0)+1;w.research.completedAt=w.sellerProfile.approvedAt;

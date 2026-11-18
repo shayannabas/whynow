@@ -4,10 +4,12 @@ const { esc } = require('../utils.cjs');
 const { getWorkspace } = require('./state.cjs');
 const { todaySections, whyNow } = require('../account-lifecycle.cjs');
 const styles = require('./styles.cjs');
+const {progressHeader,progressClient}=require('./pipeline-progress.cjs');
 
 const NAV_SECTIONS = [
   ['Pipeline', [
     ['/', 'Overview'],
+    ['/pipeline', 'Guided pipeline'],
     ['/discovery', 'New discovery'],
     ['/results', 'Results', 'accounts'],
     ['/review-queue', 'Priority leads', 'review']
@@ -166,7 +168,8 @@ function shell(state, body, title = 'Overview', activePath = '') {
   const counts = navCounts(state, workspace);
   const sellerProfileStatus = workspace?.sellerProfile?.approvedAt ? '<span>Seller profile approved</span>' : '';
   const switcher = `<form method="post" action="/workspaces/switch" class="workspace-switcher"><label for="workspace">Active workspace</label><p class="workspace-full-name">${esc(workspace?.name||'No workspace selected')}</p><div class="workspace-control"><select id="workspace" name="id" ${options ? '' : 'disabled'}>${options || '<option>No workspaces yet</option>'}</select>${options ? '<button type="submit">Switch</button>' : ''}</div></form>`;
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B0F14"><title>${esc(title)} · WhyNow</title><style>${styles}</style><script>${clientScript}</script></head><body><div class="layout"><aside class="side" aria-label="App sidebar"><div class="side-head"><a class="logo" href="/" aria-label="WhyNow overview"><span class="logo-mark" aria-hidden="true">W</span><span>WhyNow</span></a><button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="primary-nav" aria-expanded="false">Menu</button></div>${switcher}<nav id="primary-nav" class="nav" aria-label="Primary navigation">${navHtml(path, counts)}</nav><footer class="sidebar-footer"><span>${esc(workspace?.name || 'Local workspace')}</span>${sellerProfileStatus}<span>Demo mode · no send path</span></footer></aside><main tabindex="-1"><div class="ss-page-body">${body}</div></main></div></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B0F14"><title>${esc(title)} · WhyNow</title><style>${styles}</style><script>${clientScript}
+${progressClient}</script></head><body><div class="layout"><aside class="side" aria-label="App sidebar"><div class="side-head"><a class="logo" href="/" aria-label="WhyNow overview"><span class="logo-mark" aria-hidden="true">W</span><span>WhyNow</span></a><button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="primary-nav" aria-expanded="false">Menu</button></div>${switcher}<nav id="primary-nav" class="nav" aria-label="Primary navigation">${navHtml(path, counts)}</nav><footer class="sidebar-footer"><span>${esc(workspace?.name || 'Local workspace')}</span>${sellerProfileStatus}<span>Demo mode · no send path</span></footer></aside><main tabindex="-1">${progressHeader(state)}<div class="ss-page-body">${body}</div></main></div></body></html>`;
 }
 
 function sevenDaySeries(accounts, now = new Date()) {

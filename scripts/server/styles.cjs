@@ -197,6 +197,37 @@ const INTERFACE_CSS = `
 .v21-query-list li{margin:8px 0}
 .v21-query-list code{display:block;white-space:pre-wrap;overflow-wrap:anywhere}
 .v21-sender input{margin-left:8px}
+
+.v21-progress-wrap{position:sticky;top:8px;z-index:18;display:flex;justify-content:flex-end;margin:0 0 8px;pointer-events:none}
+.v21-progress{position:relative;pointer-events:auto}
+.v21-progress>summary{display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;min-height:30px;padding:5px 11px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow-sm);font-size:12px;font-weight:750}
+.v21-progress progress{width:48px;height:6px;accent-color:var(--accent)}
+.v21-progress-pop{position:absolute;top:calc(100% + 6px);right:0;min-width:min(330px,90vw);max-height:65vh;overflow:auto;background:var(--surface);padding:16px;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-md);font-size:13px}
+.v21-progress-pop h2,.v21-progress-pop h3{margin:0;font-size:15px}
+.v21-progress-pop ul,.v21-progress-pop ol{padding-left:20px}
+.v21-progress-pop li{margin:4px 0}
+.v21-stepper{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}
+.v21-step{min-width:112px;flex:1;display:flex;align-items:center;gap:7px;padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);text-decoration:none;font-size:12px;font-weight:730}
+.v21-step-icon{display:grid;place-items:center;flex:0 0 20px;height:20px;border-radius:50%;background:var(--neutral-soft)}
+.v21-step.current{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent-strong)}
+.v21-step.done .v21-step-icon{color:var(--accent-strong)}
+.v21-step.locked{color:var(--ink-2);background:var(--canvas)}
+.v21-guide-card{width:min(900px,100%);margin:0 auto;display:grid;gap:14px;align-items:start;animation:v21-enter .22s ease-out}
+.v21-guide-card h2,.v21-guide-card p{margin:0}
+.v21-guide-card>.ss-btn{justify-self:start}
+.v21-guide-form{display:grid;gap:10px;justify-items:start}
+.v21-guide-form label{width:100%;display:block}
+.v21-guide-form textarea{display:block;width:100%;margin:5px 0;font:inherit}
+.v21-guide-form input:not([type=checkbox]){display:block;width:min(500px,100%);margin-top:6px}
+.v21-guide-form button{width:auto}
+.v21-guide-nav:not(:empty){border-top:1px solid var(--line);padding-top:12px}
+.v21-step-items{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.v21-step-items li{display:flex;justify-content:space-between;gap:10px;align-items:start;padding:9px 10px;border:1px solid var(--line);border-radius:8px}
+.v21-stat-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(145px,100%),1fr))}
+.v21-stat-grid>div{padding:12px;display:grid;gap:6px;border-radius:10px;background:var(--canvas);border:1px solid var(--line)}
+.v21-stat-grid strong{font-size:23px;line-height:1.2}
+@keyframes v21-enter{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:960px){.v21-progress-wrap{position:relative;top:auto}}
 .v2-settings{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;max-width:450px}
 .nav a,.workspace-full-name,.sidebar-footer span,.kill-item,.ss-badge{white-space:normal;overflow-wrap:anywhere}
 `;
