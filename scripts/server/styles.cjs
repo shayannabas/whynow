@@ -174,6 +174,29 @@ const INTERFACE_CSS = `
 .v2-persona-form{display:grid;gap:7px;margin-top:8px}
 .v2-role-list{display:grid;gap:8px}
 .v2-role-list li{display:flex;gap:10px;flex-wrap:wrap}
+
+.v21-timing,.v21-person-head,.v21-sender{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.v21-timing>span+span:before{content:"·";margin-right:10px;color:var(--ink-2)}
+.brief-company,.v21-icp-summary{overflow-wrap:anywhere}
+.brief-hero .ss-badge{min-height:22px;padding:3px 9px;line-height:1.3;white-space:nowrap}
+.score-box small{display:block;color:var(--ink-2);margin-top:4px}
+.v21-account-actions summary{cursor:pointer;font-weight:750}
+.v21-account-actions form{margin-top:12px;display:grid;gap:8px}
+.v21-tier-tabs.v2-chips{flex-wrap:nowrap;overflow-x:auto;min-width:0;padding-bottom:3px}
+.v21-tier-tabs .v2-chip{flex:none}
+.v21-priority .lead-rail{min-width:0}
+.v21-lead-list .v2-lead,.v2-lead{padding:9px 11px}
+.v21-person-head{justify-content:space-between;align-items:flex-start}
+.v21-person-head h2,.v21-person h3{margin:0}
+.v21-person-head form{margin:0}
+.v21-person-head form button,.v21-persona-draft button,.v21-persona-form button{width:auto}
+.v21-person-list{display:grid;grid-template-columns:minmax(0,1fr);margin:12px 0}
+.v21-person .ss-badge{justify-self:start}
+.v21-persona-draft{border-top:1px solid var(--line);margin-top:8px;padding-top:8px;display:grid;gap:8px}
+.v21-draft-body{white-space:pre-wrap}
+.v21-query-list li{margin:8px 0}
+.v21-query-list code{display:block;white-space:pre-wrap;overflow-wrap:anywhere}
+.v21-sender input{margin-left:8px}
 .v2-settings{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;max-width:450px}
 .nav a,.workspace-full-name,.sidebar-footer span,.kill-item,.ss-badge{white-space:normal;overflow-wrap:anywhere}
 `;

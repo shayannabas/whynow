@@ -32,6 +32,7 @@ const {icpStudio,priorityLeads,settingsPage,exportsPage}=require('./targeting-pa
 const {editIcp,updateIcpApproval}=require('../icps.cjs');
 const {accountForSearch,contactReady,personaTitles,savedPersonas}=require('../collectors/apollo-people.cjs');
 
+const {saveSender,senderFirstName}=require('./sender-settings.cjs');
 const {createPersonaCoordinator}=require('../persona-runner.cjs');
 
 async function readSmallForm(req){
@@ -89,6 +90,13 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
       if(req.method==='GET'&&pathname==='/review-queue')return html(200,priorityLeads(read(),requestUrl.searchParams));
       if(req.method==='GET'&&pathname==='/icp-studio')return html(200,icpStudio(read(),requestUrl.searchParams));
       if(req.method==='GET'&&pathname==='/settings')return html(200,settingsPage(read(),env));
+      if(req.method==='POST'&&pathname==='/settings/outreach'){
+        if(!localAdmin||req.headers.origin!==`http://${req.headers.host}`)return json(res,403,{error:'Use the local page form'});
+        const fields=await readSmallForm(req);
+        try{await mutate(state=>saveSender(state,fields.get('senderFirstName')));}
+        catch(error){return html(400,settingsPage(read(),env,error.message));}
+        res.writeHead(303,{Location:'/settings'});return res.end();
+      }
       if(req.method==='GET'&&pathname==='/exports')return html(200,exportsPage(read()));
       if(req.method==='GET'&&pathname==='/results/export'){
         if(!localAdmin)return json(res,403,{error:'Local administrator access only'});
@@ -170,10 +178,10 @@ function createRouter({stateFile,env=process.env,runtimeFactory=options=>new Col
               const {personaKey}=require('./personas-page.cjs');
               const person=savedPersonas(account).find(row=>personaKey(row)===fields.get('personaKey'));
               if(!person||!personaTitles(workspace,account).includes(person.matchedRole))throw Error('The saved persona no longer matches approved roles.');
-              return createTemplateDraft(current,workspaceId,accountId,{title:person.matchedRole,senderFirstName:fields.get('senderFirstName'),demoMergeField:'true'},{approvedRole:person.matchedRole});
+              return createTemplateDraft(current,workspaceId,accountId,{title:person.matchedRole,senderFirstName:senderFirstName(current),demoMergeField:'true'},{approvedRole:person.matchedRole,personaKey:personaKey(person)});
             });
           }catch(error){return showError(error.message);}
-          res.writeHead(303,{Location:location+'?tab=outreach'});return res.end();
+          res.writeHead(303,{Location:location+'?tab=personas'});return res.end();
         }
         try{await personaCoordinator.start(workspaceId,{accountIds:[accountId],requireActive:true});}
         catch(error){return showError(error.message);}

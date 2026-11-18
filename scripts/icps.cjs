@@ -97,11 +97,11 @@ function updateIcpApproval(workspace,form,now){
   workspace.icps=rows.map(item=>item.id!==row.id?item:{...item,status:'approved',approvedAt:now});
 }
 
-function buildIcpDiscoveryTasks(workspace,now=new Date()){
-  const playbook=approvedPlaybook(workspace);
+function buildIcpDiscoveryTasks(workspace,now=new Date(),previewIcp){
+  const playbook=previewIcp?playbookFor(workspace):approvedPlaybook(workspace);
   if(!playbook||workspace.referenceDemo?.loadOnly)return null;
   const quote=value=>'"'+String(value).replace(/["\r\n]/g,' ').slice(0,90)+'"';
-  const icps=discoveryIcps(workspace);
+  const icps=previewIcp?[previewIcp]:discoveryIcps(workspace);
   if(!icps.length)return null;
   const pairs=playbook.triggers.flatMap(rule=>icps.filter(icp=>icp.triggerIds.includes(rule.id)&&rule.keywords?.length).map(icp=>({rule,icp})));
   const hosts=[['greenhouse','(site:job-boards.greenhouse.io OR site:boards.greenhouse.io)'],['lever','site:jobs.lever.co'],['ashby','site:jobs.ashbyhq.com']];
